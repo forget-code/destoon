@@ -1,0 +1,25 @@
+<?php
+defined('IN_DESTOON') or exit('Access Denied');
+$MCFG = array();
+$MCFG['module'] = 'photo';
+$MCFG['name'] = 'Í¼¿â';
+$MCFG['author'] = 'Destoon.COM';
+$MCFG['homepage'] = 'www.destoon.com';
+$MCFG['copy'] = false;
+$MCFG['uninstall'] = true;
+$MCFG['moduleid'] = 12;
+
+$RT = array();
+$RT['file']['index'] = 'Í¼¿â¹ÜÀí';
+$RT['file']['html'] = '¸üÐÂÍøÒ³';
+
+$RT['action']['index']['add'] = 'Ìí¼ÓÍ¼¿â';
+$RT['action']['index']['edit'] = 'ÐÞ¸ÄÍ¼¿â';
+$RT['action']['index']['delete'] = 'É¾³ýÍ¼¿â';
+$RT['action']['index']['check'] = 'ÉóºËÍ¼¿â';
+$RT['action']['index']['recycle'] = '»ØÊÕÕ¾';
+$RT['action']['index']['move'] = 'Í¼¿âÒÆ¶¯';
+$RT['action']['index']['level'] = 'ÐÅÏ¢¼¶±ð';
+
+$CT = true;
+?>

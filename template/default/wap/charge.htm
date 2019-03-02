@@ -1,0 +1,11 @@
+{template 'header', 'wap'}
+³äÖµ¿¨³äÖµ<br/>
+<form action="index.php" method="post">
+<input type="hidden" name="moduleid" value="{$moduleid}"/>
+<input type="hidden" name="action" value="{$action}"/>
+<input type="hidden" name="forward" value="{$forward}"/>
+¿¨ºÅ:<input type="text" name="number" size="10"/><br/>
+ÃÜÂë:<input type="text" name="password" size="10"/><br/>
+<input type="submit" name="submit" value="³äÖµ"/>
+</form>
+{template 'footer', 'wap'}
