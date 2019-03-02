@@ -58,7 +58,7 @@ class ClientResponseHandler  {
 	//一般PHP5环境下没问题，PHP4需要检测一下环境是否安装了iconv以及simplexml模块
 	function setContent($content) {
 		$this->content = $content;
-		
+		if(function_exists('libxml_disable_entity_loader')) libxml_disable_entity_loader(true);
 		$xml = simplexml_load_string($this->content);
 		$encode = $this->getXmlEncode($this->content);
 		

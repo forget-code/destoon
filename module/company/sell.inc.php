@@ -39,6 +39,7 @@ if($itemid) {
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $keyword;
 	$head_description = $introduce ? $introduce : $title;
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);;
 } else {
 	$typeid = isset($typeid) ? intval($typeid) : 0;
 	$view = isset($view) ? 1 : 0;
@@ -46,7 +47,16 @@ if($itemid) {
 	$condition = "username='$username' AND status=3";
 	if($typeid) {
 		$MTYPE = get_type('product-'.$userid);
-		$condition .= " AND mycatid='$typeid'";
+		if($MTYPE[$typeid]['parentid']) {
+			$condition .= " AND mycatid='$typeid'";
+		} else {
+			$cids = $typeid.',';
+			foreach($MTYPE as $k=>$v) {
+				if($v['parentid'] == $typeid) $cids .= $k.',';
+			}
+			$cids = substr($cids, 0, -1);
+			$condition .= " AND mycatid IN ($cids)";
+		}
 		$url .= "&typeid=$typeid";
 		$head_title = $MTYPE[$typeid]['typename'].$DT['seo_delimiter'].$head_title;
 	}
@@ -81,6 +91,7 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($typeid ? '&typeid='.$typeid : '').($page > 1 ? '&page='.$page : '');
 }
 include template('sell', $template);
 ?>

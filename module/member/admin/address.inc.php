@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/address.class.php';
 $do = new address();
 $menus = array (
@@ -35,6 +35,7 @@ switch($action) {
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
+		if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 		if($username) $condition .= " AND username='$username'";
 		$lists = $do->get_list($condition, 'itemid DESC');
 		include tpl('address', $module);

@@ -1,17 +1,18 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-//show_menu($menus);
+show_menu($menus);
 ?>
 <script type="text/javascript">
 var _del = 0;
 </script>
 <form action="?">
-<div class="tt">[<?php echo $P['title'];?>]选项搜索</div>
+<div class="tt">选项搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
+<input type="hidden" name="pollid" value="<?php echo $pollid;?>"/>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
@@ -31,7 +32,8 @@ var _del = 0;
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<div class="tt">[<?php echo $P['title'];?>]选项管理</div>
+<input type="hidden" name="pollid" value="<?php echo $pollid;?>"/>
+<div class="tt">选项管理</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="40">删除</th>
@@ -56,7 +58,7 @@ var _del = 0;
 <td><input name="post[<?php echo $v['itemid'];?>][thumb]" type="text" size="15" value="<?php echo $v['thumb'];?>" id="thumb_<?php echo $v['itemid'];?>"/>&nbsp;&nbsp;<span onclick="Dthumb(<?php echo $moduleid;?>,<?php echo $P['thumb_width'];?>,<?php echo $P['thumb_height'];?>,Dd('thumb_<?php echo $v['itemid'];?>').value,0,'thumb_<?php echo $v['itemid'];?>');" class="jt"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_upload.gif" width="12" height="12" title="上传"/></span>&nbsp;&nbsp;<span onclick="_preview(Dd('thumb_<?php echo $v['itemid'];?>').value);" class="jt"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_preview.gif" width="12" height="12" title="预览"/></span>&nbsp;&nbsp;<span onclick="Dd('thumb_<?php echo $v['itemid'];?>').value='';" class="jt"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_delete.gif" width="12" height="12" title="删除"/></span></td>
 <td><input name="post[<?php echo $v['itemid'];?>][polls]" type="text" size="3" value="<?php echo $v['polls'];?>"/></td>
 <td><script type="text/javascript">perc(<?php echo $v['polls'];?>,<?php echo $P['polls'];?>,'60px');</script></td>
-<td><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=record&pollid=<?php echo $v['pollid'];?>&itemid=<?php echo $v['itemid'];?>', '[<?php echo $P['title'];?>] 投票记录');"><img src="admin/image/poll.png" width="16" height="16" title="投票记录" alt=""/></a></td>
+<td><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=record&pollid=<?php echo $v['pollid'];?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/poll.png" width="16" height="16" title="投票记录" alt=""/></a></td>
 </tr>
 <?php } ?>
 <tr>
@@ -87,10 +89,10 @@ var _del = 0;
 </td>
 </tr>
 <tr>
-<td colspan="8"><div class="pages"><?php echo $pages;?></div></td>
+<td colspan="9"><div class="pages"><?php echo $pages;?></div></td>
 </tr>
 </table>
 </form>
 <?php load('clear.js'); ?>
-<script type="text/javascript">Menuon(1);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

@@ -16,7 +16,7 @@ switch($action) {
 		} else {
 			message($L['mail_msg_not_add']);
 		}
-		dmsg($L['mail_msg_cancel'], $MOD['linkurl'].'mail.php');
+		dmsg($L['mail_msg_cancel'], '?action=index');
 	break;
 	case 'show':
 		$itemid or message();

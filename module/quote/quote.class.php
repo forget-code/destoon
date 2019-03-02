@@ -10,7 +10,7 @@ class quote {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function quote($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -20,21 +20,27 @@ class quote {
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','thumb','tag','status','hits','username','addtime','adddate', 'editor','edittime','ip','template', 'linkurl','filepath','note');
     }
 
+    function quote($moduleid) {
+		$this->__construct($moduleid);
+    }
+
 	function pass($post) {
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_catid'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
 		if(!$post['content']) return $this->_(lang('message->pass_content'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		is_url($post['thumb']) or $post['thumb'] = '';
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['adddate'] = timetodate($post['addtime'], 3);
 		$post['edittime'] = $DT_TIME;
 		$post['fee'] = dround($post['fee']);
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($post['content'] && isset($post['clear_link']) && $post['clear_link']) $post['content'] = clear_link($post['content']);
@@ -44,10 +50,10 @@ class quote {
 		if($this->itemid) {
 			$post['editor'] = $_username;
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 		} else {
 			$post['username'] = $post['editor'] = $_username;
@@ -61,8 +67,15 @@ class quote {
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'addtime DESC', $cache = '') {
@@ -74,6 +87,7 @@ class quote {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -112,7 +126,7 @@ class quote {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -132,7 +146,7 @@ class quote {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'], $this->itemid);
 		if($post['status'] == 3) $this->tohtml($this->itemid, $post['catid']);
@@ -246,7 +260,7 @@ class quote {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}

@@ -14,10 +14,11 @@
 <script type="text/javascript" src="{DT_STATIC}file/script/member.js"></script>
 </head>
 <body>
-{if $action == 'item'}
+{if $job == 'item'}
 <form action="?">
 <div class="tt">{$MODULE[$mid][name]}搜索</div>
 <input type="hidden" name="action" value="{$action}"/>
+<input type="hidden" name="job" value="{$job}"/>
 <input type="hidden" name="from" value="{$from}"/>
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="username" value="{$username}"/>
@@ -27,7 +28,7 @@
 &nbsp;&nbsp;关键词：<input type="text" size="40" name="kw" id="kw" value="{$kw}" title="关键词"/>&nbsp;
 {$MODULE[$mid][name]}ID：<input type="text" size="10" name="itemid" value="{$itemid}">&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?action={$action}&mid={$mid}&from={$from}&username={$username}');"/>
+<input type="button" value="重 置" class="btn" onclick="Go('?action={$action}&job={$job}&mid={$mid}&from={$from}&username={$username}');"/>
 </td>
 </tr>
 </table>
@@ -79,8 +80,8 @@ function S(itemid, title, linkurl, thumb, introduce, level, style) {
 		parent.Dd('linkurl').value=linkurl;
 		parent.Dd('thumb').value=thumb;
 		parent.Dd('introduce').value=Dd('introduce_'+itemid).innerHTML;
-		parent.select_op('level', level);		
 		parent.color_select(style);
+		parent.$('#level').val(level);
 		{elseif $from == 'relate'}
 		parent.Dd('id').value=itemid;
 		parent.Dd('dform_add').submit();
@@ -102,6 +103,7 @@ try{parent.Dd('Dtop').style.top=new_top+'px';}catch(e){}
 <div class="tt">{$MODULE[$mid][name]}搜索</div>
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="action" value="{$action}"/>
+<input type="hidden" name="job" value="{$job}"/>
 <input type="hidden" name="from" value="{$from}"/>
 <input type="hidden" name="fid" value="{$fid}"/>
 <table cellpadding="2" cellspacing="1" class="tb">
@@ -109,7 +111,7 @@ try{parent.Dd('Dtop').style.top=new_top+'px';}catch(e){}
 <td>
 <input type="text" size="60" name="kw" id="kw" value="{$kw}" title="关键词"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="返 回" class="btn" onclick="Go('?from={$from}&fid={$fid}');"/>&nbsp;
+<input type="button" value="返 回" class="btn" onclick="Go('?action={$action}&job={$job}&from={$from}&fid={$fid}');"/>&nbsp;
 <input type="button" value="上 传" class="btn" onclick="window.open('{$DT[file_my]}?mid=12&action=add');"/>&nbsp;
 <input type="button" value="关 闭" class="btn" onclick="{if $from == 'album'}window.parent.cDialog();{else}window.close();{/if}"/>
 </td>
@@ -118,8 +120,8 @@ try{parent.Dd('Dtop').style.top=new_top+'px';}catch(e){}
 </form>
 {/if}
 <style>
-.photo {width:115px;height:115px;overflow:hidden;float:left;text-align:center;padding:10px;}
-.photo_img {padding:3px;border:#CCCCCC 1px solid;margin:0 0 5px 0;background:#FFFFFF;cursor:pointer;}
+.photo {width:115px;height:130px;overflow:hidden;float:left;text-align:center;padding:10px;}
+.photo_img {width:100px;height:100px;overflow:hidden;padding:3px;margin:0 auto 8px auto;background:#FFFFFF;border:#CCCCCC 1px solid;cursor:pointer;}
 </style>
 {if $itemid || $DT['uploadlog']}
 <script type="text/javascript">
@@ -140,9 +142,8 @@ function S(t, m, l) {
 {if $lists}
 {loop $lists $k $v}
 <div class="photo">
-<img src="{$v[thumb]}" width="100" title="{$v[introduce]}" onclick="S('{$v[thumb]}','{$v[middle]}','{$v[large]}');" class="photo_img"/>
-<a href="{$v[large]}" target="_blank" class="t"><img src="{DT_SKIN}image/zoomin.gif"/></a>&nbsp;&nbsp;
-<a href="{$v[middle]}" target="_blank" class="t"><img src="{DT_SKIN}image/zoomout.gif"/></a>
+	<div class="photo_img"><img src="{$v[thumb]}" width="100" title="{$v[introduce]}" onclick="S('{$v[thumb]}','{$v[middle]}','{$v[large]}');"/></div>
+	<div><a href="{$v[large]}" target="_blank"><img src="{DT_SKIN}image/zoomin.gif"/></a>&nbsp;&nbsp;<a href="{$v[middle]}" target="_blank"><img src="{DT_SKIN}image/zoomout.gif"/></a></div>
 </div>
 {/loop}
 <div class="c_b"></div>

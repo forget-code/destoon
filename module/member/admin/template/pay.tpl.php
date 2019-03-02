@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -57,7 +57,7 @@ show_menu($menus);
 <td class="f_blue"><?php echo $v['fee'];?></td>
 <td><?php echo $v['currency'] == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?></td>
 <td><?php echo $MODULE[$v['moduleid']]['name'];?></td>
-<td><a href="<?php echo $EXT['linkurl'];?>redirect.php?mid=<?php echo $v['moduleid'];?>&itemid=<?php echo $v['itemid'];?>" target="_blank"><?php echo $v['title'];?></a></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $v['moduleid'];?>&itemid=<?php echo $v['itemid'];?>" target="_blank"><?php echo $v['title'];?></a></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a></td>
 <td><a href="javascript:_ip('<?php echo $v['ip'];?>');"><?php echo $v['ip'];?></a></td>
 <td class="px11"><?php echo $v['paytime'];?></td>

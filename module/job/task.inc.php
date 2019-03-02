@@ -55,7 +55,7 @@ if($html == 'show') {
 		}
 	}
 	include DT_ROOT.'/include/update.inc.php';	
-	if($MOD['show_html'] && $edittime > @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl'])) tohtml('show', $module);
+	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
 	if($MOD['list_html'] && $task_list && $CAT) {

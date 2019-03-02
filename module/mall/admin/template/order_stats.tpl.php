@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -63,5 +63,5 @@ if (swfobject.hasFlashPlayerVersion("8")) {
 </td>
 </tr>
 </table>
-<script type="text/javascript">Menuon(2);</script>
+<script type="text/javascript">Menuon(3);</script>
 <?php include tpl('footer');?>

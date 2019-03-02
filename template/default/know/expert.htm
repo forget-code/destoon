@@ -7,13 +7,13 @@
 		<table cellpadding="5" cellspacing="1" width="100%" bgcolor="#DDDDDD">			
 		<tr bgcolor="#FFFFFF">
 		<td rowspan="4" align="center">
-		<img src="{useravatar($username, 'large')}" width="100" alt=""/>
+		<img src="{useravatar($username, 'large')}" width="100" height="100" alt=""/>
 		{if $DT[im_web]}<div style="padding:8px 0 5px 0;">{im_web($username, 1)}</div>{/if}	
 		</td>
 		<td align="center" width="120">姓 名</td>
 		<td width="280">{$title}</td>
-		<td align="center" width="120">擅长领域</td>
-		<td width="280">{$major}</td>
+		<td align="center" width="120">昵 称</td>
+		<td width="280">{$passport}</td>
 		</tr>
 		<tr bgcolor="#FFFFFF">
 		<td align="center">被提问</td>
@@ -32,6 +32,12 @@
 		<td>{$hits}</td>
 		<td align="center">求 助</td>
 		<td><a href="{$MODULE[2][linkurl]}{$DT[file_my]}?mid=10&action=add&askto={$username}" target="_blank" class="b">向TA提问</a></td>
+		</tr>
+		<tr>
+		<td colspan="5" bgcolor="#EEEEEE">&nbsp;&nbsp;<strong>擅长领域</strong></td>
+		</tr>
+		<tr>
+		<td colspan="5" bgcolor="#FFFFFF"><div class="pd10 lh18 px14">{$major}</div></td>
 		</tr>
 		<tr>
 		<td colspan="5" bgcolor="#EEEEEE">&nbsp;&nbsp;<strong>专家介绍</strong></td>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -13,7 +13,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件分类</td>
-<td><?php echo type_select('mail', 1, 'typeid', '请选择分类', $typeid, 'id="typeid"');?> <img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类" class="c_p" onclick="Dwidget('?file=type&item=<?php echo $file;?>', '订阅分类');"/> <span id="dtypeid" class="f_red"></span></td>
+<td><span id="type_box"><?php echo type_select($TYPE, 1, 'typeid', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='mail',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=mail', '订阅分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件标题</td>
@@ -21,7 +21,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件内容</td>
-<td><textarea name="content" id="content" class="dsn"><?php echo $content;?></textarea><?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<td><textarea name="content" id="content" class="dsn"><?php echo $content;?></textarea><?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 </table>

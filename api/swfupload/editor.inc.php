@@ -19,12 +19,12 @@ $swf_is_admin = defined('DT_ADMIN');
 	//window.onload = function () {
 		swfu = new SWFUpload({
 			// Backend Settings
-			upload_url: "<?php echo $swf_is_admin ? DT_PATH : $MODULE[1]['linkurl'];?>upload.php",
+			upload_url: UPPath,
 			post_params: {"from": "photo", "width": "100", "height": "100", "swf_userid": "<?php echo $_userid;?>", "swf_username": "<?php echo $_username;?>", "swf_groupid": "<?php echo $_groupid;?>", "swf_company": "<?php echo $_company;?>", "swf_auth": "<?php echo md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP);?>", "swfupload": "1"},
 
 			// File Upload Settings
 			file_size_limit : "32 MB",	// 32MB
-			file_types : "*.jpg;*.jpeg,*.gif;*.png",
+			file_types : "*.jpg;*.jpeg;*.gif;*.png",
 			file_types_description : "Images",
 			file_upload_limit : swfu_max,
 

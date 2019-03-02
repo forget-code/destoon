@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $MCFG = array();
 $MCFG['module'] = 'special';
 $MCFG['name'] = '专题';
@@ -18,6 +18,7 @@ $RT['action']['index']['add'] = '添加专题';
 $RT['action']['index']['edit'] = '修改专题';
 $RT['action']['index']['delete'] = '删除专题';
 $RT['action']['index']['check'] = '审核专题';
+$RT['action']['index']['reject'] = '未通过';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '专题移动';
 $RT['action']['index']['level'] = '信息级别';

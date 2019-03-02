@@ -1,7 +1,8 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
+$category_title = isset($category_title) ? strip_tags($category_title) : '';
 $category_title = convert($category_title, 'UTF-8', DT_CHARSET);
-$category_extend = isset($category_extend) ? stripslashes($category_extend) : '';
+$category_extend = isset($category_extend) ? decrypt($category_extend, DT_KEY.'CAT') : '';
 $category_moduleid = isset($category_moduleid) ? intval($category_moduleid) : 1;
 if(!$category_moduleid) exit;
 $category_deep = isset($category_deep) ? intval($category_deep) : 0;

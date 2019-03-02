@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 var d_date, c_year, c_month, t_year, t_month, t_day, v_year, v_month, v_day, ca_sep, ca_id, ca_interval, ca_timeout;

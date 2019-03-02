@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $MCFG['module'] = 'video';
 $MCFG['name'] = '视频';
 $MCFG['author'] = 'DESTOON.COM';
@@ -17,7 +17,7 @@ $RT['action']['index']['edit'] = '修改视频';
 $RT['action']['index']['delete'] = '删除视频';
 $RT['action']['index']['check'] = '审核视频';
 $RT['action']['index']['expire'] = '过期视频';
-$RT['action']['index']['reject'] = '未通过视频';
+$RT['action']['index']['reject'] = '未通过';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '移动视频';
 $RT['action']['index']['level'] = '视频级别';

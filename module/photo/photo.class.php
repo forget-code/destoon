@@ -11,7 +11,7 @@ class photo {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function photo($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $table_item, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -22,22 +22,27 @@ class photo {
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','thumb','banner','status','hits','open','password','question','answer','username','addtime', 'editor','edittime','ip','template', 'linkurl','filepath','domain','note');
     }
 
+    function photo($moduleid) {
+		$this->__construct($moduleid);
+    }
+
 	function pass($post) {
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_catid'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
-		if(!$post['thumb']) return $this->_(lang('message->pass_thumb'));
+		if(!is_url($post['thumb'])) return $this->_(lang('message->pass_thumb'));
 		if(!$post['password'] && $post['open'] == 2) return $this->_(lang('photo->pass_password'));
 		if(!$post['question'] && $post['open'] == 1) return $this->_(lang('photo->pass_question'));
 		if(!$post['answer'] && $post['open'] == 1) return $this->_(lang('photo->pass_answer'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
 		$post['fee'] = dround($post['fee']);
 		$post['content'] = save_local($post['content']);
@@ -47,10 +52,10 @@ class photo {
 		if($this->itemid) {
 			$post['editor'] = $_username;
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 		} else {
 			$post['username'] = $post['editor'] = $_username;
@@ -64,8 +69,15 @@ class photo {
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'addtime DESC', $cache = '') {
@@ -77,6 +89,7 @@ class photo {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -115,7 +128,7 @@ class photo {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -135,7 +148,7 @@ class photo {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'], $this->itemid);
 		if($post['status'] == 3) $this->tohtml($this->itemid, $post['catid']);
@@ -250,7 +263,7 @@ class photo {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}

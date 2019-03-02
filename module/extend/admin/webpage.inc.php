@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/webpage.class.php';
 isset($item) or $item = 1;
 $do = new webpage();
@@ -11,9 +11,7 @@ $menus = array (
     array('创建新组', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&action=group'),
     array('生成网页', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&action=html'),
 );
-
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
-
 $this_forward = '?moduleid='.$moduleid.'&file='.$file.'&item='.$item;
 switch($action) {
 	case 'add':
@@ -105,7 +103,7 @@ switch($action) {
 				$itemid = $fid + $num;
 			}
 		} else {
-			if($all) dheader("?moduleid=3&file=vote&action=html&all=1&item=$item&one=$one");
+			if($all) dheader("?moduleid=3&file=gift&action=html&all=1&item=$item&one=$one");
 			dmsg('生成成功', "?moduleid=$moduleid&file=$file&item=$item");
 		}
 		msg('ID从'.$fid.'至'.($itemid-1).'[单页]生成成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&item=$item&all=$all&one=$one");
@@ -125,7 +123,7 @@ switch($action) {
 		$sfields = array('按条件', '标题', '链接地址', '内容', '绑定域名');
 		$dfields = array('title','title','linkurl','content','domain');
 		$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序');
-		$dorder  = array('listorder DESC,itemid DESC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC');
+		$dorder  = array('listorder DESC,itemid DESC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		$level = isset($level) ? intval($level) : 0;

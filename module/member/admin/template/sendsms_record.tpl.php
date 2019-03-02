@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -51,7 +51,7 @@ show_menu($menus);
 </table>
 <div class="btns">
 <input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中记录吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete_record'}else{return false;}"/>&nbsp;
-<input type="submit" value=" 清理记录 " class="btn" onclick="if(confirm('为了系统安全,系统仅删除30天之前的记录\n此操作不可撤销，请谨慎操作')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 清理记录 " class="btn" onclick="if(confirm('为了系统安全,系统仅删除90天之前的记录\n此操作不可撤销，请谨慎操作')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear'}else{return false;}"/>&nbsp;
 </div>
 </form>
 <div class="pages"><?php echo $pages;?></div>

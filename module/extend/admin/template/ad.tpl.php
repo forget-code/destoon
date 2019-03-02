@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -42,7 +42,7 @@ show_menu($menus);
 <th>广告</th>
 <th>HTML调用代码</th>
 <th>JS调用代码</th>
-<th width="120">操作</th>
+<th width="130">操作</th>
 </tr>
 <?php foreach($places as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center" name="编辑:<?php echo $v['editor'];?>&#10;更新时间:<?php echo $v['editdate'];?>">

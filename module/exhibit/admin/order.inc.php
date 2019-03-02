@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array($MOD['name'].'管理', '?moduleid='.$moduleid),
     array('报名管理', '?moduleid='.$moduleid.'&file='.$file),
@@ -10,7 +10,7 @@ switch($action) {
 		$itemid or msg('未指定记录');
 		$item = $db->get_one("SELECT * FROM {$table_order} WHERE itemid=$itemid");
 		$item or msg('记录不存在');
-		$item['linkurl'] = $EXT['linkurl'].'redirect.php?mid='.$moduleid.'&itemid='.$item['id'];
+		$item['linkurl'] = DT_PATH.'api/redirect.php?mid='.$moduleid.'&itemid='.$item['id'];
 		$item['addtime'] = timetodate($item['addtime'], 6);
 		include tpl('order_show', $module);
 	break;
@@ -53,7 +53,7 @@ switch($action) {
 		$lists = array();
 		$result = $db->query("SELECT * FROM {$table_order} WHERE $condition ORDER BY $dorder[$order] LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
-			$r['linkurl'] = $EXT['linkurl'].'redirect.php?mid='.$moduleid.'&itemid='.$r['id'];
+			$r['linkurl'] = DT_PATH.'api/redirect.php?mid='.$moduleid.'&itemid='.$r['id'];
 			$r['addtime'] = timetodate($r['addtime'], 5);
 			$lists[] = $r;
 		}

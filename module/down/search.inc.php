@@ -96,6 +96,5 @@ $cols = 4;
 $class = '';
 $seo_file = 'search';
 include DT_ROOT.'/include/seo.inc.php';
-$template = $MOD['template_search'] ? $MOD['template_search'] : 'search';
-include template($template, $module);
+include template($MOD['template_search'] ? $MOD['template_search'] : 'search', $module);
 ?>

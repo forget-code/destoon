@@ -87,7 +87,13 @@
 				</tr>
 				{if $username && !$expired}
 				<tr>
-				<td colspan="2"><img src="{DT_SKIN}image/btn_inquiry.gif" alt="询价" class="c_p" onclick="Go('{$MOD[linkurl]}{rewrite('inquiry.php?itemid='.$itemid)}');"/></td>
+				<td colspan="2">
+				{if SELL_ORDER && $price>0 && $minamount>0 && $amount>0 && $unit}
+				<img src="{DT_SKIN}image/btn_tobuy.gif" alt="购买" class="c_p" onclick="Go('{$MOD[linkurl]}{rewrite('buy.php?itemid='.$itemid)}');"/>
+				{else}
+				<img src="{DT_SKIN}image/btn_inquiry.gif" alt="询价" class="c_p" onclick="Go('{$MOD[linkurl]}{rewrite('inquiry.php?itemid='.$itemid)}');"/>
+				{/if}
+				</td>
 				</tr>
 				{/if}
 				</table>
@@ -139,6 +145,7 @@
 	[ <a href="javascript:SendFav();">加入收藏</a> ]&nbsp;
 	[ <a href="javascript:SendPage();">告诉好友</a> ]&nbsp;
 	[ <a href="javascript:Print();">打印本文</a> ]&nbsp;
+	[ <a href="javascript:SendReport();">违规举报</a> ]&nbsp;
 	[ <a href="javascript:window.close()">关闭窗口</a> ]
 	</center>
 	<br/>

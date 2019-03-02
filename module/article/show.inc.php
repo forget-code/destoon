@@ -46,18 +46,21 @@ if($fee) {
 }
 $pages = '';
 $subtitles = count($titles);
-if(strpos($content, '[pagebreak]') !== false) {
-	$content = explode('[pagebreak]', $content);
+$total = 1;
+if(strpos($content, '<hr class="de-pagebreak" />') !== false) {
+	$content = explode('<hr class="de-pagebreak" />', $content);
 	$total = count($content);
-	$pages = showpages($item, $total, $page);
-	$content = $content[$page-1];
+	$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
+	if($pages) $pages = substr($pages, 0, strpos($pages, '<cite>'));
+	$content = isset($content[$page-1]) ? $content[$page-1] : '';
 	if($total < $subtitles) $subtitles = $total;
 }
+if($page > $total) include load('404.inc');
 if($MOD['keylink']) $content = keylink($content, $moduleid);
 include DT_ROOT.'/include/update.inc.php';
 $seo_file = 'show';
 include DT_ROOT.'/include/seo.inc.php';
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
 if($subtitle) $seo_title = $subtitle.$seo_delimiter.$seo_title;
 $template = 'show';
 if($MOD['template_show']) $template = $MOD['template_show'];

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -41,7 +41,7 @@ function sql_execute($sql) {
 }
 
 function sql_dumptable($table, $startfrom = 0, $currsize = 0) {
-	global $db, $sizelimit, $startrow, $sqlcompat, $sqlcharset, $dumpcharset, $DT_PRE;
+	global $db, $sizelimit, $startrow, $sqlcompat, $sqlcharset, $dumpcharset, $DT_PRE, $CFG;
 	if(!isset($tabledump)) $tabledump = '';
 	$offset = 100;
 	if(!$startfrom) {
@@ -63,7 +63,11 @@ function sql_dumptable($table, $startfrom = 0, $currsize = 0) {
 			$comma = "";
 			$tabledump .= "INSERT INTO `$table` VALUES(";
 			for($i = 0; $i < $numfields; $i++) {
-				$tabledump .= $comma."'".mysql_escape_string($row[$i])."'";
+				if(strpos($CFG['database'], 'mysqli') !== false) {
+					$tabledump .= $comma."'".mysqli_escape_string($db->connid, $row[$i])."'";
+				} else {
+					$tabledump .= $comma."'".mysql_escape_string($row[$i])."'";
+				}
 				$comma = ",";
 			}
 			$tabledump .= ");\n";

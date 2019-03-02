@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $mid or $mid = 1;
 $CATEGORY = cache_read('category-'.$mid.'.php');
 $MOD = cache_read('module-'.$mid.'.php');
@@ -138,7 +138,8 @@ switch($action) {
 	break;
 	case 'count':
 		require DT_ROOT.'/include/module.func.php';
-		$tb =get_table($mid);
+		$tb = get_table($mid);
+		if($mid == 18) $tb = $tb.'_group';
 		if(!isset($num)) {
 			$num = 50;
 		}
@@ -173,7 +174,7 @@ switch($action) {
 			$do->cache();
 			dmsg('更新成功', "?mid=$mid&file=$file");
 		}
-		msg('ID从'.$fid.'至'.($catid-1).'更新成功'.progress($sid, $fid, $tid), "?mid=$mid&file=$file&action=$action&sid=$sid&fid=$catid&tid=$tid&num=$num");
+		msg('ID从'.$fid.'至'.($catid-1).'更新成功'.progress($sid, $fid, $tid), "?file=$file&mid=$mid&action=$action&sid=$sid&fid=$catid&tid=$tid&num=$num");
 	break;
 	case 'ckdir':
 		if($do->get_catdir($catdir)) {
@@ -187,11 +188,11 @@ switch($action) {
 			update_category($c);
 		}
 		$do->cache();
-		dmsg('更新成功', "?mid=$mid&file=$file");
+		dmsg('更新成功', '?file='.$file.'&mid='.$mid);
 	break;
 	case 'cache':
 		$do->repair();
-		dmsg('更新成功', "?mid=$mid&file=$file");
+		dmsg('更新成功', '?file='.$file.'&mid='.$mid);
 	break;
 	case 'delete':
 		if($catid) $catids = $catid;
@@ -208,7 +209,7 @@ switch($action) {
 			update_category($CATEGORY[$catid]);
 		}		
 		$NUM > 200 ? $do->cache() : $do->repair();
-		dmsg('更新成功', $forward);
+		dmsg('更新成功', '?file='.$file.'&mid='.$mid.'&parentid='.$parentid);
 	break;
 	case 'letters':
 		$update = false;
@@ -228,7 +229,7 @@ switch($action) {
 	case 'letter':
 		isset($catname) or $catname = '';
 		if(!$catname || strpos($catname, "\n") !== false) exit('');
-		if(strtoupper(DT_CHARSET) != 'UTF-8') $catname = convert($catname, 'UTF-8', DT_CHARSET);
+		if(DT_CHARSET != 'UTF-8') $catname = convert($catname, 'UTF-8', DT_CHARSET);
 		exit($do->get_letter($catname, false));
 	break;
 	default:
@@ -252,9 +253,9 @@ class category {
 	var $catid;
 	var $category = array();
 	var $db;
-	var $table;
+	var $table;	
 
-	function category($moduleid = 1, $catid = 0) {
+	function __construct($moduleid = 1, $catid = 0) {
 		global $db, $DT_PRE, $CATEGORY;
 		$this->moduleid = $moduleid;
 		$this->catid = $catid;
@@ -262,6 +263,10 @@ class category {
 		$this->category = $CATEGORY;
 		$this->table = $DT_PRE.'category';
 		$this->db = &$db;
+	}
+
+	function category($moduleid = 1, $catid = 0) {
+		$this->__construct($moduleid, $catid);
 	}
 
 	function add($category)	{

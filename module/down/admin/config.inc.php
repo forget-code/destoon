@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $MCFG['module'] = 'down';
 $MCFG['name'] = '下载';
 $MCFG['author'] = 'DESTOON.COM';
@@ -17,7 +17,7 @@ $RT['action']['index']['edit'] = '修改下载';
 $RT['action']['index']['delete'] = '删除下载';
 $RT['action']['index']['check'] = '审核下载';
 $RT['action']['index']['expire'] = '过期下载';
-$RT['action']['index']['reject'] = '未通过下载';
+$RT['action']['index']['reject'] = '未通过';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '移动下载';
 $RT['action']['index']['level'] = '下载级别';

@@ -52,10 +52,10 @@
 	{elseif $module == 'down'}
 		<div class="downurl">
 		<ul>
-			<li><a href="{$MOD[linkurl]}down.php?auth={$auth}" class="t" rel="nofollow">主站下载</a></li>
+			<li><a href="{$MOD[linkurl]}down.php?itemid={$itemid}" class="t" rel="nofollow">主站下载</a></li>
 			{if $MIRROR}
 			{loop $MIRROR $k=>$v}
-			<li><a href="{$MOD[linkurl]}down.php?mirror={$k}&auth={$auth}" class="t" rel="nofollow">{$v[name]}镜像</a></li>
+			<li><a href="{$MOD[linkurl]}down.php?mirror={$k}&itemid={$itemid}" class="t" rel="nofollow">{$v[name]}镜像</a></li>
 			{/loop}
 			{/if}
 		</ul>
@@ -112,7 +112,7 @@
 <td>
 <a href="{$pay_url}" rel="nofollow"><img src="{DT_SKIN}image/btn_pay.gif" alt="立即支付"/></a>
 &nbsp;&nbsp;&nbsp;
-<a href="{$MODULE[2][linkurl]}{if $currency=='money'}charge.php?action=pay{else}credit.php?action=buy{/if}" rel="nofollow"><img src="{DT_SKIN}image/btn_charge.gif" alt="帐户充值"/></a>
+<a href="{$MODULE[2][linkurl]}{if $currency=='money'}charge.php?action=pay&reason=pay|{$mid}|{$itemid}{else}credit.php?action=buy{/if}" rel="nofollow"><img src="{DT_SKIN}image/btn_charge.gif" alt="帐户充值"/></a>
 </td>
 </tr>
 </table>

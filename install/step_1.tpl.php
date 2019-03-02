@@ -14,7 +14,7 @@ include IN_ROOT.'/header.tpl.php';
 <textarea style="width:100%;height:190px;margin:0 0 10px 0;">
 <?php echo $license;?>
 </textarea>
-<strong style="color:red;">注意</strong>：本软件仅限个人免费使用，非个人用户(公司、协会、政府部门等)必须购买授权后正式建站
+<strong style="color:red;">注意</strong>：本软件仅限个人免费使用，非个人用户(公司、协会等组织机构)必须购买授权后正式建站
 </div>
 </div>
 <div class="foot">

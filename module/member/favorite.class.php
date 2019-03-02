@@ -7,11 +7,15 @@ class favorite {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function favorite() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'favorite';
 		$this->db = &$db;
 		$this->fields = array('listorder', 'userid','typeid','title','style','url','addtime','note');
+    }
+
+    function favorite() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -40,12 +44,13 @@ class favorite {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['title'] = set_style($r['title'], $r['style']);
-			$r['url'] = $MODULE[3]['linkurl'].'redirect.php?url='.urlencode(fix_link($r['url']));
+			$r['url'] = DT_PATH.'api/redirect.php?url='.urlencode(fix_link($r['url']));
 			$r['type'] = $r['typeid'] && isset($TYPE[$r['typeid']]) ? set_style($TYPE[$r['typeid']]['typename'], $TYPE[$r['typeid']]['style']) : $L['default_type'];
 			$lists[] = $r;
 		}

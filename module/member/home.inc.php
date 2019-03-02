@@ -12,7 +12,7 @@ if($action == 'reset' && in_array($item, array('menu', 'side', 'main'))) {
 		$db->query("DELETE FROM {$DT_PRE}company_setting WHERE userid=$_userid AND item_key='$v'");
 	}
 	$tabs = array('menu'=>1, 'side'=>2, 'main'=>3);
-	dmsg($L['home_msg_reset'], 'home.php?tab='.$tabs[$item]);
+	dmsg($L['home_msg_reset'], '?tab='.$tabs[$item]);
 }
 if($submit) {
 	if(isset($reset)) {
@@ -27,7 +27,7 @@ if($submit) {
 		delete_upload($setting['banner4'], $_userid);
 		delete_upload($setting['banner5'], $_userid);
 		$db->query("DELETE FROM {$DT_PRE}company_setting WHERE userid=$_userid");
-		dmsg($L['home_msg_reset'], 'home.php?tab='.$tab);
+		dmsg($L['home_msg_reset'], '?tab='.$tab);
 	} else {
 		$HOME = get_company_setting($_userid);
 		if($HOME['background'] != $setting['background']) delete_upload($HOME['background'], $_userid);
@@ -43,16 +43,18 @@ if($submit) {
 		clear_upload($setting['background'].$setting['logo'].$setting['video'].$setting['banner'].$setting['bannerf'].$setting['banner1'].$setting['banner2'].$setting['banner3'].$setting['banner4'].$setting['banner5']);
 		$announce = $setting['announce'];
 		unset($setting['announce']);
+		$setting['stats'] = $setting['stats_type'] ? $stats[$setting['stats_type']] : '';
+		$setting['kf'] = $setting['kf_type'] ? $kf[$setting['kf_type']] : '';
 		$setting = dhtmlspecialchars($setting);
 		$setting['announce'] = dsafe($announce);
 		update_company_setting($_userid, $setting);
-		dmsg($L['home_msg_save'], 'home.php?tab='.$tab);
+		dmsg($L['home_msg_save'], '?tab='.$tab);
 	}
 } else {
 	$CS = cache_read('module-4.php');
 	$api_map = $CS['map'];
-	$api_stats = $CS['stats'];
-	$api_kf = $CS['kf'];
+	$api_stats = $CS['stats'] ? explode(',', $CS['stats']) : array();
+	$api_kf = $CS['kf'] ? explode(',', $CS['kf']) : array();
 	$menu_f = ',';
 	foreach(explode(',' , $MG['menu_c']) as $v) {
 		$menu_f .= $MFILE[$v].',';

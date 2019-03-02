@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('编辑助手', '?file='.$file),
 );
@@ -18,7 +18,7 @@ switch($action) {
 			dir_create(DT_ROOT.'/file/temp/'.$name);
 			require DT_ROOT.'/admin/unzip.class.php';
 			$zip = new unzip;
-			$zip->extract_zip(DT_ROOT.'/file/temp/'.$name.'.zip', DT_ROOT.'/file/temp/'.$name);
+			$zip->extract_zip(DT_ROOT.'/file/temp/'.$name.'.zip', DT_ROOT.'/file/temp/'.$name.'/');
 			file_del(DT_ROOT.'/file/temp/'.$name.'.zip');
 			$F = get_file(DT_ROOT.'/file/temp/'.$name);
 			if($F) {
@@ -100,7 +100,7 @@ switch($action) {
 			$dir = dirname($word);
 			$base = DT_PATH.'file/temp/'.$dir.'/';
 			$content = str_replace('src="', 'src="'.$base, $content);
-			$content = save_remote($content, 'jpg|gif|png', 1);
+			$content = save_remote($content, 'jpg|jpeg|gif|png', 1);
 			$tmp = explode('/', $dir);
 			dir_delete(DT_ROOT.'/file/temp/'.$tmp[0]);
 		}

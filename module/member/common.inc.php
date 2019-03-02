@@ -40,7 +40,7 @@ if(defined('DT_ADMIN')) {
 			if($m['moduleid'] > 4 && $m['moduleid'] != 11) $MENUMODS[] = $m['moduleid'];
 			if($m['moduleid'] == 9 && in_array(-9, $MYMODS)) $MENUMODS[] = -9;
 		}
-	}
+	}	
 }
 isset($admin_user) or $admin_user = false;
 //$AREA = cache_read('area.php');

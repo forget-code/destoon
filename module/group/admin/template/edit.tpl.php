@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $tname;?></div>
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
@@ -61,7 +61,6 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
-<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -74,16 +73,16 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 详细说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <?php
-if($MOD['swfu']) { 
+if($MOD['swfu'] && DT_EDITOR == 'fckeditor') { 
 	include DT_ROOT.'/api/swfupload/editor.inc.php';
 }
 ?>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 需要物流</td>
+<td class="tl"><span class="f_hid">*</span> 需要快递</td>
 <td>
 <input type="radio" name="post[logistic]" value="1" <?php if($logistic) echo 'checked';?> id="logistic_1"/><label for="logistic_1"> 是</label>&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[logistic]" value="0" <?php if(!$logistic) echo 'checked';?> id="logistic_0"/><label for="logistic_0"> 否</label>
@@ -226,16 +225,7 @@ function check() {
 		}
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	if(Dd('property_require') != null) {
-		var ptrs = Dd('property_require').getElementsByTagName('option');
-		for(var i = 0; i < ptrs.length; i++) {		
-			f = 'property-'+ptrs[i].value;
-			if(Dd(f).value == 0 || Dd(f).value == '') {
-				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
-				return false;
-			}
-		}
-	}
+	<?php echo $CP ? property_js() : '';?>
 	return true;
 }
 </script>

@@ -2,23 +2,30 @@
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $MOD['vote_enable'] or dheader(DT_PATH);
-$TYPE = get_type('vote', 1);
-require MD_ROOT.'/vote.class.php';
-$do = new vote();
+require DT_ROOT.'/include/post.func.php';
+$ext = 'vote';
+$url = $EXT[$ext.'_url'];
+$TYPE = get_type($ext, 1);
+$_TP = sort_type($TYPE);
+require MD_ROOT.'/'.$ext.'.class.php';
+$do = new $ext();
 $typeid = isset($typeid) ? intval($typeid) : 0;
+$destoon_task = rand_task();
 if($itemid) {
 	$do->itemid = $itemid;
 	$item = $do->get_one();
-	$item or dheader(DT_PATH);
+	$item or dheader($url);
 	extract($item);
 	if($submit) {
+		if($verify == 1) captcha($captcha, 1);
+		if($verify == 2) question($answer, 1);
 		$could_vote = true;
 		$condition = $_username ? "AND username='$_username'" : "AND ip='$DT_IP'";
 		$r = $db->get_one("SELECT rid FROM {$DT_PRE}vote_record WHERE itemid=$itemid $condition");
 		if($r) $could_vote = false;
 		if($fromtime && $DT_TIME < $fromtime) $could_vote = false;
 		if($totime && $DT_TIME > $totime) $could_vote = false;
-		if(!check_group($_groupid, $MOD['vote_group'])) $could_vote = false;
+		if(!check_group($_groupid, $groupids)) $could_vote = false;
 		if($could_vote) {
 			if($item['choose']) {
 				$ids = array();
@@ -55,28 +62,33 @@ if($itemid) {
 	$adddate = timetodate($addtime, 3);
 	$fromdate = $fromtime ? timetodate($fromtime, 3) : $L['timeless'];
 	$todate = $totime ? timetodate($totime, 3) : $L['timeless'];
-	$votes = array();
+	$V = array();
 	$j = 0;
 	for($i = 1; $i < 11; $i++) {
 		$s = 's'.$i;
 		if($$s) {
-			$votes[$i]['title'] = $$s;
+			$V[$i]['title'] = $$s;
 			$v = 'v'.$i;
-			$votes[$i]['votes'] = $$v;
-			$votes[$i]['percent'] = $item['votes'] ? dround($$v*100/$item['votes'], 2, true).'%' : '0%';
-			$votes[$i]['number'] = ++$j;
+			$V[$i]['votes'] = $$v;
+			$V[$i]['percent'] = $item['votes'] ? dround($$v*100/$item['votes'], 2, true).'%' : '0%';
+			$V[$i]['number'] = ++$j;
 		}
 	}
 	$db->query("UPDATE {$DT_PRE}vote SET hits=hits+1 WHERE itemid=$itemid");
-	$head_title = $head_keywords = $head_description = $title.$DT['seo_delimiter'].$L['vote_title'];
-	$template = $item['template'] ? $item['template'] : 'vote';
+	$head_title = $title.$DT['seo_delimiter'].$L['vote_title'];
+	$template = $item['template'] ? $item['template'] : $ext;
 	include template($template, $module);
 } else {
-	$head_title = $head_keywords = $head_description = $L['vote_title'];
+	$head_title = $L['vote_title'];
+	if($catid) $typeid = $catid;
 	$condition = '1';
-	if($typeid) $condition .= " AND typeid=$typeid";
+	if($typeid) {
+		isset($TYPE[$typeid]) or dheader($url);
+		$condition .= " AND typeid IN (".type_child($typeid, $TYPE).")";
+		$head_title = $TYPE[$typeid]['typename'].$DT['seo_delimiter'].$head_title;
+	}
 	if($cityid) $condition .= ($AREA[$cityid]['child']) ? " AND areaid IN (".$AREA[$cityid]['arrchildid'].")" : " AND areaid=$cityid";
 	$lists = $do->get_list($condition, 'addtime DESC');
-	include template('vote', $module);
+	include template($ext, $module);
 }
 ?>

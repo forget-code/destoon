@@ -7,11 +7,15 @@ class announce {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function announce() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'announce';
 		$this->db = &$db;
 		$this->fields = array('typeid','areaid','level', 'title','style','content','addtime','fromtime','totime','editor','edittime','template', 'islink', 'linkurl');
+    }
+
+    function announce() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -59,6 +63,7 @@ class announce {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -68,7 +73,7 @@ class announce {
 			$r['fromdate'] = $r['fromtime'] ? timetodate($r['fromtime'], 3) : $L['timeless'];
 			$r['todate'] = $r['totime'] ? timetodate($r['totime'], 3) : $L['timeless'];
 			$r['typename'] = $TYPE[$r['typeid']]['typename'];
-			$r['typeurl'] = $MOD['announce_url'].rewrite('index.php?typeid='.$r['typeid']);
+			$r['typeurl'] = $MOD['announce_url'].list_url($r['typeid']);
 			$lists[] = $r;
 		}
 		return $lists;
@@ -88,7 +93,6 @@ class announce {
 		if(!$post['islink']) {
 			$linkurl = $this->linkurl($this->itemid);
 			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			if($MOD['announce_html']) tohtml('announce', $module, "itemid=$this->itemid");
 		}
 		return $this->itemid;
 	}
@@ -105,24 +109,13 @@ class announce {
 		if(!$post['islink']) {
 			$linkurl = $this->linkurl($this->itemid);
 			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			if($MOD['announce_html']) tohtml('announce', $module, "itemid=$this->itemid");
-		}
-		return true;
-	}
-
-	function update() {
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE islink=0");
-		while($r = $this->db->fetch_array($result)) {
-			$itemid = $r['itemid'];
-			$linkurl = $this->linkurl($itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$itemid");
 		}
 		return true;
 	}
 
 	function linkurl($itemid) {
-		global $DT, $MOD;
-		$linkurl = $MOD['announce_html'] ? $itemid.'.'.$DT['file_ext'] :  rewrite('index.php?itemid='.$itemid);
+		global $MOD;
+		$linkurl = show_url($itemid);
 		return $MOD['announce_url'].$linkurl;
 	}
 
@@ -151,16 +144,6 @@ class announce {
 			$k = intval($k);
 			$v = intval($v);
 			$this->db->query("UPDATE {$this->table} SET listorder=$v WHERE itemid=$k");
-		}
-		return true;
-	}
-
-	function html() {
-		global $module;
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE islink=0");
-		while($r = $this->db->fetch_array($result)) {
-			$itemid = $r['itemid'];
-			tohtml('announce', $module, "itemid=$itemid");
 		}
 		return true;
 	}

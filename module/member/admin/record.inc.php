@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 isset($username) or $username = '';
 $menus = array (
     array($DT['money_name'].'增减', '?moduleid='.$moduleid.'&file='.$file.'&username='.$username.'&action=add'),

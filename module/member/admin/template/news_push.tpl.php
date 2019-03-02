@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -20,7 +20,7 @@ show_menu($menus);
 <td>&nbsp;<?php echo category_select('catid', '请选择分类', 0, $aid);?></td>
 </tr>
 <tr>
-<td class="tl">提示信息</td>
+<td class="tl"><span class="f_hid">*</span> 提示信息</td>
 <td>&nbsp;系统会自动丢弃已经推送过的新闻</td>
 </tr>
 <tr>

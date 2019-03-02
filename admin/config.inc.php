@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $MCFG = array();
 $MCFG['module'] = 'destoon';
 $MCFG['name'] = '核心';
@@ -13,7 +13,9 @@ $RT['file']['database'] = '数据维护';
 $RT['file']['template'] = '模板管理';
 $RT['file']['skin'] = '风格管理';
 $RT['file']['tag'] = '标签向导';
+$RT['file']['cron'] = '计划任务';
 $RT['file']['scan'] = '木马扫描';
+$RT['file']['patch'] = '文件备份';
 $RT['file']['md5'] = '文件校验';
 $RT['file']['log'] = '后台日志';
 $RT['file']['upload'] = '上传记录';

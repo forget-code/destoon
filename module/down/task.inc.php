@@ -36,7 +36,6 @@ if($html == 'show') {
 	}
 	if($_username && $_username == $item['username']) $user_status = 3;
 	if($user_status == 3) {
-		$auth = encrypt("$itemid");
 		include DT_ROOT.'/file/config/filetype.inc.php';
 		include DT_ROOT.'/file/config/mirror.inc.php';
 	}
@@ -45,7 +44,7 @@ if($html == 'show') {
 	$update = '';
 	include DT_ROOT.'/include/update.inc.php';
 	echo 'Inner("hits", \''.$item['hits'].'\');';
-	if($MOD['show_html'] && $edittime > @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl'])) tohtml('show', $module);
+	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
 	if($MOD['list_html'] && $task_list && $CAT) {

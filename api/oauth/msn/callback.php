@@ -7,15 +7,7 @@ $par = 'client_id='.urlencode(WRAP_CLIENT_ID)
 	 . '&client_secret='.urlencode(WRAP_CLIENT_SECRET)
 	 . '&code='.urlencode($_REQUEST['code'])
 	 . '&grant_type=authorization_code';
-$cur = curl_init(WRAP_ACCESS_URL);
-curl_setopt($cur, CURLOPT_POST, 1);
-curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
-curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
-curl_setopt($cur, CURLOPT_HEADER, 0);
-curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
-curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
-$rec = curl_exec($cur);
-curl_close($cur);
+$rec = dcurl(WRAP_ACCESS_URL, $par);
 if(strpos($rec, 'access_token') !== false) {
 	$arr = json_decode($rec, true);
 	$_SESSION['access_token'] = $arr['access_token'];

@@ -8,11 +8,15 @@ class webpage {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function webpage() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'webpage';
 		$this->db = &$db;
 		$this->fields = array('item','areaid', 'title','level','style','content','seo_title','seo_keywords','seo_description','editor','edittime','template', 'islink', 'linkurl','domain');
+    }
+
+    function webpage() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -67,6 +71,7 @@ class webpage {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

@@ -1,12 +1,12 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
 ?>
-<tr>
+<tr style="display:<?php echo $trade ? '' : 'none';?>;">
 <td class="tl">支付宝担保交易</td>
 <td>
 <input type="radio" name="setting[trade]" value="alipay"  <?php if($trade){ ?>checked <?php } ?> onclick="Ds('dtrade');"/> 开启&nbsp;&nbsp;
 <input type="radio" name="setting[trade]" value=""  <?php if(!$trade){ ?>checked <?php } ?> onclick="Dh('dtrade');"/> 关闭&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/trade/alipay/ico.gif" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=https://b.alipay.com/order/productDetail.htm?productId=2011042200323187" target="_blank" class="t">[申请帐号]</a>
+<img src="<?php echo DT_PATH;?>api/trade/alipay/ico.gif" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=https://b.alipay.com/order/productDetail.htm?productId=2011042200323187" target="_blank" class="t">[申请帐号]</a>
 </td>
 </tr>
 <tbody id="dtrade" style="display:<?php if(!$trade) echo 'none';?>">

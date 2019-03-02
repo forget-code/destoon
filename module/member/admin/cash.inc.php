@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('提现记录', '?moduleid='.$moduleid.'&file='.$file),
     array('统计报表', '?moduleid='.$moduleid.'&file='.$file.'&action=stats'),
@@ -14,7 +14,7 @@ if($action == 'edit' || $action == 'show') {
 	$item or msg('记录不存在');
 	$item['addtime'] = timetodate($item['addtime'], 5);
 	$item['edittime'] = timetodate($item['edittime'], 5);
-	$member = $db->get_one("SELECT * FROM {$DT_PRE}member WHERE username='$item[username]'");
+	$member = userinfo($item['username']);
 }
 switch($action) {
 	case 'stats':
@@ -81,13 +81,11 @@ switch($action) {
 			isset($status) or msg('请指定受理结果');
 			$money = $item['amount'] + $item['fee'];
 			if($status == 3) {
-				money_lock($member['username'], -$money);
-				money_record($member['username'], -$item['amount'], $item['bank'], $_username, '提现成功');
-				money_record($member['username'], -$item['fee'], $item['bank'], $_username, '提现手续费');
+				//
 			} else if($status == 2 || $status == 1) {
 				$note or msg('请填写原因备注');
-				money_lock($member['username'], -$money);
-				money_add($member['username'], $money);
+				money_add($item['username'], $money);
+				money_record($item['username'], $money, '站内', 'system', '提现失败', '流水号:'.$itemid);
 			} else {
 				msg();
 			}
@@ -108,8 +106,8 @@ switch($action) {
 		dmsg('删除成功', $forward);
 	break;
 	default:
-		$sfields = array('按条件', '会员名', '金额', '手续费', '收款方式', '收款帐号', '收款人', '备注', '受理人');
-		$dfields = array('username', 'username', 'bank', 'amount', 'fee', 'note', 'editor');
+		$sfields = array('按条件', '会员名', '金额', '手续费', '开户银行', '开户网点', '收款户名', '收款帐号', '备注', '受理人');
+		$dfields = array('username', 'username', 'amount', 'fee', 'bank', 'branch', 'truename', 'account', 'note', 'editor');
 		$sorder  = array('排序方式', '金额降序', '金额升序', '手续费降序', '手续费升序', '时间降序', '时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'fee DESC', 'fee ASC', 'addtime DESC', 'addtime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;

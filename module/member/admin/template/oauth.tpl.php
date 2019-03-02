@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -43,7 +43,6 @@ foreach($OAUTH as $k=>$v) {
 <th>绑定时间</th>
 <th>上次登录</th>
 <th>登录次数</th>
-<th width="40">操作</th>
 </tr>
 <?php foreach($members as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
@@ -55,7 +54,6 @@ foreach($OAUTH as $k=>$v) {
 <td class="px11"><?php echo $v['adddate'];?></td>
 <td class="px11"><?php echo $v['logindate'];?></td>
 <td><?php echo $v['logintimes'];?></td>
-<td><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&itemid=<?php echo $v['itemid'];?>" onclick="return confirm('确定要解除会员绑定吗？此操作将不可撤销');"><img src="admin/image/delete.png" width="16" height="16" title="解除绑定" alt=""/></a></td>
 </tr>
 <?php }?>
 </table>

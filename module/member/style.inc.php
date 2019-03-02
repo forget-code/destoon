@@ -42,7 +42,7 @@ if($itemid) {
 			if($o) $db->query("UPDATE {$DT_PRE}style SET hits=hits-1 WHERE itemid=$o[itemid] AND hits>1");			
 			$db->query("UPDATE {$DT_PRE}style SET hits=hits+1,`$fd`=`$fd`+$amount WHERE itemid=$itemid");
 			$db->query("UPDATE {$DT_PRE}company SET template='$r[template]',skin='$r[skin]',styletime=$styletime WHERE userid=$_userid");
-			dmsg($L['style_msg_buy_success'], 'style.php');
+			dmsg($L['style_msg_buy_success'], '?action=index');
 		} else {
 			$r['thumb'] = is_file(DT_ROOT.'/'.$MODULE[4]['moduledir'].'/skin/'.$r['skin'].'/thumb.gif') ? $MODULE[4]['linkurl'].'skin/'.$r['skin'].'/thumb.gif' : $MODULE[4]['linkurl'].'image/nothumb.gif';
 			extract($r);
@@ -81,7 +81,7 @@ if($itemid) {
 		$maxfee = isset($maxfee) ? dround($maxfee) : '';
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$order_select  = dselect($sorder, 'order', '', $order);
-		$type_select = type_select('style', 1, 'typeid', $L['choose_type'], $typeid);
+		$type_select = type_select($TYPE, 1, 'typeid', $L['choose_type'], $typeid);
 		$condition = "1";
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if(!$all) $condition .= " AND groupid LIKE '%,$_groupid,%'";

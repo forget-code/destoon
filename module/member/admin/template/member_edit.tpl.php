@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 load('profile.js');
@@ -17,17 +17,16 @@ load('profile.js');
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员头像</td>
-<td><img src="<?php echo useravatar($username, 'large');?>" style="margin:6px;"/></td>
+<td><img src="<?php echo useravatar($username, 'large');?>" style="margin:6px;" width="128" height="128"/></td>
 </tr>
-
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员登录名</td>
 <td><strong><?php echo $username;?></strong>&nbsp;&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&username=<?php echo urlencode($username);?>&catid=1#editusername" class="t">[修改会员名]</a></td>
 </tr>
 
 <tr>
-<td class="tl"><span class="f_red">*</span> 通行证户名</td>
-<td><input type="text" size="30" name="member[passport]" id="passport" value="<?php echo $passport;?>"/>&nbsp;<span id="dpassport" class="f_red"></span></td>
+<td class="tl"><span class="f_hid">*</span> 昵称</td>
+<td><strong><?php echo $passport;?></strong>&nbsp;&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&passport=<?php echo urlencode($passport);?>&catid=2#editpassport" class="t">[修改昵称]</a></td>
 </tr>
 
 <tr>
@@ -110,15 +109,26 @@ load('profile.js');
 </td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 收款银行</td>
+<td class="tl"><span class="f_hid">*</span> 开户银行</td>
 <td>
 <select name="member[bank]">
-<option value="">收款方式</option>
+<option value="">开户银行</option>
 <?php foreach($BANKS as $v) { ?>
 <option value="<?php echo $v;?>" <?php if($bank == $v) { ?>selected<?php } ?>><?php echo $v;?></option>;
 <?php } ?>
 </select>
 </td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 帐号类型</td>
+<td>
+<input type="radio" name="member[banktype]" value="0"<?php if($banktype == 0) { ?> checked<?php } ?>/> 对私
+<input type="radio" name="member[banktype]" value="1"<?php if($banktype == 1) { ?> checked<?php } ?>/> 对公
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 开户网点</td>
+<td><input type="text" size="50" name="member[branch]" id="branch" value="<?php echo $branch;?>"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 收款帐号</td>
@@ -218,8 +228,8 @@ load('profile.js');
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 公司介绍</td>
-<td><textarea name="member[introduce]" id="introduce" class="dsn"><?php echo $introduce;?></textarea>
-<?php echo deditor($moduleid, 'introduce', $MOD['editor'], '95%', 300);?><br/><span id="dintroduce" class="f_red"></span></td>
+<td><textarea name="member[content]" id="content" class="dsn"><?php echo $content;?></textarea>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 300);?><br/><span id="dcontent" class="f_red"></span></td>
 </tr>
 <?php echo $CFD ? fields_html('<td class="tl">', '<td>', $user, $CFD) : '';?>
 </table>
@@ -371,10 +381,6 @@ function Dcheck() {
 		}
 	}
 	<?php } ?>
-	if(Dd('passport').value == '') {
-		Dmsg('请填写通行证', 'passport');
-		return false;
-	}
 	if(Dd('email').value == '') {
 		Dmsg('请填写电子邮箱', 'email');
 		return false;
@@ -418,8 +424,8 @@ function Dcheck() {
 		Dmsg('请填写公司电话', 'telephone');
 		return false;
 	}
-	if(FCKLen('introduce') < 5) {
-		Dmsg('公司介绍不能少于5字，当前已经输入'+FCKLen('introduce')+'字', 'introduce');
+	if(FCKLen('content') < 10) {
+		Dmsg('公司介绍最少10字，当前已经输入'+FCKLen('content')+'字', 'content');
 		return false;
 	}
 	<?php } ?>

@@ -1,12 +1,12 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('充值记录', '?moduleid='.$moduleid.'&file='.$file),
     array('统计报表', '?moduleid='.$moduleid.'&file='.$file.'&action=stats'),
 );
 $PAY = cache_read('pay.php');
 $PAY['card']['name'] = '充值卡';
-$dstatus = array('未知', '失败', '作废', '成功', '人工');
+$dstatus = array('等待支付', '支付失败', '记录作废', '支付成功', '人工审核');
 $table = $DT_PRE.'finance_charge';
 switch($action) {
 	case 'stats':
@@ -94,7 +94,7 @@ switch($action) {
 		dmsg('删除成功'.$db->affected_rows().'条记录', $forward);
 	break;
 	default:
-		$_status = array('<span style="color:blue;">未知</span>', '<span style="color:red;">失败</span>', '<span style="color:#FF00FF;">作废</span>', '<span style="color:green;">成功</span>', '<span style="color:green;">人工</span>');
+		$_status = array('<span style="color:blue;">等待支付</span>', '<span style="color:red;">支付失败</span>', '<span style="color:#FF00FF;">记录作废</span>', '<span style="color:green;">支付成功</span>', '<span style="color:green;">人工审核</span>');
 		$sfields = array('按条件', '会员名', '充值金额', '手续费', '实收金额', '备注', '操作人');
 		$dfields = array('username', 'username', 'amount', 'fee', 'money', 'note', 'editor');
 		$sorder  = array('结果排序方式', '充值金额降序', '充值金额升序', '手续费降序', '手续费升序', '实收金额降序', '实收金额升序', '下单时间降序', '下单时间升序', '支付时间降序', '支付时间升序');

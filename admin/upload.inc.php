@@ -1,15 +1,15 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('上传记录', '?file='.$file),
 );
 $id = isset($id) ? intval($id) : -1;
 ($id > -1 && $id < 10) or $id = -1;
-if($id == -1 && $action != 'part') $action = 'part';
+if($id == -1 && $action != 'part' && $action != 'delete_user' && $action != 'find') $action = 'part';
 if($id > -1) $table = $DT_PRE.'upload_'.$id;
 switch($action) {
 	case 'delete':
@@ -20,13 +20,64 @@ switch($action) {
 			 delete_upload($r['fileurl'], 0);
 		}
 		$db->query("DELETE FROM {$table} WHERE pid IN ($itemids)");
-		dmsg('删除成功', $forward);
+		if(isset($ajax)) {
+			exit('1');
+		} else {
+			dmsg('删除成功', $forward);
+		}
 	break;
 	case 'delete_record':
 		$itemid or msg('请选择记录');
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
 		$db->query("DELETE FROM {$table} WHERE pid IN ($itemids)");
 		dmsg('删除成功', $forward);
+	break;
+	case 'delete_user':
+		check_name($username) or msg('请填写会员名');
+		$u = $db->get_one("SELECT userid,groupid FROM {$DT_PRE}member WHERE username='$username'");
+		if($u && $u['groupid'] == 1) msg('管理组不可删除');
+		if($id > -1) {
+			if(!isset($fid)) {
+				$r = $db->get_one("SELECT min(pid) AS fid FROM {$table} WHERE username='$username'");
+				$fid = $r['fid'] ? $r['fid'] : 0;
+			}
+			if(!isset($tid)) {
+				$r = $db->get_one("SELECT max(pid) AS tid FROM {$table} WHERE username='$username'");
+				$tid = $r['tid'] ? $r['tid'] : 0;
+			}
+			isset($num) or $num = 2;
+			isset($sid) or $sid = $fid;
+			isset($itemid) or $itemid = 1;
+			if($fid <= $tid) {
+				$result = $db->query("SELECT * FROM {$table} WHERE pid>=$fid AND username='$username' ORDER BY pid LIMIT 0,$num ");
+				if($db->affected_rows($result)) {
+					while($r = $db->fetch_array($result)) {
+						$itemid = $r['pid'];
+						delete_upload($r['fileurl'], 0);
+					}
+					$itemid += 1;
+				} else {
+					$itemid = $fid + $num;
+				}
+				msg('ID从'.$fid.'至'.($itemid-1).'删除成功'.progress($sid, $fid, $tid), "?file=$file&action=$action&username=$username&id=$id&sid=$sid&fid=$itemid&tid=$tid&num=$num");
+			} else {
+				dmsg('删除成功', "?file=$file");
+			}
+		} else {
+			if($u) {
+				$id = $u['userid']%10;
+			} else {
+				for($i = 0; $i < 10; $i++) {
+					$t = $db->get_one("SELECT itemid FROM {$DT_PRE}upload_{$i} WHERE username='$username'");
+					if($t) {
+						$id = $i;
+						break;
+					}
+				}
+				if($id == -1) msg('会员['.$username.']没有上传记录');
+			}
+			msg('正在开始删除..', "?file=$file&action=$action&username=$username&id=$id");
+		}
 	break;
 	case 'part':
 		$lists = array();
@@ -39,6 +90,16 @@ switch($action) {
 			$lists[] = $r;
 		}
 		include tpl('upload_part');
+	break;
+	case 'play':
+		isset($video) or exit;
+		include tpl('header');
+		load('player.js');
+		exit('<script type="text/javascript">document.write(player("'.$video.'", 480, 360, 0 ,1));</script></body></html>');
+	break;
+	case 'find':
+		$kw or msg();
+		dheader('?file='.$file.'&id='.(match_userid($kw)%10).'&kw='.$kw);
 	break;
 	default:
 		$sfields = array('按条件', '文件名', '会员', '来源', '后缀', '信息ID');
@@ -85,6 +146,7 @@ switch($action) {
 			}
 			$r['addtime'] = timetodate($r['addtime'], 6);
 			$r['image'] = is_image($r['fileurl']) ? 1 : 0;
+			$r['video'] = in_array($r['ext'], array('swf', 'flv', 'mp4')) ? 1 : 0;
 			$r['fileurl'] = str_replace('.thumb.'.$r['ext'], '', $r['fileurl']);
 			$r['img_w'] = $r['width'] > 100 ? 100 : $r['width'];
 			$lists[] = $r;

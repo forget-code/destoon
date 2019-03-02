@@ -1,10 +1,12 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
+if($EXT['comment_api']) exit;
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
-$itemid or exit;
 isset($MODULE[$mid]) or exit;
 in_array($mid, explode(',', $MOD['comment_module'])) or exit;
+$itemid or exit;
+isset($proxy) or $proxy = '';
 if(in_array($itemid, cache_read('bancomment-'.$mid.'.php'))) {
 	$template = 'close';
 	$linkurl = $MODULE[$mid]['linkurl'];
@@ -41,7 +43,7 @@ switch($action) {
 		$f = $op ? 'agree' : 'against';
 		if(get_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid)) exit('-1');
 		$db->query("UPDATE {$DT_PRE}comment SET `{$f}`=`{$f}`+1 WHERE itemid=$cid");
-		set_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid, 1, $DT_TIME + 365*86400);
+		set_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid, 1, $DT_TIME + 86400);
 		exit('1');
 	break;
 	case 'delete':
@@ -53,7 +55,7 @@ switch($action) {
 			$star = 'star'.$r['star'];
 			$db->query("UPDATE {$DT_PRE}comment_stat SET comment=comment-1,`{$star}`=`{$star}`-1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
 			$db->query("DELETE FROM {$DT_PRE}comment WHERE itemid=$cid");
-			$forward = $MOD['linkurl'].'comment.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&rand='.mt_rand(10, 99);
+			$forward = DT_PATH.'api/comment.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&proxy='.$proxy.'&rand='.mt_rand(10, 99);
 			dalert($L['comment_msg_del_success'], '', 'parent.window.location="'.$forward.'";');
 		} else {
 			dalert($L['comment_msg_not_comment']);
@@ -101,16 +103,17 @@ switch($action) {
 			if($BANWORD) $content = banword($BANWORD, $content, false);
 			$star = intval($star);
 			in_array($star, array(1, 2, 3)) or $star = 3;
-			$status = get_status(3, $MOD['comment_check'] == 2 ? $MG['check_add'] : $MOD['comment_check']);
+			$status = get_status(3, $MOD['comment_check'] == 2 ? $MG['check'] : $MOD['comment_check']);
 			$hidden = isset($hidden) ? 1 : 0;
+			$title = addslashes($title);
 			$content = nl2br($content);
 			$quotation = '';
 			$qid = isset($qid) ? intval($qid) : 0;
 			if($qid) {
-				$r = $db->get_one("SELECT ip,hidden,username,content,quotation,addtime FROM {$DT_PRE}comment WHERE itemid=$qid");
+				$r = $db->get_one("SELECT ip,hidden,username,passport,content,quotation,addtime FROM {$DT_PRE}comment WHERE itemid=$qid");
 				if($r) {
 					if($r['username']) {
-						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['username'];
+						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['passport'];
 					} else {
 						$r['name'] = 'IP:'.hide_ip($r['ip']);
 					}
@@ -127,7 +130,7 @@ switch($action) {
 				}
 				$db->query("UPDATE {$DT_PRE}comment SET quote=quote+1 WHERE itemid=$qid");
 			}
-			$db->query("INSERT INTO {$DT_PRE}comment (item_mid,item_id,item_title,item_username,content,quotation,qid,addtime,username,hidden,star,ip,status) VALUES ('$mid','$itemid','".addslashes($title)."','$username','$content','$quotation','$qid','$DT_TIME','$_username','$hidden','$star','$DT_IP','$status')");
+			$db->query("INSERT INTO {$DT_PRE}comment (item_mid,item_id,item_title,item_username,content,quotation,qid,addtime,username,passport,hidden,star,ip,status) VALUES ('$mid','$itemid','$title','$username','$content','$quotation','$qid','$DT_TIME','$_username','$_passport','$hidden','$star','$DT_IP','$status')");
 			$cid = $db->insert_id();
 			$r = $db->get_one("SELECT sid FROM {$DT_PRE}comment_stat WHERE moduleid=$mid AND itemid=$itemid");
 			$star = 'star'.$star;
@@ -144,10 +147,10 @@ switch($action) {
 				$items = isset($items) ? intval($items)+1 : 1;
 				$page = ceil($items/$pagesize);
 				if($MOD['comment_show']) {
-					$forward = $MOD['linkurl'].'comment.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&rand='.mt_rand(10, 99).'#last';
+					$forward = DT_PATH.'api/comment.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&proxy='.$proxy.'&rand='.mt_rand(10, 99).'#last';
 					dalert('', '', 'parent.window.location="'.$forward.'";');
 				} else {
-					$forward = $MOD['comment_url'].rewrite('index.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&rand='.mt_rand(10, 99)).'#last';
+					$forward = $MOD['comment_url'].rewrite('index.php?mid='.$mid.'&itemid='.$itemid.'&page='.$page.'&proxy='.$proxy.'&rand='.mt_rand(10, 99)).'#last';
 					dalert('', '', 'top.window.location="'.$forward.'";');
 				}
 			} else {
@@ -167,10 +170,10 @@ switch($action) {
 					$r['addtime'] = timetodate($r['addtime'], 5);
 					$r['replytime'] = $r['replytime'] ? timetodate($r['replytime'], 5) : '';
 					if($r['username']) {
-						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['username'];
+						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['passport'];
 						$r['uname'] = $r['hidden'] ? '' : $r['username'];
 					} else {
-						$r['name'] = 'IP:'.hide_ip($r['ip']);
+						$r['name'] = $MOD['comment_am'];
 						$r['uname'] = '';
 					}
 					$lists[] = $r;

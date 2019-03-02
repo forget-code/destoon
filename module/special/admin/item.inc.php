@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $specialid = isset($specialid) ? intval($specialid) : 0;
 $specialid or msg('请选择'.$MOD['name']);
 $special = $db->get_one("SELECT * FROM {$table} WHERE itemid=$specialid");
@@ -38,6 +38,7 @@ switch($action) {
 			}
 			$content = '';
 			$addtime = timetodate($DT_TIME);
+			$typeid = 0;
 			$item = array();
 			$menuid = 0;
 			$tname = $menus[$menuid][0];

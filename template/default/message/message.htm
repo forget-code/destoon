@@ -18,10 +18,10 @@ a:link,a:visited,a:active {color:#ABBBD6;text-decoration:none;}
 <script type="text/javascript">try {document.execCommand("BackgroundImageCache", false, true);} catch(e) {}</script>
 </head>
 {if $dtime == -1}
-<body style="background:#FFFFFF;margin:10px;color:#444444;">
-<img src="{DT_SKIN}image/load.gif" align="absmiddle"/> Loading...
+<body style="background:#FFFFFF;margin:200px auto;">
+<center><img src="{DT_SKIN}image/loading...gif" alt="login"/></center>
 {$dmessage}
-<meta http-equiv="refresh" content="0;URL={$dforward}">
+<meta http-equiv="refresh" content="0;URL={$dforward}"/>
 {else}
 <body onkeydown="if(event.keyCode==13) window.history.back();">
 <table cellpadding="0" cellspacing="0" width="400"  align="center">

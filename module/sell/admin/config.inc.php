@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $MCFG['module'] = 'sell';
 $MCFG['name'] = '供应';
 $MCFG['author'] = 'DESTOON.COM';
@@ -17,7 +17,7 @@ $RT['action']['index']['edit'] = '修改供应';
 $RT['action']['index']['delete'] = '删除供应';
 $RT['action']['index']['check'] = '审核供应';
 $RT['action']['index']['expire'] = '过期供应';
-$RT['action']['index']['reject'] = '未通过供应';
+$RT['action']['index']['reject'] = '未通过';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '移动供应';
 $RT['action']['index']['level'] = '信息级别';

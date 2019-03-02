@@ -44,13 +44,11 @@
 				<th width="80">频 道</th>
 				<th>订阅地址</th>
 				<th width="60">订 阅</th>
-				<th width="100">订阅到QQ邮箱</th>
 				</tr>
 				<tr align="center" bgcolor="#FFFFFF">
 				<td class="f_red">自定义</td>
 				<td><input type="text" style="width:96%;" value="{$feed_code}" onmouseover="this.select();"/></td>
 				<td><a href="{$feed_code}" target="_blank"><img src="{DT_STATIC}file/image/xml.gif" alt="订阅"/></a></td>
-				<td><a href="http://mail.qq.com/cgi-bin/feed?u={$feed_code}" target="_blank"><img src="{DT_STATIC}file/image/rss_qq.gif" alt="订阅到QQ邮箱"/></a></td>
 				</tr>
 				</table>
 				{/if}
@@ -61,14 +59,12 @@
 				<th width="80">频 道</th>
 				<th>订阅地址</th>
 				<th width="60">订 阅</th>
-				<th width="100">订阅到QQ邮箱</th>
 			</tr>
 			{loop $FD $k $v}
 			<tr align="center" bgcolor="#FFFFFF">
 			<td><a href="{$v[linkurl]}" target="_blank">{$v[name]}</a></td>
 			<td><input type="text" style="width:96%;" value="{$v[rssurl]}" onmouseover="this.select();"/></td>
 			<td><a href="{$v[rssurl]}" target="_blank"><img src="{DT_STATIC}file/image/xml.gif" alt="订阅"/></a></td>
-			<td><a href="http://mail.qq.com/cgi-bin/feed?u={$v[rssurl]}" target="_blank"><img src="{DT_STATIC}file/image/rss_qq.gif" alt="订阅到QQ邮箱"/></a></td>
 			</tr>
 			{/loop}
 			</table>

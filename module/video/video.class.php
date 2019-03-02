@@ -10,7 +10,7 @@ class video {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function video($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -20,25 +20,30 @@ class video {
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','tag','thumb','video','mobile','width','height','player','status','hits','username','addtime','editor','edittime','ip','template', 'linkurl','filepath','note');
     }
 
+    function video($moduleid) {
+		$this->__construct($moduleid);
+    }
+
 	function pass($post) {
 		global $DT_TIME, $MOD;
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_catid'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
-		if(!$post['thumb']) return $this->_(lang('message->pass_thumb'));
+		if(!is_url($post['thumb'])) return $this->_(lang('message->pass_thumb'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['editor'] = $_username;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
 		$post['fee'] = dround($post['fee']);
-		$post['video'] = fix_link(trim($post['video']));
+		$post['video'] = fix_link($post['video']);
 		$post['video_width'] = intval($post['video_width']);
 		$post['video_height'] = intval($post['video_height']);
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($MOD['clear_link']) $post['content'] = clear_link($post['content']);
@@ -46,10 +51,10 @@ class video {
 		if($MOD['introduce_length']) $post['introduce'] = addslashes(get_intro($post['content'], $MOD['introduce_length']));
 		if($this->itemid) {
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 			if($r['video'] != $post['video']) delete_upload($r['video'], match_userid($r['video']));
 		} else {
@@ -63,8 +68,15 @@ class video {
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'edittime DESC', $cache = '') {
@@ -76,6 +88,7 @@ class video {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -114,7 +127,7 @@ class video {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -134,7 +147,7 @@ class video {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'].$post['video'], $this->itemid);
 		if($post['status'] > 2) $this->tohtml($this->itemid, $post['catid']);
@@ -154,7 +167,7 @@ class video {
 			$keyword = str_replace("//", '', addslashes($keyword));
 			$update .= ",keyword='$keyword'";
 		}
-		$mobile = $this->m3u8($item['video']) ? 1 : 0;
+		$mobile = $this->is_mobile($item['video']) ? 1 : 0;
 		if($mobile != $item['mobile']) $update .= ",mobile='$mobile'";
 		$item['itemid'] = $itemid;
 		$linkurl = itemurl($item);
@@ -242,7 +255,7 @@ class video {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
@@ -253,9 +266,9 @@ class video {
 		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
-	function m3u8($url) {
+	function is_mobile($url) {
 		if(file_ext($url) == 'mp4') return true;
-		return preg_match("/youku.com|tudou.com|56.com|ku6.com/i", $url);
+		return preg_match("/youku.com|tudou.com|static.video.qq.com|imgcache.qq.com|56.com|ku6.com|youtube.com/i", $url);
 	}
 
 	function _($e) {

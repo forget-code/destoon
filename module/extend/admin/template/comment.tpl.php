@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -36,7 +36,7 @@ show_menu($menus);
 <tr>
 <th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>评论内容</th>
-<th width="50">操作</th>
+<th width="60">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
@@ -54,7 +54,7 @@ show_menu($menus);
 </span>
 &nbsp;
 <?php if($v['username']) { ?>
-<a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a> 
+<a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['passport'];?></a> 
 <?php } else { ?>
 Guest
 <?php } ?>
@@ -71,9 +71,9 @@ Guest
 <?php } ?>
 </div>
 <div class="b5 c_b"> </div>
-<div><span class="f_red">原文：</span><a href="<?php echo $EXT['linkurl'];?>redirect.php?mid=<?php echo $v['item_mid'];?>&itemid=<?php echo $v['item_id'];?>" target="_blank"><?php echo $v['item_title'];?></a></div>
+<div><a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $v['item_mid'];?>&itemid=<?php echo $v['item_id'];?>" target="_blank"><img src="admin/image/link.gif" width="16" height="16" title="点击打开原文" alt="" align="absmiddle"/></a> <a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $v['item_mid'];?>&itemid=<?php echo $v['item_id'];?>" target="_blank"><?php echo $v['item_title'];?></a></div>
 <div class="b5 c_b"> </div>
-<div><strong>IP:</strong><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&ip=<?php echo $v['ip'];?>"><?php echo $v['ip'];?></a> <span class="f_dblue">来自:<?php echo ip2area($v['ip']);?></span></div>
+<div>IP:<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&ip=<?php echo $v['ip'];?>"><?php echo $v['ip'];?></a> - <?php echo ip2area($v['ip']);?></div>
 </td>
 <td>
 <a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;

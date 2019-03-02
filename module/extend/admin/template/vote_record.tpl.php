@@ -1,7 +1,7 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-//show_menu($menus);
+show_menu($menus);
 ?>
 <form action="?">
 <div class="tt">记录搜索</div>
@@ -12,8 +12,8 @@ include tpl('header');
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>
-&nbsp;
-<input type="text" size="50" name="kw" value="<?php echo $kw;?>" title="会员或IP"/>
+&nbsp;<?php echo $fields_select;?>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>
 &nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
@@ -23,7 +23,7 @@ include tpl('header');
 </tr>
 </table>
 </form>
-<div class="tt">[<?php echo $title;?>] 投票记录</div>
+<div class="tt">投票记录</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>IP</th>
@@ -50,5 +50,5 @@ foreach(explode(',', $v['votes']) as $v) {
 </table>
 <div class="pages"><?php echo $pages;?></div>
 <br/>
-<script type="text/javascript">Menuon(1);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

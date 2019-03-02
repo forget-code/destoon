@@ -1,5 +1,6 @@
 <?php
 $names = array (
+  'buy' => '购买',
   'compare' => '产品比较',
   'index' => '首页',
   'inquiry' => '询盘页',

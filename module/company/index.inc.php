@@ -12,10 +12,17 @@ if(isset($homepage) && check_name($homepage)) {
 	} else {
 		$whost = $host;
 	}
-	if(strpos($MODULE[4]['linkurl'], $host) === false) {
-		$www = str_replace($CFG['com_domain'], '', $host);
-		if(check_name($www)) {
-			$username = $homepage = $www;
+	if($host && strpos($MODULE[4]['linkurl'], $host) === false) {
+		if(substr($host, -strlen($CFG['com_domain'])) == $CFG['com_domain']) {
+			$www = substr($host, 0, -strlen($CFG['com_domain']));
+			if(check_name($www)) {
+				$username = $homepage = $www;
+			} else {
+				$head_title = $L['not_company'];
+				if($DT_BOT) dhttp(404, $DT_BOT);
+				include template('com-notfound', 'message');
+				exit;
+			}
 		} else {
 			if($whost == $host) {//301 xxx.com to www.xxx.com
 				$w3 = 'www.'.$host;
@@ -44,14 +51,14 @@ if($username) {
 	}
 	if(!check_group($_groupid, $MOD['group_index'])) include load('403.inc');
 	if($MOD['index_html']) {	
-		$html_file = DT_ROOT.'/'.$MOD['moduledir'].'/index.inc.html';
+		$html_file = DT_CACHE.'/htm/company.htm';
 		if(!is_file($html_file)) tohtml('index', $module);
 		if(is_file($html_file)) exit(include($html_file));
 	}
 	$seo_file = 'index';
 	include DT_ROOT.'/include/seo.inc.php';
 	if($page == 1) $head_canonical = $MOD['linkurl'];
-	if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.($page > 1 ? '&page='.$page : '');
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, 0, $page);
 	$destoon_task = "moduleid=$moduleid&html=index";
 	include template('index', $module);
 }

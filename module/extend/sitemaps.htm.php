@@ -14,6 +14,7 @@ $data .= '<loc>'.DT_PATH.'</loc>';
 $data .= '<lastmod>'.$today.'</lastmod>';
 $data .= '<changefreq>always</changefreq>';
 $data .= '<priority>1.0</priority>';
+$data .= '<data><display></display></data>';
 $data .= '</url>';
 $item = '';
 foreach($mods as $mid) {
@@ -25,6 +26,7 @@ foreach($mods as $mid) {
 		$data .= '<lastmod>'.$today.'</lastmod>';
 		$data .= '<changefreq>hourly</changefreq>';
 		$data .= '<priority>0.9</priority>';
+		$data .= '<data><display></display></data>';
 		$data .= '</url>';
 		if($nums) {
 			$fields = $mid == 4 ? 'linkurl' : 'linkurl,edittime';
@@ -37,6 +39,7 @@ foreach($mods as $mid) {
 				$item .= '<lastmod>'.($mid == 4 ? $today : timetodate($r['edittime'], 3)).'</lastmod>';
 				$item .= '<changefreq>'.$MOD['sitemaps_changefreq'].'</changefreq>';
 				$item .= '<priority>'.$MOD['sitemaps_priority'].'</priority>';
+				$item .= '<data><display></display></data>';
 				$item .= '</url>';
 			}
 		}
@@ -58,6 +61,7 @@ foreach($mods as $mid) {
 		$data .= '<lastmod>'.$today.'</lastmod>';
 		$data .= '<changefreq>always</changefreq>';
 		$data .= '<priority>1.0</priority>';
+		$data .= '<data><display></display></data>';
 		$data .= '</url>';
 		foreach(cache_read('category-'.$mid.'.php') as $c) {
 			$data .= '<url>';
@@ -65,6 +69,7 @@ foreach($mods as $mid) {
 			$data .= '<lastmod>'.$today.'</lastmod>';
 			$data .= '<changefreq>hourly</changefreq>';
 			$data .= '<priority>0.9</priority>';
+			$data .= '<data><display></display></data>';
 			$data .= '</url>';
 		}
 		$item = '';
@@ -80,6 +85,7 @@ foreach($mods as $mid) {
 				$item .= '<lastmod>'.($mid == 4 ? $today : timetodate($r['edittime'], 3)).'</lastmod>';
 				$item .= '<changefreq>'.$MOD['sitemaps_changefreq'].'</changefreq>';
 				$item .= '<priority>'.$MOD['sitemaps_priority'].'</priority>';
+				$item .= '<data><display></display></data>';
 				$item .= '</url>';
 			}
 		}

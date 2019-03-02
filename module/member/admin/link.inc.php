@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/link.class.php';
 $do = new dlink();
 $menus = array (
@@ -56,7 +56,8 @@ switch($action) {
 	break;
 	case 'check':
 		if($itemid) {
-			$status = $status == 3 ? 3 : 2;
+			//$status = $status == 3 ? 3 : 2;
+			$status = 3;
 			$do->check($itemid, $status);
 			dmsg($status == 3 ? '审核成功' : '取消成功', $forward);
 		} else {

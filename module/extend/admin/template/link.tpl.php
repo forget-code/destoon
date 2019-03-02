@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -11,8 +11,9 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>
-&nbsp;<?php echo $type_select;?>&nbsp;
+&nbsp;<?php echo $fields_select;?>&nbsp;
 <input type="text" size="20" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo $type_select;?>&nbsp;
 <?php echo $level_select;?>&nbsp;
 <select name="type">
 <option value="0"<?php if($type == 0) echo ' selected';?>>类型</option>
@@ -47,8 +48,8 @@ show_menu($menus);
 <td><input type="text" size="2" name="listorder[<?php echo $v['itemid'];?>]" value="<?php echo $v['listorder'];?>"/></td>
 <td><a href="<?php echo $v['typeurl'];?>" target="_blank"><?php echo $v['typename'];?></td>
 <td><?php if($v['level']) {?><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&level=<?php echo $v['level'];?>"><img src="admin/image/level_<?php echo $v['level'];?>.gif" title="<?php echo $v['level'];?>级" alt=""/></a><?php } ?></td>
-<td><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
-<td><?php if($v['thumb']) {?><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><img src="<?php echo $v['thumb'];?>" width="88" /><?php } ?></a></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
+<td><?php if($v['thumb']) {?><a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><img src="<?php echo $v['thumb'];?>" width="88" /><?php } ?></a></td>
 <td><?php echo $v['thumb'] ? 'LOGO' : '文字';?></td>
 <td>
 <a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;

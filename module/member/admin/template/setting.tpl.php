@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 $menus = array (
   array('基本设置'),
@@ -167,7 +167,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">注册客户端屏蔽</td>
-<td><textarea name="setting[banagent]" style="width:96%;height:30px;overflow:visible;"><?php echo $banagent;?></textarea><?php tips('群发软件可以伪造IP，但是部分软件发送的客户端信息相同<br/>例如某群发软件的客户端信息全部包含 .NET CLR 1.0.3705<br/>可在此直接屏蔽含有此类特征码的客户端注册<br/>多个特征码请用 | 分割');?>
+<td><textarea name="setting[banagent]" style="width:96%;height:30px;overflow:visible;"><?php echo $banagent;?></textarea><?php tips('群发软件可以伪造IP，但是部分软件发送的客户端信息相同<br/>例如某群发软件的客户端信息全部包含 .NET CLR 1.0.3705<br/>可在此直接屏蔽含有此类特征码的客户端注册<br/>多个特征码请用 | 分隔');?>
 </td>
 </tr>
 <tr>
@@ -176,10 +176,30 @@ show_menu($menus);
 <input type="text" size="3" name="setting[iptimeout]" value="<?php echo $iptimeout;?>"/><?php tips('同一IP在本时间间隔内将只能注册一个帐号，填0为不限制');?>
 </td>
 </tr>
-
 <tr>
 <td class="tl">会员便签默认值</td>
 <td><textarea name="setting[usernote]" style="width:96%;height:30px;overflow:visible;"><?php echo $usernote;?></textarea><?php tips('会员便签没有填写时，默认显示此值');?>
+</td>
+</tr>
+<tr>
+<td class="tl">会员资料修改需审核</td>
+<td>
+<?php
+$ECK = array(
+	'thumb' => '形象图片',
+	'areaid' => '所在地区',
+	'type' => '公司类型',
+	'business' => '经营范围',
+	'regyear' => '成立年份',
+	'capital' => '注册资本',
+	'address' => '公司地址',
+	'telephone' => '联系电话',
+	'content' => '公司介绍',
+);
+foreach($ECK as $k=>$v) {
+	echo '<input type="checkbox" name="setting[edit_check][]" value="'.$k.'" id="check_'.$k.'" '.(strpos(','.$edit_check.',', ','.$k.',') !== false ? ' checked' : '').'/><label for="check_'.$k.'"> '.$v.' </label>';
+}
+?>
 </td>
 </tr>
 <tr>
@@ -204,7 +224,7 @@ show_menu($menus);
 <tr>
 <td class="tl">验证邮件/短信有效期</td>
 <td>
-<input type="text" size="3" name="setting[auth_days]" value="<?php echo $auth_days;?>"/> 天<?php tips('验证信链接超过有效期天数将失效 填0为不限制');?>
+<input type="text" size="3" name="setting[auth_days]" value="<?php echo $auth_days;?>"/> 天<?php tips('验证邮件链接超过有效期天数将失效 填0为不限制<br/>如果是短信，则为对应的乘10分钟，例如设置3，代表30分钟内有效');?>
 </td>
 </tr>
 
@@ -519,10 +539,11 @@ X
 </tr>
 <tr>
 <td class="tl">最小充值额度</td>
-<td><input type="text" size="20" name="setting[mincharge]" value="<?php echo $mincharge;?>"/> 0表示不限，填数字表示最小额度，填多个数字用|分割表示选择额度</td>
+<td><input type="text" size="20" name="setting[mincharge]" value="<?php echo $mincharge;?>"/> 0表示不限，填数字表示最小额度，填多个数字用|分隔表示选择额度</td>
+</tr>
 <tr>
 <td class="tl">线下付款方式网页地址</td>
-<td><input type="text" size="60" name="setting[pay_url]" value="<?php echo $pay_url;?>"/><?php tips('如果未启用会员在线充值，则系统自动调转至此地址查看普通付款方式。建议用插件的单网页功能建立');?></td>
+<td><input type="text" size="60" name="setting[pay_url]" value="<?php echo $pay_url;?>"/><?php tips('如果未启用会员在线充值，则系统自动调转至此地址查看普通付款方式。建议用扩展功能的单网页建立');?></td>
 </tr>
 <tr>
 <td class="tl">会员提现</td>
@@ -560,19 +581,25 @@ X
 <td><input type="text" size="5" name="setting[cash_fee_max]" value="<?php echo $cash_fee_max;?>"/> 0为不限</td>
 </tr>
 <tr>
+<td class="tl">保证金基数</td>
+<td><input type="text" size="5" name="setting[deposit]" value="<?php echo $deposit;?>"/><?php tips('例如设置为1000，会员每次增加保证金最少为1000且必须是1000的倍数，例如2000、5000、10000，最小值为100');?></td>
+</tr>
+<tr>
 <td class="tl">买家确认收货时间限制</td>
 <td><input type="text" size="2" name="setting[trade_day]" value="<?php echo $trade_day;?>"/> 天<?php tips('买家在此时间内未确认收货或申请仲裁，则系统自动付款给卖家，交易成功');?></td>
 </tr>
+<!--
 <tr>
 <td class="tl">卖家确认发货时间限制</td>
 <td><input type="text" size="2" name="setting[trade_send]" value="<?php echo $trade_send;?>"/> 天<?php tips('买家付款后，卖家在此时间内未发货，则系统自动退款给买家');?></td>
 </tr>
+-->
 <tr>
 <td class="tl">常用支付方式</td>
 <td><input type="text" name="setting[pay_banks]" style="width:95%;" value="<?php echo $pay_banks;?>"/><?php tips('手动添加'.$DT['money_name'].'流水时需选择');?></td>
 </tr>
 <tr>
-<td class="tl">常用物流方式</td>
+<td class="tl">常用快递方式</td>
 <td><input type="text" name="setting[send_types]" style="width:95%;" value="<?php echo $send_types;?>"/></td>
 </tr>
 </table>
@@ -678,7 +705,7 @@ X
 <td class="tl"><?php echo $DT['credit_name'];?>对应价格</td>
 <td>
 <input type="text" size="50" name="setting[credit_price]" value="<?php echo $credit_price;?>"/><br/>
-<span class="f_gray"><?php echo $DT['credit_name'];?>和价格用|分割，二者必须一一对应</span>
+<span class="f_gray"><?php echo $DT['credit_name'];?>和价格用|分隔，二者必须一一对应</span>
 </td>
 </tr>
 </table>
@@ -836,7 +863,7 @@ X
 <td class="tl">论坛会员自动激活</td>
 <td>
 <input type="radio" name="setting[uc_bbs]" value="0" <?php if(!$uc_bbs) echo 'checked';?>/> 关闭&nbsp;&nbsp;
-<input type="radio" name="setting[uc_bbs]" value="1" <?php if($uc_bbs) echo 'checked';?>/> 开启 <?php tips('此项可以在会员注册后自动激活论坛帐号，但仅适用于使用DZX2版本的论坛，且论坛与UC安装在同一数据库，且整合方式为MySQL连接，请确认你的整合符合上述条件，否则请勿开启');?>
+<input type="radio" name="setting[uc_bbs]" value="1" <?php if($uc_bbs) echo 'checked';?>/> 开启 <?php tips('此项可以在会员注册后自动激活论坛帐号，但仅适用于使用DZX2以上版本的论坛，且论坛与UC安装在同一数据库，且整合方式为MySQL连接，请确认你的整合符合上述条件，否则请勿开启');?>
 </td>
 </tr>
 <tr>

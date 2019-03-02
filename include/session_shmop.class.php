@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -8,12 +8,16 @@ class dsession {
 	var $shmop_key;
 	var $shmop_id;
 
-    function dsession() {
+    function __construct() {
 		if(DT_DOMAIN) @ini_set('session.cookie_domain', '.'.DT_DOMAIN);
     	session_set_save_handler(array(&$this,'open'), array(&$this,'close'), array(&$this,'read'), array(&$this,'write'), array(&$this,'destroy'), array(&$this,'gc'));
 		session_cache_limiter('private, must-revalidate');
 		session_start();
 		header("cache-control: private");
+    }
+
+    function dsession() {
+		$this->__construct();
     }
 
 	function open($path, $name) {

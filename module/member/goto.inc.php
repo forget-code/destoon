@@ -9,7 +9,11 @@ if($email) {
 	$url = str_replace('vip.', '', $tmp[1]);
 	$url = 'http://mail.'.$url;
 } else {
-	$url = 'http://';
+	if($action == 'register_success') {
+		$url = $DT['file_login'].'?auth='.$auth.'&forward='.urlencode($forward);
+	} else {
+		$url = 'http://';
+	}
 }
 include template('goto', $module);
 ?>

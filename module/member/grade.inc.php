@@ -2,7 +2,7 @@
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 if($action == crypt_action('promo')) {
-	$code = htmlspecialchars(trim($code));
+	$code = dhtmlspecialchars(trim($code));
 	if($code) {
 		$p = $db->get_one("SELECT * FROM {$DT_PRE}finance_promo WHERE number='$code' AND totime>$DT_TIME");
 		if($p && ($p['reuse'] || (!$p['reuse'] && !$p['username']))) {
@@ -83,16 +83,16 @@ if($submit && $could_up) {
 			}
 		}
 	}
-	$company = htmlspecialchars(trim($company));
-	$truename = htmlspecialchars(trim($truename));
-	$telephone = htmlspecialchars(trim($telephone));
-	$mobile = htmlspecialchars(trim($mobile));
-	$email = htmlspecialchars(trim($email));
-	$msn = htmlspecialchars(trim($msn));
-	$qq = htmlspecialchars(trim($qq));
-	$ali = htmlspecialchars(trim($ali));
-	$skype = htmlspecialchars(trim($skype));
-	$content = htmlspecialchars(trim($content));
+	$company = dhtmlspecialchars(trim($company));
+	$truename = dhtmlspecialchars(trim($truename));
+	$telephone = dhtmlspecialchars(trim($telephone));
+	$mobile = dhtmlspecialchars(trim($mobile));
+	$email = dhtmlspecialchars(trim($email));
+	$msn = dhtmlspecialchars(trim($msn));
+	$qq = dhtmlspecialchars(trim($qq));
+	$ali = dhtmlspecialchars(trim($ali));
+	$skype = dhtmlspecialchars(trim($skype));
+	$content = dhtmlspecialchars(trim($content));
 	$db->query("INSERT INTO {$DT_PRE}upgrade (userid,username,groupid,company,truename,telephone,mobile,email,msn,qq,ali,skype,content,addtime,ip,amount,promo_code,promo_type,promo_amount,status) VALUES ('$_userid','$_username', '$groupid','$company','$truename','$telephone','$mobile','$email','$msn','$qq','$ali','$skype','$content', '$DT_TIME', '$DT_IP','$amount','$promo_code','$promo_type','$promo_amount','2')");
 	 message($L['grade_msg_success'], DT_PATH, 5);
 } else {

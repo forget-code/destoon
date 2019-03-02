@@ -11,9 +11,14 @@ function im_qq($id, $style = 0) {
 
 function im_ali($id, $style = 0) {
 	if($id) {
-		if(!check_name($id) && strtoupper(DT_CHARSET) != 'UTF-8') $id = convert($id, 'GBK', 'UTF-8');
+		$tb = 0;
+		if(substr($id, 0, 3) == 'TB:') {
+			$tb = 1;
+			$id = substr($id, 3);
+		}
+		if(!check_name($id) && DT_CHARSET != 'UTF-8') $id = convert($id, 'GBK', 'UTF-8');
 		$id = urlencode($id);
-		return '<a href="http://amos.alicdn.com/msg.aw?v=2&uid='.$id.'&site=cnalichn&s=6&charset=UTF-8" target="_blank" rel="nofollow"><img src="http://amos.alicdn.com/online.aw?v=2&uid='.$id.'&site=cnalichn&s=6&charset=UTF-8" title="点击旺旺交谈/留言" alt="" align="absmiddle" onerror="this.src=DTPath+\'file/image/ali-off.gif\';" onload="if(this.width>20)this.src=SKPath+\'image/ali-off.gif\';"/></a>';
+		return ($tb ? '<a href="http://www.taobao.com/webww/ww.php?ver=3&touid='.$id.'&siteid=cntaobao&status=2&charset=UTF-8" target="_blank" rel="nofollow"><img src="http://amos.alicdn.com/realonline.aw?v=2&uid='.$id.'&site=cntaobao&s=2&charset=UTF-8"' : '<a href="http://amos.alicdn.com/msg.aw?v=2&uid='.$id.'&site=cnalichn&s=6&charset=UTF-8" target="_blank" rel="nofollow"><img src="http://amos.alicdn.com/online.aw?v=2&uid='.$id.'&site=cnalichn&s=6&charset=UTF-8"').' title="点击旺旺交谈/留言" alt="" align="absmiddle" onerror="this.src=DTPath+\'file/image/ali-off.gif\';" onload="if(this.width>20)this.src=SKPath+\'image/ali-off.gif\';"/></a>';
 	}
 	return '';
 }

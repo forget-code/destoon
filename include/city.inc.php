@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -14,25 +14,25 @@ if($city) {
 	if(strpos(DT_PATH, $http_host) === false && strpos($city_domain, $http_host) === false) {
 		$c = $db->get_one("SELECT * FROM {$DT_PRE}city WHERE domain='http://".$http_host."/'");
 		if($c) {
-			set_cookie('city', $c['areaid'].'|'.$c['domain'], $DT_TIME + 365*86400);
+			set_cookie('city', $c['areaid'].'|'.$c['domain'], $DT_TIME + 30*86400);
 			$cityid = $c['areaid'];
 		}
 	}
-	#if($city_domain && !defined('DT_ADMIN') && strpos($DT_URL, DT_PATH) !== false) dheader(str_replace(DT_PATH, $city_domain, $DT_URL));
+	if($city_domain && $DT_URL == DT_PATH) dheader($city_domain);
 } else {
 	if(strpos(DT_PATH, $http_host) === false) {
 		$c = $db->get_one("SELECT * FROM {$DT_PRE}city WHERE domain='http://".$http_host."/'");
 		if($c) {
-			set_cookie('city', $c['areaid'].'|'.$c['domain'], $DT_TIME + 365*86400);
+			set_cookie('city', $c['areaid'].'|'.$c['domain'], $DT_TIME + 30*86400);
 			$cityid = $c['areaid'];
 		}
 	} else {
 		if($DT['city_ip'] && !defined('DT_ADMIN') && !$DT_BOT) {
 			$iparea = ip2area($DT_IP);
-			$result = $db->query("SELECT * FROM {$DT_PRE}city");
+			$result = $db->query("SELECT * FROM {$DT_PRE}city ORDER BY areaid");
 			while($r = $db->fetch_array($result)) {
 				if(preg_match("/".$r['name'].($r['iparea'] ? '|'.$r['iparea'] : '')."/i", $iparea)) {
-					set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 365*86400);
+					set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 30*86400);
 					$cityid = $r['areaid'];
 					if($r['domain']) dheader($r['domain']);
 					$c = $r;

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -17,7 +17,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 详细地址</td>
-<td class="tr"><input name="post[address]" type="text" id="title" size="60" value="<?php echo $address;?>"/> <span id="dtitle" class="f_red"></span></td>
+<td class="tr"><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?><input name="post[address]" type="text" id="title" size="60" value="<?php echo $address;?>"/> <span id="dareaid" class="f_red"></span><span id="dtitle" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮政编码</td>
@@ -50,6 +50,11 @@ show_menu($menus);
 function check() {
 	var l;
 	var f;
+	f = 'areaid_1';
+	if(Dd(f).value == 0) {
+		Dmsg('请选择所在地区', 'areaid', 1);
+		return false;
+	}
 	f = 'username';
 	l = Dd(f).value.length;
 	if(l < 2) {

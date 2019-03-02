@@ -6,10 +6,14 @@ class answer {
 	var $table;
 	var $errmsg = errmsg;
 
-    function answer() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'know_answer';
 		$this->db = &$db;
+    }
+
+    function answer() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -38,7 +42,8 @@ class answer {
 			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
-		$pages = pages($items, $page, $pagesize);		
+		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();	
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -72,6 +77,7 @@ class answer {
 			if($r) {
 				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 				$this->db->query("DELETE FROM {$DT_PRE}know_vote WHERE aid=$itemid");
+				if($r['content']) delete_local($r['content'], get_user($r['username']));
 				if($r['username'] && $MOD['credit_del_answer']) {
 					credit_add($r['username'], -$MOD['credit_del_answer']);
 					credit_record($r['username'], -$MOD['credit_del_answer'], 'system', lang('my->credit_record_answer_del'), 'ID:'.$r['qid']);
@@ -81,7 +87,7 @@ class answer {
 	}
 
 	function check($itemid, $status = 3) {
-		global $MOD;
+		global $MOD, $DT_TIME;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { 
 				$this->check($v, $status); 
@@ -90,9 +96,17 @@ class answer {
 			if($MOD['credit_answer'] && $status == 3) {
 				$this->itemid = $itemid;
 				$item = $this->get_one();
-				if($item['username']) {
-					credit_add($item['username'], $MOD['credit_answer']);
-					credit_record($item['username'], $MOD['credit_answer'], 'system', lang('my->credit_record_answer_add'), 'ID:'.$itemid);
+				if($item['username']) {					
+					$could_credit = true;
+					$reason = lang('my->credit_record_answer_add');
+					if($MOD['credit_maxanswer'] > 0) {					
+						$r = $this->db->get_one("SELECT SUM(amount) AS total FROM {$this->db->pre}finance_credit WHERE username='$item[username]' AND addtime>$DT_TIME-86400  AND reason='".$reason."'");
+						if($r['total'] >= $MOD['credit_maxanswer']) $could_credit = false;
+					}
+					if($could_credit) {
+						credit_add($item['username'], $MOD['credit_answer']);
+						credit_record($item['username'], $MOD['credit_answer'], 'system', $reason, 'ID:'.$itemid);
+					}
 				}
 			}
 			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");

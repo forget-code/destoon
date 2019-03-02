@@ -1,14 +1,13 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
-if(strpos(get_env('self'), '/admin.php') !== false) msg('后台文件名admin.php未修改，此功能已被系统禁用');
+defined('DT_ADMIN') or exit('Access Denied');
 require DT_ROOT.'/include/sql.func.php';
 $menus = array (
-    array('数据库备份', '?file='.$file),
-    array('数据库恢复', '?file='.$file.'&action=import'),
+    array('数据备份', '?file='.$file),
+    array('数据恢复', '?file='.$file.'&action=import'),
     array('字符替换', '?file='.$file.'&action=replace'),
     array('执行SQL', '?file='.$file.'&action=execute'),
     array('显示进程', '?file='.$file.'&action=process'),
@@ -18,6 +17,8 @@ $menus = array (
 $this_forward = '?file='.$file;
 $D = DT_ROOT.'/file/backup/';
 isset($dir) or $dir = '';
+isset($table) or $table = '';
+if($table) $table = strip_sql($table, 0);
 switch($action) {
 	case 'repair':
 		$DT['close'] or msg('为了数据安全，此操作必须在网站设置里关闭网站');
@@ -35,6 +36,7 @@ switch($action) {
 		if(!$tables) msg();
 		if(is_array($tables)) {
 			foreach($tables as $table) {
+				$table = strip_sql($table, 0);
 				if(strpos($table, $DT_PRE) === false) $db->query("DROP TABLE `$table`");
 			}
 		}
@@ -47,7 +49,7 @@ switch($action) {
 				msg('SQL语句为空');
 			} else {
 				$sql = stripslashes($sql);
-				$sql = str_replace(array('updat&#101;','replac&#101;','delet&#101;'), array('update','replace','delete'), $sql);
+				$sql = strip_sql($sql, 0);
 				sql_execute($sql);
 				dmsg('执行成功', '?file='.$file.'&action=execute');
 			}
@@ -57,16 +59,23 @@ switch($action) {
 	break;
 	case 'process':
 		$lists = array();
-		$result = $db->query("SHOW PROCESSLIST");
+		$result = $db->query("SHOW FULL PROCESSLIST");
 		while($r = $db->fetch_array($result)) {
 			$lists[] = $r;
 		}
 		include tpl('database_process');
 	break;
 	case 'kill':
-		$id = isset($id) ? intval($id) : 0;
 		$db->halt = 0;
-		if($id) $db->query("KILL $id");
+		if($itemid) {
+			if(is_array($itemid)) {
+				foreach($itemid as $id) {
+					$db->query("KILL $id");
+				}
+			} else {
+				$db->query("KILL $itemid");
+			}
+		}
 		dmsg('结束成功', '?file='.$file.'&action=process');
 	break;
 	case 'comments':
@@ -404,6 +413,8 @@ switch($action) {
 				$random = timetodate($DT_TIME, 'Y-m-d H.i.s').' '.strtolower(random(10));
 				$tsize = 0;
 				foreach($tables as $k=>$v) {
+					$v = strip_sql($v, 0);
+					$tables[$k] = $v;
 					$tsize += $sizes[$v];
 				}
 				$tid = ceil($tsize*1024/$sizelimit);

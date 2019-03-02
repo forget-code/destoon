@@ -32,9 +32,7 @@
 					<div>
 						购物车当前有
 						<span class="f_red">
-						<script type="text/javascript">
-						document.write(substr_count(get_cookie('cart'), ','));
-						</script>
+						<script type="text/javascript">document.write(get_cart());</script>
 						</span>
 						件商品，<a href="{$MOD[linkurl]}cart.php" class="b" rel="nofollow">去结算&raquo;</a> <span class="f_gray">|</span> 
 						<a href="{$MODULE[2][linkurl]}trade.php?action=order" class="b" rel="nofollow">我的订单</a>

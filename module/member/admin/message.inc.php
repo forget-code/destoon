@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/message.class.php';
 $menus = array (
     array('发送信件', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),

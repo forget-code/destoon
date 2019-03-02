@@ -8,7 +8,7 @@ class message {
 	var $pre;
 	var $errmsg = errmsg;
 
-    function message()	{
+    function __construct() {
 		global $db, $DT_PRE, $_userid, $_username;
 		$this->userid = $_userid;
 		$this->username = $_username;
@@ -16,12 +16,16 @@ class message {
 		$this->db = &$db;
     }
 
+    function message()	{
+		$this->__construct();
+    }
+
 	function is_message($message) {
 		global $L;
 		if(!is_array($message)) return false;
 		if(empty($message['title'])) return $this->_($L['pass_title']);
 		if(empty($message['content'])) return $this->_($L['pass_content']);
-		if(preg_match("/(embed|object)/i", $message['content'])) return false;
+		if(DT_MAX_LEN && strlen($message['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
@@ -35,6 +39,7 @@ class message {
 		clear_upload($message['content']);
 		$message['title'] = dhtmlspecialchars(trim($message['title']));
 		$message['content'] = dsafe(addslashes(save_remote(save_local(stripslashes($message['content'])))));
+		if(preg_match("/(embed|object)/i", $message['content'])) return false;
 		if(isset($message['save'])) {
 			$this->db->query("INSERT INTO {$this->pre}message(title,typeid,content,fromuser,touser,addtime,ip,status) values('$message[title]','$message[typeid]','$message[content]','$this->username','$message[touser]','$DT_TIME','$DT_IP','1')");
 		} else {
@@ -65,7 +70,7 @@ class message {
 		$r = $this->get_one();
 		if($r['status'] != 1 || $r['fromuser'] != $this->username) return $this->_($L['message_msg_edit']);
 		clear_upload($message['content']);
-		$message['title'] = htmlspecialchars(trim($message['title']));
+		$message['title'] = dhtmlspecialchars(trim($message['title']));
 		$message['content'] = dsafe(addslashes(save_remote(save_local(stripslashes($message['content'])))));
 		delete_diff($message['content'], $r['content']);
 		$this->db->query("UPDATE {$this->pre}message SET title='$message[title]',content='$message[content]' WHERE itemid='$this->itemid' ");
@@ -86,6 +91,7 @@ class message {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$messages = array();
 		$result = $this->db->query("SELECT * FROM {$this->pre}message WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -195,11 +201,16 @@ class message {
 		if(!$this->itemid) return false;
 		$itemids = is_array($this->itemid) ? implode(',', $this->itemid) : intval($this->itemid);
 		$condition = "status=3 AND isread=0 AND touser='$this->username' AND itemid IN($itemids)";
-		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->pre}message WHERE $condition ");
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->pre}message WHERE $condition");
 		if($r['num']) {
-			$this->db->query("UPDATE {$this->pre}message SET isread=1 WHERE $condition ");
+			$this->db->query("UPDATE {$this->pre}message SET isread=1 WHERE $condition");
 			$this->db->query("UPDATE {$this->pre}member SET message=message-$r[num] WHERE username='$this->username' ");
 		}
+	}
+
+	function markall() {
+		$this->db->query("UPDATE {$this->pre}message SET isread=1 WHERE status=3 AND isread=0 AND touser='$this->username'");
+		$this->db->query("UPDATE {$this->pre}member SET message=0 WHERE username='$this->username' ");
 	}
 
 	function restore() {
@@ -263,7 +274,7 @@ class message {
 		global $DT_TIME;
 		if(!$this->_is_message($message)) return false;
 		clear_upload($message['content']);
-		$message['title'] = htmlspecialchars(trim($message['title']));
+		$message['title'] = dhtmlspecialchars(trim($message['title']));
 		$message['content'] = dsafe(addslashes(save_remote(save_local(stripslashes($message['content'])))));
 		if($message['type']) {
 			$message['groupids'] = implode(',', $message['groupids']);
@@ -279,7 +290,7 @@ class message {
 	function _edit($message) {
 		if(!$this->_is_message($message)) return false;
 		clear_upload($message['content']);
-		$message['title'] = htmlspecialchars(trim($message['title']));
+		$message['title'] = dhtmlspecialchars(trim($message['title']));
 		$message['content'] = dsafe(addslashes(save_remote(save_local(stripslashes($message['content'])))));
 		$message['groupids'] = implode(',', $message['groupids']);
 		$this->db->query("UPDATE {$this->pre}message SET title='$message[title]',content='$message[content]',groupids='$message[groupids]' WHERE itemid='$this->itemid' ");

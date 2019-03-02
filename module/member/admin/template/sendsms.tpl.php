@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -62,15 +62,21 @@ show_menu($menus);
 <table cellpadding="0" cellspacing="0" width="100%">
 <tr>
 <td valign="top" width="250"><textarea name="content" id="content" rows="15" cols="35" onkeyup="S();" onblur="S();"></textarea></td>
-<td valign="top" class="f_gray"><br/>
+<td valign="top" class="f_gray">
 - 当前已输入<strong id="len1">0</strong>字，签名<strong id="len2">0</strong>字，共<strong id="len3" class="f_red">0</strong>字，分<strong id="len4" class="f_blue">0</strong>条短信 (<?php echo $DT['sms_len'];?>字/条)<br/>
 - 以上分条仅为系统估算，实际分条以运营商返回数据为准<br/>
 - 内容支持变量，会员资料保存于$user数组<br/>
 - 例 {$user[username]} 表示会员名<br/>
 - 例 {$user[company]} 表示公司名<br/>
 - 如果是给非会员发送短信，请不要使用变量<br/>
-<?php if(!$DT['sms'] || !$DT['sms_uid'] || !$DT['sms_key']) { ?>
-<span class="f_red">- 注意：无法发送，未设置发送参数</span> <a href="?file=setting" class="t">点此设置</a><br/>
+<?php if(!$DT['sms'] || !DT_CLOUD_UID || !DT_CLOUD_KEY) { ?>
+<span class="f_red">- 注意：无法发送，未设置发送参数</span> <a href="?file=setting&tab=7" class="t">点此设置</a><br/>
+<?php } else { ?>
+
+<span class="f_red">
+- 由于政策原因，并非所有内容都可以正常发送...<a href="<?php echo DT_PATH;?>api/redirect.php?url=http://help.destoon.com/use/29.html%23faq" target="_blank" class="t">了解详情</a><br/>
+- 发送任何违法信息，帐号会被禁用且不退款<br/>
+</span><br/>
 <?php } ?>
 <span id="dcontent" class="f_red"></span>
 </td>

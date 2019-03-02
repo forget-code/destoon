@@ -10,7 +10,7 @@ class know {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function know($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -20,18 +20,24 @@ class know {
 		$this->fields = array('catid','areaid','level','title','style','fee','credit','aid','process','hidden','introduce','addition','thumb','tag','status','hits','username','ask','addtime','totime','editor','edittime','ip','template', 'linkurl','filepath','note');
     }
 
+    function know($moduleid) {
+		$this->__construct($moduleid);
+    }
+
 	function pass($post) {
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_catid'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		is_url($post['thumb']) or $post['thumb'] = '';
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
-		$post['title'] = trim($post['title']);
 		$post['credit'] = intval($post['credit']);
 		$post['fee'] = dround($post['fee']);
 		$post['hidden'] = (isset($post['hidden']) && $post['hidden']) ? 1 : 0;
@@ -43,10 +49,10 @@ class know {
 		if($MOD['introduce_length']) $post['introduce'] = addslashes(get_intro($post['content'], $MOD['introduce_length']));
 		if($this->itemid) {
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 		} else {
 			$post['aid'] = 0;
@@ -62,8 +68,15 @@ class know {
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'addtime DESC', $cache = '') {
@@ -75,6 +88,7 @@ class know {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -82,7 +96,7 @@ class know {
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
-			$r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
+			if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
 			$catids[$r['catid']] = $r['catid'];
 			$lists[] = $r;
 		}
@@ -113,7 +127,7 @@ class know {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -133,7 +147,7 @@ class know {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'], $this->itemid);
 		if($post['status'] == 3) $this->tohtml($this->itemid, $post['catid']);
@@ -156,6 +170,14 @@ class know {
 		$item['itemid'] = $itemid;
 		$linkurl = itemurl($item);
 		if($linkurl != $item['linkurl']) $update .= ",linkurl='$linkurl'";
+		if($item['process'] == 0 || $item['process'] == 3) {
+			$answer = $this->db->count($this->table.'_answer', "qid=$itemid AND status=3");
+			if($answer != $item['answer']) $update .= ",answer='$answer'";
+		}
+		if($item['username']) {
+			$passport = addslashes(get_user($item['username'], 'username', 'passport'));
+			if($passport != $item['passport']) $update .= ",passport='$passport'";
+		}
 		if($update) $this->db->query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
 	}
 
@@ -181,7 +203,7 @@ class know {
 	}
 
 	function delete($itemid, $all = true) {
-		global $MOD, $DT_PRE;
+		global $MOD;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { 
 				$this->delete($v, $all);
@@ -198,8 +220,6 @@ class know {
 				if($r['thumb']) delete_upload($r['thumb'], $userid);
 				if($r['content']) delete_local($r['content'], $userid);
 				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
-				$this->db->query("DELETE FROM {$DT_PRE}know_answer WHERE qid=$itemid");
-				$this->db->query("DELETE FROM {$DT_PRE}know_vote WHERE qid=$itemid");
 				$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
 				$this->db->query("DELETE FROM {$content_table} WHERE itemid=$itemid");
 				if($MOD['cat_property']) $this->db->query("DELETE FROM {$this->db->pre}category_value WHERE moduleid=$this->moduleid AND itemid=$itemid");
@@ -207,6 +227,12 @@ class know {
 					credit_add($r['username'], -$MOD['credit_del']);
 					credit_record($r['username'], -$MOD['credit_del'], 'system', lang('my->credit_record_del', array($MOD['name'])), 'ID:'.$this->itemid);
 				}
+				$this->db->query("DELETE FROM {$this->table}_vote WHERE qid=$itemid");
+				$result = $this->db->query("SELECT * FROM {$this->table}_answer WHERE qid=$itemid");
+				while($rr = $this->db->fetch_array($result)) {
+					if($rr['content']) delete_local($rr['content'], get_user($rr['username']));
+				}
+				$this->db->query("DELETE FROM {$this->table}_answer WHERE qid=$itemid");
 			}
 		}
 	}
@@ -239,7 +265,7 @@ class know {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
@@ -257,6 +283,7 @@ class know {
 		} else {
 			$totime = $DT_TIME + $MOD['overdays']*86400;
 			$this->db->query("UPDATE {$this->table} SET totime=$totime,process=1,updatetime=$DT_TIME WHERE itemid=$itemid AND process=0");
+			$this->tohtml($itemid);
 			return true;
 		}
 	}

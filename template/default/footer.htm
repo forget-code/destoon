@@ -19,8 +19,8 @@
 		<div id="powered"><a href="http://www.destoon.com/" target="_blank"><img src="{DT_STATIC}file/image/powered.gif" width="136" height="10" alt="Powered by DESTOON"/></a></div>
 	</div>
 </div>
-<!--[系统关键代码，请勿删除]-->
-<div id="back2top" class="back2top"><a href="javascript:void(0);" title="返回顶部">&nbsp;</a></div>
+<!--[以下为系统关键代码，请勿删除]-->
+<div class="back2top"><a href="javascript:void(0);" title="返回顶部">&nbsp;</a></div>
 <script type="text/javascript">
 {if $destoon_task}
 show_task('{$destoon_task}');
@@ -28,9 +28,6 @@ show_task('{$destoon_task}');
 {php include DT_ROOT.'/api/task.inc.php';}
 {/if}
 {if $lazy}$(function(){$("img").lazyload();});{/if}
-$('#back2top').click(function() {
-	$("html, body").animate({scrollTop:0}, 200);
-});
 </script>
 </body>
 </html>

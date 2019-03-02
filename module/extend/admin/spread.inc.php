@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/spread.class.php';
 $do = new spread();
 $menus = array (
@@ -8,6 +8,7 @@ $menus = array (
     array('排名审核', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
     array('起价设置', '?moduleid='.$moduleid.'&file='.$file.'&action=price'),
     array('生成排名', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
+    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
     array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
 );
 if(in_array($action, array('', 'check'))) {

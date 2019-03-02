@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -60,7 +60,7 @@ show_menu($menus);
 <td><?php echo $v['price'];?></td>
 <td><?php echo $v['currency'] == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['company'];?></a></td>
-<td><a href="<?php echo $EXT['linkurl'];?>redirect.php?mid=<?php echo $v['mid'];?>&itemid=<?php echo $v['tid'];?>" target="_blank"><?php echo $v['tid'];?></a></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $v['mid'];?>&itemid=<?php echo $v['tid'];?>" target="_blank"><?php echo $v['tid'];?></a></td>
 <td class="px11"><?php echo $v['fromdate'];?></td>
 <td class="px11"><?php echo $v['todate'];?></td>
 <td<?php if($v['days']<5) echo ' class="f_red"';?>><?php echo $v['days'];?></td>

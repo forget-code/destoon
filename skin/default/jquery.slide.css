@@ -1,7 +1,7 @@
 .jqslide{background:#000000;color:#FFFFFF;padding-top:30px;}
-.jqslide .pic{text-align:center;position:relative;z-index:10;width:960px;height:600px;margin:0 auto;}
+.jqslide .pic{text-align:center;position:relative;z-index:5;width:960px;height:600px;margin:0 auto;}
 .jqslide .pic .big{text-align:center;vertical-align:center;position:relative;width:960px;height:600px;}
-.jqslide .pic .prev,.jqslide .pic .next {background:url('image/spacer.gif');cursor:pointer;height:100%;position:absolute;top:0;width:50%;z-index:10;}
+.jqslide .pic .prev,.jqslide .pic .next {background:url('image/spacer.gif');cursor:pointer;height:100%;position:absolute;top:0;width:50%;z-index:5;}
 .jqslide .pic .prev{left:0;}
 .jqslide .pic .next{right:0;}
 .jqslide .pic .prevbtn {cursor:url('image/prev.cur'),auto;display:block;height:100%;outline:none;width:100%;}
@@ -17,4 +17,4 @@
 .jqslide .scl,.jqslide .scr{background:url('image/jquery.slide.sc.png') no-repeat 0 0;display:block;width:20px;height:65px;position:absolute;top:7px;left:130px;}
 .jqslide .scr{left:810px;background-position:0 -95px;}
 .jqslide .scb {background:url('image/jquery.slide.sc.png') no-repeat  0 -190px;height:13px;left:150px;position:absolute;top:100px;width:260px;cursor:e-resize;}
-#pload{background:url('image/jquery.slide.pload.gif') no-repeat;position:absolute;width:37px;height:37px;z-index:1000;display:none;left:50%;top:50%;}
+#pload{background:url('image/jquery.slide.pload.gif') no-repeat;position:absolute;width:37px;height:37px;z-index:5;display:none;left:50%;top:50%;}

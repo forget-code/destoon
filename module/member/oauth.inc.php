@@ -1,6 +1,7 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 login();
+$MOD['oauth'] or dheader('./');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
 switch($action) {
@@ -9,7 +10,7 @@ switch($action) {
 		$U = $db->get_one("SELECT * FROM {$DT_PRE}oauth WHERE itemid=$itemid");
 		if(!$U || $U['username'] != $_username) message();
 		$db->query("DELETE FROM {$DT_PRE}oauth WHERE itemid=$itemid");
-		dmsg($L['oauth_quit'], 'oauth.php');
+		dmsg($L['oauth_quit'], '?action=index');
 	break;
 	default:
 		$lists = array();

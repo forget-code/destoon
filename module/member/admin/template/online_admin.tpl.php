@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -16,13 +16,13 @@ show_menu($menus);
 </tr>
 <?php foreach($lists as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
-<td><img src="<?php echo useravatar($v['username']);?>" style="padding:5px;"/></td>
+<td><img src="<?php echo useravatar($v['username']);?>" style="padding:5px;" width="48" height="48"/></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>')"><span<?php echo $sid == $v['sid'] ? ' style="color:red;" title="我"' : '';?>><?php echo $v['username'];?></span></a></td>
 <td><a href="<?php echo $MODULE[$v['moduleid']]['linkurl'];?>" target="_blank"><?php echo $MODULE[$v['moduleid']]['name'];?></a></td>
 <td><?php echo $v['ip'];?></td>
 <td><?php echo ip2area($v['ip']);?></td>
 <td><?php echo $v['lasttime'];?></td>
-<td><input type="text" size="30" value="<?php echo $v['qstring'];?>" title="<?php echo $v['qstring'];?>"/></td>
+<td><input type="text" size="30" value="<?php echo $v['qstring'];?>" title="<?php echo $v['qstring'];?>"/> <a href="?<?php echo $v['qstring'];?>" target="_blank"><img src="admin/image/link.gif" width="16" height="16" title="点击打开网址" alt="" align="absmiddle"/></a></td>
 </tr>
 <?php }?>
 </table>

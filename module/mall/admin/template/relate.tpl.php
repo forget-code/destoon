@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 ?>
 <div class="tt">关联商品</div>
@@ -19,7 +19,7 @@ include tpl('header');
 <div style="width:130px;float:left;">
 	<table width="120">
 	<tr align="center" height="110" class="c_p">
-	<td width="120"><a href="<?php echo $MOD['linkurl'];?><?php echo $v['linkurl'];?>" target="_blank"><img src="<?php echo $v['thumb'];?>" width="100" height="100" alt=""/></a></td>
+	<td width="120"><a href="<?php echo $MOD['linkurl'];?><?php echo $v['linkurl'];?>" target="_blank"><img src="<?php echo $v['thumb'];?>" width="100" height="100" alt="" title="<?php echo $v['title'];?>"/></a></td>
 	</tr>
 	<tr align="center">
 	<td>标题 <input type="text" size="8" name="post[<?php echo $v['itemid'];?>][relate_title]" value="<?php echo $v['relate_title'];?>"/></td>

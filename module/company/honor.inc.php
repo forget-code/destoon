@@ -10,6 +10,7 @@ if($itemid) {
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $title.','.$COM['company'];
 	$head_description = dsubstr(strip_tags($content), 200);
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.'&itemid='.$itemid;
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -40,6 +41,7 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 }
 include template('honor', $template);
 ?>

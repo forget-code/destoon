@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -31,7 +31,7 @@ show_menu($menus);
 <?php echo category_select('catid', '所属行业', $catid, $moduleid);?>&nbsp;
 <?php echo ajax_area_select('areaid', '所在地区', $areaid);?>&nbsp;
 <select name="logistic">
-<option value="-1">物流</option>
+<option value="-1">快递</option>
 <option value="0" <?php if($logistic == 0) echo 'selected';?>>不需要</option>
 <option value="1" <?php if($logistic == 1) echo 'selected';?>>需要</option>
 </select>&nbsp;
@@ -93,7 +93,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>
 </td>
 <td class="f_price" title="市场价：<?php echo $v['marketprice'];?> 节省：<?php echo $v['savemoney'];?> 折扣：<?php echo $v['discount'];?>"><?php echo $v['price'];?></td>
 <td class="px11"><?php echo $v['discount'];?></td>
-<td class="px11"><?php echo $v['orders'];?></td>
+<td class="px11"><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=order&id=<?php echo $v['itemid'];?>', '[<?php echo $v['alt'];?>] 订单列表');"><?php echo $v['orders'];?></a></td>
 <td class="px11"><?php echo $v['sales'];?></td>
 <td class="px11"><?php echo $v['hits'];?></td>
 <td>
@@ -104,6 +104,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>
 </tr>
 <?php } ?>
 </table>
+<?php include tpl('notice_chip');?>
 <div class="btns">
 
 <?php if($action == 'check') { ?>
@@ -134,12 +135,12 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>
 
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中<?php echo $MOD['name'];?>吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="submit" value=" 还 原 " class="btn" onclick="if(confirm('确定要还原选中<?php echo $MOD['name'];?>吗？状态将被设置为已通过')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=restore'}else{return false;}"/>&nbsp;
-<input type="submit" value=" 清 空 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear';"/>
+<input type="submit" value=" 清 空 " class="btn" onclick="if(confirm('确定要清空回收站吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear';}else{return false;}"/>
 
 <?php } else { ?>
 
 <input type="submit" value=" 更新信息 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=update';"/>&nbsp;
-<?php if($MOD['show_html']) { ?><input type="submit" value=" 生成网页 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=tohtml';"/>&nbsp;<?php } ?>
+<?php if($MOD['show_html']) { ?><input type="submit" value=" 生成网页 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=tohtml';"/>&nbsp; <?php } ?>
 <input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中<?php echo $MOD['name'];?>吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="submit" value=" 移动分类 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=move';"/>&nbsp;

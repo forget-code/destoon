@@ -1,25 +1,13 @@
 {if $action == 'my'}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset={DT_CHARSET}"/>
-<title>{if $head_title}{$head_title}{$DT[seo_delimiter]}{/if}{$DT[sitename]}</title>
-<link rel="stylesheet" type="text/css" href="{DT_STATIC}{$MODULE[2][moduledir]}/image/style.css" />
-<script type="text/javascript" src="{DT_STATIC}lang/{DT_LANG}/lang.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/config.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/jquery.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/common.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/admin.js"></script>
-</head>
-<body style="background:#EBF0F6;">
+{template 'header-widget', $module}
 <form action="friend.php">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="from" value="{$from}"/>
-<div class="tt" style="background:#EBF0F6;">
+<div class="tt">
 {$fields_select}&nbsp;
-<input type="text" size="50" name="kw" value="{$kw}" title="关键词"/>&nbsp;
-<input type="submit" value=" 搜 索 " class="btn"/>
-<input type="button" value=" 重 搜 " class="btn" onclick="Go('friend.php?action={$action}&from={$from}');"/>
+<input type="text" size="40" name="kw" value="{$kw}" title="关键词"/>&nbsp;
+<input type="submit" value="搜 索" class="btn"/>
+<input type="button" value="重 搜" class="btn" onclick="Go('friend.php?action={$action}&from={$from}');"/>
 </div>
 </form>
 {if $lists}
@@ -35,7 +23,7 @@
 </tr>
 {loop $lists $k $v}
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center" title="{$v[note]}">
-<td><img src="{useravatar($v[username], 'small')}" width="20"/></td>
+<td><img src="{useravatar($v[username], 'small')}" width="20" height="20"/></td>
 <td align="left">&nbsp;<a href="{userurl($v[username])}" target="_blank" class="t">{$v[company]}</a></td>
 <td>{$v[truename]}</td>
 <td id="v_{$v[itemid]}">{if $from=='sms'}{$v[mobile]}{else}{$v[username]}{/if}</td>
@@ -47,8 +35,8 @@
 </div>
 {if $page}<div class="pages">{$pages}</div>{/if}
 <div style="text-align:center;">
-<input type="button" value=" 确 定 " class="btn" onclick="window.parent.cDialog();"/>&nbsp;&nbsp;
-<input type="button" value=" 关 闭 " class="btn" onclick="window.parent.cDialog();"/>
+<input type="button" value="确 定" class="btn" onclick="window.parent.cDialog();"/>&nbsp;&nbsp;
+<input type="button" value="关 闭" class="btn" onclick="window.parent.cDialog();"/>
 </div>
 <script type="text/javascript">
 var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
@@ -129,9 +117,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="add"><a href="friend.php?action=add"><span>添加商友</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="home"><a href="friend.php"><span>我的商友</span></a></td>
-<td class="tab_nav">&nbsp;</td>
+<td class="tab" id="home"><a href="friend.php?action=index"><span>我的商友</span></a></td>
 <td class="tab" id="type"><a href="javascript:Dwidget('type.php?item=friend', '[商友分类]', 600, 300);"><span>商友分类</span></a></td>
 </tr>
 </table>
@@ -142,7 +128,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 <table cellpadding="5" cellspacing="1" class="tb">
 <tr>
 <td class="tl">分类</td>
-<td class="tr">{$type_select}&nbsp; <a href="javascript:Dwidget('type.php?item=friend', '[商友分类]', 600, 300);" class="t">[管理分类]</a></td>
+<td class="tr"><span id="type_box">{$type_select}</span>&nbsp; <a href="javascript:var type_item='friend-{$_userid}',type_name='post[typeid]',type_default='{$L[default_type]}',type_id={$typeid},type_interval=setInterval('type_reload()',500);Dwidget('type.php?item=friend', '[商友分类]', 600, 300);" class="t">[管理分类]</a></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 姓名</td>
@@ -150,7 +136,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 </tr>
 <tr>
 <td class="tl">会员名</td>
-<td class="tr"><input type="text" size="20" name="post[username]" id="username" value="{$username}"/> <input type="button" class="btn" value="显示资料" onclick="Go('friend.php?action=add&username='+Dd('username').value);"/></td>
+<td class="tr"><input type="text" size="20" name="post[username]" id="username" value="{$username}"/> <input type="button" class="btn_b" value="显示资料" onclick="Go('friend.php?action=add&username='+Dd('username').value);"/></td>
 </tr>
 <tr>
 <td class="tl">公司名称</td>
@@ -206,7 +192,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 添 加 " class="btn_g"/></td>
 </tr>
 </table>
 </form>
@@ -219,7 +205,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 <table cellpadding="5" cellspacing="1" class="tb">
 <tr>
 <td class="tl">分类</td>
-<td class="tr">{$type_select}&nbsp; <a href="javascript:Dwidget('type.php?item=friend', '[商友分类]', 600, 300);" class="t">[管理分类]</a></td>
+<td class="tr"><span id="type_box">{$type_select}</span>&nbsp; <a href="javascript:var type_item='friend-{$_userid}',type_name='post[typeid]',type_default='{$L[default_type]}',type_id={$typeid},type_interval=setInterval('type_reload()',500);Dwidget('type.php?item=friend', '[商友分类]', 600, 300);" class="t">[管理分类]</a></td>
 </tr>
 <tr>
 <td class="tl">显示顺序</td>
@@ -287,7 +273,7 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 修 改 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 修 改 " class="btn_g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 取 消 " class="btn" onclick="history.back(-1);"/></td>
 </tr>
 </table>
 </form>
@@ -302,10 +288,10 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 <input type="button" value=" 重 搜 " class="btn" onclick="Go('friend.php');"/>
 </div>
 </form>
-<table cellpadding="5" cellspacing="1" width="100%" bgcolor="#9CB8CC">
+<table cellpadding="5" cellspacing="1" width="100%" bgcolor="#E8E8E8">
 {loop $lists $k $v}
 {if $k%2==0}<tr>{/if}
-<td valign="top" width="50%" bgcolor="#FFFFFF" onmouseover="this.style.backgroundColor='#F2F6FB';" onmouseout="this.style.backgroundColor='#FFFFFF';" title="{$v[note]}">
+<td valign="top" width="50%" bgcolor="#FFFFFF" onmouseover="this.style.backgroundColor='#F5F5F5';" onmouseout="this.style.backgroundColor='#FFFFFF';" title="{$v[note]}">
 {if $v}
 <table cellpadding="2" cellspacing="2" width="96%" align="center">
 <tr>
@@ -324,8 +310,8 @@ var itemids = [{loop $lists $i $t}{if $i},{/if}'{$t[itemid]}'{/loop}];
 <td height="20">
 <span class="f_r" title="添加时间 {$v[adddate]}">
 <a href="friend.php?typeid={$v[typeid]}" class="t">[{$v[type]}]</a>&nbsp;
-<a href="friend.php?action=edit&itemid={$v[itemid]}" class="t">[修改]</a>&nbsp;
-<a href="friend.php?action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');" class="t">[删除]</a>&nbsp;
+<a href="?action=edit&itemid={$v[itemid]}" class="t">[修改]</a>&nbsp;
+<a href="?action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');" class="t">[删除]</a>&nbsp;
 </span>
 {if $v[homepage]}<a href="{$v[homepage]}" target="_blank"><img width="16" height="16" src="{DT_SKIN}image/homepage.gif" title="公司主页" alt="" align="absmiddle"/></a>&nbsp;{/if}
 {if $DT[sms] && $v[mobile]}<a href="sms.php?action=add&mob={$v[mobile]}"><img width="16" height="16" src="{DT_SKIN}image/mobile.gif" title="发送短信" align="absmiddle"/></a>&nbsp;{/if}

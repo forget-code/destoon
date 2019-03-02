@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -11,11 +11,11 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">发件人</td>
-<td><a href="<?php echo userurl($fromuser);?>" target="_blank"><?php echo $fromuser;?></a></td>
+<td><a href="javascript:_user('<?php echo $fromuser;?>');"><?php echo $fromuser;?></a></td>
 </tr>
 <tr>
 <td class="tl">收件人</td>
-<td><a href="<?php echo userurl($touser);?>" target="_blank"><?php echo $touser;?></a></td>
+<td><a href="javascript:_user('<?php echo $touser;?>');"><?php echo $touser;?></a></td>
 </tr>
 <tr>
 <td class="tl">发信时间</td>

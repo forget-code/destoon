@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -31,7 +31,7 @@ var _del = 0;
 <td><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&mid=<?php echo $v['moduleid'];?>"><?php echo isset($MODULE[$v['moduleid']]) ? $MODULE[$v['moduleid']]['name'] : '其他';?></a></td>
 <td class="px11"><?php echo $v['edittime'];?></td>
 <td><?php echo $v['editor'];?></td>
-<td><a href="<?php echo $EXT['linkurl'];?>redirect.php?itemid=<?php echo $v['itemid'];?>&mid=<?php echo $v['moduleid'];?>" target="_blank">点击打开</a></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?itemid=<?php echo $v['itemid'];?>&mid=<?php echo $v['moduleid'];?>" target="_blank">点击打开</a></td>
 </td>
 </tr>
 <?php } ?>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/member.class.php';
 $do = new member;
 $menus = array (
@@ -26,10 +26,10 @@ if($_catids || $_areaids) {
 }
 
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('按条件', '公司名', '会员名', '通行证名','姓名', '手机号码', '部门', '职位', 'Email', 'QQ', 'MSN', '阿里旺旺', 'Skype', '注册IP', '登录IP', '客服专员', '开户银行', '银行帐号', $DT['trade_nm'], '推荐人');
-	$dfields = array('username', 'company', 'username', 'passport', 'truename', 'mobile', 'department', 'career', 'email', 'qq', 'msn', 'ali', 'skype', 'regip', 'loginip', 'support', 'bank', 'account', 'trade', 'inviter');
-	$sorder  = array('结果排序方式', '注册时间降序', '注册时间升序', '登录时间降序', '登录时间升序', '登录次数降序', '登录次数升序', '账户'.$DT['money_name'].'降序', '账户'.$DT['money_name'].'升序', '会员'.$DT['credit_name'].'降序', '会员'.$DT['credit_name'].'升序', '短信余额降序', '短信余额升序');
-	$dorder  = array('userid DESC', 'regtime DESC', 'regtime ASC', 'logintime DESC', 'logintime ASC', 'logintimes DESC', 'logintimes ASC', 'money DESC', 'money ASC', 'credit DESC', 'credit ASC', 'sms DESC', 'sms ASC');
+	$sfields = array('按条件', '公司名', '会员名', '昵称','姓名', '手机号码', '部门', '职位', 'Email', 'QQ', 'MSN', '阿里旺旺', 'Skype', '注册IP', '登录IP', '客服专员', '开户银行', '银行帐号', $DT['trade_nm'], '推荐人', '备注');
+	$dfields = array('username', 'company', 'username', 'passport', 'truename', 'mobile', 'department', 'career', 'email', 'qq', 'msn', 'ali', 'skype', 'regip', 'loginip', 'support', 'bank', 'account', 'trade', 'inviter', 'note');
+	$sorder  = array('结果排序方式', '注册时间降序', '注册时间升序', '修改时间降序', '修改时间升序', '登录时间降序', '登录时间升序', '登录次数降序', '登录次数升序', '账户'.$DT['money_name'].'降序', '账户'.$DT['money_name'].'升序', '会员'.$DT['credit_name'].'降序', '会员'.$DT['credit_name'].'升序', '短信余额降序', '短信余额升序');
+	$dorder  = array('userid DESC', 'regtime DESC', 'regtime ASC', 'edittime DESC', 'edittime ASC', 'logintime DESC', 'logintime ASC', 'logintimes DESC', 'logintimes ASC', 'money DESC', 'money ASC', 'credit DESC', 'credit ASC', 'sms DESC', 'sms ASC');
 	$sgender = array('性别', '先生' , '女士');
 	$savatar = array('头像', '已上传' , '未上传');
 	$sprofile = array('资料', '已完善' , '未完善');
@@ -47,6 +47,7 @@ if(in_array($action, array('', 'check'))) {
 	$avatar = isset($avatar) ? intval($avatar) : 0;
 	$uid = isset($uid) ? intval($uid) : '';
 	$username = isset($username) ? trim($username) : '';
+	$passport = isset($passport) ? trim($passport) : '';
 	$vprofile = isset($vprofile) ? intval($vprofile) : 0;
 	$vemail = isset($vemail) ? intval($vemail) : 0;
 	$vmobile = isset($vmobile) ? intval($vmobile) : 0;
@@ -63,6 +64,8 @@ if(in_array($action, array('', 'check'))) {
 	$maxcredit = isset($maxcredit) ? intval($maxcredit) : '';
 	$minsms = isset($minsms) ? intval($minsms) : '';
 	$maxsms = isset($maxsms) ? intval($maxsms) : '';
+	$mindeposit = isset($mindeposit) ? intval($mindeposit) : '';
+	$maxdeposit = isset($maxdeposit) ? intval($maxdeposit) : '';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
@@ -75,7 +78,7 @@ if(in_array($action, array('', 'check'))) {
 	$vtruename_select = dselect($struename, 'vtruename', '', $vtruename);
 	$vbank_select = dselect($sbank, 'vbank', '', $vbank);
 	$vcompany_select = dselect($scompany, 'vcompany', '', $vcompany);
-	$vtrade_select = dselect($strade, 'vtrade', '', $vtrade);
+	$vtrade_select = $DT['trade_nm'] ? dselect($strade, 'vtrade', '', $vtrade) : '';
 
 	$condition = $action ? 'groupid=4' : 'groupid!=4';//
 	if($_areaids) $condition .= " AND areaid IN (".$_areaids.")";//CITY
@@ -85,6 +88,7 @@ if(in_array($action, array('', 'check'))) {
 	if($groupid) $condition .= " AND groupid=$groupid";
 	if($uid) $condition .= " AND userid=$uid";
 	if($username) $condition .= " AND username='$username'";
+	if($passport) $condition .= " AND passport='$passport'";
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 	if($vprofile) $condition .= $vprofile == 1 ? " AND edittime>0" : " AND edittime=0";
 	if($vemail) $condition .= $vemail == 1 ? " AND vemail>0" : " AND vemail=0";
@@ -101,6 +105,8 @@ if(in_array($action, array('', 'check'))) {
 	if($maxcredit) $condition .= " AND credit<=$maxcredit";
 	if($minsms) $condition .= " AND sms>=$minsms";
 	if($maxsms) $condition .= " AND sms<=$maxsms";
+	if($mindeposit) $condition .= " AND deposit>=$mindeposit";
+	if($maxdeposit) $condition .= " AND deposit<=$maxdeposit";
 }
 if(in_array($action, array('add', 'edit'))) {
 	$COM_TYPE = explode('|', $MOD['com_type']);
@@ -151,6 +157,7 @@ switch($action) {
 		if(!$_founder && $userid != $_userid && $user['groupid'] == 1) msg('您无权修改其他管理员资料');
 		if($submit) {
 			if($userid == $_userid && $member['password']) msg('系统检查到您要修改密码，正在进入密码修改界面...', '?action=password', 3);
+			$member['passport'] = $user['passport'];
 			$member['edittime'] = $member['edittime'] ? $DT_TIME : 0;
 			$member['validtime'] = $member['validtime'] ? strtotime($member['validtime']) : 0;
 			if($userid == 1 || $userid == $CFG['founderid']) $member['groupid'] = 1;
@@ -181,9 +188,9 @@ switch($action) {
 			$content_table = content_table(4, $userid, is_file(DT_CACHE.'/4.part'), $DT_PRE.'company_data');
 			$t = $db->get_one("SELECT * FROM {$content_table} WHERE userid=$userid");
 			if($t) {
-				$introduce = $t['content'];
+				$content = $t['content'];
 			} else {
-				$introduce = '';
+				$content = '';
 				$db->query("INSERT INTO {$content_table} (userid,content) VALUES ('$userid','')");
 			}
 			$cates = $catid ? explode(',', substr($catid, 1, -1)) : array();
@@ -271,6 +278,7 @@ switch($action) {
 		$cusername or message('当前会员名不能为空');
 		$nusername or message('会员名不能为空');
 		$user = $do->get_one($cusername);
+		$user or message('当前会员名不存在');
 		$userid = $user['userid'];
 		if(!$_founder && $cusername != $_username) {
 			if($user['groupid'] == 1) msg('您无权修改其他管理员用户名');
@@ -285,6 +293,21 @@ switch($action) {
 			msg($do->errmsg);
 		}
 	break;
+	case 'passport':
+		$cpassport or message('当前会员昵称不能为空');
+		$npassport or message('会员昵称不能为空');
+		$user = $db->get_one("SELECT * FROM {$DT_PRE}member WHERE passport='$cpassport'");
+		$user or message('当前会员昵称不存在');
+		$userid = $user['userid'];
+		if(!$_founder && $user['username'] != $_username) {
+			if($user['groupid'] == 1) msg('您无权修改其他管理员昵称');
+		}
+		if($do->edit_passport($cpassport, $npassport, $user['username'])) {
+			dmsg('修改成功', $forward);
+		} else {
+			msg($do->errmsg);
+		}
+	break;
 	case 'login':
 		if($userid) {
 			if($_userid == $userid) msg('', $MODULE[2]['linkurl']);
@@ -294,9 +317,9 @@ switch($action) {
 				if($user['groupid'] == 1) msg('您无权登入其他管理员会员中心');
 				if($_admin > 1 && $user['support'] && $user['support'] != $_username) msg('您无权登入该会员的会员中心');
 			}
-			$auth = encrypt($userid.'|'.$_username);
+			$auth = encrypt($userid.'|'.$_username, DT_KEY.'ADMIN');
 			set_cookie('admin_user', $auth);
-			msg('授权成功，正在转入会员商务中心...', $MODULE[2]['linkurl'].'?tm='.$DT_TIME);
+			msg('授权成功，正在转入会员商务中心...', $MODULE[2]['linkurl'].'?reload='.$DT_TIME);
 		} else {
 			msg();
 		}
@@ -310,6 +333,31 @@ switch($action) {
 		} else {
 			msg('IP:'.$ip.' 未被系统锁定');
 		}
+	break;
+	case 'note_add':
+		$userid or msg('请选择会员');
+		$note = str_replace(array('|', '-'), array('/', '_'), strip_tags(trim($note)));
+		strlen($note) > 3 or msg('请填写备注内容');
+		$do->userid = $userid;
+		$member = $do->get_one();
+		$member or msg('会员不存在');
+		if($member['note']) {
+			$note = timetodate($DT_TIME, 5)."|".$_username."|".$note."\n--------------------\n".addslashes($member['note']);
+		} else {
+			$note = timetodate($DT_TIME, 5)."|".$_username."|".$note;
+		}
+		$db->query("UPDATE {$table} SET note='$note' WHERE userid=$userid");
+		dmsg('追加成功', '?moduleid='.$moduleid.'&action=show&userid='.$userid);
+	break;
+	case 'note_edit':
+		$_admin == 1 or msg();
+		$userid or msg('请选择会员');
+		$do->userid = $userid;
+		$member = $do->get_one();
+		$member or msg('会员不存在');
+		$note = strip_tags($note);
+		$db->query("UPDATE {$table} SET note='$note' WHERE userid=$userid");
+		dmsg('修改成功', '?moduleid='.$moduleid.'&action=show&userid='.$userid);
 	break;
 	default:
 		$members = $do->get_list($condition, $dorder[$order]);

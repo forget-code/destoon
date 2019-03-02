@@ -7,8 +7,8 @@ if($html == 'show') {
 	$update = '';
 	include DT_ROOT.'/include/update.inc.php';
 	echo 'Inner("hits", \''.$item['hits'].'\');';
-	$fileurl = $item['domain'] ? $item['filepath'] : $item['linkurl'];
-	if($MOD['show_html'] && $edittime > @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$fileurl)) tohtml('show', $module);
+	$item['linkurl'] = $item['domain'] ? $item['filepath'] : $item['linkurl'];
+	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
 	if($MOD['list_html'] && $task_list && $CAT) {

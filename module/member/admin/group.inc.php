@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('会员组添加', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('会员组管理', '?moduleid='.$moduleid.'&file='.$file),
@@ -41,9 +41,11 @@ if($action == 'add') {
 			if($vip < 1) $do->vip = $vip = 1;
 			$setting['fee'] = intval($setting['fee']);
 			if($setting['fee'] < 1) $setting['fee'] = 3000;
+			$setting['reg'] = 0;
 		} else {
 			$do->vip = $vip = $setting['fee'] = 0;
 		}
+		if($groupid == 6) $setting['reg'] = 1;
 		$do->listorder = intval($listorder);
 		$do->edit($setting);
 		dmsg('修改成功', '?moduleid='.$moduleid.'&file='.$file.'&action=edit&groupid='.$groupid);
@@ -89,10 +91,14 @@ class group {
 	var $db;
 	var $table;
 
-	function group() {
+	function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'member_group';
 		$this->db = &$db;
+	}
+
+	function group() {
+		$this->__construct();
 	}
 
 	function add($setting) {

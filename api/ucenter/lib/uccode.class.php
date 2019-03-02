@@ -10,6 +10,10 @@
 class uccode {
 	var $uccodes;
 
+	function __construct() {
+		$this->uccode();
+	}
+
 	function uccode() {
 		$this->uccode = array(
 			'pcodecount' => -1,

@@ -115,5 +115,6 @@ $cols = 5;
 $class = '';
 $seo_file = 'search';
 include DT_ROOT.'/include/seo.inc.php';
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].($kw ? 'index.php?moduleid='.$moduleid.'&kw='.encrypt($kw, DT_KEY.'KW') : 'search.php?action=mod'.$moduleid);
 include template('search', $module);
 ?>

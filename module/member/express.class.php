@@ -7,11 +7,15 @@ class express {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function express() {
+   function __construct() {
 		global $db;
 		$this->table = $db->pre.'mall_express';
 		$this->db = &$db;
 		$this->fields = array('parentid','areaid','title','express','fee_start','fee_step','username','addtime','listorder','note');
+    }
+
+    function express() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -41,10 +45,11 @@ class express {
 	}
 
 	function get_list($condition, $order = 'listorder ASC,itemid ASC') {
-		global $MOD, $pages, $page, $pagesize, $offset, $nums;
+		global $MOD, $pages, $page, $pagesize, $offset, $items;
 		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
-		$nums = $r['num'];
-		$pages = pages($nums, $page, $pagesize);		
+		$items = $r['num'];
+		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();	
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

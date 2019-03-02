@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -9,7 +9,7 @@ class dsession {
 	var $table;
 	var $time;
 
-    function dsession() {
+    function __construct() {
 		global $db, $DT_TIME;
 		$this->db = &$db;
 		$this->table = $this->db->pre.'session';
@@ -19,6 +19,10 @@ class dsession {
 		session_cache_limiter('private, must-revalidate');
 		session_start();
 		header("cache-control: private");
+    }
+
+    function dsession() {
+		$this->__construct();
     }
 
     function open($path, $name) {

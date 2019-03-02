@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -10,8 +10,10 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>
-&nbsp;<?php echo $type_select;?>&nbsp;
+&nbsp;<?php echo $fields_select;?>&nbsp;
 <input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo $type_select;?>&nbsp;
+<?php echo $level_select;?>&nbsp;
 <?php echo $DT['city'] ? ajax_area_select('areaid', '地区(分站)', $areaid).'&nbsp;' : '';?>
 <?php echo $order_select;?>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>

@@ -7,7 +7,6 @@ include load($module.'.lang');
 include load('my.lang');
 require MD_ROOT.'/article.class.php';
 $do = new article($moduleid);
-
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -16,7 +15,6 @@ if(in_array($action, array('add', 'edit'))) {
 	if($CP) require DT_ROOT.'/include/property.func.php';
 	isset($post_ppt) or $post_ppt = array();
 }
-
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
@@ -24,7 +22,6 @@ if(in_array($action, array('', 'add'))) {
 	$limit_used = $r['num'];
 	$limit_free = $MG['article_limit'] > $limit_used ? $MG['article_limit'] - $limit_used : 0;
 }
-
 switch($action) {
 	case 'add':
 		if($MG['article_limit'] && $limit_used >= $MG['article_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
@@ -72,20 +69,17 @@ switch($action) {
 				$post['clear_link'] = $MOD['clear_link'] ? 1 : 0;
 				$post['introduce_length'] = $MOD['introduce_length'] ? $MOD['introduce_length'] : 0;
 				$post['areaid'] = $cityid;
-				
+				if($FD) fields_check($post_fields);
+				if($CP) property_check($post_ppt);
 				if($could_color && $color && $_credit > $MOD['credit_color']) {
 					$post['style'] = $color;
 					credit_add($_username, -$MOD['credit_color']);
 					credit_record($_username, -$MOD['credit_color'], 'system', $L['title_color'], '['.$MOD['name'].']'.$post['title']);
 				}
-
-				if($FD) fields_check($post_fields);
-				if($CP) property_check($post_ppt);
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
 				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
-
 				if($fee_add) {
 					if($fee_currency == 'money') {
 						money_add($_username, -$fee_add);
@@ -100,7 +94,6 @@ switch($action) {
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
 				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
-				if(isset($post['sync_qzone']) && $post['sync_qzone']) $js .= sync_weibo('qzone', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
 					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
@@ -145,10 +138,10 @@ switch($action) {
 				$post['addtime'] = timetodate($item['addtime']);
 				$post['level'] = $item['level'];
 				$post['fee'] = $item['fee'];
-				$post['style'] = $item['style'];
-				$post['template'] = $item['template'];
-				$post['filepath'] = $item['filepath'];
-				$post['note'] = $item['note'];
+				$post['style'] = addslashes($item['style']);
+				$post['template'] = addslashes($item['template']);
+				$post['filepath'] = addslashes($item['filepath']);
+				$post['note'] = addslashes($item['note']);
 				$need_check =  $MOD['check_add'] == 2 ? $MG['check'] : $MOD['check_add'];
 				$post['status'] = get_status($item['status'], $need_check);
 				$post['hits'] = $item['hits'];
@@ -176,7 +169,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username FROM {$table} WHERE itemid=$itemid");
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -193,7 +186,6 @@ switch($action) {
 		$lists = $do->get_list($condition, $MOD['order']);
 		break;
 }
-$head_title = lang($L['module_manage'], array($MOD['name']));
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 4; $i++) {
@@ -201,5 +193,6 @@ if($_userid) {
 		$nums[$i] = $r['num'];
 	}
 }
+$head_title = lang($L['module_manage'], array($MOD['name']));
 include template($MOD['template_my'] ? $MOD['template_my'] : 'my_'.$module, 'member');
 ?>

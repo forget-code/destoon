@@ -1,26 +1,23 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class ip {
 	var $ip;
-	var $iptype;
 	var $ipfile;
 
-	function ip($ip, $type = '') {
+	function __construct($ip) {
 		$this->ip = $ip;
-		$this->iptype = $type;
+	}
+
+	function ip($ip) {
+		$this->__construct($ip);
 	}
 
 	function area() {
-		if($this->iptype) {
-			$func = $this->iptype;
-			$this->ipfile = DT_ROOT.'/file/ipdata/'.$func.'.dat';
-			return $this->$func();
-		}
-		foreach(array('wry', 'tiny', 'sina') as $d) {
+		foreach(array('wry', 'tiny') as $d) {
 			$ipfile = DT_ROOT.'/file/ipdata/'.$d.'.dat';
 			if(is_file($ipfile)) {
 				$this->ipfile = $ipfile;
@@ -167,22 +164,6 @@ class ip {
 		fseek($fp, $offset['len'] + $index_offset['len'] - 1024);
 		if($index_length['len']) return convert(fread($fp, $index_length['len']), 'GBK', DT_CHARSET);
 		return 'Unknown';
-	}
-
-	function sina() {
-		$api = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip='.$this->ip;
-		$data = file_get($api);
-		if($data && strpos($data, 'remote_ip_info') !== false) {
-			$data = str_replace(array('var remote_ip_info = ', ';'), array('', ''), $data);
-			$arr = json_decode($data, true);
-			$area = '';
-			if(isset($arr['country']) && strpos($data, "\u4e2d\u56fd") === false) $area .= $arr['country'];
-			if(isset($arr['province'])) $area .= $arr['province'];
-			if(isset($arr['city'])) $area .= $arr['city'];
-			if(isset($arr['isp'])) $area .= $arr['isp'];
-			return $area ? convert($area, 'UTF-8', DT_CHARSET) : 'Unknown';
-		}
-		return 'SINA API Error';
 	}
 }
 ?>

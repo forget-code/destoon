@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/comment.class.php';
 $do = new comment();
 $menus = array (
@@ -10,8 +10,8 @@ $menus = array (
 );
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('内容', '原文标题', '会员名', 'IP', '原文ID', '评论ID');
-	$dfields = array('content', 'item_title', 'username', 'ip', 'item_id', 'itemid');
+	$sfields = array('内容', '原文标题', '会员名', '昵称', 'IP', '原文ID', '评论ID');
+	$dfields = array('content', 'item_title', 'username', 'passport', 'ip', 'item_id', 'itemid');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '回复时间降序', '回复时间升序', '引用次数降序', '引用次数升序', '支持次数降序', '支持次数升序', '反对次数降序', '反对次数升序', '评分高低降序', '评分高低升序');
 	$dorder  = array('itemid desc', 'addtime DESC', 'addtime ASC', 'replytime DESC', 'replytime ASC', 'quote DESC', 'quote ASC', 'agree DESC', 'agree ASC', 'against DESC', 'against ASC', 'star DESC', 'star ASC');
 	$sstar = $L['star_type'];

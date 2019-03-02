@@ -38,7 +38,7 @@ $priv1 = $orderid;//设置为订单ID
 $plain = $merid . $ordid . $transamt . $curyid . $transdate . $transtype . $priv1;
 //生成签名值，必填
 $chkvalue = sign($plain);
-$chkvalue or exit('签名失败！');
+$chkvalue or message('签名失败！');
 ?>
 <html>
 <head>

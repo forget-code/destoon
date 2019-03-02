@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 //show_menu($menus);
 ?>
@@ -64,7 +64,6 @@ include tpl('header');
 <div class="t_c"><input type="submit" value=" 更 新 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 预 览 " class="btn" onclick="window.open('<?php echo $MOD['linkurl'].$item['linkurl'];?>');"/></div>
 </form>
 <div class="pages"><?php echo $pages;?></div>
-<?php load('clear.js'); ?>
 <div class="tt">方法二、批量上传图片</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
@@ -86,7 +85,7 @@ include tpl('header');
 	//window.onload = function () {
 		swfu = new SWFUpload({
 			// Backend Settings
-			upload_url: "<?php echo DT_PATH;?>upload.php",
+			upload_url: UPPath,
 			post_params: {"from": "photo", "width": "100", "height": "100", "swf_userid": "<?php echo $_userid;?>", "swf_username": "<?php echo $_username;?>", "swf_groupid": "<?php echo $_groupid;?>", "swf_company": "<?php echo $_company;?>", "swf_auth": "<?php echo md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP);?>", "swfupload": "1"},
 
 			// File Upload Settings

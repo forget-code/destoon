@@ -12,6 +12,6 @@ if($catid) $seo_title = $seo_catname.$seo_title;
 if($typeid != 99) $seo_title = $TYPE[$typeid].$seo_delimiter.$seo_title;
 if($page == 1) $head_canonical = $MOD['linkurl'];
 $destoon_task = "moduleid=$moduleid&html=index";
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, 0, $page);
 include template($MOD['template_index'] ? $MOD['template_index'] : 'index', $module);
 ?>

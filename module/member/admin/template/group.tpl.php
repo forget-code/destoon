@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -44,7 +44,6 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="f_gray">
-&nbsp;&nbsp;- ID为5和6的会员组必须是扣费模式，否则可能导致会员无法正常注册<br/>
 &nbsp;&nbsp;- 会员组请按服务的范围(服务级别)由低到高依次排序，否则将影响会员的升级<br/>
 &nbsp;&nbsp;- 扣费模式会员组可以注册时选择，包年模式需要会员在线升级<br/>
 </td>

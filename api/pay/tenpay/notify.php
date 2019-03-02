@@ -1,8 +1,11 @@
 <?php
+$_SERVER['REQUEST_URI'] = '';
 $_DPOST = $_POST;
+$_DGET = $_GET;
 require '../../../common.inc.php';
 $_POST = $_DPOST;
-if(!$_POST) exit('fail');
+$_GET = $_DGET;
+if(!$_POST && !$_GET) exit('fail');
 $bank = 'tenpay';
 $PAY = cache_read('pay.php');
 if(!$PAY[$bank]['enable']) exit('fail');
@@ -85,18 +88,7 @@ require DT_ROOT.'/api/pay/'.$bank.'/config.inc.php';
 						$charge_amount = $r['amount'];
 						$editor = 'N'.$bank;
 						if($total_fee == $charge_money) {
-							$db->query("UPDATE {$DT_PRE}finance_charge SET status=3,money=$charge_money,receivetime='$DT_TIME',editor='$editor' WHERE itemid=$charge_orderid");
-							require DT_ROOT.'/include/module.func.php';
-							money_add($r['username'], $r['amount']);
-							money_record($r['username'], $r['amount'], $PAY[$bank]['name'], 'system', '在线充值', '订单ID:'.$charge_orderid);
-							$MOD = cache_read('module-2.php');
-							if($MOD['credit_charge'] > 0) {
-								$credit = intval($r['amount']*$MOD['credit_charge']);
-								if($credit > 0) {
-									credit_add($r['username'], $credit);
-									credit_record($r['username'], $credit, 'system', '充值奖励', '充值'.$r['amount'].$DT['money_unit']);
-								}
-							}
+							require DT_ROOT.'/api/pay/success.inc.php';
 							exit('success');
 						} else {
 							$note = '充值金额不匹配S:'.$charge_money.'R:'.$total_fee;
@@ -147,12 +139,13 @@ require DT_ROOT.'/api/pay/'.$bank.'/config.inc.php';
 		//通信失败
 		echo "fail";
 		//后台调用通信失败,写日志，方便定位问题
-		echo "<br>call err:" . $httpClient->getResponseCode() ."," . $httpClient->getErrInfo() . "<br>";
+		//echo "<br>call err:" . $httpClient->getResponseCode() ."," . $httpClient->getErrInfo() . "<br>";
 	 } 
 	
 	
    } else {
-    echo "<br/>" . "认证签名失败" . "<br/>";
-    echo $resHandler->getDebugInfo() . "<br>";
+	   echo "fail";
+    //echo "<br/>" . "认证签名失败" . "<br/>";
+    //echo $resHandler->getDebugInfo() . "<br>";
 }
 ?>

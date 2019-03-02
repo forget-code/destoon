@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -10,7 +10,7 @@ show_menu($menus);
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="post[mycatid]" value="<?php echo $mycatid;?>"/>
-<div class="tt"><?php echo $tname;?></div>
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息类型</td>
@@ -26,7 +26,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
 <br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <?php if($CP) { ?>
@@ -36,7 +36,6 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
-<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -49,11 +48,11 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 详细说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <?php
-if($MOD['swfu']) { 
+if($MOD['swfu'] && DT_EDITOR == 'fckeditor') { 
 	include DT_ROOT.'/api/swfupload/editor.inc.php';
 }
 ?>
@@ -125,7 +124,7 @@ if($MOD['swfu']) {
 	<table width="100%">
 	<tr>
 	<td width="70">计量单位</td>
-	<td><input name="post[unit]" type="text" size="10" value="<?php echo $unit;?>" onkeyup="if(this.value){Dd('u1').innerHTML=Dd('u2').innerHTML=Dd('u3').innerHTML=this.value;}" id="u0"/><input type="hidden" id="uu" value="单位"/></td>
+	<td><input name="post[unit]" type="text" size="10" value="<?php echo $unit;?>" onblur="if(this.value){Dd('u1').innerHTML=Dd('u2').innerHTML=Dd('u3').innerHTML=this.value;}" id="u0"/><input type="hidden" id="uu" value="单位"/></td>
 	</tr>
 	<tr>
 	<td>产品单价</td>
@@ -328,16 +327,7 @@ function check() {
 		}
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	if(Dd('property_require') != null) {
-		var ptrs = Dd('property_require').getElementsByTagName('option');
-		for(var i = 0; i < ptrs.length; i++) {		
-			f = 'property-'+ptrs[i].value;
-			if(Dd(f).value == 0 || Dd(f).value == '') {
-				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
-				return false;
-			}
-		}
-	}
+	<?php echo $CP ? property_js() : '';?>
 	return true;
 }
 </script>

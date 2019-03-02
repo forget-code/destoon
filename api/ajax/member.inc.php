@@ -1,6 +1,5 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-isset($job) or $job = '';
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 isset($value) or $value = '';
 $value = convert($value, 'UTF-8', DT_CHARSET);
@@ -14,6 +13,7 @@ switch($job) {
 	break;
 	case 'passport':
 		if(!$value) exit;
+		if($_userid) $do->userid = $_userid;
 		if(!$do->is_passport($value)) exit($do->errmsg);
 	break;
 	case 'password':
@@ -26,14 +26,12 @@ switch($job) {
 		$value = trim($value);
 		if(!$do->is_email($value)) exit($do->errmsg);
 		if($do->email_exists($value)) exit($L['member_email_reg']);
-		$session = new dsession();
-		$_SESSION['regemail'] = md5(md5($value.DT_KEY.$DT_IP));
 	break;
 	case 'emailcode':
 		$value = trim($value);
 		if(!preg_match("/[0-9]{6}/", $value)) exit('&nbsp;');
 		$session = new dsession();
-		if($_SESSION['email_code'] != md5($_SESSION['email'].'|'.$value)) exit('&nbsp;');
+		if($_SESSION['email_code'] != md5($_SESSION['email_save'].'|'.$value)) exit('&nbsp;');
 	break;
 	case 'mobile':
 		$value = trim($value);
@@ -44,7 +42,7 @@ switch($job) {
 		$value = trim($value);
 		if(!preg_match("/[0-9]{6}/", $value)) exit('&nbsp;');
 		$session = new dsession();
-		if($_SESSION['mobile_code'] != md5($_SESSION['mobile'].'|'.$value)) exit('&nbsp;');
+		if($_SESSION['mobile_code'] != md5($_SESSION['mobile_save'].'|'.$value)) exit('&nbsp;');
 	break;
 	case 'company':
 		if(!$value) exit($L['member_company_null']);

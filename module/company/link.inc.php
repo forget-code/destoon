@@ -20,5 +20,6 @@ if($items) {
 	}
 	$db->free_result($result);
 }
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 include template('link', $template);
 ?>

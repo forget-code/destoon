@@ -7,7 +7,6 @@ include load($module.'.lang');
 include load('my.lang');
 require MD_ROOT.'/brand.class.php';
 $do = new brand($moduleid);
-
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -16,7 +15,6 @@ if(in_array($action, array('add', 'edit'))) {
 	if($CP) require DT_ROOT.'/include/property.func.php';
 	isset($post_ppt) or $post_ppt = array();
 }
-
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
@@ -25,7 +23,6 @@ if(in_array($action, array('', 'add'))) {
 	$limit_free = $MG['brand_limit'] > $limit_used ? $MG['brand_limit'] - $limit_used : 0;
 }
 if(check_group($_groupid, $MOD['group_refresh'])) $MOD['credit_refresh'] = 0;
-
 switch($action) {
 	case 'add':
 		if($MG['brand_limit'] && $limit_used >= $MG['brand_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
@@ -70,8 +67,6 @@ switch($action) {
 			if($msg) dalert($msg);
 			$msg = question($answer, $need_question, true);
 			if($msg) dalert($msg);
-			if(isset($post['islink'])) unset($post['islink']);
-			$post['clear_link'] = $MOD['clear_link'];
 			if($do->pass($post)) {
 				$CAT = get_cat($post['catid']);
 				if(!$CAT || !check_group($_groupid, $CAT['group_add'])) dalert(lang($L['group_add'], array($CAT['catname'])));
@@ -81,20 +76,17 @@ switch($action) {
 				$post['status'] = get_status(3, $need_check);
 				$post['hits'] = 0;
 				$post['username'] = $_username;
-				
+				if($FD) fields_check($post_fields);
+				if($CP) property_check($post_ppt);
 				if($could_color && $color && $_credit > $MOD['credit_color']) {
 					$post['style'] = $color;
 					credit_add($_username, -$MOD['credit_color']);
 					credit_record($_username, -$MOD['credit_color'], 'system', $L['title_color'], '['.$MOD['name'].']'.$post['title']);
 				}
-
-				if($FD) fields_check($post_fields);
-				if($CP) property_check($post_ppt);
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
 				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
-
 				if($fee_add) {
 					if($fee_currency == 'money') {
 						money_add($_username, -$fee_add);
@@ -109,7 +101,6 @@ switch($action) {
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
 				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
-				if(isset($post['sync_qzone']) && $post['sync_qzone']) $js .= sync_weibo('qzone', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
 					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
@@ -127,9 +118,9 @@ switch($action) {
 				$MG['copy'] && $_userid or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 
 				$do->itemid = $itemid;
-				$r = $do->get_one();
-				if(!$r || $r['username'] != $_username) message();
-				extract($r);
+				$item = $do->get_one();
+				if(!$item || $item['username'] != $_username) message();
+				extract($item);
 				$thumb = '';
 				$totime = $totime > $DT_TIME ? timetodate($totime, 3) : '';
 			} else {
@@ -157,22 +148,16 @@ switch($action) {
 		if($MG['edit_limit'] && $DT_TIME - $item['addtime'] > $MG['edit_limit']*86400) message(lang($L['edit_limit'], array($MG['edit_limit'])));
 
 		if($submit) {
-			if($item['islink']) {
-				$post['islink'] = 1;
-			} else if(isset($post['islink'])) {
-				unset($post['islink']);
-			}
-			$post['clear_link'] = $MOD['clear_link'];
 			if($do->pass($post)) {
 				$CAT = get_cat($post['catid']);
 				if(!$CAT || !check_group($_groupid, $CAT['group_add'])) dalert(lang($L['group_add'], array($CAT['catname'])));
 				$post['addtime'] = timetodate($item['addtime']);
 				$post['level'] = $item['level'];
 				$post['fee'] = $item['fee'];
-				$post['style'] = $item['style'];
-				$post['template'] = $item['template'];
-				$post['filepath'] = $item['filepath'];
-				$post['note'] = $item['note'];
+				$post['style'] = addslashes($item['style']);
+				$post['template'] = addslashes($item['template']);
+				$post['filepath'] = addslashes($item['filepath']);
+				$post['note'] = addslashes($item['note']);
 				$need_check =  $MOD['check_add'] == 2 ? $MG['check'] : $MOD['check_add'];
 				$post['status'] = get_status($item['status'], $need_check);
 				$post['hits'] = $item['hits'];
@@ -198,7 +183,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username FROM {$table} WHERE itemid=$itemid");
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -211,7 +196,7 @@ switch($action) {
 		$s = $f = 0;
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username,edittime FROM {$table} WHERE itemid=$itemid");
 			$could_refresh = $item && $item['username'] == $_username;
 			if($could_refresh && $MG['refresh_limit'] && $DT_TIME - $item['edittime'] < $MG['refresh_limit']) $could_refresh = false;
 			if($could_refresh && $MOD['credit_refresh'] && $MOD['credit_refresh'] > $_credit) $could_refresh = false;
@@ -243,7 +228,6 @@ switch($action) {
 		$lists = $do->get_list($condition, $MOD['order']);
 	break;
 }
-$head_title = lang($L['module_manage'], array($MOD['name']));
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 5; $i++) {
@@ -251,5 +235,6 @@ if($_userid) {
 		$nums[$i] = $r['num'];
 	}
 }
+$head_title = lang($L['module_manage'], array($MOD['name']));
 include template($MOD['template_my'] ? $MOD['template_my'] : 'my_'.$module, 'member');
 ?>

@@ -8,6 +8,7 @@ $table_data = $DT_PRE.'info_data_'.$moduleid;
 if($itemid) {
 	$item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 	if(!$item || $item['status'] < 3 || $item['username'] != $username) dheader($MENU[$menuid]['linkurl']);
+	if($item['islink']) dheader($item['linkurl']);
 	unset($item['template']);
 	extract($item);
 	$CAT = get_cat($catid);
@@ -34,6 +35,7 @@ if($itemid) {
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $keyword;
 	$head_description = $introduce ? $introduce : $title;
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);;
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -64,6 +66,7 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 }
 include template('info', $template);
 ?>

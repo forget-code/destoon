@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $table = $DT_PRE.'resume';
 require MD_ROOT.'/resume.class.php';
 $do = new resume($moduleid);
@@ -23,8 +23,8 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$TYPE[0] = '工作';
 	$MARRIAGE[0] = '婚姻';
 	$EDUCATION[0] = '学历';
-	$sfields = array('模糊', '标题', '简介', '会员名', '真实姓名', '毕业院校', '所学专业', '专业技能', '语言水平', '期望职位', '联系手机', '联系电话', '联系地址', 'Email', 'MSN', 'QQ', '模板', 'IP');
-	$dfields = array('keyword', 'title', 'introduce', 'username', 'truename', 'school', 'major', 'skill', 'language', 'job', 'mobile', 'telephone', 'address', 'email', 'msn', 'qq','template', 'ip');
+	$sfields = array('模糊', '标题', '简介', '会员名', '真实姓名', '毕业院校', '所学专业', '专业技能', '语言水平', '联系手机', '联系电话', '联系地址', 'Email', 'MSN', 'QQ', '模板', 'IP');
+	$dfields = array('keyword', 'title', 'introduce', 'username', 'truename', 'school', 'major', 'skill', 'language', 'mobile', 'telephone', 'address', 'email', 'msn', 'qq','template', 'ip');
 	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
 
@@ -104,7 +104,6 @@ switch($action) {
 			$open = 3;
 			$item = array();
 			$menuid = 0;
-			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -132,7 +131,6 @@ switch($action) {
 			list($byear, $bmonth, $bday) = explode('-', $birthday);
 			$menuon = array('4', '3', '2', '1');
 			$menuid = $menuon[$status];
-			$tname = '修改简历';
 			include tpl('resume_'.$action, $module);
 		}
 	break;
@@ -148,7 +146,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 5;
-			include tpl($action, $module);
+			include tpl($action);
 		}
 	break;
 	case 'update':

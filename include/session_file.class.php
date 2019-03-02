@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -9,7 +9,7 @@ class dsession {
 		if(DT_DOMAIN) @ini_set('session.cookie_domain', '.'.DT_DOMAIN);
 		@ini_set('session.gc_maxlifetime', 1800);
     	if(is_dir(DT_ROOT.'/file/session/')) {
-			$dir = DT_ROOT.'/file/session/'.substr(DT_KEY, 2, 6).'/';
+			$dir = DT_ROOT.'/file/session/'.strtolower(substr(md5(DT_KEY), 2, 6)).'/';
 			if(is_dir($dir)) {
 				session_save_path($dir);
 			} else {

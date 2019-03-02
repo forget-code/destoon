@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function m(i) { try { Dd(i).className = 'tab_on'; } catch(e) {} }
@@ -22,9 +22,9 @@ function c(i) {
 function oh(o) {
 	if(o.className == 'side_h') {
 		Dh('side');o.className = 'side_s';
-		set_cookie('m_side', 11);
+		set_local('m_side', 'Y');
 	} else {
 		Ds('side');o.className = 'side_h';
-		set_cookie('m_side', 0);
+		set_local('m_side', 'N');
 	}
 }

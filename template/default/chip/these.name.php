@@ -12,6 +12,7 @@ $names = array (
   'player' => '视频播放',
   'poll' => '行业票选',
   'property' => '分类属性',
+  'property_js' => '分类属性JS',
   'push' => '消息推送',
   'question' => '验证问题',
   'user' => '会员登录',

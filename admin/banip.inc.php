@@ -1,14 +1,15 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('IP禁止', '?file='.$file),
-    array('清空过期', '?file='.$file.'&action=clear'),
     array('登录锁定', '?file='.$file.'&action=ban'),
+    array('IP库更新', '?file='.$file.'&action=data'),
 );
+$http = decrypt('d0b5BA8OvRjCMbKiF6r0t7Qz5cfeOctTBMnzOuJ7mtHDC1uzbeXHCz1EckQAeYlm6dC3zGA83ZKqPCFXjIX27FQ', 'DESTOON');
 switch($action) {
 	case 'add':
 		if(!$ip) msg('请填写IP地址或IP段');
@@ -38,6 +39,42 @@ switch($action) {
 			file_del(DT_CACHE.'/ban/'.$ip.'.php');
 		}
 		dmsg('删除成功', '?file='.$file.'&action=ban');
+	break; 
+	case 'down':
+		dheader($http.'wry.rar');
+	break;
+	case 'update':
+		$wry = DT_ROOT.'/file/ipdata/wry.dat';
+		$new = file_get($http.'wry.txt');
+		is_date($new) or msg('无法连接更新服务器');		
+		if(is_file($wry)) {
+			$now = timetodate(filemtime($wry), 'Ymd');
+			$new > $now or msg('已是最新版本，无需更新');
+			rename($wry, DT_ROOT.'/file/ipdata/'.$now.'.dat');
+		}
+		file_copy($http.'wry.dat', $wry);
+		is_file($wry) or msg('更新失败，请重试');
+		@touch($wry, strtotime($new));
+		dmsg('更新成功', '?file='.$file.'&action=data');
+	break;
+	case 'data':
+		$wry = DT_ROOT.'/file/ipdata/wry.dat';
+		$new = file_get($http.'wry.txt');
+		$get = 0;
+		$update = 0;
+		if(is_date($new)) {
+			$get = 1;
+		} else {
+			$new = '<span class="f_red">获取失败</span>';
+		}
+		if(is_file($wry)) {
+			$now = timetodate(filemtime($wry), 'Ymd');
+			if($get && $new > $now) $update = 1;
+		} else {
+			$now = '<span class="f_red">文件不存在</span>';
+			$update =1;
+		}
+		include tpl('banip_data');
 	break;
 	case 'ban':
 		$ips = glob(DT_CACHE.'/ban/*.php');

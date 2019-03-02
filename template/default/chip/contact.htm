@@ -16,6 +16,9 @@
 	&nbsp;<a href="{userurl($member[username], 'file=credit')}">[诚信档案]</a>
 	</li>
 	{/if}
+	{if $member[deposit]}
+	<li class="f_green">已缴纳 <strong>{$member[deposit]}</strong> {$DT[money_unit]}保证金</li>
+	{/if}
 	<li style="padding-top:6px;padding-bottom:6px;">
 	<span>联系人</span>{$member[truename]}({gender($member[gender])})&nbsp;{$member[career]}&nbsp;
 	{if $member[username] && $DT[im_web]}{im_web($member[username].'&mid='.$moduleid.'&itemid='.$itemid)}&nbsp;{/if}
@@ -27,7 +30,7 @@
 	<li><span>会员</span> [{if online($member[userid])==1}<font class="f_red">当前在线</font>{else}<font class="f_gray">当前离线</font>{/if}] <a href="{$MODULE[2][linkurl]}friend.php?action=add&username={$member[username]}" rel="nofollow">[加为商友]</a> <a href="{$MODULE[2][linkurl]}message.php?action=send&touser={$member[username]}" rel="nofollow">[发送信件]</a></li>
 	{if $member[mail]}<li><span>邮件</span>{anti_spam($member[mail])}</li>{/if}
 	{if $member[telephone]}<li><span>电话</span>{anti_spam($member[telephone])}</li>{/if}
-	{if $member[mobile]}<li><span>手机</span>{anti_spam($member[mobile])}{if $DT[sms] && $member[vmobile]}&nbsp;&nbsp;<a href="{$MODULE[2][linkurl]}sms.php?action=add&auth={encrypt($member[mobile])}" target="_blank" rel="nofollow">[发送短信]</a>{/if}</li>{/if}
+	{if $member[mobile]}<li><span>手机</span>{anti_spam($member[mobile])}{if $DT[sms] && $member[vmobile]}&nbsp;&nbsp;<a href="{$MODULE[2][linkurl]}sms.php?action=add&auth={encrypt($member[mobile], DT_KEY.'SMS')}" target="_blank" rel="nofollow">[发送短信]</a>{/if}</li>{/if}
 	<li><span>地区</span>{area_pos($member[areaid], '-')}</li>
 	{if $member[address]}<li title="{$member[address]}"><span>地址</span>{$member[address]}</li>{/if}
 {else}
@@ -70,7 +73,7 @@
 <td>
 <a href="{$pay_url}" rel="nofollow"><img src="{DT_SKIN}image/btn_pay.gif" alt="立即支付"/></a>
 &nbsp;&nbsp;&nbsp;
-<a href="{$MODULE[2][linkurl]}{if $currency=='money'}charge.php?action=pay{else}credit.php?action=buy{/if}" rel="nofollow"><img src="{DT_SKIN}image/btn_charge.gif" alt="帐户充值"/></a>
+<a href="{$MODULE[2][linkurl]}{if $currency=='money'}charge.php?action=pay&reason=pay|{$mid}|{$itemid}{else}credit.php?action=buy{/if}" rel="nofollow"><img src="{DT_SKIN}image/btn_charge.gif" alt="帐户充值"/></a>
 </td>
 </tr>
 </table>

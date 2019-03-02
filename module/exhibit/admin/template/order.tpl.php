@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 if(!$id) show_menu($menus);
 ?>
@@ -38,7 +38,7 @@ if(!$id) show_menu($menus);
 <th>展会</th>
 <th>报名人数</th>
 <th>会员</th>
-<th width="120">报名时间</th>
+<th width="130">报名时间</th>
 <th width="40">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>

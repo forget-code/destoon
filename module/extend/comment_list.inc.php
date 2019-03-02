@@ -2,15 +2,10 @@
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
-$itemid or dheader(DT_PATH);
 isset($MODULE[$mid]) or dheader(DT_PATH);
-in_array($mid, explode(',', $MOD['comment_module'])) or exit;
-if(in_array($itemid, cache_read('bancomment-'.$mid.'.php'))) {
-	$template = 'close';
-	$linkurl = $MODULE[$mid]['linkurl'];
-	include template('comment-show', $module);
-	exit;
-}
+$itemid or dheader($MODULE[$mid]['linkurl']);
+in_array($mid, explode(',', $MOD['comment_module'])) or dheader($MODULE[$mid]['linkurl']);
+if(in_array($itemid, cache_read('bancomment-'.$mid.'.php'))) dheader(DT_PATH.'api/redirect.php?mid='.$mid.'&itemid='.$itemid);
 if($mid == 4) {
 	$item = $db->get_one("SELECT company,linkurl,username,groupid FROM ".get_table($mid)." WHERE userid=$itemid");
 	$item or dheader(DT_PATH);
@@ -23,6 +18,7 @@ if($mid == 4) {
 	$item['status'] > 2 or dheader(DT_PATH);
 	$linkurl = $MODULE[$mid]['linkurl'].$item['linkurl'];
 }
+if($EXT['comment_api']) dheader($linkurl);
 $template = $message = $forward = '';
 $username = $item['username'];
 $title = $item['title'];
@@ -41,7 +37,7 @@ switch($action) {
 		$f = $op ? 'agree' : 'against';
 		if(get_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid)) exit('-1');
 		$db->query("UPDATE {$DT_PRE}comment SET `{$f}`=`{$f}`+1 WHERE itemid=$cid");
-		set_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid, 1, $DT_TIME + 365*86400);
+		set_cookie('comment_vote_'.$mid.'_'.$itemid.'_'.$cid, 1, $DT_TIME + 86400);
 		exit('1');
 	break;
 	case 'delete':
@@ -101,16 +97,17 @@ switch($action) {
 			if($BANWORD) $content = banword($BANWORD, $content, false);
 			$star = intval($star);
 			in_array($star, array(1, 2, 3)) or $star = 3;
-			$status = get_status(3, $MOD['comment_check'] == 2 ? $MG['check_add'] : $MOD['comment_check']);
+			$status = get_status(3, $MOD['comment_check'] == 2 ? $MG['check'] : $MOD['comment_check']);
 			$hidden = isset($hidden) ? 1 : 0;
+			$title = addslashes($title);
 			$content = nl2br($content);
 			$quotation = '';
 			$qid = isset($qid) ? intval($qid) : 0;
 			if($qid) {
-				$r = $db->get_one("SELECT ip,hidden,username,content,quotation,addtime FROM {$DT_PRE}comment WHERE itemid=$qid");
+				$r = $db->get_one("SELECT ip,hidden,username,passport,content,quotation,addtime FROM {$DT_PRE}comment WHERE itemid=$qid");
 				if($r) {
 					if($r['username']) {
-						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['username'];
+						$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['passport'];
 					} else {
 						$r['name'] = 'IP:'.hide_ip($r['ip']);
 					}
@@ -127,7 +124,7 @@ switch($action) {
 				}
 				$db->query("UPDATE {$DT_PRE}comment SET quote=quote+1 WHERE itemid=$qid");
 			}
-			$db->query("INSERT INTO {$DT_PRE}comment (item_mid,item_id,item_title,item_username,content,quotation,qid,addtime,username,hidden,star,ip,status) VALUES ('$mid','$itemid','".addslashes($title)."','$username','$content','$quotation','$qid','$DT_TIME','$_username','$hidden','$star','$DT_IP','$status')");
+			$db->query("INSERT INTO {$DT_PRE}comment (item_mid,item_id,item_title,item_username,content,quotation,qid,addtime,username,passport,hidden,star,ip,status) VALUES ('$mid','$itemid','$title','$username','$content','$quotation','$qid','$DT_TIME','$_username','$_passport','$hidden','$star','$DT_IP','$status')");
 			$cid = $db->insert_id();
 			$r = $db->get_one("SELECT sid FROM {$DT_PRE}comment_stat WHERE moduleid=$mid AND itemid=$itemid");
 			$star = 'star'.$star;
@@ -161,10 +158,10 @@ switch($action) {
 				$r['addtime'] = timetodate($r['addtime'], 5);
 				$r['replytime'] = $r['replytime'] ? timetodate($r['replytime'], 5) : '';
 				if($r['username']) {
-					$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['username'];
+					$r['name'] = $r['hidden'] ? $MOD['comment_am'] : $r['passport'];
 					$r['uname'] = $r['hidden'] ? '' : $r['username'];
 				} else {
-					$r['name'] = 'IP:'.hide_ip($r['ip']);
+					$r['name'] = $MOD['comment_am'];
 					$r['uname'] = '';
 				}
 				$lists[] = $r;

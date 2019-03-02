@@ -1,12 +1,15 @@
 <?php
+$_SERVER['REQUEST_URI'] = '';
 $_DPOST = $_POST;
+$_DGET = $_GET;
 require '../../../common.inc.php';
 $_POST = $_DPOST;
-if(!$_POST) exit('error');
+$_GET = $_DGET;
+if(!$_POST && !$_GET) exit('error');
 $bank = 'chinabank';
 $PAY = cache_read('pay.php');
 if(!$PAY[$bank]['enable']) exit('error');
-if(strlen($PAY[$bank]['keycode']) < 10) exit('error');
+if(strlen($PAY[$bank]['keycode']) < 7) exit('error');
 $key = $PAY[$bank]['keycode'];
 $v_oid     =trim($_POST['v_oid']);
 $v_pmode   =trim($_POST['v_pmode']);
@@ -30,18 +33,7 @@ if($v_md5str == $md5string) {
 				$charge_amount = $r['amount'];
 				$editor = 'N'.$bank;
 				if($v_amount == $charge_money) {
-					$db->query("UPDATE {$DT_PRE}finance_charge SET status=3,money=$charge_money,receivetime='$DT_TIME',editor='$editor' WHERE itemid=$charge_orderid");
-					require DT_ROOT.'/include/module.func.php';
-					money_add($r['username'], $r['amount']);
-					money_record($r['username'], $r['amount'], $PAY[$bank]['name'], 'system', '在线充值', '订单ID:'.$charge_orderid);
-					$MOD = cache_read('module-2.php');
-					if($MOD['credit_charge'] > 0) {
-						$credit = intval($r['amount']*$MOD['credit_charge']);
-						if($credit > 0) {
-							credit_add($r['username'], $credit);
-							credit_record($r['username'], $credit, 'system', '充值奖励', '充值'.$r['amount'].$DT['money_unit']);
-						}
-					}
+					require DT_ROOT.'/api/pay/success.inc.php';
 					exit('ok');
 				} else {
 					$note = '充值金额不匹配S:'.$charge_money.'R:'.$v_amount;

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('添加产品', '?file='.$file.'&moduleid='.$moduleid.'&action=add'),
     array('产品管理', '?file='.$file.'&moduleid='.$moduleid),	
@@ -82,11 +82,15 @@ class product {
 	var $table;
 	var $fields;
 
-	function product() {
+	function __construct() {
 		global $db;
 		$this->table = $db->pre.'quote_product';
 		$this->db = &$db;
 		$this->fields = array('title','catid','level','style','unit','minprice','maxprice','n1','n2','n3','v1','v2','v3','market','addtime','editor','edittime','seo_title','seo_keywords','seo_description','content');
+	}
+
+	function product() {
+		$this->__construct();
 	}
 
 	function pass($post) {

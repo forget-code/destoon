@@ -5,19 +5,24 @@
 	<td valign="top" class="left_menu">
 		<ul>
 		<li class="left_menu_li"><a href="{$MODULE[1][linkurl]}">网站首页</a></li>
-		<li class="left_menu_li" id="type_0"><a href="./">友情链接</a></li>
-		{loop $TYPE $t}
-		<li class="left_menu_li" id="type_{$t[typeid]}"><a href="{rewrite('index.php?typeid='.$t['typeid'])}">{$t[typename]}</a></li>
+		<li class="left_menu_li" id="type_0"><a href="{$url}">友情链接</a></li>
+		{loop $_TP[0] $v0}
+		<li class="left_menu_li" id="type_{$v0[typeid]}"><a href="{$url}{list_url($v0[typeid])}">{$v0[typename]}</a></li>
+			{if isset($_TP[1][$v0[typeid]])}
+			{loop $_TP[1][$v0[typeid]] $v1}
+			<li class="left_menu_li" id="type_{$v1[typeid]}"><a href="{$url}{list_url($v1[typeid])}">&nbsp;|- {$v1[typename]}</a></li>
+			{/loop}
+			{/if}
 		{/loop}
-		<li class="left_menu_li" id="type_reg"><a href="{rewrite('index.php?action=reg')}">申请链接</a></li>
+		<li class="left_menu_li" id="type_reg"><a href="{$url}index.php?action=reg">申请链接</a></li>
 		</ul>
 	</td>
 	<td valign="top">
 		<div class="left_box">
 		{if $action == 'reg'}		
-			<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="./">友情链接</a> &raquo; <a href="{rewrite('index.php?action=reg')}">申请链接</a></div>
+			<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$url}">友情链接</a> &raquo; <a href="{$url}index.php?action=reg">申请链接</a></div>
 			<br/>
-			<form method="post" action="index.php" id="dform" onsubmit="return check();">
+			<form method="post" action="{$url}index.php" id="dform" onsubmit="return check();">
 			<input type="hidden" name="action" value="reg"/>
 			<table cellpadding="6" cellspacing="1" width="96%" align="center" bgcolor="#E3EEF5">
 			{if $MOD[link_request]}
@@ -89,12 +94,12 @@
 			try{Dd('type_reg').className='left_menu_on';}catch(e){}
 			</script>
 		{else}
-			<div class="pos"><span class="f_r f_b"><a href="{rewrite('index.php?action=reg')}">申请链接</a>&nbsp;&nbsp;&nbsp;&nbsp;</span>当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="./">友情链接</a></div>
+			<div class="pos"><span class="f_r"><a href="{$url}index.php?action=reg" class="b">申请链接</a></span>当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$url}">友情链接</a>{if $typeid} &raquo; <a href="{$url}{list_url($typeid)}">{$TYPE[$typeid][typename]}</a>{/if}</div>
 			<div style="padding:10px;">
 			{if $typeid}
-			<!--{tag("table=link&condition=thumb!='' and status=3 and username='' and typeid=$typeid&areaid=$cityid&pagesize=1400&order=listorder desc,itemid desc&template=list-link&cols=7")}-->
+			<!--{tag("table=link&condition=thumb!='' and status=3 and username='' and typeid IN (".type_child($typeid, $TYPE).")&areaid=$cityid&pagesize=1400&order=listorder desc,itemid desc&template=list-link&cols=7")}-->
 			<div class="b10"></div>
-			<!--{tag("table=link&condition=thumb='' and status=3 and username='' and typeid=$typeid&areaid=$cityid&pagesize=1400&order=listorder desc,itemid desc&template=list-link&cols=7")}-->
+			<!--{tag("table=link&condition=thumb='' and status=3 and username='' and typeid IN (".type_child($typeid, $TYPE).")&areaid=$cityid&pagesize=1400&order=listorder desc,itemid desc&template=list-link&cols=7")}-->
 			{else}
 			<!--{tag("table=link&condition=status=3 and thumb!='' and username=''&pagesize=1400&order=listorder desc,itemid desc&areaid=$cityid&template=list-link&cols=7")}-->
 			<div class="b10"></div>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $setting = include(DT_ROOT.'/file/setting/module-22.php');
 update_setting($moduleid, $setting);
 $sql = file_get(DT_ROOT.'/file/setting/'.$module.'.sql');

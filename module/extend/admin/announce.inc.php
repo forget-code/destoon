@@ -1,19 +1,17 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('announce', 1);
 require MD_ROOT.'/announce.class.php';
 $do = new announce();
 $menus = array (
     array('添加公告', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('公告列表', '?moduleid='.$moduleid.'&file='.$file),
-    array('更新地址', '?moduleid='.$moduleid.'&file='.$file.'&action=update'),
-    array('生成网页', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
+    array('更新地址', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
     array('公告分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'公告分类\');'),
+    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
     array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
 );
-
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
-
 switch($action) {
 	case 'add':
 		if($submit) {
@@ -28,6 +26,7 @@ switch($action) {
 				isset($$v) or $$v = '';
 			}
 			$addtime = timetodate($DT_TIME);
+			$typeid = 0;
 			$menuid = 0;
 			include tpl('announce_edit', $module);
 		}
@@ -55,10 +54,6 @@ switch($action) {
 		$do->order($listorder);
 		dmsg('排序成功', $forward);
 	break;
-	case 'update':
-		$do->update();
-		dmsg('更新成功', $forward);
-	break;
 	case 'html':
 		$all = (isset($all) && $all) ? 1 : 0;
 		$one = (isset($one) && $one) ? 1 : 0;
@@ -75,11 +70,14 @@ switch($action) {
 			$tid = $r['tid'] ? $r['tid'] : 0;
 		}
 		if($fid <= $tid) {
-			$result = $db->query("SELECT itemid FROM {$DT_PRE}announce WHERE itemid>=$fid ORDER BY itemid LIMIT 0,$num");
+			$result = $db->query("SELECT itemid,linkurl,islink FROM {$DT_PRE}announce WHERE itemid>=$fid ORDER BY itemid LIMIT 0,$num");
 			if($db->affected_rows($result)) {
 				while($r = $db->fetch_array($result)) {
 					$itemid = $r['itemid'];
-					tohtml('announce', $module);
+					if(!$r['islink']) {
+						$linkurl = $do->linkurl($itemid);
+						if($linkurl != $r['linkurl']) $db->query("UPDATE {$DT_PRE}announce SET linkurl='$linkurl' WHERE itemid=$itemid");
+					}
 				}
 				$itemid += 1;
 			} else {
@@ -87,9 +85,9 @@ switch($action) {
 			}
 		} else {
 			if($all) dheader('?moduleid=3&file=webpage&action=html&all=1&one='.$one);
-			dmsg('生成成功', "?moduleid=$moduleid&file=$file");
+			dmsg('更新成功', "?moduleid=$moduleid&file=$file");
 		}
-		msg('ID从'.$fid.'至'.($itemid-1).'[公告]生成成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&all=$all&one=$one");
+		msg('ID从'.$fid.'至'.($itemid-1).'[公告]更新成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&all=$all&one=$one");
 	break;
 	case 'delete':
 		$itemid or msg('请选择公告');
@@ -114,7 +112,7 @@ switch($action) {
 		$condition = '1';
 		if($_areaids) $condition .= " AND areaid IN (".$_areaids.")";//CITY
 		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
-		if($typeid) $condition .= " AND typeid=$typeid";
+		if($typeid) $condition .= " AND typeid IN (".type_child($typeid, $TYPE).")";
 		if($level) $condition .= " AND level=$level";
 		if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 		$lists = $do->get_list($condition, $dorder[$order]);

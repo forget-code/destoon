@@ -1,12 +1,14 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 var UA = navigator.userAgent.toLowerCase();
 var isIE = (document.all && window.ActiveXObject && !window.opera) ? true : false;
 var isGecko = UA.indexOf('webkit') != -1;
 var DMURL = document.location.protocol+'//'+location.hostname+(location.port ? ':'+location.port : '')+'/';
-var AJPath = (DTPath.indexOf('://') == -1 ? DTPath : (DTPath.indexOf(DMURL) == -1 ? DMURL : DTPath))+'ajax.php';
+if(DTPath.indexOf(DMURL) != -1) DMURL = DTPath;
+var AJPath = DMURL+'ajax.php';
+var UPPath = DMURL+'upload.php';
 if(isIE) try {document.execCommand("BackgroundImageCache", false, true);} catch(e) {}
 var xmlHttp;
 var Try = {
@@ -42,33 +44,23 @@ function checkall(f, t) {
 	var t = t ? t : 1;
 	for(var i = 0; i < f.elements.length; i++) {
 		var e = f.elements[i];
-		if(e.type != 'checkbox') continue;
+		if(e.type != 'checkbox' || e.name == 'msg' || e.name == 'eml' || e.name == 'sms' || e.name == 'wec') continue;
 		if(t == 1) e.checked = e.checked ? false : true;
 		if(t == 2) e.checked = true;
 		if(t == 3) e.checked = false;	
 	}
 }
-function stoinp(s, i, p) {
-	if(Dd(i).value) {
-		var p = p ? p : ',';
-		var a = Dd(i).value.split(p);
-		for (var j=0; j<a.length; j++) {if(s == a[j]) return;}
-		Dd(i).value += p+s;
-	} else {
-		Dd(i).value = s;
-	}
-}
-function select_op(i, v) {
-	var o = Dd(i);
-	for(var i=0; i<o.options.length; i++) {if(o.options[i].value == v) {o.options[i].selected=true;break;}}
-}
 function Dmsg(str, i, s, t) {
-	var t = t ? t : 5000; var s = s ? true : false;
-	try{if(s){window.scrollTo(0,0);}Dd('d'+i).innerHTML = '<img src="'+SKPath+'image/check_error.gif" width="12" height="12" align="absmiddle"/> '+str+sound('tip');Dd(i).focus();}catch(e){}
+	var t = t ? t : 5000; var s = s ? 1 : 0; var h = i == 'content' ? 450 : 50;
+	try{
+		if(typeof Dbrowser != 'undefined') {alert(str);return;}
+		if(s || i == 'content'){$("html, body").animate({scrollTop:$('#d'+i).offset().top-h}, 100);}
+		Dd('d'+i).innerHTML = '<img src="'+SKPath+'image/check_error.gif" width="12" height="12" align="absmiddle"/> '+str+sound('tip');
+		Dd(i).focus();
+	}catch(e){}
 	window.setTimeout(function(){Dd('d'+i).innerHTML = '';}, t);
 }
 function Inner(i,s) {try {Dd(i).innerHTML = s;}catch(e){}}
-function InnerTBD(i,s) {try {Dd(i).innerHTML = s;} catch(e) {Dd(i).parentNode.outerHTML=Dd(i).parentNode.outerHTML.replace(Dd(i).innerHTML,s);}}
 function Go(u) {window.location = u;}
 function confirmURI(m,f) {if(confirm(m)) Go(f);}
 function showmsg(m, t) {
@@ -95,33 +87,11 @@ function Es(t) {
 		for(var i=0;i<ss.length;i++) {ss[i].style.visibility = 'visible';}
 	}
 }
-function FCKLen(i) {
-	var i = i ? i : 'content';
-	var o = FCKeditorAPI.GetInstance(i);
-	var d = o.EditorDocument;
-	var l ;
-	if(document.all) {
-		l = d.body.innerText.length;
-	} else {
-		var r = d.createRange(); r.selectNodeContents(d.body); l = r.toString().length;
-	}
-	return l;
-}
-function FCKXHTML(i) {
-	var i = i ? i : 'content';
-	return FCKeditorAPI.GetInstance(i).GetXHTML(true);
-}
+function FCKLen(i) {return EditorAPI(i, 'len');}
+function FCKXHTML(i) {return EditorAPI(i, 'get');}
 function Tb(d, t, p, c) {
 	for(var i=1; i<=t; i++) {
 		if(d == i) {Dd(p+'_t_'+i).className = c+'_2'; Ds(p+'_c_'+i);} else {Dd(p+'_t_'+i).className = c+'_1'; Dh(p+'_c_'+i);}
-	}
-}
-function is_captcha(v) {
-	if(v == L['str_captcha']) return false;
-	if(v.match(/^[a-z0-9A-Z]{1,}$/)) {
-		return v.match(/^[a-z0-9A-Z]{4,}$/);
-	} else {
-		return v.length > 1;
 	}
 }
 function ext(v) {return v.substring(v.lastIndexOf('.')+1, v.length).toLowerCase();}
@@ -132,6 +102,23 @@ function PushNew() {
 	s.id = "destoon_push";
 	s.src = DTPath+"api/push.js.php?refresh="+Math.random()+".js";
 	document.body.appendChild(s);
+}
+function Dnotification(id, url, icon, title, content) {
+	 if(window.webkitNotifications) {
+		 if(webkitNotifications.checkPermission()==1) {
+			 window.onclick = function() {
+				window.webkitNotifications.requestPermission(function() {
+					if(webkitNotifications.checkPermission()==0) {						
+						var N = window.webkitNotifications.createNotification(icon, title, content);
+						N.replaceId = id;N.onclick = function() {window.focus();window.top.location = url;N.cancel();};N.show();
+					}
+				});
+			 };
+		 } else if(webkitNotifications.checkPermission()==0) {	
+			var N = window.webkitNotifications.createNotification(icon, title, content);
+			N.replaceId = id;N.onclick = function() {window.focus();window.top.location = url;N.cancel();};N.show();
+		 }
+	 }
 }
 function set_cookie(n, v, d) {
 	var e = ''; 
@@ -154,8 +141,13 @@ function get_cookie(n) {
 	return v;
 }
 function del_cookie(n) {var e = new Date((new Date()).getTime() - 1 ); e = "; expires=" + e.toGMTString(); document.cookie = CKPrex + n + "=" + escape("") +";path=/"+ e;}
+function set_local(n, v) {window.localStorage ? localStorage.setItem(CKPrex + n, v) : set_cookie(n, v);}
+function get_local(n) {return window.localStorage ? localStorage.getItem(CKPrex + n) : get_cookie(n);}
+function del_local(n) {window.localStorage ? localStorage.removeItem(CKPrex + n) : del_cookie(n);}
 function substr_count(str, exp) {if(str == '') return 0;var s = str.split(exp);return s.length-1;}
+function checked_count(id) {var c=0;$('#'+id).find(':checked').each(function(i){c++;});return c;}
 function lang(s, a) {for(var i = 0; i < a.length; i++) {s = s.replace('{V'+i+'}', a[i]);} return s;}
+function get_cart() {var cart = parseInt(get_cookie('cart'));return cart > 0 ? cart : 0;}
 document.onkeydown = function(e) {
 	var k = typeof e == 'undefined' ? event.keyCode : e.keyCode;
 	if(k == 37) {
@@ -166,3 +158,13 @@ document.onkeydown = function(e) {
 		try{if(Dd('search_tips').style.display != 'none' || Dd('search_tips').innerHTML != ''){SCTip(k);return false;}}catch(e){}
 	}
 }
+$(document).ready(function(){
+	$(window).bind("scroll.back2top", function() {
+		var st = $(document).scrollTop(), winh = $(window).height();
+        (st > 0) ? $('.back2top').show() : $('.back2top').hide();        
+        if(!window.XMLHttpRequest) { $('.back2top').css("top", st + winh - 166);}//IE6
+	});
+	$('.back2top').click(function() {
+		$("html, body").animate({scrollTop:0}, 200);
+	});
+});

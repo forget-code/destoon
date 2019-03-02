@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -18,11 +18,19 @@ if(!function_exists('file_put_contents')) {
 }
 
 function file_ext($filename) {
-	return strtolower(trim(substr(strrchr($filename, '.'), 1)));
+	if(strpos($filename, '.') === false) return '';
+	$ext = strtolower(trim(substr(strrchr($filename, '.'), 1)));
+	return preg_match("/^[a-z0-9]{1,10}$/", $ext) ? $ext : '';
 }
 
 function file_vname($name) {
-	return str_replace(array(' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|', "'", '$', '&', '%', '#', '@'), array('-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''), $name);
+	if(strpos($name, '/') === false) return str_replace(array(' ', '\\', ':', '*', '?', '"', '<', '>', '|', "'", '$', '&', '%', '#', '@'), array('-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''), $name);
+	$tmp = explode('/', $name);
+	$str = '';
+	foreach($tmp as $k=>$v) {
+		$str .= ($k ? '/' : '').file_vname($v);
+	}
+	return $str;
 }
 
 function file_down($file, $filename = '', $data = '') {
@@ -114,10 +122,8 @@ function dir_create($path) {
 			if(is_dir($cur_dir)) continue;
 			@mkdir($cur_dir);
 			if(DT_CHMOD) @chmod($cur_dir, DT_CHMOD);
-			if(!is_file($cur_dir.'/index.html') && !is_file($cur_dir.'/index.php')) file_copy(DT_ROOT.'/file/index.html', $cur_dir.'/index.html');
 		}
 	} else {
-		$idx = strpos($path, '/file/') !== false ? true : false;
 		$dir = str_replace(DT_ROOT.'/', '', $path);
 		$dir = dir_path($dir);
 		$temp = explode('/', $dir);
@@ -128,7 +134,6 @@ function dir_create($path) {
 			if(is_dir($cur_dir)) continue;
 			@mkdir($cur_dir);
 			if(DT_CHMOD) @chmod($cur_dir, DT_CHMOD);
-			if($idx && !is_file($cur_dir.'/index.html') && !is_file($cur_dir.'/index.php')) file_copy(DT_ROOT.'/file/index.html', $cur_dir.'/index.html');
 		}
 	}
 	return is_dir($path);
@@ -179,7 +184,7 @@ function dir_copy($fromdir, $todir) {
 function dir_delete($dir) {
 	$dir = dir_path($dir);
 	if(!is_dir($dir)) return false;
-	$dirs = array(DT_ROOT.'/admin/', DT_ROOT.'/api/', DT_CACHE.'/', DT_ROOT.'/file/', DT_ROOT.'/include/', DT_ROOT.'/lang/', DT_ROOT.'/member/', DT_ROOT.'/module/', DT_ROOT.'/extend/', DT_ROOT.'/skin/', DT_ROOT.'/template/', DT_ROOT.'/wap/');
+	$dirs = array(DT_ROOT.'/admin/', DT_ROOT.'/api/', DT_CACHE.'/', DT_ROOT.'/file/', DT_ROOT.'/include/', DT_ROOT.'/lang/', DT_ROOT.'/member/', DT_ROOT.'/module/', DT_ROOT.'/skin/', DT_ROOT.'/template/', DT_ROOT.'/mobile/');
 	if(substr($dir, 0, 1) == '.' || in_array($dir, $dirs)) die("Cannot Remove System DIR $dir ");
 	$list = glob($dir.'*');
 	if($list) {

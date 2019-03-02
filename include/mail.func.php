@@ -1,28 +1,44 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function dmail($mail_to, $mail_subject, $mail_body, $mail_from = '', $mail_sign = true) {
 	global $DT;
 	if($DT['mail_type'] == 'close') return 'close';
-	$sendmail_from = $mail_from ? $mail_from : $DT['mail_sender'];
-	$mail_from = "=?".strtolower(DT_CHARSET)."?B?".base64_encode($DT['mail_name'] ? $DT['mail_name'] : $DT['sitename'])."?= <".$sendmail_from.">";
-	$mail_subject = stripslashes($mail_subject);
-	$mail_subject = str_replace("\r", '', str_replace("\n", '', $mail_subject));
-	$mail_subject = "=?".strtolower(DT_CHARSET)."?B?".base64_encode($mail_subject)."?=";
 	if($DT['mail_sign'] && $mail_sign) $mail_body .= $DT['mail_sign'];
-	$mail_body = stripslashes($mail_body);
-	$mail_body = chunk_split(base64_encode(str_replace("\r\n.", " \r\n..", str_replace("\n", "\r\n", str_replace("\r", "\n", str_replace("\r\n", "\n", str_replace("\n\r", "\r", $mail_body)))))));
-	$mail_dlmt = $DT['mail_delimiter'] == 1 ? "\r\n" : ($DT['mail_delimiter'] == 2 ? "\n" : "\r");
-	$headers = '';
-	$headers .= "From: $mail_from".$mail_dlmt;
-	$headers .= "X-Priority: 3".$mail_dlmt;
-	$headers .= "X-Mailer: Destoon".$mail_dlmt;
-	$headers .= "MIME-Version: 1.0".$mail_dlmt;
-	$headers .= "Content-type: text/html; charset=".DT_CHARSET.$mail_dlmt;
-	$headers .= "Content-Transfer-Encoding: base64".$mail_dlmt;
+	if($DT['mail_type'] == 'sc') {
+		$url = 'http://sendcloud.sohu.com/webapi/mail.send.json';
+		$par = 'api_user='.$DT['smtp_user'].'&api_key='.$DT['smtp_pass'].'&from='.$DT['mail_sender'].'&fromname='.convert($DT['mail_name'], DT_CHARSET, 'UTF-8').'&to='.$mail_to.'&subject='.convert($mail_subject, DT_CHARSET, 'UTF-8').'&html='.convert($mail_body, DT_CHARSET, 'UTF-8');
+		$rec = dcurl($url, $par);
+		$arr = json_decode($rec, true);
+		if($arr['message'] == 'success') return 'SUCCESS';		
+		$errmsg = '';
+		foreach($arr['errors'] as $v) {
+			$errmsg .= convert($v, 'UTF-8', DT_CHARSET)."\n";
+		}
+		$errmsg = trim($errmsg);
+		if(defined('TESTMAIL')) dalert('Error:'.$errmsg);
+		log_write($errmsg, 'sendcloud');
+		return $errmsg;
+	} else {
+		$sendmail_from = $mail_from ? $mail_from : $DT['mail_sender'];
+		$mail_from = "=?".strtolower(DT_CHARSET)."?B?".base64_encode($DT['mail_name'] ? $DT['mail_name'] : $DT['sitename'])."?= <".$sendmail_from.">";
+		$mail_subject = stripslashes($mail_subject);
+		$mail_subject = str_replace("\r", '', str_replace("\n", '', $mail_subject));
+		$mail_subject = "=?".strtolower(DT_CHARSET)."?B?".base64_encode($mail_subject)."?=";
+		$mail_body = stripslashes($mail_body);
+		$mail_body = chunk_split(base64_encode(str_replace("\r\n.", " \r\n..", str_replace("\n", "\r\n", str_replace("\r", "\n", str_replace("\r\n", "\n", str_replace("\n\r", "\r", $mail_body)))))));
+		$mail_dlmt = $DT['mail_delimiter'] == 1 ? "\r\n" : ($DT['mail_delimiter'] == 2 ? "\n" : "\r");
+		$headers = '';
+		$headers .= "From: $mail_from".$mail_dlmt;
+		$headers .= "X-Priority: 3".$mail_dlmt;
+		$headers .= "X-Mailer: Destoon".$mail_dlmt;
+		$headers .= "MIME-Version: 1.0".$mail_dlmt;
+		$headers .= "Content-type: text/html; charset=".DT_CHARSET.$mail_dlmt;
+		$headers .= "Content-Transfer-Encoding: base64".$mail_dlmt;
+	}
 	if($DT['mail_type'] == 'smtp') {
 		$host = $DT['smtp_host'].':'.$DT['smtp_port'].' ';
 		if(!$fp = fsockopen($DT['smtp_host'], $DT['smtp_port'], $errno, $errstr, 30)) {

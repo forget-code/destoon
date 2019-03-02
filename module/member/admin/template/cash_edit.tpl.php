@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -13,44 +13,36 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员名</td>
-<td><?php echo $item['username'];?> <a href="javascript:_user('<?php echo $item['username'];?>');" class="t">[资料]</a></td>
+<td><a href="javascript:_user('<?php echo $item['username'];?>');" class="t"><?php echo $item['username'];?></a></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 提现金额</td>
-<td class="f_red"><strong><?php echo $item['amount'];?></strong></td>
+<td class="tl"><span class="f_hid">*</span> 实付金额</td>
+<td class="f_red"><?php echo $item['amount'];?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 手续费</td>
-<td class="f_blue"><strong><?php echo $item['fee'];?></strong></td>
+<td class="f_blue"><?php echo $item['fee'];?></td>
 </tr>
 <tr class="on">
-<td class="tl"><span class="f_hid">*</span> 收款方式</td>
+<td class="tl"><span class="f_hid">*</span> 开户银行</td>
 <td><?php echo $item['bank'];?></td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 帐户类型</td>
+<td><?php echo $item['banktype'] ? '对公' : '对私';?></td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 开户网点</td>
+<td><?php echo $item['branch'];?></td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 收款户名</td>
+<td><?php echo $item['truename'];?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 收款帐号</td>
 <td><?php echo $item['account'];?></td>
 </tr>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 收款人</td>
-<td><?php echo $item['truename'];?></td>
-</tr>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 手机</td>
-<td><?php echo $member['mobile'];?></td>
-</tr>
-<?php if($member['qq']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> QQ</td>
-<td><?php echo im_qq($member['qq']);?> <?php echo $member['qq'];?></td>
-</tr>
-<?php } ?>
-<?php if($member['msn']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> MSN</td>
-<td><?php echo im_msn($member['msn']);?> <?php echo $member['msn'];?></td>
-</tr>
-<?php } ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 申请时间</td>
 <td><?php echo $item['addtime'];?></td>

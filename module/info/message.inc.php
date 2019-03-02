@@ -41,21 +41,21 @@ if($_userid) {
 if($submit) {
 	captcha($captcha, $need_captcha);
 	question($answer, $need_question);
-	$title = htmlspecialchars(trim($title));
+	$title = dhtmlspecialchars(trim($title));
 	if(!$title) message($L['msg_type_title']);
-	$content = htmlspecialchars(trim($content));
+	$content = dhtmlspecialchars(trim($content));
 	if(!$content) message($L['msg_type_content']);
 	if(!$_userid) {
-		$truename = htmlspecialchars(trim($truename));
+		$truename = dhtmlspecialchars(trim($truename));
 		if(!$truename) message($L['msg_type_truename']);
-		$telephone = htmlspecialchars(trim($telephone));
+		$telephone = dhtmlspecialchars(trim($telephone));
 		if(!$telephone) message($L['msg_type_telephone']);
-		$email = htmlspecialchars(trim($email));
-		$company = htmlspecialchars(trim($company));
-		$qq = htmlspecialchars(trim($qq));
-		$msn = htmlspecialchars(trim($msn));
-		$ali = htmlspecialchars(trim($ali));
-		$skype = htmlspecialchars(trim($skype));
+		$email = dhtmlspecialchars(trim($email));
+		$company = dhtmlspecialchars(trim($company));
+		$qq = dhtmlspecialchars(trim($qq));
+		$msn = dhtmlspecialchars(trim($msn));
+		$ali = dhtmlspecialchars(trim($ali));
+		$skype = dhtmlspecialchars(trim($skype));
 	}
 	$content = nl2br($content);
 	if($company) $content .= '<br/>'.$L['content_company'].$company;

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2014 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -8,33 +8,55 @@ function dhtmlspecialchars($string) {
 	if(is_array($string)) {
 		return array_map('dhtmlspecialchars', $string);
 	} else {
-		$string = htmlspecialchars($string, ENT_QUOTES, strtoupper(DT_CHARSET) == 'GBK' ? 'GB2312' : 'UTF-8');
-		$string = str_replace('&amp;', '&', $string);
-		if(defined('DT_ADMIN')) return $string;
-		$_string = str_replace(array('&quot;', '&#34;', '"'), array('', '', ''), $string);
-		if($_string == $string) return $string;
-		return strip_sql($_string);
+		$string = htmlspecialchars($string, ENT_QUOTES, DT_CHARSET == 'GBK' ? 'GB2312' : 'UTF-8');
+		return str_replace('&amp;', '&', $string);
 	}
 }
 
-function dsafe($string) {
+function dsafe($string, $type = 1) {
 	if(is_array($string)) {
 		return array_map('dsafe', $string);
 	} else {
-		$string = preg_replace("/\<\!\-\-([\s\S]*?)\-\-\>/", "", $string);
-		$string = preg_replace("/\/\*([\s\S]*?)\*\//", "", $string);
-		$string = preg_replace("/&#([a-z0-9]+)([;]*)/i", "", $string);
-		if(preg_match("/&#([a-z0-9]+)([;]*)/i", $string)) return nl2br(strip_tags($string));
-		$match = array("/s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/i","/d[\s]*a[\s]*t[\s]*a[\s]*\:/i","/b[\s]*a[\s]*s[\s]*e/i","/e[\\\]*x[\\\]*p[\\\]*r[\\\]*e[\\\]*s[\\\]*s[\\\]*i[\\\]*o[\\\]*n/i","/i[\\\]*m[\\\]*p[\\\]*o[\\\]*r[\\\]*t/i","/on([a-z]{2,})([\(|\=|\s]+)/i","/about/i","/frame/i","/link/i","/meta/i","/textarea/i","/eval/i","/alert/i","/confirm/i","/prompt/i","/cookie/i","/document/i","/newline/i","/colon/i","/<style/i","/\\\x/i");
-		$replace = array("s<em></em>cript","da<em></em>ta:","ba<em></em>se","ex<em></em>pression","im<em></em>port","o<em></em>n\\1\\2","a<em></em>bout","f<em></em>rame","l<em></em>ink","me<em></em>ta","text<em></em>area","e<em></em>val","a<em></em>lert","/con<em></em>firm/i","prom<em></em>pt","coo<em></em>kie","docu<em></em>ment","new<em></em>line","co<em></em>lon","<sty1e","\<em></em>x");
-		return preg_replace($match, $replace, $string);
+		if($type) {
+			$string = str_replace('<em></em>', '', $string);
+			$string = preg_replace("/\<\!\-\-([\s\S]*?)\-\-\>/", "", $string);
+			$string = preg_replace("/\/\*([\s\S]*?)\*\//", "", $string);
+			$string = preg_replace("/&#([a-z0-9]{1,})/i", "<em></em>&#\\1", $string);
+			$match = array("/s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/i","/d[\s]*a[\s]*t[\s]*a[\s]*\:/i","/b[\s]*a[\s]*s[\s]*e/i","/e[\\\]*x[\\\]*p[\\\]*r[\\\]*e[\\\]*s[\\\]*s[\\\]*i[\\\]*o[\\\]*n/i","/i[\\\]*m[\\\]*p[\\\]*o[\\\]*r[\\\]*t/i","/on([a-z]{2,})([\(|\=|\s]+)/i","/about/i","/frame/i","/link/i","/meta/i","/textarea/i","/eval/i","/alert/i","/confirm/i","/prompt/i","/cookie/i","/document/i","/newline/i","/colon/i","/<style/i","/\\\x/i");
+			$replace = array("s<em></em>cript","da<em></em>ta:","ba<em></em>se","ex<em></em>pression","im<em></em>port","o<em></em>n\\1\\2","a<em></em>bout","f<em></em>rame","l<em></em>ink","me<em></em>ta","text<em></em>area","e<em></em>val","a<em></em>lert","/con<em></em>firm/i","prom<em></em>pt","coo<em></em>kie","docu<em></em>ment","new<em></em>line","co<em></em>lon","<sty1e","\<em></em>x");
+			return str_replace(array('isShowa<em></em>bout', 'co<em></em>ntrols'), array('isShowAbout', 'controls'), preg_replace($match, $replace, $string));
+		} else {
+			return str_replace(array('<em></em>', '<sty1e'), array('', '<style'), $string);
+		}
 	}
 }
 
-function strip_sql($string) {
-	$match = array("/union/i","/where/i","/outfile/i","/dumpfile/i","/0x([a-z0-9]{2,})/i","/select([\s\S]*?)from/i","/select([\s\*\/\-\(\+@])/i","/update([\s\*\/\-\(\+@])/i","/replace([\s\*\/\-\(\+@])/i","/delete([\s\*\/\-\(\+@])/i","/drop([\s\*\/\-\(\+@])/i","/load_file[\s]*\(/i","/substring[\s]*\(/i","/substr[\s]*\(/i","/left[\s]*\(/i","/concat[\s]*\(/i","/concat_ws[\s]*\(/i","/make_set[\s]*\(/i","/ascii[\s]*\(/i","/hex[\s]*\(/i","/ord[\s]*\(/i","/char[\s]*\(/i");
-	$replace = array('unio&#110;','wher&#101;','outfil&#101;','dumpfil&#101;','0&#120;\\1','selec&#116;\\1from','selec&#116;\\1','updat&#101;\\1','replac&#101;\\1','delet&#101;\\1','dro&#112;\\1','load_fil&#101;(','substrin&#103;(','subst&#114;(','lef&#116;(','conca&#116;(','concat_w&#115;(','make_se&#116;(','asci&#105;(','he&#120;(','or&#100;(','cha&#114;(');
-	return is_array($string) ? array_map('strip_sql', $string) : preg_replace($match, $replace, $string);
+function strip_sql($string, $type = 1) {
+	if(is_array($string)) {
+		return array_map('strip_sql', $string);
+	} else {
+		if($type) {
+			global $DT_PRE;
+			$string = preg_replace("/\/\*([\s\S]*?)\*\//", "", $string);
+			$string = preg_replace("/0x([a-f0-9]{2,})/i", '0&#120;\\1', $string);
+			$string = preg_replace_callback("/(select|update|replace|delete|drop)([\s\S]*?)({$DT_PRE}|from)/i", 'strip_wd', $string);
+			$string = preg_replace_callback("/(load_file|substring|substr|reverse|trim|space|left|right|mid|lpad|concat|concat_ws|make_set|ascii|bin|oct|hex|ord|char|conv)([^a-z]?)\(/i", 'strip_wd', $string);
+			$string = preg_replace_callback("/(union|where|having|outfile|dumpfile|{$DT_PRE})/i", 'strip_wd', $string);
+			return $string;
+		} else {
+			return str_replace(array('&#95;','&#100;','&#101;','&#103;','&#105;','&#109;','&#110;','&#112;','&#114;','&#115;','&#116;','&#118;','&#120;'), array('_','d','e','g','i','m','n','p','r','s','t','v','x'), $string);
+		}
+	}
+}
+
+function strip_wd($m) {
+	if(is_array($m) && isset($m[1])) {
+		$wd = substr($m[1], 0, -1).'&#'.ord(strtolower(substr($m[1], -1))).';';
+		if(isset($m[3])) return $wd.$m[2].$m[3];
+		if(isset($m[2])) return $wd.$m[2].'(';
+		return $wd;
+	}
+	return '';
 }
 
 function strip_uri($uri) {
@@ -49,22 +71,24 @@ function strip_uri($uri) {
 	}
 }
 
-function strip_kw($kw) {
-	$kw = htmlspecialchars(trim(urldecode($kw)));
+function strip_kw($kw, $max = 0) {
+	$kw = dhtmlspecialchars(trim(urldecode($kw)));
 	if($kw) {
 		if(strpos($kw, '%') !== false) return '';
-		$kw = str_replace("'", '', $kw);
+		$kw = str_replace(array("'", '&'), array('', ''), $kw);
+		$max = intval($max);
+		if($max > 0 && strlen($kw) > $max) $kw = dsubstr($kw, $max);
 	}
 	return $kw;
 }
 
-function strip_key($array, $deep = 0) {
+function strip_key($array) {
 	foreach($array as $k=>$v) {
-		if($deep && !preg_match("/^[a-z0-9_\-]{1,}$/i", $k)) {
+		if(!preg_match("/^[a-z0-9_\-]{1,64}$/i", $k)) {
 			dhttp(403, 0);
-			dalert('HTTP 403 Forbidden', DT_PATH);
+			dalert('HTTP 403 Forbidden - Bad Data', DT_PATH);
 		}
-		if(is_array($v)) strip_key($v, 1);
+		if(is_array($v)) strip_key($v);
 	}
 }
 

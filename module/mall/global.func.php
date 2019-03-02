@@ -28,15 +28,12 @@ function get_nv($n, $v) {
 	return count($p) > 1 ? $p : array();
 }
 
-function get_cart() {
-	//
-}
-
-function set_cart() {
-	//
-}
-
-function del_cart($key) {
-	//
+function get_price($amount, $price, $step) {
+	if($step) {
+		$s = unserialize($step);
+		if($s['a3'] && $amount > $s['a3']) return $s['p3'];
+		if($s['a2'] && $amount > $s['a2']) return $s['p2'];
+	}
+	return $price;
 }
 ?>

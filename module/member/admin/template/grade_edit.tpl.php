@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -89,7 +89,7 @@ show_menu($menus);
 <td><?php echo $ip;?> - <?php echo ip2area($ip);?></td>
 </tr>
 </table>
-<div class="tt"><span class="f_hid">*</span> 申请受理</div>
+<div class="tt">申请受理</div>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/expert.class.php';
 $do = new expert();
 $menus = array (
@@ -8,8 +8,8 @@ $menus = array (
 );
 if(in_array($action, array('', 'check'))) {
 	$level = isset($level) ? intval($level) : 0;
-	$sfields = array('按条件', '姓名', '会员名', '擅长领域', '专家介绍');
-	$dfields = array('title', 'title', 'username', 'major', 'content');
+	$sfields = array('按条件', '姓名', '会员名', '昵称', '擅长领域', '专家介绍');
+	$dfields = array('title', 'title', 'username', 'passport', 'major', 'content');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '修改时间降序', '修改时间升序', '浏览人气降序', '浏览人气升序', '被提问数降序', '被提问数升序', '回答次数降序', '回答次数升序', '被采纳数降序', '被采纳数升序');
 	$dorder  = array('addtime DESC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC', 'ask DESC', 'ask ASC', 'answer DESC', 'answer ASC', 'best DESC', 'best ASC');
 
@@ -62,7 +62,7 @@ switch($action) {
 	break;
 	case 'delete':
 		$itemid or msg('请选择专家');
-		isset($recycle) ? $do->recycle($itemid) : $do->delete($itemid);
+		$do->delete($itemid);
 		dmsg('删除成功', $forward);
 	break;
 	default:

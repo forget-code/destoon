@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,6 +7,7 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
+<input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>单页</div>
 <table cellpadding="2" cellspacing="1" class="tb">
@@ -22,7 +23,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 单页内容</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Default', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -51,7 +52,7 @@ show_menu($menus);
 </tr>
 </tbody>
 <?php if($DT['city']) { ?>
-<tr>
+<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
 <td><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?></td>
 </tr>

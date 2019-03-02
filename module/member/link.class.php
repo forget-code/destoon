@@ -7,11 +7,15 @@ class dlink {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function dlink() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'link';
 		$this->db = &$db;
 		$this->fields = array('listorder', 'title','style','username','addtime','editor','edittime','status', 'linkurl');
+    }
+
+    function dlink() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -45,6 +49,7 @@ class dlink {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

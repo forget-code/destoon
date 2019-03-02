@@ -1,24 +1,19 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<form action="?" target="_blank" id="check_title">
-<input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
-<input type="hidden" name="file" value="<?php echo $file;?>"/>
-<input type="hidden" name="kw" value="" id="kw"/>
-</form>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $tname;?></div>
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 问题分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
 <br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <tr>
@@ -36,7 +31,6 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
-<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -45,7 +39,7 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 问题说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -157,16 +151,7 @@ function check() {
 		return false;
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	if(Dd('property_require') != null) {
-		var ptrs = Dd('property_require').getElementsByTagName('option');
-		for(var i = 0; i < ptrs.length; i++) {		
-			f = 'property-'+ptrs[i].value;
-			if(Dd(f).value == 0 || Dd(f).value == '') {
-				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
-				return false;
-			}
-		}
-	}
+	<?php echo $CP ? property_js() : '';?>
 	return true;
 }
 </script>

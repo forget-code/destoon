@@ -58,15 +58,15 @@ for(; $page <= $total; $page++) {
 	$P = $T[$page-1];
 	$P['src'] = str_replace('.thumb.'.file_ext($P['thumb']), '', $P['thumb']);
 	$destoon_task = "moduleid=$moduleid&html=show&itemid=$itemid&page=$page";
-	if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
-	$filename = $total == 1 ? DT_ROOT.'/'.$MOD['moduledir'].'/'.$fileurl : DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, $page);
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
+	$filename = DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, $page);
 	ob_start();
 	include template($template, $module);
 	$data = ob_get_contents();
 	ob_clean();
 	if($DT['pcharset']) $filename = convert($filename, DT_CHARSET, $DT['pcharset']);
 	file_put($filename, $data);
-	if($page == 1 && $total > 1) {
+	if($page == 1) {
 		$indexname = DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, 0);
 		if($DT['pcharset']) $indexname = convert($indexname, DT_CHARSET, $DT['pcharset']);
 		file_copy($filename, $indexname);

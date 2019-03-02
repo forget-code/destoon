@@ -2,7 +2,7 @@
 defined('IN_DESTOON') or exit('Access Denied');
 if($_userid) dheader($MOD['linkurl']);
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-if(isset($print)) exit(include template('agreement', $module));
+if(isset($read)) exit(include template('agreement', $module));
 if(!$MOD['enable_register']) message($L['register_msg_close'], DT_PATH);
 if($MOD['defend_proxy']) {
 	if($_SERVER['HTTP_X_FORWARDED_FOR'] || $_SERVER['HTTP_VIA'] || $_SERVER['HTTP_PROXY_CONNECTION'] || $_SERVER['HTTP_USER_AGENT_VIA'] || $_SERVER['HTTP_CACHE_INFO'] || $_SERVER['HTTP_PROXY_CONNECTION']) {
@@ -36,15 +36,13 @@ if($could_emailcode) {
 		if($do->email_exists($email)) exit('3');
 		if(!$do->is_email($email)) exit('4');
 		isset($_SESSION['email_send']) or $_SESSION['email_send'] = 0;
-		if($_SESSION['email_time'] && $DT_TIME - $_SESSION['email_time'] < 60) exit('5');
+		if($_SESSION['email_time'] && (($DT_TIME - $_SESSION['email_time']) < 60)) exit('5');
 		if($_SESSION['email_send'] > 9) exit('6');
-
 		$emailcode = random(6, '0123456789');
-		$_SESSION['email'] = $email;
+		$_SESSION['email_save'] = $email;
 		$_SESSION['email_code'] = md5($email.'|'.$emailcode);
 		$_SESSION['email_time'] = $DT_TIME;
 		$_SESSION['email_send'] = $_SESSION['email_send'] + 1;
-
 		$title = $L['register_msg_emailcode'];
 		$content = ob_template('emailcode', 'mail');
 		send_mail($email, $title, stripslashes($content));
@@ -60,21 +58,19 @@ if($could_mobilecode) {
 		if(!is_mobile($mobile)) exit('2');
 		isset($_SESSION['mobile_send']) or $_SESSION['mobile_send'] = 0;
 		if($do->mobile_exists($mobile)) exit('3');
-		if($_SESSION['mobile_time'] && $DT_TIME - $_SESSION['mobile_time'] < 180) exit('5');
+		if($_SESSION['mobile_time'] && (($DT_TIME - $_SESSION['mobile_time']) < 180)) exit('5');
 		if($_SESSION['mobile_send'] > 4) exit('6');
-
+		if(max_sms($mobile)) exit('6');
 		$mobilecode = random(6, '0123456789');
-		$_SESSION['mobile'] = $mobile;
+		$_SESSION['mobile_save'] = $mobile;
 		$_SESSION['mobile_code'] = md5($mobile.'|'.$mobilecode);
 		$_SESSION['mobile_time'] = $DT_TIME;
 		$_SESSION['mobile_send'] = $_SESSION['mobile_send'] + 1;
-
-		$content = lang('sms->sms_code', array($mobilecode, $MOD['auth_days'])).$DT['sms_sign'];
+		$content = lang('sms->sms_code', array($mobilecode, $MOD['auth_days']*10)).$DT['sms_sign'];
 		send_sms($mobile, $content);
 		exit('1');
 	}
 }
-
 
 $FD = $MFD = cache_read('fields-member.php');
 $CFD = cache_read('fields-company.php');
@@ -91,11 +87,10 @@ if($submit) {
 		if($uid == -2) dalert($L['register_msg_passport'], '', 'parent.Dd("passport").focus();');
 	}
 	$msg = captcha($captcha, $MOD['captcha_register'], true);
-	if($msg) dalert($msg);
+	if($msg) dalert($msg, '', reload_captcha());
 	$msg = question($answer, $MOD['question_register'], true);
-	if($msg) dalert($msg);
+	if($msg) dalert($msg, '', reload_question());
 	$post['email'] = trim($post['email']);
-	if($_SESSION['regemail'] != md5(md5($post['email'].DT_KEY.$DT_IP))) dalert($L['check_sign'].'(2)');
 	$RG = array();
 	foreach($GROUP as $k=>$v) {
 		if($k > 4 && $v['vip'] == 0) $RG[] = $k;
@@ -104,17 +99,17 @@ if($submit) {
 	$reload_question = $MOD['question_register'] ? reload_question() : '';
 	in_array($post['regid'], $RG) or dalert($L['register_pass_groupid'], '', $reload_captcha.$reload_question);
 	if($could_emailcode) {
-		if(!preg_match("/[0-9]{6}/", $post['emailcode']) || $_SESSION['email_code'] != md5($post['email'].'|'.$post['emailcode'])) dalert($L['register_pass_emailcode'], '', $reload_captcha.$reload_question);
+		if(!preg_match("/^[0-9]{6}$/", $post['emailcode']) || $_SESSION['email_code'] != md5($post['email'].'|'.$post['emailcode'])) dalert($L['register_pass_emailcode'], '', $reload_captcha.$reload_question);
 	}
 	if($could_mobilecode) {
-		if(!preg_match("/[0-9]{6}/", $post['mobilecode']) || $_SESSION['mobile_code'] != md5($post['mobile'].'|'.$post['mobilecode'])) dalert($L['register_pass_mobilecode'], '', $reload_captcha.$reload_question);
+		if(!preg_match("/^[0-9]{6}$/", $post['mobilecode']) || $_SESSION['mobile_code'] != md5($post['mobile'].'|'.$post['mobilecode'])) dalert($L['register_pass_mobilecode'], '', $reload_captcha.$reload_question);
 	}
 	if($post['regid'] == 5) $post['company'] = $post['truename'];
 	$post['groupid'] = $MOD['checkuser'] ? 4 : $post['regid'];
 	$post['content'] = $post['introduce'] = $post['thumb'] = $post['banner'] = $post['catid'] = $post['catids'] = '';
 	$post['edittime'] = 0;
 	$inviter = get_cookie('inviter');
-	$post['inviter'] = $inviter ? decrypt($inviter) : '';
+	$post['inviter'] = $inviter ? decrypt($inviter, DT_KEY.'INVITER') : '';
 	check_name($post['inviter']) or $post['inviter'] = '';
 	if($do->add($post)) {
 		$userid = $do->userid;
@@ -134,35 +129,22 @@ if($submit) {
 		}
 		//send sms
 		if($MOD['checkuser'] == 2) {
-			$auth = make_auth($username);
-			$db->query("UPDATE {$DT_PRE}member SET auth='$auth',authvalue='$email',authtime='$DT_TIME' WHERE username='$username'");
-			$authurl = $MOD['linkurl'].'send.php?action=check&auth='.$auth;
-			$title = $L['register_msg_activate'];
-			$content = ob_template('check', 'mail');
-			send_mail($email, $title, $content);
-			$goto = $MOD['linkurl'].'goto.php?action=register&email='.$email;
-			dalert('', '', 'top.window.location="'.$goto.'";');
+			$goto = 'send.php?action=check&auth='.encrypt($email.'|'.$DT_TIME, DT_KEY.'REG');
+			dalert('', '', 'parent.window.location="'.$goto.'";');
+		} else if($MOD['checkuser'] == 1) {
+			$forward = $MOD['linkurl'];
 		} else if($MOD['checkuser'] == 0) {
 			if($MOD['welcome_message'] || $MOD['welcome_email']) {
 				$title = $L['register_msg_welcome'];
 				$content = ob_template('welcome', 'mail');
 				if($MOD['welcome_message']) send_message($username, $title, $content);
-				if($MOD['welcome_email'] && $DT['mail_type'] != 'close') send_mail($post['email'], $title, $content);
+				if($MOD['welcome_email'] && $DT['mail_type'] != 'close') send_mail($email, $title, $content);
 			}
 		}
 		if($could_emailcode) $db->query("UPDATE {$DT_PRE}member SET vemail=1 WHERE username='$username'");
 		if($could_mobilecode) $db->query("UPDATE {$DT_PRE}member SET vmobile=1 WHERE username='$username'");
-		if(!get_cookie('bind')) session_destroy();
-		echo '<html><head><title>Login...</title><meta http-equiv="Content-Type" content="text/html;charset='.DT_CHARSET.'"></head>';
-		echo '<body onload="document.getElementById(\'login\').submit();">';
-		echo '<form method="post" action="'.$MOD['linkurl'].$DT['file_login'].'" id="login" target="_top">';
-		echo '<input type="hidden" name="forward" value="'.($forward ? $forward : $MOD['linkurl']).'"/>';
-		echo '<input type="hidden" name="username" value="'.$username.'"/>';
-		echo '<input type="hidden" name="password" value="'.$post['password'].'"/>';
-		echo '<input type="hidden" name="auto" value="1"/>';
-		echo '<input type="hidden" name="captcha" value=""/>';
-		echo '</form></body></html>';
-		exit;
+		$forward = 'goto.php?action=register_success&username='.$username.'&auth='.encrypt('LOGIN|'.$username.'|'.$post['password'].'|'.$DT_TIME, DT_KEY.'LOGIN').'&forward='.urlencode($forward);
+		dalert('', '', 'parent.window.location="'.$forward.'"');
 	} else {
 		$reload_captcha = $MOD['captcha_register'] ? reload_captcha() : '';
 		$reload_question = $MOD['question_register'] ? reload_question() : '';
@@ -174,10 +156,10 @@ if($submit) {
 	$COM_MODE = explode('|', $MOD['com_mode']);
 	$MONEY_UNIT = explode('|', $MOD['money_unit']);
 	$mode_check = dcheckbox($COM_MODE, 'post[mode][]', '', 'onclick="check_mode(this);"', 0);
-	$auth = isset($auth) ? rawurldecode($auth) : '';
+	isset($auth) or $auth = '';
 	$username = $password = $email = $passport = '';
 	if($auth) {
-		$auth = decrypt($auth);
+		$auth = decrypt($auth, DT_KEY.'UC');
 		$auth = explode('|', $auth);
 		$passport = $auth[0];
 		if(check_name($passport)) $username = $passport;
@@ -187,6 +169,7 @@ if($submit) {
 	}
 	$areaid = $cityid;
 	set_cookie('forward_url', $forward);
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'register.php?forward='.urlencode($forward);
 	$head_title = $L['register_title'];
 	include template('register', $module);
 }

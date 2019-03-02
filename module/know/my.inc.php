@@ -1,13 +1,86 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-$MG['know_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/include/post.func.php';
+if($action == 'answer') {
+	$itemid or dheader($MOD['linkurl']);
+	$item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
+	$item['status'] > 2 or dheader($MOD['linkurl']);
+	include load('misc.lang');
+	$linkurl = $MOD['linkurl'].$item['linkurl'];
+	/*
+	$aid = isset($aid) ? intval($aid) : 0;
+	$aser = $aid ? $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid AND status=3") : array();
+	if($aser && $aser['qid'] != $itemid) exit;
+	$could_admin = $could_addition = $could_close = $_username && $_username == $item['username'];
+	if($item['process'] > 1) $could_addition = $could_close = false;
+	$could_answer = false;
+	*/
+	$could_answer = check_group($_groupid, $MOD['group_answer']);
+	if($item['process'] != 1 || ($_username && $_username == $item['username'])) $could_answer = false;
+	$need_captcha = $MOD['captcha_answer'] == 2 ? $MG['captcha'] : $MOD['captcha_answer'];
+	$need_question = $MOD['question_answer'] == 2 ? $MG['question'] : $MOD['question_answer'];
+	if($could_answer && !$MOD['answer_repeat']) {
+		if($_username) {
+			$r = $db->get_one("SELECT itemid FROM {$table}_answer WHERE username='$_username' AND qid=$itemid");
+		} else {
+			$r = $db->get_one("SELECT itemid FROM {$table}_answer WHERE ip='$DT_IP' AND qid=$itemid AND addtime>$DT_TIME-86400");
+		}
+		if($r) $could_answer = false;
+	}
+	$could_answer or dheader($linkurl);
+	if($submit) {
+		$msg = captcha($captcha, $need_captcha, true);
+		if($msg) dalert($msg);
+		$msg = question($answer, $need_question, true);
+		if($msg) dalert($msg);
+		$content = stripslashes(trim($content));
+		if(!$content) dalert($L['type_answer']);
+		$content = save_local($content);
+		if($MOD['clear_alink']) $content = clear_link($content);
+		if($MOD['save_remotepic']) $content = save_remote($content);
+		$content = dsafe($content);
+		$content = addslashes($content);
+		clear_upload($content);
+		$url = dhtmlspecialchars(trim($url));	
+		$need_check =  $MOD['check_add'] == 2 ? $MG['check'] : $MOD['check_answer'];
+		$status = get_status(3, $need_check);
+		$hidden = isset($hidden) ? 1 : 0;
+		$expert = 0;
+		if($_username) {
+			$t = $db->get_one("SELECT itemid FROM {$table}_expert WHERE username='$_username'");
+			if($t) {
+				$expert = 1;
+				$db->query("UPDATE {$table}_expert SET answer=answer+1 WHERE username='$_username'");
+			}
+		}
+		$db->query("INSERT INTO {$table}_answer (qid,linkurl,content,username,expert,addtime,ip,status,hidden) VALUES ('$itemid','$url','$content','$_username','$expert','$DT_TIME','$DT_IP','$status','$hidden')");
+		if($MOD['credit_answer'] && $_username && $status == 3) {
+			$could_credit = true;
+			if($MOD['credit_maxanswer'] > 0) {					
+				$r = $db->get_one("SELECT SUM(amount) AS total FROM {$DT_PRE}finance_credit WHERE username='$_username' AND addtime>$DT_TIME-86400  AND reason='".$L['answer_question']."'");
+				if($r['total'] >= $MOD['credit_maxanswer']) $could_credit = false;
+			}
+			if($could_credit) {
+				credit_add($_username, $MOD['credit_answer']);
+				credit_record($_username, $MOD['credit_answer'], 'system', $L['answer_question'], 'ID:'.$itemid);
+			}
+		}
+		if($MOD['answer_message'] && $item['username']) {
+			send_message($item['username'], lang($L['answer_msg_title'], array(dsubstr($item['title'], 20, '...'))), lang($L['answer_msg_content'], array($item['title'], stripslashes($content), $linkurl)));
+		}
+		dalert($status == 3 ? $L['answer_success'] : $L['answer_check'], '', 'parent.window.location="'.$linkurl.'";');
+	} else {
+		$head_title = $L['answer_title'];
+		include template('my_'.$module, 'member');
+	}
+	exit;
+}
+$MG['know_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 include load($module.'.lang');
 include load('my.lang');
 require MD_ROOT.'/know.class.php';
 $do = new know($moduleid);
-
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -16,7 +89,6 @@ if(in_array($action, array('add', 'edit'))) {
 	if($CP) require DT_ROOT.'/include/property.func.php';
 	isset($post_ppt) or $post_ppt = array();
 }
-
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
@@ -24,7 +96,6 @@ if(in_array($action, array('', 'add'))) {
 	$limit_used = $r['num'];
 	$limit_free = $MG['know_limit'] > $limit_used ? $MG['know_limit'] - $limit_used : 0;
 }
-
 switch($action) {
 	case 'add':
 		if($MG['know_limit'] && $limit_used >= $MG['know_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
@@ -47,6 +118,7 @@ switch($action) {
 		$could_color = check_group($_groupid, $MOD['group_color']) && $MOD['credit_color'] && $_userid;
 
 		if($submit) {
+			$post['credit'] = abs(intval($post['credit']));
 			if($post['credit'] && $post['credit'] > $_credit) dalert($L['balance_lack']);
 			if(isset($post['hidden']) && $post['credit'] + $MOD['credit_hidden'] > $_credit) dalert($L['balance_lack']);
 			if($fee_add && $fee_add > ($fee_currency == 'money' ? $_money : $_credit)) dalert($L['balance_lack']);
@@ -69,15 +141,13 @@ switch($action) {
 				$post['hits'] = 0;
 				$post['username'] = $_username;
 				$post['areaid'] = $cityid;
-				
+				if($FD) fields_check($post_fields);
+				if($CP) property_check($post_ppt);
 				if($could_color && $color && $_credit > $MOD['credit_color']) {
 					$post['style'] = $color;
 					credit_add($_username, -$MOD['credit_color']);
 					credit_record($_username, -$MOD['credit_color'], 'system', $L['title_color'], '['.$MOD['name'].']'.$post['title']);
 				}
-
-				if($FD) fields_check($post_fields);
-				if($CP) property_check($post_ppt);
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
@@ -115,7 +185,6 @@ switch($action) {
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
 				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
-				if(isset($post['sync_qzone']) && $post['sync_qzone']) $js .= sync_weibo('qzone', $moduleid, $do->itemid);
 				if($post['status'] == 3) {
 					$r = $db->get_one("SELECT linkurl FROM {$table} WHERE itemid=$do->itemid");
 					$forward = $MOD['linkurl'].$r['linkurl'];
@@ -161,7 +230,6 @@ switch($action) {
 		$lists = $do->get_list($condition, $MOD['order']);
 		break;
 }
-$head_title = lang($L['module_manage'], array($MOD['name']));
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 4; $i++) {
@@ -169,5 +237,6 @@ if($_userid) {
 		$nums[$i] = $r['num'];
 	}
 }
+$head_title = lang($L['module_manage'], array($MOD['name']));
 include template('my_'.$module, 'member');
 ?>

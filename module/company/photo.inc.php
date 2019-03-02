@@ -71,10 +71,11 @@ if($itemid) {
 			$t = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 			$content = $t['content'];
 		}
+		if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);;
 	} else {
 		$error = '';
 		if($submit) {
-			if($key && $key == $_key) {
+			if(isset($key) && $key == $_key) {
 				$pass = true;
 				set_cookie('photo_'.$itemid, md5(md5($DT_IP.$open.$_key.DT_KEY)), $DT_TIME + 86400);
 				dheader($linkurl);
@@ -119,6 +120,7 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 }
 include template('photo', $template);
 ?>

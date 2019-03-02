@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/job.class.php';
 $do = new job($moduleid);
 $menus = array (
@@ -61,7 +61,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level);
+	$level_select = level_select('level', '级别', $level, 'all');
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -70,7 +70,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($AREA[$areaid]['child']) ? " AND areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND areaid=$areaid";
-	if($level) $condition .= " AND level=$level";
+	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 	if($gender) $condition .= " AND gender=$gender";
 	if($type) $condition .= " AND type=$type";
 	if($marriage) $condition .= " AND marriage=$marriage";
@@ -111,7 +111,6 @@ switch($action) {
 			$username = $_username;
 			$item = array();
 			$menuid = 0;
-			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -141,7 +140,6 @@ switch($action) {
 			$totime = $totime ? timetodate($totime, 3) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
-			$tname = '修改招聘';
 			include tpl($action, $module);
 		}
 	break;
@@ -157,7 +155,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 6;
-			include tpl($action, $module);
+			include tpl($action);
 		}
 	break;
 	case 'update':
@@ -172,7 +170,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('更新成功', $forward);
+		dmsg('生成成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择'.$MOD['name']);

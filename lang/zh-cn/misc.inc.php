@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -96,9 +96,11 @@ $L['record_expired'] = '[{V0}]问题过期';
 $L['select_credit'] = '请选择'.$DT['credit_name'];
 $L['lack_credit'] = $DT['credit_name'].'不足';
 $L['type_answer'] = '请填写答案';
+$L['answer_title'] = '我来回答';
 $L['answer_question'] = '回答问题';
 $L['answer_msg_title'] = '您的提问[{V0}]收到新的回答';
 $L['answer_msg_content'] = '<strong>问</strong>:{V0}<br/><strong>答</strong>:{V1}<br/>详见:<a href="{V2}" target="_blank">{V2}</a><br/>如果回答没有显示出来，可能需要系统审核后显示';
+$L['answer_success'] = '回答成功，感谢参与';
 $L['answer_check'] = '回答成功，请等待审核';
 $L['expired_msg_title'] = '您的提问[{V0}]即将到期，请及时处理';
 $L['expired_msg_content'] = '详见:<a href="{V0}" target="_blank">{V0}</a>';
@@ -109,16 +111,13 @@ $L['sms_message'] = '留言';
 $L['cart_title'] = '购物车';
 /* mall|group/buy.inc.php */
 $L['buy_title'] = '提交订单';
+$L['post_free'] = '包邮';
 $L['msg_buy_success'] = '订单提交成功';
 /* group/buy.inc.php*/
 $L['group_expired'] = '团购已结束';
-$L['in_site'] = '站内';
-$L['group_order_credit'] = '团购订单';
-$L['need_charge'] = '余额不足，请充值';
 /* exhibit/sign.inc.php*/
 $L['sign_title'] = '在线报名';
 $L['sign_again'] = '您已经报过名了，不能重复提交';
 $L['has_started'] = '展会已经开始';
-$L['msg_sign_amount'] = '请填写报名人数';
 $L['msg_sign_success'] = '报名提交成功，请等待工作人员与您联系';
 ?>

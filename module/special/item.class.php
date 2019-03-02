@@ -8,12 +8,16 @@ class item {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function item($specialid) {
+    function __construct($specialid) {
 		global $db, $DT_PRE;
 		$this->specialid = $specialid;
 		$this->table = $DT_PRE.'special_item';
 		$this->db = &$db;
 		$this->fields = array('typeid','specialid','level','title','style','introduce','thumb','username','addtime', 'editor','edittime','ip','template','linkurl','note');
+    }
+
+    function item($specialid) {
+		$this->__construct($specialid);
     }
 
 	function pass($post) {
@@ -51,6 +55,7 @@ class item {
 			$items = $r['num'];
 		}
 		$pages =  pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {

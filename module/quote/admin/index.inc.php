@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/quote.class.php';
 $do = new quote($moduleid);
 $menus = array (
@@ -23,8 +23,8 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '产品名', '简介', '会员名', 'IP');
-	$dfields = array('keyword', 'title', 'tag', 'introduce', 'username', 'ip');
+	$sfields = array('模糊', '标题', '产品名', '简介', '会员名', '编辑', 'IP', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'tag', 'introduce', 'username', 'editor', 'ip', 'filepath', 'template');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
 
@@ -43,7 +43,7 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$itemid or $itemid = '';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level);
+	$level_select = level_select('level', '级别', $level, 'all');
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -52,7 +52,7 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
-	if($level) $condition .= " AND level=$level";
+	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 	if($fromtime) $condition .= " AND `$datetype`>=$fromtime";
 	if($totime) $condition .= " AND `$datetype`<=$totime";
 	if($thumb) $condition .= " AND thumb<>''";
@@ -84,7 +84,6 @@ switch($action) {
 			$addtime = timetodate($DT_TIME);
 			$item = array();
 			$menuid = 0;
-			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -113,7 +112,6 @@ switch($action) {
 			$addtime = timetodate($addtime);
 			$menuon = array('4', '3', '2', '1');
 			$menuid = $menuon[$status];
-			$tname = '修改'.$MOD['name'];
 			include tpl($action, $module);
 		}
 	break;
@@ -129,7 +127,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 5;
-			include tpl($action, $module);
+			include tpl($action);
 		}
 	break;
 	case 'update':
@@ -145,7 +143,7 @@ switch($action) {
 		foreach($html_itemids as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('更新成功', $forward);
+		dmsg('生成成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择'.$MOD['name']);

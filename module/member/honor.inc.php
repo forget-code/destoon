@@ -15,15 +15,19 @@ switch($action) {
 		if($submit) {
 			if($do->pass($post)) {
 				$post['username'] = $_username;
+				$post['addtime'] = 0;
 				$need_check =  $MOD['credit_check'] == 2 ? $MG['check'] : $MOD['credit_check'];
 				$post['status'] = get_status(3, $need_check);
 				$do->add($post);
-				dmsg($L['op_add_success'], $MOD['linkurl'].'honor.php?status='.$post['status']);
+				dmsg($L['op_add_success'], '?status='.$post['status']);
 			} else {
 				message($do->errmsg);
 			}
-		} else {		
-			$addtime = timetodate($DT_TIME);
+		} else {
+			foreach($do->fields as $v) {
+				$$v = '';
+			}
+			$content = '';	
 			$today = timetodate($DT_TIME, 'Ymd');
 			$head_title = $L['honor_title_add'];
 		}
@@ -53,11 +57,14 @@ switch($action) {
 		}
 	break;
 	case 'delete':
-		$itemid or message();
-		$do->itemid = $itemid;
-		$r = $do->get_one();
-		if(!$r || $r['username'] != $_username) message();
-		$do->recycle($itemid);
+		$itemid or message($L['honor_msg_choose']);
+		$itemids = is_array($itemid) ? $itemid : array($itemid);
+		foreach($itemids as $itemid) {
+			$do->itemid = $itemid;
+			$item = $do->get_one();
+			if(!$item || $item['username'] != $_username) message();
+			$do->recycle($itemid);
+		}
 		dmsg($L['op_del_success'], $forward);
 	break;
 	default:

@@ -3,20 +3,15 @@
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="add"><a href="sms.php?action=add"><span>发送短信</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="action_buy"><a href="sms.php?action=buy"><span>短信购买</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action"><a href="sms.php"><span>短信记录</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action_record"><a href="sms.php?action=record"><span>接收记录</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action_send"><a href="sms.php?action=send"><span>发送记录</span></a></td>
-<td class="tab_nav">&nbsp;</td>
+<td class="tab" id="action"><a href="?action=index"><span>短信记录</span></a></td>
+<td class="tab" id="action_record"><a href="?action=record"><span>接收记录</span></a></td>
+<td class="tab" id="action_send"><a href="?action=send"><span>发送记录</span></a></td>
 </tr>
 </table>
 </div>
 {if $action == 'add'}
-<form method="post" action="sms.php" onsubmit="return check();" id="dform">
+<form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
@@ -28,14 +23,15 @@
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 短信内容</td>
-<td class="tr"><textarea name="content" id="content" rows="15" cols="35" onkeyup="S();" onblur="S();"></textarea>
+<td class="tr lh18"><textarea name="content" id="content" rows="15" cols="35" onkeyup="S();" onblur="S();"></textarea>
 <br/>当前已输入<strong id="chars" class="f_red">0</strong>字，计<strong id="counts" class="f_green">0</strong>条({$DT[sms_len]}字/条)，可用<strong class="f_blue">{$_sms}</strong>条
+<br/><span class="f_red">请勿发送任何违法信息，否则帐号会被禁用且不退款</span>
 <br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 立即发送 " class="btn_g"/></td>
 </tr>
 </table>
 </form>
@@ -58,11 +54,11 @@ function check() {
 </script>
 <script type="text/javascript">s('sms');m('add');</script>
 {elseif $action == 'buy'}
-<form method="post" action="sms.php" onsubmit="return check();" id="dform">
+<form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
-<td class="tl">帐户可用余额</td>
+<td class="tl">帐户余额</td>
 <td class="tr"><strong class="f_blue">{$_money}</strong> {$DT[money_unit]}</td>
 </tr>
 <tr>
@@ -83,7 +79,7 @@ function check() {
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 立即购买 " class="btn_g"/></td>
 </tr>
 </table>
 </form>

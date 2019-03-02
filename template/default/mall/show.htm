@@ -28,19 +28,65 @@
 			<td width="15"> </td>
 			<td valign="top">
 				<div id="big_div" style="display:none;"><img src="" id="big_pic"/></div>
+				{if $a2}
+				<div class="step_price">
+				<table width="100%" cellpadding="6" cellspacing="0">
+				<tr>
+				<td>起批</td>
+				<td>{$a1}-{$a2}{$unit}</td>
+				{if $a3}
+				<td>{$a2+1}-{$a3}{$unit}</td>
+				<td>{$a3}{$unit}以上</td>
+				{else}
+				<td>{$a2+1}{$unit}以上</td>
+				{/if}
+				</tr>
+				<tr>
+				<td>价格</td>
+				<td class="f_price">{$DT[money_sign]}<span class="px13">{$p1}</span></td>
+				{if $a3}
+				<td class="f_price">{$DT[money_sign]}<span class="px13">{$p2}</span></td>
+				<td class="f_price">{$DT[money_sign]}<span class="px13">{$p3}</span></td>
+				{else}
+				<td class="f_price">{$DT[money_sign]}<span class="px13">{$p2}</span></td>
+				{/if}
+				</tr>
+				</table>
+				</div>
+				{/if}
 				<table width="100%" cellpadding="5" cellspacing="5">
+				{if !$a2}
 				<tr>
 				<td>单价：</td>
-				<td class="f_gray">￥<span class="f_price px16">{$price}</span></td>
+				<td class="f_price">{$DT[money_sign]}<span class="px16">{$price}</span></td>
 				</tr>
-				{if $fee_start_1>0 || $fee_start_2>0 || $fee_start_3>0}
+				{/if}
+				{if $express_name_1 == '包邮'}
 				<tr>
-				<td>运费：</td>
+				<td>物流：</td>
+				<td>
+				{if $fee_start_1>0}
+				{if $fee_start_2>0} {$express_name_2}:{$fee_start_2}&nbsp;&nbsp;{/if}
+				{if $fee_start_3>0} {$express_name_3}:{$fee_start_3}&nbsp;&nbsp;{/if}
+				满{$fee_start_1}包邮
+				{else}
+				包邮
+				{/if}</td>
+				</tr>
+				{elseif $fee_start_1>0 || $fee_start_2>0 || $fee_start_3>0}
+				<tr>
+				<td>物流：</td>
 				<td class="f_gray">
-				{if $fee_start_1>0} {$express_name_1}:<span class="f_price">{$fee_start_1}</span>&nbsp;&nbsp;{/if}
-				{if $fee_start_2>0} {$express_name_2}:<span class="f_price">{$fee_start_2}</span>&nbsp;&nbsp;{/if}
-				{if $fee_start_3>0} {$express_name_3}:<span class="f_price">{$fee_start_3}</span>&nbsp;&nbsp;{/if}
+				{if $fee_start_1>0} {$express_name_1}:{$fee_start_1}&nbsp;&nbsp;{/if}
+				{if $fee_start_2>0} {$express_name_2}:{$fee_start_2}&nbsp;&nbsp;{/if}
+				{if $fee_start_3>0} {$express_name_3}:{$fee_start_3}&nbsp;&nbsp;{/if}
 				</td>
+				</tr>
+				{/if}
+				{if $cod}
+				<tr>
+				<td>到付：</td>
+				<td>支持货到付款</td>
 				</tr>
 				{/if}
 				<tr>
@@ -49,22 +95,18 @@
 				</tr>
 				<tr>
 				<td>销量：</td>
-				<td><a href="#order" onclick="Mshow('order');" class="b">累计出售 <span class="f_orange">{$sales}</span> 件，{$orders} 个订单</a></td>
+				<td><a href="#order" onclick="Mshow('order');" class="b">累计出售 <span class="f_orange">{$sales}</span> {$unit}</a></td>
 				</tr>
 				<tr>
 				<td>评价：</td>
 				<td><a href="#comment" onclick="Mshow('comment');" class="b">已有 <span class="f_orange">{$comments}</span> 条评价</a></td>
 				</tr>
 				<tr>
-				<td>库存：</td>
-				<td>还剩 <span class="f_orange">{$amount}</span> 件</td>
-				</tr>
-				<tr>
-				<td width="60">人气：</td>
+				<td>人气：</td>
 				<td>已有 <span class="f_orange"><span id="hits">{$hits}</span></span> 人关注</td>
 				</tr>
 				<tr>
-				<td>更新：</td>
+				<td width="50">更新：</td>
 				<td>{$editdate}</td>
 				</tr>
 				{if $RL}
@@ -77,54 +119,50 @@
 				</td>
 				</tr>
 				{/if}
-				{if $p1}
+				{if $P1}
 				<tr>
 				<td>{$n1}：</td>
 				<td id="p1">
 				<ul>
-				{loop $p1 $i $v}
+				{loop $P1 $i $v}
 				<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
 				{/loop}
 				</ul>
 				</td>
 				</tr>
 				{/if}
-				{if $p2}
+				{if $P2}
 				<tr>
 				<td>{$n2}：</td>
 				<td id="p2">
 				<ul>
-				{loop $p2 $i $v}
+				{loop $P2 $i $v}
 				<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
 				{/loop}
 				</ul>
 				</td>
 				</tr>
 				{/if}
-				{if $p3}
+				{if $P3}
 				<tr>
 				<td>{$n3}：</td>
 				<td id="p3">
 				<ul>
-				{loop $p3 $i $v}
+				{loop $P3 $i $v}
 				<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
 				{/loop}
 				</ul>
 				</td>
 				</tr>
 				{/if}
-				{if $status == 3 && $amount > 0}
+				{if $amount}
+				{if $status == 3}
+				<tr>
+				<td>数量：</td>
+				<td class="f_gray"><img src="{DT_SKIN}image/arrow_l.gif" width="16" height="8" alt="减少" class="c_p" onclick="Malter('-', {$a1}, {$amount});"/> <input type="text" value="{$a1}" size="4" class="cc_inp" id="amount" onkeyup="Malter('', {$a1}, {$amount});"/> <img src="{DT_SKIN}image/arrow_r.gif" width="16" height="8" alt="增加" class="c_p" onclick="Malter('+', {$a1}, {$amount});"/>{$unit} 库存{$amount}{$unit}</td>
+				</tr>
 				<tr>
 				<td colspan="2">
-				<div id="cart_tip" style="display:none;">
-					<p><img src="{DT_SKIN}image/close.gif" alt="关闭" width="17" height="12" onclick="Dh('cart_tip');"/>提示信息</p>
-					<div>已成功添加到购物车！购物车里已有 <span id="cart_num">0</span> 种商品</div>
-					<center>
-					<input type="button" value="再逛逛" onclick="Dh('cart_tip');"/>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="button" value="去结算" onclick="Go('{$MOD[linkurl]}cart.php');"/>
-					</center>
-				</div>
 				<img src="{DT_SKIN}image/btn_tobuy.gif" alt="立即购买" class="c_p" onclick="BuyNow();"/>
 				&nbsp;
 				<img src="{DT_SKIN}image/btn_addcart.gif" alt="加入购物车" class="c_p" onclick="AddCart();"/>
@@ -133,8 +171,14 @@
 				{else}
 				<tr>
 				<td></td>
-				<td><strong class="f_red">该商品已下架</strong></td>
+				<td><strong class="f_red px14">该商品已下架</strong></td>
 				</tr>				
+				{/if}
+				{else}
+				<tr>
+				<td></td>
+				<td><strong class="f_red px14">该商品库存不足</strong></td>
+				</tr>
 				{/if}
 				</table>
 			</td>
@@ -180,17 +224,13 @@
 </div>
 
 <div class="m">
-	<form method="post" action="{$MODULE[2][linkurl]}sendmail.php" name="sendmail" id="sendmail" target="_blank">
-	<input type="hidden" name="itemid" value="{$itemid}"/> 
-	<input type="hidden" name="title" value="{$title}"/>
-	<input type="hidden" name="linkurl" value="{$linkurl}"/>
-	</form>
 	<br/>
 	<center>
 	[ <a href="{$MOD[linkurl]}search.php">商品搜索</a> ]&nbsp;
 	[ <a href="javascript:SendFav();">加入收藏</a> ]&nbsp;
-	[ <a href="javascript:Dd('sendmail').submit();void(0);">告诉好友</a> ]&nbsp;
+	[ <a href="javascript:SendPage();">告诉好友</a> ]&nbsp;
 	[ <a href="javascript:Print();">打印本文</a> ]&nbsp;
+	[ <a href="javascript:SendReport();">违规举报</a> ]&nbsp;
 	[ <a href="javascript:window.close()">关闭窗口</a> ]
 	</center>
 	<br/>
@@ -215,9 +255,9 @@ var m_l = {
 </script>
 <script type="text/javascript" src="{DT_STATIC}file/script/mall.js"></script>
 <script type="text/javascript">
-{if $p1}addE(1);{/if}
-{if $p2}addE(2);{/if}
-{if $p3}addE(3);{/if}
+{if $P1}addE(1);{/if}
+{if $P2}addE(2);{/if}
+{if $P3}addE(3);{/if}
 if(window.location.href.indexOf('#') != -1) {
 	var t = window.location.href.split('#');
 	try {Mshow(t[1]);} catch(e) {}

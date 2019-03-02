@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -30,7 +30,7 @@ show_menu($menus);
 <th>姓名</th>
 <th>会员</th>
 <th>擅长领域</th>
-<th width="120">添加时间</th>
+<th width="130">添加时间</th>
 <th>人气</th>
 <th>被提问</th>
 <th>回答</th>
@@ -41,9 +41,9 @@ show_menu($menus);
 <?php foreach($lists as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
-<td><img src="<?php echo useravatar($v['username']);?>" alt="" style="padding:5px;"/></a></td>
+<td><img src="<?php echo useravatar($v['username']);?>" alt="" style="padding:5px;" width="48" height="48"/></a></td>
 <td><a href="<?php echo $v['linkurl'];?>" target="_blank"><?php echo $v['title'];?></a></td>
-<td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a></td>
+<td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['passport'];?></a></td>
 <td><?php echo $v['major'];?></td>
 <td class="px11" title="更新时间 <?php echo $v['editdate'];?>"><?php echo $v['adddate'];?></td>
 <td class="px11"><?php echo $v['hits'];?></td>

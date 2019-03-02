@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-define('DT_NONUSER', true);
+$_COOKIE = array();
 require '../common.inc.php';
 if($DT_BOT) dhttp(403);
 $URL = DT_PATH;

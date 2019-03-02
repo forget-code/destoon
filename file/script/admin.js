@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 var dgX = dgY = 0; var dgDiv;
@@ -18,13 +18,17 @@ function mkDialog(u, c, t, w, s, p, px, py) {
 	var ch = body.clientHeight;
 	var bsw = body.scrollWidth;
 	var bsh = body.scrollHeight;
-	var bw = parseInt((bsw < cw) ? cw : bsw);
+	//var bw = parseInt((bsw < cw) ? cw : bsw);
 	var bh = parseInt((bsh < ch) ? ch : bsh);
 	if(!s) {
 		var Dmid = document.createElement("div");
 		with(Dmid.style){zIndex = 998; position = 'absolute'; width = '100%'; height = bh+'px'; overflow = 'hidden'; top = 0; left = 0; border = "0px"; backgroundColor = '#EEEEEE';if(isIE){filter = " Alpha(Opacity=50)";}else{opacity = 50/100;}}
 		Dmid.id = "Dmid";
 		document.body.appendChild(Dmid);
+		$('#Dmid').click(function(){cDialog();});
+	}
+	if($('#head-bar').length > 0) {
+		cw = ch = 320;
 	}
 	var sl = px ? px : body.scrollLeft + parseInt((cw-w)/2);
 	var st = py ? py : body.scrollTop + parseInt(ch/2) - 100;
@@ -32,7 +36,7 @@ function mkDialog(u, c, t, w, s, p, px, py) {
 	with(Dtop.style){zIndex = 999; position = 'absolute'; width = w+'px'; left = sl+'px'; top = st+'px'; display = 'none';}
 	Dtop.id = 'Dtop';
 	document.body.appendChild(Dtop);
-	Dd('Dtop').innerHTML = '<div class="dbody"><div class="dhead" ondblclick="cDialog();" onmousedown="dragstart(\'Dtop\', event);"  onmouseup="dragstop(event);" onselectstart="return false;"><span onclick="cDialog();" title="'+L['dialog_close']+'"></span>'+t+sound('tip')+'</div><div class="dbox">'+c+'</div>'+((c.indexOf('<iframe') != -1 && c.indexOf('scrolling') != -1) ? '<div class="dsize"><div onmousedown="resizestart(\'Dtop\', event);" onmouseup="resizestop(event);"></div></div>' : '')+'</div>';
+	Dd('Dtop').innerHTML = '<div class="dbody"><div class="dhead" ondblclick="cDialog();" onmousedown="dragstart(\'Dtop\', event);"  onmouseup="dragstop(event);" onselectstart="return false;"><span onclick="cDialog();" title="'+L['dialog_close']+'"></span>'+t+sound('tip')+'</div><div class="dbox">'+c+'</div>'+((c.indexOf('<iframe') != -1 && c.indexOf('scrolling="no"') == -1) ? '<div class="dsize"><div onmousedown="resizestart(\'Dtop\', event);" onmouseup="resizestop(event);"></div></div>' : '')+'</div>';
 	Eh();
 	$('#Dtop').show(1, function() {
 		st = py ? py : body.scrollTop + parseInt(ch/2) - parseInt($('#Dtop').height()/2);
@@ -95,32 +99,33 @@ function Dtip(c, w, t) {
 function Dfile(m, o, i, e) {
 	var e = e ? e : '';
 	var c = '<iframe name="UploadFile" style="display:none;" src=""></iframe>';
-	c += '<form method="post" target="UploadFile" enctype="multipart/form-data" action="'+DTPath+'upload.php" onsubmit="return isImg(\'upfile\',\''+e+'\');"><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="file"/><input type="hidden" name="old" value="'+o+'"/><input type="hidden" name="fid" value="'+i+'"/><table cellpadding="2"><tr><td><input id="upfile" type="file" size="20" name="upfile" onchange="if(isImg(\'upfile\',\''+e+'\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/>'+(e ? '<br>'+L['allow']+e : '')+'</td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
+	c += '<form method="post" target="UploadFile" enctype="multipart/form-data" action="'+UPPath+'" onsubmit="return isImg(\'upfile\',\''+e+'\');"><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="file"/><input type="hidden" name="old" value="'+o+'"/><input type="hidden" name="fid" value="'+i+'"/><table cellpadding="2"><tr><td><input id="upfile" type="file" size="20" name="upfile" onchange="if(isImg(\'upfile\',\''+e+'\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/>'+(e ? '<br>'+L['allow']+e : '')+'</td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
 	mkDialog('', c, L['upload_file'], 250);
 }
 function Dthumb(m, w, h, o, s, i) {
 	var s = s ? 'none' : ''; var i = i ? i : 'thumb'; var c = '<iframe name="UploadThumb" style="display:none;" src=""></iframe>';
-	c += '<form method="post" target="UploadThumb" enctype="multipart/form-data" action="'+DTPath+'upload.php" onsubmit="return isUP(\'upthumb\');"><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="thumb"/><input type="hidden" name="old" value="'+o+'"/><input type="hidden" name="fid" value="'+i+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upthumb\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upthumb\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upthumb" type="file" size="20" name="upthumb" onchange="if(isImg(\'upthumb\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
+	c += '<form method="post" target="UploadThumb" enctype="multipart/form-data" action="'+UPPath+'" onsubmit="return isUP(\'upthumb\');"><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="thumb"/><input type="hidden" name="old" value="'+o+'"/><input type="hidden" name="fid" value="'+i+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upthumb\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upthumb\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upthumb" type="file" size="20" name="upthumb" onchange="if(isImg(\'upthumb\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
 	mkDialog('', c, L['upload_img'], 250);
 }
 function Dalbum(f, m, w, h, o, s) {
 	var s = s ? 'none' : ''; var c = '<iframe name="UploadAlbum" style="display:none" src=""></iframe>';
-	c += '<form method="post" target="UploadAlbum" enctype="multipart/form-data" action="'+DTPath+'upload.php" onsubmit="return isUP(\'upalbum\');"><input type="hidden" name="fid" value="'+f+'"/><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="album"/><input type="hidden" name="old" value="'+o+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upalbum\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upalbum\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upalbum" type="file" size="20" name="upalbum" onchange="if(isImg(\'upalbum\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
+	c += '<form method="post" target="UploadAlbum" enctype="multipart/form-data" action="'+UPPath+'" onsubmit="return isUP(\'upalbum\');"><input type="hidden" name="fid" value="'+f+'"/><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="album"/><input type="hidden" name="old" value="'+o+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upalbum\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upalbum\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upalbum" type="file" size="20" name="upalbum" onchange="if(isImg(\'upalbum\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
 	mkDialog('', c, L['upload_img'], 250);
 }
 function Dphoto(f, m, w, h, o, s) {
 	var s = s ? 'none' : ''; var c = '<iframe name="UploadPhoto" style="display:none" src=""></iframe>';
-	c += '<form method="post" target="UploadPhoto" enctype="multipart/form-data" action="'+DTPath+'upload.php" onsubmit="return isUP(\'upalbum\');"><input type="hidden" name="fid" value="'+f+'"/><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="photo"/><input type="hidden" name="old" value="'+o+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upalbum\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upalbum\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upalbum" type="file" size="20" name="upalbum" onchange="if(isImg(\'upalbum\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
+	c += '<form method="post" target="UploadPhoto" enctype="multipart/form-data" action="'+UPPath+'" onsubmit="return isUP(\'upalbum\');"><input type="hidden" name="fid" value="'+f+'"/><input type="hidden" name="moduleid" value="'+m+'"/><input type="hidden" name="from" value="photo"/><input type="hidden" name="old" value="'+o+'"/><table cellpadding="3"><tr><td><input id="remote_0" type="radio" name="isremote" value="0" checked onclick="ReLo(0, \'upalbum\');"/><label for="remote_0"> '+L['up_local']+'</label>&nbsp;&nbsp;&nbsp;<input id="remote_1" type="radio" name="isremote" value="1" onclick="ReLo(1, \'upalbum\');"/><label for="remote_1"> '+L['up_remote']+'</label></td></tr><tr id="remote_url" style="display:none;"><td><input id="remote" type="text" size="30" name="remote" value="http://" onclick="if(this.value==\'http://\')this.value=\'\';"/></td></tr><tr id="local_url"><td><input id="upalbum" type="file" size="20" name="upalbum" onchange="if(isImg(\'upalbum\')){this.form.submit();Dd(\'Dsubmit\').disabled=true;Dd(\'Dsubmit\').value=\''+L['uploading']+'\';}"/></td></tr><tr style="display:'+s+'"><td>'+L['width']+' <input type="text" size="3" name="width" value="'+w+'"/> px &nbsp;&nbsp;&nbsp;'+L['height']+' <input type="text" size="3" name="height" value="'+h+'"/> px </td></tr><tr><td><input type="submit" class="btn" value="'+L['upload']+'" id="Dsubmit"/>&nbsp;&nbsp;<input type="button" class="btn" value="'+L['cancel']+'" onclick="cDialog();"/></td></tr></table></form>';
 	mkDialog('', c, L['upload_img'], 250);
 }
-function Dwidget(u, t, w, h) {
+function Dwidget(u, t, w, h, s) {
 	var w = w ? w : (document.body.scrollWidth - 100);
 	var h = h ? h : ($(window).height() - 100);
-	mkDialog('', '<iframe src="'+u+'&widget=1" width="'+w+'" height="'+h+'" border="0" vspace="0" hspace="0" marginwidth="0" marginheight="0" framespacing="0" frameborder="0" scrolling="yes"></iframe>', t, w+20, 0, 0);
+	var s = s ? s : 'auto';
+	mkDialog('', '<iframe src="'+u+'&widget=1" width="'+w+'" height="'+h+'" border="0" vspace="0" hspace="0" marginwidth="0" marginheight="0" framespacing="0" frameborder="0" scrolling="'+s+'"></iframe>', t, w+20, 0, 0);
 }
 function getAlbum(v, i) {Dd('thumb'+i).value = v; Dd('showthumb'+i).src = v;}
 function delAlbum(i, s) {Dd('thumb'+i).value = ''; Dd('showthumb'+i).src = SKPath+'image/'+s+'pic.gif';}
-function selAlbum(i) {Dwidget(DTPath+'api/select.php?from=album&fid='+i, L['choose_img'], 730, 300)}
+function selAlbum(i) {Dwidget(AJPath+'?action=choose&from=album&fid='+i, L['choose_img'], 730, 300)}
 function ReLo(r, i) {
 	if(r) {
 		Dd(i).value = '';Ds('remote_url');Dh('local_url');
@@ -177,10 +182,7 @@ function _preview(s, t) {
 		Dtip(L['empty_img']);
 	}
 }
-function pagebreak() {
-	var oEditor = FCKeditorAPI.GetInstance('content');
-	if(oEditor.EditMode == FCK_EDITMODE_WYSIWYG) {oEditor.InsertHtml('[pagebreak]');} else {alert(L['wysiwyg_mode']);}
-}
+function pagebreak() {EditorAPI('content', 'ins', '<hr class="de-pagebreak" />');}
 function _delete() {return confirm(L['confirm_del']);}
 function _into(i, str) {
 	var o = Dd(i);
@@ -211,8 +213,27 @@ function RandStr() {
     }
     return str;
 }
-function select_item(m, f) {f = f ? f : '';Dwidget(DTPath+'api/select.php?mid='+m+'&action=item&from='+f, L['choose_item'], 755, 300);}
+function select_item(m, f) {f = f ? f : '';Dwidget(AJPath+'?action=choose&mid='+m+'&job=item&from='+f, L['choose_item'], 755, 300);}
 function Menuon(i) {try{Dd('Tab'+i).className='tab_on';}catch(e){}}
+function type_reload() {
+	if(Dd('Dtop') == null) {
+		$.get(AJPath+'?action=type&item='+type_item+'&name='+type_name+'&default='+type_default+'&itemid='+type_id,function(data,status){
+			$('#type_box').html(data);
+		});
+		clearInterval(type_interval);
+	}
+}
+function Dn(r) {
+	var r = r ? 1 : 0;
+	if(Dd('msg').checked) {
+		Dd('sms').disabled = false;Dd('wec').disabled = false;
+	} else {
+		Dd('sms').checked = false;Dd('wec').checked = false;Dd('sms').disabled = true;Dd('wec').disabled = true;
+	}
+	if(r && (Dd('msg').checked || Dd('eml').checked) && (Dd('reason').value.length > 2 || Dd('reason').value == L['op_reason'])) {
+		alert(L['op_reason_null']);Dd('reason').focus();
+	}
+}
 var MMove = 1;
 function dragstart(i, e) {dgDiv = Dd(i); if(!e) {e = window.event;} dgX = e.clientX - parseInt(dgDiv.style.left); dgY = e.clientY - parseInt(dgDiv.style.top); document.onmousemove = dragmove;}
 function dragmove(e) {if(!e) {e = window.event;} if(!MMove) return; dgDiv.style.left = (e.clientX - dgX) + 'px';  dgDiv.style.top = (e.clientY - dgY) + 'px';}

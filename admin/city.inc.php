@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('分站添加', '?file='.$file.'&action=edit'),
     array('分站管理', '?file='.$file),
@@ -17,7 +17,8 @@ switch($action) {
 		if($submit) {
 			if(!$post['areaid']) msg('请选择所在地区');
 			if(!$post['name']) msg('分站名不能为空');
-			$city['cityname'] = trim($city['cityname']);
+			$post['name'] = trim($post['name']);
+			$post['domain'] = fix_domain($post['domain']);
 			$do->edit($post);
 			dmsg('更新成功', $forward);
 		} else {
@@ -63,11 +64,15 @@ class city {
 	var $db;
 	var $table;
 
-	function city($areaid = 0)	{
+	function __construct($areaid = 0)	{
 		global $db, $city;
 		$this->db = &$db;
 		$this->table = $this->db->pre.'city';
 		$this->areaid = $areaid;
+	}
+
+	function city($areaid = 0)	{
+		$this->__construct($areaid);
 	}
 
 	function edit($post) {
@@ -88,6 +93,8 @@ class city {
 		$areaid = $post['areaid'];
 		if(!$areaid) return false;
 		$post['letter'] or $post['letter'] = $this->letter($post['name']);
+		$post['name'] = trim($post['name']);
+		$post['domain'] = fix_domain($post['domain']);
 		$sql = '';
 		foreach($post as $k=>$v) {
 			$sql .= ",$k='$v'";

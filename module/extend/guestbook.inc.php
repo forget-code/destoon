@@ -6,12 +6,13 @@ $TYPE = explode('|', trim($MOD['guestbook_type']));
 require DT_ROOT.'/include/post.func.php';
 require MD_ROOT.'/guestbook.class.php';
 $do = new guestbook();
+$destoon_task = rand_task();
 if($submit) {
 	captcha($captcha, $MOD['guestbook_captcha']);
 	if($do->pass($post)) {
 		$post['areaid'] = $cityid;
 		$do->add($post);
-		message($L['gbook_success'], $forward);
+		message($L['gbook_success'], $EXT['guestbook_url']);
 	} else {
 		message($do->errmsg);
 	}
@@ -22,8 +23,7 @@ if($submit) {
 	if($cityid) $condition .= ($AREA[$cityid]['child']) ? " AND areaid IN (".$AREA[$cityid]['arrchildid'].")" : " AND areaid=$cityid";
 	$lists = $do->get_list($condition);
 	$head_title = $L['gbook_title'];
-	$title = isset($title) ? htmlspecialchars($title) : '';
-	$content = isset($content) ? htmlspecialchars($content) : '';
+	$content = isset($content) ? dhtmlspecialchars(stripslashes($content)) : '';
 	$truename = $telephone = $email = $qq = $msn = $ali = $skype = '';
 	if($_userid) {
 		$user = userinfo($_username);

@@ -3,24 +3,23 @@
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
-<td class="tab" id="action_buy"><a href="credit.php?action=buy"><span>{$DT[credit_name]}购买</span></a></td>
-<td class="tab_nav">&nbsp;</td>
+<td class="tab" id="action_buy"><a href="?action=buy"><span>{$DT[credit_name]}购买</span></a></td>
 {if $MOD[credit_exchange]}
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action_exchange"><a href="credit.php?action=exchange"><span>{$DT[credit_name]}兑换</span></a></td>
+<td class="tab" id="action_exchange"><a href="?action=exchange"><span>{$DT[credit_name]}兑换</span></a></td>
 {/if}
-<td class="tab" id="action"><a href="credit.php"><span>{$DT[credit_name]}记录</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action_invite"><a href="credit.php?action=invite"><span>推广赚{$DT[credit_name]}</span></a></td>
+<td class="tab" id="action"><a href="?action=index"><span>{$DT[credit_name]}记录</span></a></td>
+<td class="tab" id="action_invite"><a href="?action=invite"><span>推广赚{$DT[credit_name]}</span></a></td>
 {if $action == 'less'}
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="action_less"><a href="credit.php?action=less"><span>{$DT[credit_name]}不足</span></a></td>
+<td class="tab" id="action_less"><a href="?action=less"><span>{$DT[credit_name]}不足</span></a></td>
+{/if}
+{if $EXT[gift_enable]}
+<td class="tab" id="action_gift"><a href="{$EXT[gift_url]}" target="_blank"><span>积分换礼</span></a></td>
 {/if}
 </tr>
 </table>
 </div>
 {if $action == 'exchange'}
-<form method="post" action="credit.php" onsubmit="return check();" id="dform">
+<form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="submit" value="1"/>
 <table cellspacing="1" cellpadding="6" class="tb">
@@ -57,12 +56,13 @@ function check() {
 </script>
 <script type="text/javascript">s('credit');m('action_exchange');</script>
 {elseif $action == 'buy'}
-<form method="post" action="credit.php" onsubmit="return check();" id="dform">
+<form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
+<input type="hidden" name="forward" value="{$forward}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
-<td class="tl">帐户可用余额</td>
-<td class="tr"><strong class="f_blue">{$_money}</strong> {$DT[money_unit]}</td>
+<td class="tl">账户余额</td>
+<td class="tr"><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 购买额度</td>
@@ -74,32 +74,46 @@ function check() {
 <td>&nbsp;&nbsp;{$DT[money_name]}({$DT[money_unit]})&nbsp;&nbsp;</td>
 </tr>
 {loop $C $k $v}
-<tr align="center" onclick="Dd('type_{$k}').checked=true;">
-<td><input type="radio" name="type" id="type_{$k}" value="{$k}" {if $k==0}checked{/if}/></td>
-<td class="f_red">&nbsp;&nbsp;{$v}&nbsp;&nbsp;</td>
-<td class="f_blue">&nbsp;&nbsp;{$P[$k]}&nbsp;&nbsp;</td>
+<tr align="center" onclick="Dd('type_{$k}').checked=true;k={$k};">
+<td><input type="radio" name="type" id="type_{$k}" value="{$k}" {if $k==$select}checked{/if}/></td>
+<td class="f_red" id="c_{$k}">{$v}</td>
+<td class="f_blue" id="p_{$k}">{$P[$k]}</td>
 </tr>
 {/loop}
 </table>
 </td>
 </tr>
-<tr>
+<tr id="payword" style="display:none;">
 <td class="tl"><span class="f_red">*</span> 支付密码</td>
 <td class="tr">{template 'password', 'chip'}&nbsp;<span id="dpassword" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 立即购买 " class="btn_g"/></td>
 </tr>
 </table>
 </form>
 <script type="text/javascript">
+var k = {$select};
 function check() {
-	if(Dd('password').value == '') {
-		Dmsg('请填写支付密码', 'password');
+	if($('#p_'+k).html() > {$_money}) {
+		Go('charge.php?action=pay&reason=credit|'+k+'&amount='+($('#p_'+k).html() - {$_money}));
 		return false;
 	}
+	var f,l;
+	f = 'password';
+	l = Dd(f).value.length;
+	if(l < 6) {
+		Dmsg('请填写支付密码', f);
+		return false;
+	}
+	return true;
 }
+window.setInterval(
+	function() {
+		$('#p_'+k).html() > {$_money} ? Dh('payword') : Ds('payword');
+	}, 
+500);
 </script>
 <script type="text/javascript">s('credit');m('action_buy');</script>
 {elseif $action == 'invite'}
@@ -140,7 +154,7 @@ function check() {
 </tr>
 <tr>
 <td class="tl">推广记录</td>
-<td class="tr"><a href="credit.php?kw={urlencode('推广')}" class="t">点击查看&raquo;</a></td>
+<td class="tr"><a href="?kw={urlencode('推广')}" class="t">点击查看&raquo;</a></td>
 </tr>
 </table>
 <script type="text/javascript">s('credit');m('action_invite');</script>
@@ -153,11 +167,11 @@ function check() {
 <tr>
 <td class="tl">您可以...</td>
 <td class="tr">
-<a href="credit.php?action=buy" class="t">购买{$DT[credit_name]}</a> &nbsp;|&nbsp;
+<a href="?action=buy" class="t">购买{$DT[credit_name]}</a> &nbsp;|&nbsp;
 {if $MOD[credit_exchange]}
-<a href="credit.php?action=exchange" class="t">兑换{$DT[credit_name]}</a> &nbsp;|&nbsp; 
+<a href="?action=exchange" class="t">兑换{$DT[credit_name]}</a> &nbsp;|&nbsp; 
 {/if}
-<a href="credit.php?action=invite" class="t">推广赚{$DT[credit_name]}</a>
+<a href="?action=invite" class="t">推广赚{$DT[credit_name]}</a>
 </td>
 </tr>
 </table>

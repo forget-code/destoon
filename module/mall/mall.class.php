@@ -9,14 +9,18 @@ class mall {
 	var $split;
 	var $errmsg = errmsg;
 
-    function mall($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
 		$this->table_data = $table_data;
 		$this->split = $MOD['split'];
 		$this->db = &$db;
-		$this->fields = array('catid','mycatid','areaid','level','title','style','fee','introduce','brand','price','amount','thumb','thumb1','thumb2','tag','status','hits','username','editor','addtime','adddate','edittime','editdate','ip','template','linkurl','filepath','elite','note','company','truename','telephone','mobile','address','email','msn','qq','ali','skype','n1','n2','n3','v1','v2','v3','express_1','express_name_1','fee_start_1','fee_step_1','express_2','express_name_2','fee_start_2','fee_step_2','express_3','express_name_3','fee_start_3','fee_step_3');
+		$this->fields = array('catid','mycatid','areaid','level','title','style','fee','introduce','brand','price','step','amount','unit','thumb','thumb1','thumb2','tag','status','hits','username','editor','addtime','adddate','edittime','editdate','ip','template','linkurl','filepath','elite','note','company','truename','telephone','mobile','address','email','msn','qq','ali','skype','n1','n2','n3','v1','v2','v3','express_1','express_name_1','fee_start_1','fee_step_1','express_2','express_name_2','fee_start_2','fee_step_2','express_3','express_name_3','fee_start_3','fee_step_3','cod');
+    }
+
+    function mall($moduleid) {
+		$this->__construct($moduleid);
     }
 
 	function pass($post) {
@@ -24,22 +28,37 @@ class mall {
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_cate'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
-		if(dround($post['price']) < 0.1) return $this->_(lang('message->pass_mall_price'));
+		if(dround($post['step']['p1']) < 0.1) return $this->_(lang('message->pass_mall_price'));
 		if(intval($post['amount']) < 1) return $this->_(lang('message->pass_mall_amount'));
-		if(!$post['thumb']) return $this->_(lang('message->pass_thumb'));
+		if(!is_url($post['thumb'])) return $this->_(lang('message->pass_thumb'));
 		if(!$post['content']) return $this->_(lang('message->pass_content'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		is_url($post['thumb']) or $post['thumb'] = '';
+		is_url($post['thumb1']) or $post['thumb1'] = '';
+		is_url($post['thumb2']) or $post['thumb2'] = '';
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['editor'] = $_username;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['adddate'] = timetodate($post['addtime'], 3);
 		$post['edittime'] = $DT_TIME;
 		$post['editdate'] = timetodate($post['edittime'], 3);
 		$post['fee'] = dround($post['fee']);
-		$post['price'] = dround($post['price']);
+		$post['step']['a1'] = intval($post['step']['a1']);
+		$post['step']['p1'] = dround($post['step']['p1'], 2, 1);
+		$post['step']['a2'] = intval($post['step']['a2']);
+		$post['step']['p2'] = dround($post['step']['p2'], 2, 1);
+		$post['step']['a3'] = intval($post['step']['a3']);
+		$post['step']['p3'] = dround($post['step']['p3'], 2, 1);
+		$post['price'] = $post['step']['p1'];
+		if(($post['step']['a2'] && $post['step']['a2'] <= $post['step']['a1']) || ($post['step']['p2'] && $post['step']['p2'] >= $post['step']['p1'])) $post['step']['a2'] = $post['step']['a3'] = $post['step']['p2'] = $post['step']['p3'] = 0;
+		if(($post['step']['a3'] && $post['step']['a3'] <= $post['step']['a2']) || ($post['step']['p3'] && $post['step']['p3'] >= $post['step']['p2']))  $post['step']['a3'] = $post['step']['p3'] = 0;
+		$post['step']['is'] = $post['step']['a2'] ? 'Y' : 'N';
+		count($post['step'] == 7) or exit;
 		$post['amount'] = intval($post['amount']);
 		$post['mycatid'] = intval($post['mycatid']);
 		$post['elite'] = $post['elite'] ? 1 : 0;
@@ -47,18 +66,15 @@ class mall {
 		if(strpos($post['v2'], '|') === false) $post['n2'] = $post['v2'] = '';
 		if(strpos($post['v3'], '|') === false) $post['n3'] = $post['v3'] = '';
 		$post['express_1'] = intval($post['express_1']);
-		$post['express_name_1'] = trim($post['express_name_1']);
 		$post['fee_start_1'] = dround($post['fee_start_1']);
 		$post['fee_step_1'] = dround($post['fee_step_1']);
 		$post['express_2'] = intval($post['express_2']);
-		$post['express_name_2'] = trim($post['express_name_2']);
 		$post['fee_start_2'] = dround($post['fee_start_2']);
 		$post['fee_step_2'] = dround($post['fee_step_2']);
 		$post['express_3'] = intval($post['express_3']);
-		$post['express_name_3'] = trim($post['express_name_3']);
 		$post['fee_start_3'] = dround($post['fee_start_3']);
 		$post['fee_step_3'] = dround($post['fee_step_3']);
-		$post['title'] = trim($post['title']);
+		$post['cod'] = intval($post['cod']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($MOD['clear_link']) $post['content'] = clear_link($post['content']);
@@ -66,14 +82,14 @@ class mall {
 		if($MOD['introduce_length']) $post['introduce'] = addslashes(get_intro($post['content'], $MOD['introduce_length']));
 		if($this->itemid) {
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
-			if($post['thumb1']) $new .= '<img src="'.$post['thumb1'].'">';
-			if($post['thumb2']) $new .= '<img src="'.$post['thumb2'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
+			if($post['thumb1']) $new .= '<img src="'.$post['thumb1'].'"/>';
+			if($post['thumb2']) $new .= '<img src="'.$post['thumb2'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
-			if($r['thumb1']) $old .= '<img src="'.$r['thumb1'].'">';
-			if($r['thumb2']) $old .= '<img src="'.$r['thumb2'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
+			if($r['thumb1']) $old .= '<img src="'.$r['thumb1'].'"/>';
+			if($r['thumb2']) $old .= '<img src="'.$r['thumb2'].'"/>';
 			delete_diff($new, $old);
 		} else {
 			$post['ip'] = $DT_IP;
@@ -81,13 +97,21 @@ class mall {
 		$content = $post['content'];
 		unset($post['content']);
 		$post = dhtmlspecialchars($post);
+		$post['step'] = serialize($post['step']);
 		$post['content'] = addslashes(dsafe($content));
 		return array_map("trim", $post);
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'edittime DESC', $cache = '') {
@@ -99,6 +123,7 @@ class mall {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -136,7 +161,7 @@ class mall {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -156,7 +181,7 @@ class mall {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'].$post['thumb1'].$post['thumb2'], $this->itemid);
 		if($post['status'] > 2) $this->tohtml($this->itemid, $post['catid']);
@@ -171,7 +196,7 @@ class mall {
 	function update($itemid) {
 		$item = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
 		$update = '';
-		$keyword = $item['title'].','.$item['brand'].','.strip_tags(cat_pos(get_cat($item['catid']), ','));
+		$keyword = $item['title'].','.($item['brand'] ? $item['brand'].',' : '').strip_tags(cat_pos(get_cat($item['catid']), ','));
 		if($keyword != $item['keyword']) {
 			$keyword = str_replace("//", '', addslashes($keyword));
 			$update .= ",keyword='$keyword'";
@@ -180,12 +205,7 @@ class mall {
 		$linkurl = itemurl($item);
 		if($linkurl != $item['linkurl']) $update .= ",linkurl='$linkurl'";
 		$member = $item['username'] ? userinfo($item['username']) : array();
-		if($member) {
-			foreach(array('groupid','vip','validated','company','areaid','truename','telephone','mobile','address','qq','msn','ali','skype') as $v) {
-				if($item[$v] != $member[$v]) $update .= ",$v='".addslashes($member[$v])."'";
-			}
-			if($item['email'] != $member['mail']) $update .= ",email='".addslashes($member['mail'])."'";
-		}
+		if($member) $update .= update_user($member, $item);
 		if($update) $this->db->query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
 	}
 
@@ -290,7 +310,7 @@ class mall {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
@@ -352,7 +372,8 @@ class mall {
 		}
 		$itemids = implode(',', $I);
 		foreach($P as $k=>$v) {
-			$T = htmlspecialchars(trim($v['relate_title']));
+			$k = intval($k);
+			$T = dhtmlspecialchars(trim($v['relate_title']));
 			$this->db->query("UPDATE {$this->table} SET relate_id='$itemids',relate_name='$N',relate_title='$T' WHERE itemid=$k");
 		}
 	}

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -14,6 +14,10 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 留言人</td>
 <td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $username : 'Guest';?></a>&nbsp; IP:<?php echo $ip;?> 来自 <?php echo ip2area($ip);?> <input type="checkbox" name="post[hidden]" value="1" <?php if($hidden) echo 'checked';?>/> 匿名留言</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 留言时间</td>
+<td><?php echo $addtime;?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 留言内容</td>
@@ -54,12 +58,12 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 前台显示</td>
 <td>
-<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 是
+<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[status]" value="2" <?php if($status == 2) echo 'checked';?>/> 否
 </td>
 </tr>
 <?php if($DT['city']) { ?>
-<tr>
+<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
 <td><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?></td>
 </tr>

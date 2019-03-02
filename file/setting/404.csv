@@ -1,5 +1,6 @@
 itemid,ID,
 url,网址,
+refer,来源,
 robot,搜索引擎,
 username,会员,
 ip,IP,

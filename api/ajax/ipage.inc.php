@@ -1,6 +1,5 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-isset($job) or exit;
 if($job == 'sell') {
 	$moduleid = 5;
 } else if($job == 'buy') {

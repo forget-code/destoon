@@ -42,13 +42,11 @@ if($html == 'show') {
 	echo 'Inner("hits", \''.$item['hits'].'\');';
 	$update = '';
 	if($member) {
-		foreach(array('groupid', 'vip','validated','company','areaid','truename','telephone','mobile','address','qq','msn','ali','skype') as $v) {
-			if($item[$v] != $member[$v]) $update .= ",$v='".addslashes($member[$v])."'";
-		}
-		if($item['email'] != $member['mail']) $update .= ",email='$member[mail]'";
+		$update_user = update_user($member, $item);
+		if($update_user) $db->query("UPDATE {$table} SET ".substr($update_user, 1)." WHERE username='$username'");
 	}
 	include DT_ROOT.'/include/update.inc.php';
-	if($MOD['show_html'] && $edittime > @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl'])) tohtml('show', $module);
+	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
 	if($MOD['list_html'] && $task_list && $CAT) {

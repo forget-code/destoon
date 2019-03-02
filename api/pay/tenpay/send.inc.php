@@ -12,7 +12,7 @@ $randNum = rand(1000, 9999);
 //订单号，此处用时间加随机数生成，商户根据自己情况调整，只要保持全局唯一就行
 $out_trade_no = $orderid;
 
-$desc = $charge_title ? $charge_title : '会员('.$_username.')帐户充值(订单号:'.$orderid.')';
+$desc = $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')';
 
 /* 创建支付请求对象 */
 $reqHandler = new RequestHandler();
@@ -38,7 +38,7 @@ $reqHandler->setParameter("subject", $desc);          //商品名称，（中介
 //系统可选参数
 $reqHandler->setParameter("sign_type", "MD5");  	 	  //签名方式，默认为MD5，可选RSA
 $reqHandler->setParameter("service_version", "1.0"); 	  //接口版本号
-$reqHandler->setParameter("input_charset", strtoupper(DT_CHARSET));   	  //字符集
+$reqHandler->setParameter("input_charset", DT_CHARSET);   	  //字符集
 $reqHandler->setParameter("sign_key_index", "1");    	  //密钥序号
 
 //业务可选参数

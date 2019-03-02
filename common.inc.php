@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 define('DT_DEBUG', 0);
@@ -12,7 +12,7 @@ if(DT_DEBUG) {
 	error_reporting(0);
 }
 if(isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) exit('Request Denied');
-@set_magic_quotes_runtime(0);
+if(function_exists('set_magic_quotes_runtime')) @set_magic_quotes_runtime(0);
 $MQG = get_magic_quotes_gpc();
 foreach(array('_POST', '_GET') as $__R) {
 	if($$__R) { 
@@ -35,7 +35,11 @@ define('DT_WIN', strpos(strtoupper(PHP_OS), 'WIN') !== false ? true: false);
 define('DT_CHMOD', ($CFG['file_mod'] && !DT_WIN) ? $CFG['file_mod'] : 0);
 define('DT_LANG', $CFG['language']);
 define('DT_KEY', $CFG['authkey']);
-define('DT_CHARSET', $CFG['charset']);
+define('DT_EDITOR', $CFG['editor']);
+define('DT_CLOUD_UID', $CFG['cloud_uid']);
+define('DT_CLOUD_KEY', $CFG['cloud_key']);
+define('DT_CHARSET', strtoupper($CFG['charset']));
+define('DT_CHARLEN', DT_CHARSET == 'GBK' ? 2 : 3);
 define('DT_CACHE', $CFG['cache_dir'] ? $CFG['cache_dir'] : DT_ROOT.'/file/cache');
 define('DT_SKIN', DT_STATIC.'skin/'.$CFG['skin'].'/');
 define('VIP', $CFG['com_vip']);
@@ -45,6 +49,7 @@ include DT_ROOT.'/lang/'.DT_LANG.'/lang.inc.php';
 require DT_ROOT.'/version.inc.php';
 require DT_ROOT.'/include/global.func.php';
 require DT_ROOT.'/include/safe.func.php';
+require DT_ROOT.'/include/cloud.func.php';
 require DT_ROOT.'/include/tag.func.php';
 require DT_ROOT.'/api/im.func.php';
 require DT_ROOT.'/api/extend.func.php';
@@ -60,7 +65,9 @@ $DT_TIME = time() + $CFG['timediff'];
 $DT_IP = get_env('ip');
 $DT_URL = get_env('url');
 $DT_REF = get_env('referer');
+$DT_MOB = get_env('mobile');
 $DT_BOT = is_robot();
+$DT_TOUCH = is_touch();
 header("Content-Type:text/html;charset=".DT_CHARSET);
 require DT_ROOT.'/include/db_'.$CFG['database'].'.class.php';
 require DT_ROOT.'/include/cache_'.$CFG['cache'].'.class.php';
@@ -96,6 +103,8 @@ if(!$CACHE) {
 $DT = $CACHE['dt'];
 $MODULE = $CACHE['module'];
 $EXT = cache_read('module-3.php');
+define('DT_MAX_LEN', $DT['max_len']);
+define('RE_WRITE', $DT['rewrite']);
 $lazy = $DT['lazy'] ? 1 : 0;
 if(!IN_ADMIN && ($DT['close'] || $DT['defend_cc'] || $DT['defend_reload'] || $DT['defend_proxy'])) include DT_ROOT.'/include/defend.inc.php';
 unset($CACHE, $CFG['db_host'], $CFG['db_user'], $CFG['db_pass'], $db_class, $db_file);
@@ -113,10 +122,17 @@ $cityid = 0;
 $city_name = $L['allcity'];
 $city_domain = $city_template = $city_sitename = '';
 if($DT['city']) include DT_ROOT.'/include/city.inc.php';
-($DT['gzip_enable'] && !$_POST && !defined('DT_WAP')) ? ob_start('ob_gzhandler') : ob_start();
-$forward = isset($forward) ? urldecode($forward) : $DT_REF; strip_uri($forward);
-$action = (isset($action) && check_name($action)) ? trim($action) : '';
-$submit = isset($_POST['submit']) ? 1 : 0;
+($DT['gzip_enable'] && !$_POST && !defined('DT_MOBILE')) ? ob_start('ob_gzhandler') : ob_start();
+if(isset($forward)) {
+	if(isset($_GET['forward'])) $forward = urldecode($forward);
+} else if($DT_REF) {
+	$forward = strpos(dirname($DT_REF).'/', (DT_DOMAIN ? DT_DOMAIN : DT_PATH)) === false ? DT_PATH : $DT_REF;
+} else {
+	$forward = DT_PATH;
+}
+strip_uri($forward);
+(isset($action) && check_name($action)) or $action = '';
+$submit = (isset($_POST['submit']) || isset($_POST['dsubmit'])) ? 1 : 0;
 if($submit) {
 	isset($captcha) or $captcha = '';
 	isset($answer) or $answer = '';
@@ -129,7 +145,7 @@ $areaid = isset($areaid) ? intval($areaid) : 0;
 $itemid = isset($itemid) ? (is_array($itemid) ? array_map('intval', $itemid) : intval($itemid)) : 0;
 $pagesize = $DT['pagesize'] ? $DT['pagesize'] : 30;
 $offset = ($page-1)*$pagesize;
-$kw = isset($_GET['kw']) ? strip_kw($_GET['kw']) : '';
+$kw = isset($_GET['kw']) ? strip_kw($_GET['kw'], $DT['max_kw']) : '';
 $keyword = $kw ? str_replace(array(' ', '*'), array('%', '%'), $kw) : '';
 $today_endtime = strtotime(date('Y-m-d', $DT_TIME).' 23:59:59');
 $seo_file = $seo_title = $head_title = $head_keywords = $head_description = $head_canonical = $head_mobile = '';
@@ -139,22 +155,20 @@ $_userid = $_admin = $_aid = $_message = $_chat = $_sound = $_online = $_money =
 $_username = $_company = $_passport = $_truename = '';
 $_groupid = 3;
 $destoon_auth = get_cookie('auth');
+if($destoon_auth) $destoon_auth = decrypt($destoon_auth, DT_KEY.'USER');
 if($destoon_auth) {	
-	$_dauth = explode("\t", decrypt($destoon_auth));
+	$_dauth = explode('|', $destoon_auth);
 	$_userid = isset($_dauth[0]) ? intval($_dauth[0]) : 0;
-	$_username = isset($_dauth[1]) ? trim($_dauth[1]) : '';
-	$_groupid = isset($_dauth[2]) ? intval($_dauth[2]) : 3;
-	$_admin = isset($_dauth[4]) ? intval($_dauth[4]) : 0;
-	if($_userid && !defined('DT_NONUSER')) {
-		$_password = isset($_dauth[3]) ? trim($_dauth[3]) : '';
+	if($_userid) {
+		$_password = isset($_dauth[1]) ? trim($_dauth[1]) : '';
 		$USER = $db->get_one("SELECT username,passport,company,truename,password,groupid,email,message,chat,sound,online,sms,credit,money,loginip,admin,aid,edittime,trade FROM {$DT_PRE}member WHERE userid=$_userid");
 		if($USER && $USER['password'] == $_password) {
 			if($USER['groupid'] == 2) dalert(lang('message->common_forbidden'));
-			extract($USER, EXTR_PREFIX_ALL, '');
 			if($USER['loginip'] != $DT_IP && ($DT['ip_login'] == 2 || ($DT['ip_login'] == 1 && IN_ADMIN))) {
 				$_userid = 0; set_cookie('auth', '');
 				dalert(lang('message->common_login', array($USER['loginip'])), DT_PATH);
 			}
+			extract($USER, EXTR_PREFIX_ALL, '');
 		} else {
 			$_userid = 0;
 			if($db->linked && !isset($swfupload) && strpos($_SERVER['HTTP_USER_AGENT'], 'Flash') === false) set_cookie('auth', '');
@@ -165,13 +179,8 @@ if($destoon_auth) {
 if($_userid == 0) { $_groupid = 3; $_username = ''; }
 if(!IN_ADMIN) {
 	if($_groupid == 1) include DT_ROOT.'/module/member/admin.inc.php';
-	if($_userid && !defined('DT_NONUSER')) {
+	if($_userid) {
 		$db->query("REPLACE INTO {$DT_PRE}online (userid,username,ip,moduleid,online,lasttime) VALUES ('$_userid','$_username','$DT_IP','$moduleid','$_online','$DT_TIME')");
-	} else {
-		if(30 == intval(timetodate($DT_TIME, 's'))) {
-			$lastime = $DT_TIME - $DT['online'];
-			$db->query("DELETE FROM {$DT_PRE}online WHERE lasttime<$lastime");
-		}
 	}
 	if($DT_BOT && $moduleid >= 4) $MOD['order'] = $moduleid == 4 ? 'userid DESC' : 'addtime DESC';
 }

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -15,7 +15,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 选择信息源</td>
-<td><select id="s_mid" onchange="if(this.value){select_item(this.value, 'special');select_op('s_mid', 0);}">
+<td><select id="s_mid" onchange="if(this.value){select_item(this.value, 'special');$('#s_mid').val(0);}">
 <option value="0">请选择</option>
 <?php
 foreach($MODULE as $m) {
@@ -26,7 +26,7 @@ foreach($MODULE as $m) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所属分类</td>
-<td><?php echo type_select($tid, 0, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?> <img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类" class="c_p" onclick="Dwidget('?file=type&item=<?php echo $tid;?>', '[<?php echo $special['title'];?>] 专题信息分类', 550, 250);"/> <span id="dtypeid" class="f_red"></span></td>
+<td><span id="type_box"><?php echo type_select($tid, 0, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='<?php echo $tid;?>',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $tid;?>', '[<?php echo $special['title'];?>] 专题信息分类', 550, 250);"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息标题</td>

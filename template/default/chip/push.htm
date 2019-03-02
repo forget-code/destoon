@@ -1,6 +1,6 @@
 var _destoon_message = {$_message};
 var _destoon_chat = {$_chat};
-var _destoon_cart = substr_count(get_cookie('cart'), ',');
+var _destoon_cart = get_cart();
 if(typeof destoon_member == 'undefined') {
 	$('#destoon_message em').remove();
 	$('#message em').remove();
@@ -38,6 +38,6 @@ if(typeof destoon_member == 'undefined') {
 	}
 	{/if}
 	{if isset($MODULE[16])}
-	$('#destoon_cart').html(_destoon_cart ? '<strong>'+_destoon_cart+'</strong>' : 0);
+	$('#destoon_cart').html(_destoon_cart > 0 ? '<strong>'+_destoon_cart+'</strong>' : 0);
 	{/if}
 }

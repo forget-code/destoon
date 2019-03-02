@@ -9,7 +9,7 @@ $parameter = array(
 	'notify_url' =>$notify_url,				//异步返回
 	'_input_charset' => $_input_charset,	//字符集，默认为GBK
 	'subject' => $DT['sitename'].'会员充值',	//商品名称，必填
-	'body' => $charge_title ? $charge_title : '会员('.$_username.')帐户充值(订单号:'.$orderid.')',      //商品描述，必填
+	'body' => $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')',      //商品描述，必填
 
 	"out_trade_no"   => $orderid,     //商品外部交易号，必填（保证唯一性）
 	"price"          => $charge,           //商品单价，必填（价格不能为0）

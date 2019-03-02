@@ -4,25 +4,19 @@
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="add"><a href="?action=send"><span>发送信件</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="inbox"><a href="?action=inbox"><span>收件箱</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="outbox"><a href="?action=outbox"><span>已发送</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="draft"><a href="?action=draft"><span>草稿箱</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="recycle"><a href="?action=recycle"><span>回收站</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="export"><a href="?action=export"><span>信件导出</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="empty"><a href="?action=empty"><span>信件清理</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="setting"><a href="?action=setting"><span>信件设置</span></a></td>
 </tr>
 </table>
 </div>
 {if $action == 'send'}
-<form method="post" action="message.php" id="dform" onsubmit="return check();">
+<form method="post" action="?" id="dform" onsubmit="return check();">
+<input type="hidden" name="forward" value="{$forward}"/> 
 <input type="hidden" name="action" value="{$action}"/> 
 <input type="hidden" name="typeid" value="{$typeid}"/> 
 <table cellspacing="1" cellpadding="6" class="tb">
@@ -38,7 +32,7 @@
 <tr>
 <td class="tl"><span class="f_red">*</span> 内容</td>
 <td class="tr"><textarea name="message[content]" id="content" class="dsn">{$content}</textarea>
-{deditor($moduleid, 'content', 'Simple', '98%', 200)}<span id="dcontent" class="f_red"></span>
+{deditor($moduleid, 'content', 'Message', '100%', 200)}<br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -58,7 +52,7 @@
 <tr>
 <td class="tl"> </td>
 <td class="tr" height="50">
-<input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/>
+<input type="submit" name="submit" value=" 确 定 " class="btn_g"/>
 {if $MG[message_limit]}
 &nbsp;&nbsp;&nbsp;今日可发 <span class="f_b f_red">{$MG[message_limit]}</span> 次
 &nbsp;&nbsp;&nbsp;当前已发 <span class="f_b">{$limit_used}</span> 次
@@ -118,7 +112,7 @@ function check() {
 </script>
 {php $action='add'}
 {elseif $action == 'edit'}
-<form method="post" action="message.php" id="dform" onsubmit="return check();">
+<form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="action" value="{$action}"/> 
 <input type="hidden" name="itemid" value="{$itemid}"/> 
 <table cellspacing="1" cellpadding="6" class="tb">
@@ -133,7 +127,7 @@ function check() {
 <tr>
 <td class="tl"><span class="f_red">*</span> 内容</td>
 <td class="tr f_gray"><textarea name="message[content]" id="content" class="dsn">{$content}</textarea>
-{deditor($moduleid, 'content', 'Simple', '98%', 200)}<span id="dcontent" class="f_red"></span>
+{deditor($moduleid, 'content', 'Simple', '100%', 200)}<br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -146,7 +140,7 @@ function check() {
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 修 改 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 修 改 " class="btn_g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
 </tr>
 </table>
 </form>
@@ -188,7 +182,7 @@ function check() {
 </script>
 {php $action='draft'}
 {elseif $action == 'export'}
-<form method="post" action="message.php">
+<form method="post" action="?">
 <input type="hidden" name="action" value="{$action}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
@@ -220,13 +214,13 @@ function check() {
 <tr>
 <td class="tl"> </td>
 <td class="tr" height="50">
-<input type="submit" name="submit" value=" 导 出 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/>
+<input type="submit" name="submit" value=" 导 出 " class="btn_g"/>
 </td>
 </tr>
 </table>
 </form>
 {elseif $action == 'empty'}
-<form method="post" action="message.php">
+<form method="post" action="?">
 <input type="hidden" name="action" value="{$action}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
@@ -253,7 +247,7 @@ function check() {
 <tr>
 <td class="tl"> </td>
 <td class="tr" height="50">
-<input type="submit" name="submit" value=" 清 理 " class="btn" onclick="if(!confirm('确定要清理吗？此操作将不可撤销')) return false;"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/>
+<input type="submit" name="submit" value=" 清 理 " class="btn_r" onclick="if(!confirm('确定要清理吗？此操作将不可撤销')) return false;"/>
 </td>
 </tr>
 </table>
@@ -275,7 +269,7 @@ function check() {
 {$content}
 </div>
 <div class="message_foot">
-<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/>
+<input type="button" value="返 回" class="btn" onclick="history.back(-1);"/>
 {if $status==4}
 <input type="button" class="btn" value="还 原" onclick="Go('?action=restore&itemid={$itemid}&forward={urlencode('?action=inbox')}');"/> 
 {if $fromuser}
@@ -309,7 +303,7 @@ function check() {
 {elseif $status==0}
 	{php $action='inbox'}
 {/if}
-<form action="message.php" method="post" id="_send">
+<form action="?" method="post" id="_send">
 <input type="hidden" name="action" value="send"/>
 <textarea name="title" class="dsn">{$title}</textarea>
 <textarea name="content" class="dsn">{$content}</textarea>
@@ -337,7 +331,7 @@ function check() {
 </div>
 {/if}
 {elseif $action == 'setting'}
-<form method="post" action="message.php">
+<form method="post" action="?">
 <input type="hidden" name="action" value="{$action}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
@@ -356,20 +350,14 @@ function check() {
 <tr>
 <td class="tl"> </td>
 <td height="50" class="tr">
-<input type="submit" name="submit" value=" 更 新 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 清 空 " class="btn" onclick="Dd('black').value='';"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/>
+<input type="submit" name="submit" value=" 更 新 " class="btn_g"/>
 </td>
 </tr>
 </table>
 </form>
 {else}
 <div class="tt">
-<div class="mr">
-<a href="?action={$action}" class="{if $typeid==-1}f_b{/if}">全部</a>
-{loop $NAME $k $v}
- | <a href="?action={$action}&typeid={$k}" class="{if $typeid==$k}f_b{/if}">{$v}</a>
-{/loop}
-</div>
-<form action="message.php">
+<form action="?">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="status" value="{$status}"/>
 <select name="typeid">
@@ -388,11 +376,23 @@ function check() {
 <option value="title"{if $fields=='title'} selected{/if}>标题</option>
 <option value="content"{if $fields=='content'} selected{/if}>全文</option>
 </select>
-<input type="text" name="kw" value="{$kw}" size="30" title="关键词"/>&nbsp;
+<input type="text" name="kw" value="{$kw}" size="50" title="关键词"/>&nbsp;
 <input type="submit" value=" 搜 索 " class="btn"/>
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?action={$action}');"/>
 </form>
 </div>
+
+<div class="nav">
+<table cellpadding="0" cellspacing="0">
+<tr>
+<td class="{if $typeid==-1}nav_2{else}nav_1{/if}"><a href="?action={$action}">全部</a></td>
+{loop $NAME $k $v}
+<td class="{if $typeid==$k}nav_2{else}nav_1{/if}"><a href="?action={$action}&typeid={$k}">{$v}</a></td>
+{/loop}
+</tr>
+</table>
+</div>
+
 <form method="post">
 <div class="ls">
 <table cellspacing="0" cellpadding="0" class="tb">
@@ -446,7 +446,10 @@ function check() {
 <input type="text" value="输入编号,如135" size="15" id="m_id" onfocus="if(this.value=='输入编号,如135')this.value='';"/>
 <input type="button" value=" 查 看 " class="btn" onclick="if(Dd('m_id').value.match(/^[0-9]{1,}$/)){Go('?action=show&itemid='+Dd('m_id').value);return;}Dd('m_id').value='';Dd('m_id').focus();"/>
 </span>
+{if $_message}
 <input type="submit" value=" 标记已读 " class="btn" onclick="this.form.action='?action=mark';"/>
+<input type="submit" value=" 全部已读 " class="btn" onclick="if(confirm('确定要标记全部信件为已读吗？此操作不可撤销')){this.form.action='?action=markall';}else{return false;}"/>
+{/if}
 <input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?action=delete';"/>
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中信件吗？此操作不可撤销')){this.form.action='?action=delete&recycle=0';}else{return false;}"/>
 {else}

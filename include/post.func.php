@@ -1,40 +1,14 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function deditor($moduleid = 1, $textareaid = 'content', $toolbarset = 'Default', $width = 500, $height = 400) {
 	global $DT, $MODULE, $_userid;
-	$moddir = defined('DT_ADMIN') ? $MODULE[2]['moduledir'].'/' : '';
 	$editor = '';
-	$editor .= '<script type="text/javascript">var ModuleID = '.$moduleid.';';
-	$editor .= 'var DTAdmin = '.(defined('DT_ADMIN') ? 1 : 0).';';
-	$editor .= 'var EDPath = "'.$moddir.'fckeditor/";';
-	$editor .= 'var ABPath = "'.$MODULE[2]['linkurl'].'fckeditor/";';
-	$editor .= 'var EDW = "'.$width.'";';
-	$editor .= 'var EDH = "'.$height.'";';
-	$width = is_numeric($width) ? $width.'px' : $width;
-	$height = is_numeric($height) ? $height.'px' : $height;
-	$editor .= 'var FCKID = "'.$textareaid.'";';
-	$editor .= '</script>';
-	$editor .= '<script type="text/javascript" src="'.$moddir.'fckeditor/fckeditor.js"></script>';
-	$editor .= '<script type="text/javascript">';
-	$editor .= 'window.onload = function() {';
-	$editor .= 'var sBasePath = "'.$moddir.'fckeditor/";';
-	$editor .= 'var oFCKeditor = new FCKeditor("'.$textareaid.'");';
-	$editor .= 'oFCKeditor.Width = "'.$width.'";';
-	$editor .= 'oFCKeditor.Height = "'.$height.'";';
-	$editor .= 'oFCKeditor.BasePath = sBasePath;';
-	$editor .= 'oFCKeditor.ToolbarSet = "'.$toolbarset.'";';
-	$editor .= 'oFCKeditor.ReplaceTextarea();';
-	$editor .= '}';
-	$editor .= '</script>';
-	$save = $textareaid == 'content' && $_userid && $DT['save_draft'];
-	if($DT['save_draft'] == 2 && !defined('DT_ADMIN')) $save = false;
-	$editor .= '<script type="text/javascript" src="'.DT_STATIC.'file/script/fckeditor.js"></script>';
-	if($save) $editor .= '<script type="text/javascript" src="'.DT_STATIC.'file/script/draft.js"></script>';
-	echo $editor;
+	include DT_ROOT.'/'.$MODULE[2]['moduledir'].'/editor/'.DT_EDITOR.'/init.inc.php';	
+	return $editor;
 }
 
 function dstyle($name, $value = '') {
@@ -88,15 +62,37 @@ function dcheckbox($sarray, $name, $checked = '', $extend = '', $key = 1, $excep
 }
 
 function type_select($item, $cache = 0, $name = 'typeid', $title = '', $typeid = 0, $extend = '', $all = '') {
-	$TYPE = get_type($item, $cache);
+	$TYPE = is_array($item) ? $item : get_type($item, $cache);
 	$select = '<select name="'.$name.'" '.$extend.'>';
 	if($all) $select .= '<option value="-1"'.($typeid == -1 ? ' selected=selected' : '').'>'.$all.'</option>';
 	if($title) $select .= '<option value="0"'.($typeid == 0 ? ' selected=selected' : '').'>'.$title.'</option>';
-	foreach($TYPE as $k=>$v) {
-		$select .= ' <option value="'.$k.'"'.($k == $typeid ? ' selected' : '').'> '.$v['typename'].'</option>';
+	$p = $c = array();
+	foreach($TYPE as $v) {
+		if($v['parentid']) {
+			$c[$v['parentid']][] = $v;
+		} else {
+			$p[] = $v;
+		}
+	}
+	foreach($p as $v0) {
+		$select .= '<option value="'.$v0['typeid'].'"'.($v0['typeid'] == $typeid ? ' selected' : '').'>'.$v0['typename'].'</option>';
+		if(isset($c[$v0['typeid']])) {
+			foreach($c[$v0['typeid']] as $v1) {
+				$select .= '<option value="'.$v1['typeid'].'"'.($v1['typeid'] == $typeid ? ' selected' : '').'>&nbsp;&#9500;'.$v1['typename'].'</option>';
+			}
+		}
 	}
 	$select .= '</select>';
 	return $select;
+}
+
+function type_child($typeid, $TYPE) {
+	if($typeid <= 0) return '0';
+	$id = $typeid;
+	foreach($TYPE as $v) {
+		if($v['parentid'] == $typeid) $id .= ','.$v['typeid'];
+	}
+	return $id;
 }
 
 function url_select($name, $ext = 'htm', $type = 'list', $urlid = 0, $extend = '') {
@@ -160,7 +156,7 @@ function group_checkbox($name = 'groupid', $checked = '', $except = '1,2,4') {
 		$sp = in_array($k, $checked) ? ' checked' : '';
 		$str .= '<input type="checkbox" name="'.$name.'" value="'.$k.'"'.$sp.' id="'.$id.$k.'"/><label for="'.$id.$k.'"> '.$v['groupname'].'&nbsp; </label>';
 	}
-	return '<span id="group_'.$id.'">'.$str.'</span>&nbsp;<a href="javascript:check_box(\'group_'.$id.'\', true);">'.$L['select_all'].'</a> / <a href="javascript:check_box(\'group_'.$id.'\', false);">'.$L['clear_all'].'</a>';
+	return '<span id="group_'.$id.'">'.$str.'</span>&nbsp;<a href="javascript:check_box(\'group_'.$id.'\', true);" class="t">'.$L['select_all'].'</a> / <a href="javascript:check_box(\'group_'.$id.'\', false);" class="t">'.$L['clear_all'].'</a>';
 }
 
 function module_checkbox($name = 'moduleid', $checked = '', $except = '1,2,3,4') {
@@ -242,7 +238,7 @@ function get_category_select($title = '', $catid = 0, $moduleid = 1, $extend = '
 	foreach($parents as $k=>$v) {
 		if($deep && $deep <= $k) break;
 		$select .= '<select onchange="load_category(this.value, '.$cat_id.');" '.$extend.'>';
-		if($title) $select .= '<option value="0">'.$title.'</option>';
+		if($title) $select .= '<option value="'.$v.'">'.$title.'</option>';
 		$condition = $v ? "parentid=$v" : "moduleid=$moduleid AND parentid=0";
 		$result = $db->query("SELECT catid,catname FROM {$db->pre}category WHERE $condition ORDER BY listorder,catid ASC");
 		while($c = $db->fetch_array($result)) {
@@ -274,7 +270,7 @@ function ajax_category_select($name = 'catid', $title = '', $catid = 0, $modulei
 	if($cat_id == 1) $select .= 'var category_title = new Array;';
 	$select .= 'category_title['.$cat_id.']=\''.$title.'\';';
 	if($cat_id == 1) $select .= 'var category_extend = new Array;';
-	$select .= 'category_extend['.$cat_id.']=\''.$extend.'\';';
+	$select .= 'category_extend['.$cat_id.']=\''.encrypt($extend, DT_KEY.'CAT').'\';';
 	if($cat_id == 1) $select .= 'var category_catid = new Array;';
 	$select .= 'category_catid['.$cat_id.']=\''.$catid.'\';';
 	if($cat_id == 1) $select .= 'var category_deep = new Array;';
@@ -299,7 +295,7 @@ function get_area_select($title = '', $areaid = 0, $extend = '', $deep = 0, $id 
 		if($deep && $deep <= $k) break;
 		$v = intval($v);
 		$select .= '<select onchange="load_area(this.value, '.$id.');" '.$extend.'>';
-		if($title) $select .= '<option value="0">'.$title.'</option>';
+		if($title) $select .= '<option value="'.$v.'">'.$title.'</option>';
 		$result = $db->query("SELECT areaid,areaname FROM {$db->pre}area WHERE parentid=$v ORDER BY listorder,areaid ASC");
 		while($a = $db->fetch_array($result)) {
 			$selectid = isset($parents[$k+1]) ? $parents[$k+1] : $areaid;
@@ -327,7 +323,7 @@ function ajax_area_select($name = 'areaid', $title = '', $areaid = 0, $extend = 
 	if($area_id == 1) $select .= 'var area_title = new Array;';
 	$select .= 'area_title['.$area_id.']=\''.$title.'\';';
 	if($area_id == 1) $select .= 'var area_extend = new Array;';
-	$select .= 'area_extend['.$area_id.']=\''.$extend.'\';';
+	$select .= 'area_extend['.$area_id.']=\''.encrypt($extend, DT_KEY.'ARE').'\';';
 	if($area_id == 1) $select .= 'var area_areaid = new Array;';
 	$select .= 'area_areaid['.$area_id.']=\''.$areaid.'\';';
 	if($area_id == 1) $select .= 'var area_deep = new Array;';
@@ -347,12 +343,17 @@ function level_select($name, $title = '', $level = 0, $extend = '') {
 		$n = isset($names[$i-1]) ? ' '.$names[$i-1] : '';
 		$select .= '<option value="'.$i.'"'.($i == $level ? ' selected' : '').'>'.$i.' '.$L['level'].$n.'</option>';
 	}
+	if($extend == 'all') $select .= '<option value="10"'.(10 == $level ? ' selected' : '').'>'.$L['level_all'].'</option>';
 	$select .= '</select>';
 	return $select;
 }
 
 function is_url($url) {
-	return preg_match("/^(http|https)\:\/\/[A-Za-z0-9_\-\/\.\#\&\?\;\,\=\%]{4,}$/", $url);
+	return preg_match("/^(http|https)\:\/\/[A-Za-z0-9_\-\/\.\#\&\?\;\,\=\%\:]{4,}$/", $url);
+}
+
+function is_filepath($filepath) {
+	return strlen($filepath) > 6 && in_array(file_ext($filepath), array('htm', 'html','shtm', 'shtml'));
 }
 
 function is_email($email) {
@@ -360,7 +361,7 @@ function is_email($email) {
 }
 
 function is_telephone($telephone) {
-	return preg_match("/^[0-9\-\+]{7,}$/", $telephone);
+	return preg_match("/^[0-9\-\+\(\)\s]{6,}$/", $telephone);
 }
 
 function is_qq($qq) {
@@ -391,23 +392,35 @@ function is_user($username) {
 function is_password($username, $password) {
 	global $db;
 	if(strlen($password) < 6) return false;
-	$r = $db->get_one("SELECT password FROM {$db->pre}member WHERE username='$username'");
+	$r = $db->get_one("SELECT password,passsalt FROM {$db->pre}member WHERE username='$username'");
 	if(!$r) return false;
-	return $r['password'] == (is_md5($password) ? md5($password) : md5(md5($password)));
+	return $r['password'] == dpassword($password, $r['passsalt']);
 }
 
 function is_payword($username, $payword) {
 	global $db;
 	if(strlen($payword) < 6) return false;
-	$r = $db->get_one("SELECT payword,password FROM {$db->pre}member WHERE username='$username'");
+	$r = $db->get_one("SELECT payword,paysalt FROM {$db->pre}member WHERE username='$username'");
 	if(!$r) return false;
-	$r['payword'] = $r['payword'] ? $r['payword'] : $r['password'];
-	return $r['payword'] == (is_md5($payword) ? md5($payword) : md5(md5($payword)));
+	return $r['payword'] == dpassword($payword, $r['paysalt']);
+}
+
+function is_crsf($url) {
+	if(strpos($url, '://') === false) {
+		//
+	} else {
+		if(strpos($url, DT_DOMAIN ? '.'.DT_DOMAIN : DT_PATH) === false) return false;
+	}
+	return preg_match("/(\?|\&|\.php)/i", $url);
+}
+
+function dpassword($password, $salt) {
+	return md5((is_md5($password) ? md5($password) : md5(md5($password))).$salt);
 }
 
 function gb2py($text, $exp = '') {
 	if(!$text) return '';
-	if(strtolower(DT_CHARSET) != 'gbk') $text = convert($text, DT_CHARSET, 'gbk');
+	if(DT_CHARSET != 'GBK') $text = convert($text, DT_CHARSET, 'GBK');
 	$data = array();
 	$tmp = @file(DT_ROOT.'/file/table/gb-pinyin.table');
 	if(!$tmp) return '';
@@ -427,10 +440,10 @@ function gb2py($text, $exp = '') {
 		}
         if($p > 0 && $p < 160) {
             $r[$k] = chr($p);
-        } elseif($p< -20319 || $p > -10247) {
+        } elseif($p < -20319 || $p > -10247) {
             $r[$k] = '';
         } else {
-            for($j = $tmps-1; $j >= 0; $j--) {
+            for($j = $tmps - 1; $j >= 0; $j--) {
                 if($data[$j][1]<=$p) break;
             }
             $r[$k] = $data[$j][0];
@@ -441,12 +454,8 @@ function gb2py($text, $exp = '') {
 }
 
 function match_userid($file) {
-	$file = basename($file);
-	if(preg_match("/\-([0-9]{2}+)\-([0-9]{1,}+)\./", $file, $m)) {
-		return $m[2];
-	} else {
-		return 0;
-	}
+	$name = explode('.', basename($file));
+	return intval(substr($name[0], strpos($name[0], '-') === false ? 8 : 12));
 }
 
 function clear_link($content) {
@@ -487,7 +496,7 @@ function save_remote($content, $ext = 'jpg|jpeg|gif|png|bmp', $self = 0) {
 		$filepath = DT_PATH.$filedir;
 		$fileroot = DT_ROOT.'/'.$filedir;
 		$file_ext = file_ext($url);
-		$filename = timetodate($DT_TIME, 'H-i-s').'-'.rand(10, 99).'-'.$_userid.'.'.$file_ext;
+		$filename = timetodate($DT_TIME, 'His').mt_rand(10, 99).$_userid.'.'.$file_ext;
 		$newfile = $fileroot.$filename;
 		if(file_copy($url, $newfile)) {
 			if(is_image($newfile)) {
@@ -510,7 +519,7 @@ function save_remote($content, $ext = 'jpg|jpeg|gif|png|bmp', $self = 0) {
 				$exp = explode("file/upload/", $newurl);
 				if($ftp->dftp_put($filedir.$filename, $exp[1])) {
 					$newurl = $DT['remote_url'].$exp[1];
-					file_del($newfile);
+					$DT['ftp_save'] or file_del($newfile);
 				}
 			}
 			$newpath[] = $newurl;
@@ -524,10 +533,14 @@ function save_local($content) {
 	global $DT, $DT_TIME, $_userid;
 	if($content == '<br type="_moz" />') return '';//FireFox
 	if($content == '&nbsp;') return '';//Chrome
+	if(DT_EDITOR == 'kindeditor') $content = str_replace('" /></embed />', '"></embed>', $content);
 	$content = preg_replace("/allowScriptAccess=\"always\"/i", "", $content);
 	$content = preg_replace("/allowScriptAccess/i", "allowscr-iptaccess", $content);
-	if(strpos($content, 'data:image') === false) return $content;
 	if(!preg_match_all("/src=([\"|']?)([^ \"'>]+)\\1/i", $content, $matches)) return $content;
+	foreach($matches[2] as $k=>$url) {
+		if(is_crsf($url)) $content = str_replace($url, DT_SKIN.'image/nopic.gif', $content);
+	}
+	if(strpos($content, 'data:image') === false) return $content;
 	require_once DT_ROOT.'/include/image.class.php';
 	$dftp = false;
 	if($DT['ftp_remote'] && $DT['remote_url']) {
@@ -539,7 +552,7 @@ function save_local($content) {
 	$DT['uploaddir'] or $DT['uploaddir'] = 'Ym/d';
 	foreach($matches[2] as $k=>$url) {
 		if(in_array($url, $urls)) continue;
-		$urls[$url] = $url;		
+		$urls[$url] = $url;
 		if(strpos($url, 'data:image') === false) continue;
 		if(strpos($url, ';base64,') === false) continue;
 		$t1 = explode(';base64,', $url);
@@ -549,10 +562,10 @@ function save_local($content) {
 		$filedir = 'file/upload/'.timetodate($DT_TIME, $DT['uploaddir']).'/';
 		$filepath = DT_PATH.$filedir;
 		$fileroot = DT_ROOT.'/'.$filedir;
-		$filename = timetodate($DT_TIME, 'H-i-s').'-'.rand(10, 99).'-'.$_userid.'.'.$file_ext;
+		$filename = timetodate($DT_TIME, 'His').mt_rand(10, 99).$_userid.'.'.$file_ext;
 		$newfile = $fileroot.$filename;
 		if(!is_image($newfile)) continue;
-		if(file_put($newfile, base64_decode($t1[1]))) {
+		if(file_put($newfile, base64_decode(strip_sql($t1[1], 0)))) {
 			if(!@getimagesize($newfile)) {
 				file_del($newfile);
 				continue;
@@ -571,7 +584,7 @@ function save_local($content) {
 				$exp = explode("file/upload/", $newurl);
 				if($ftp->dftp_put($filedir.$filename, $exp[1])) {
 					$newurl = $DT['remote_url'].$exp[1];
-					file_del($newfile);
+					$DT['ftp_save'] or file_del($newfile);
 				}
 			}
 			$newpath[] = $newurl;
@@ -601,7 +614,7 @@ function save_thumb($content, $no, $width = 120, $height = 90) {
 			$filepath = DT_PATH.$filedir;
 			$fileroot = DT_ROOT.'/'.$filedir;
 			$file_ext = file_ext($url);
-			$filename = timetodate($DT_TIME, 'H-i-s').'-'.rand(10, 99).'-'.$_userid.'.'.$file_ext;
+			$filename = timetodate($DT_TIME, 'His').mt_rand(10, 99).$_userid.'.'.$file_ext;
 			$newfile = $fileroot.$filename;
 			if(file_copy($url, $newfile)) {
 				if(is_image($newfile)) {					
@@ -617,7 +630,7 @@ function save_thumb($content, $no, $width = 120, $height = 90) {
 					$exp = explode("file/upload/", $newurl);
 					if($ftp->dftp_put($filedir.$filename, $exp[1])) {
 						$newurl = $DT['remote_url'].$exp[1];
-						file_del($newfile);
+						$DT['ftp_save'] or file_del($newfile);
 					}
 				}
 				return $newurl;
@@ -666,6 +679,7 @@ function delete_diff($new, $old, $ext = 'jpg|jpeg|gif|png|bmp|swf') {
 function delete_upload($file, $userid) {
 	global $CFG, $DT, $DT_TIME, $ftp, $db;
 	if(!defined('DT_ADMIN') && (!$userid || $userid != match_userid($file))) return false;
+	if(!$file) return false;
 	$fileurl = $file;
 	if(strpos($file, 'file/upload') === false) {//Remote
 		if($DT['ftp_remote'] && $DT['remote_url']) {
@@ -683,6 +697,7 @@ function delete_upload($file, $userid) {
 					$F = str_replace('.thumb.'.$ext, '.middle.'.$ext, $file);
 					$ftp->dftp_delete($F);
 				}
+				if($DT['ftp_save']) delete_upload(DT_PATH.'file/upload/'.$file, $userid);
 			}
 		}
 	} else {
@@ -701,7 +716,7 @@ function delete_upload($file, $userid) {
 }
 
 function clear_upload($content = '', $itemid = 0) {
-	global $CFG, $DT, $db, $session, $_userid;
+	global $DT, $db, $session, $_userid;
 	if(!is_object($session)) $session = new dsession();
 	if(!isset($_SESSION['uploads']) || !$_SESSION['uploads'] || !$content) return;
 	$update = array();
@@ -766,14 +781,6 @@ function reload_question() {
 }
 
 function sync_weibo($site, $moduleid, $itemid) {
-	$file = $site == 'qzone' ? 'qq/qzone.php' : $site.'/post.php';
-	return 'document.write(\'<img src="'.DT_PATH.'api/oauth/'.$file.'?auth='.encrypt($moduleid.'-'.$itemid).'" width="1" height="1"/>\');';
-}
-
-//TEMP FIX
-if($submit) {
-	if(isset($post['thumb']) && !is_url($post['thumb'])) $post['thumb'] = '';
-	if(isset($post['thumb1']) && !is_url($post['thumb1'])) $post['thumb1'] = '';
-	if(isset($post['thumb2']) && !is_url($post['thumb2'])) $post['thumb2'] = '';
+	return 'document.write(\'<img src="'.DT_PATH.'api/oauth/'.$site.'/post.php?auth='.encrypt($moduleid.'-'.$itemid, DT_KEY.'SYNC').'" width="1" height="1"/>\');';
 }
 ?>

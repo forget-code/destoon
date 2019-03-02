@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -36,22 +36,17 @@ show_menu($menus);
 <th>所在模块</th>
 <th>IP</th>
 <th>IP所在地</th>
-<th>访问时间</th>
-<th width="50">操作</th>
+<th width="130">访问时间</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
-<td><img src="<?php echo useravatar($v['username']);?>" style="padding:5px;"/></td>
+<td><img src="<?php echo useravatar($v['username']);?>" style="padding:5px;" width="48" height="48"/></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>')"><?php echo $v['username'];?></a></td>
 <td><?php echo $v['online'] ? '<span class="f_green">在线</span>' : '<span class="f_gray">隐身</span>';?></td>
 <td><a href="<?php echo $MODULE[$v['moduleid']]['linkurl'];?>" target="_blank"><?php echo $MODULE[$v['moduleid']]['name'];?></a></td>
 <td><?php echo $v['ip'];?></td>
 <td><?php echo ip2area($v['ip']);?></td>
 <td><?php echo $v['lasttime'];?></td>
-<td>
-<a href="javascript:_user('<?php echo $v['username'];?>')"><img src="admin/image/view.png" width="16" height="16" title="会员[<?php echo $v['username'];?>]详细资料" alt=""/></a>&nbsp;
-<a href="?moduleid=<?php echo $moduleid;?>&action=login&userid=<?php echo $v['userid'];?>" target="_blank"><img src="admin/image/set.png" width="16" height="16" title="进入会员商务中心" alt=""/></a> 
-</td>
 </tr>
 <?php }?>
 </table>

@@ -19,22 +19,22 @@ if($t) message($L['sign_again']);
 
 $linkurl = $MOD['linkurl'].$item['linkurl'];
 $need_captcha = $MOD['captcha_sign'] == 2 ? $MG['captcha'] : $MOD['captcha_sign'];
-$need_question = $MOD['question_sign'] == 2 ? $MG['question'] : $MOD['question_sign'];
 require DT_ROOT.'/include/post.func.php';
 
 if($submit) {
+	captcha($captcha, $need_captcha);
 	$amount = intval($amount);
-	if($amount < 1) message($L['msg_sign_amount']);
-	$company = htmlspecialchars($company);
-	$truename = htmlspecialchars($truename);
-	if(strlen($truename) < 4) message($L['msg_type_truename']);
+	if($amount < 1) $amount = 1;
+	$company = dhtmlspecialchars($company);
+	$truename = dhtmlspecialchars($truename);
+	if(strlen($truename) < 2*DT_CHARLEN) message($L['msg_type_truename']);
 	if(!is_mobile($mobile)) message($L['msg_type_mobile']);
 	$areaid = intval($areaid);
-	$address = htmlspecialchars($address);
-	$postcode = htmlspecialchars($postcode);
+	$address = dhtmlspecialchars($address);
+	preg_match("/^[0-9]{6}$/", $postcode) or $postcode = '';
 	is_email($email) or $email = '';
 	is_qq($qq) or $qq = '';
-	$content = htmlspecialchars($content);
+	$content = dhtmlspecialchars($content);
 	$user = $item['username'];
 	$title = addslashes($item['title']);
 	$db->query("INSERT INTO {$table_order} (id,user,title,amount,company,truename,mobile,areaid,address,postcode,email,qq,content,addtime,username,ip) VALUES ('$itemid','$user','$title','$amount','$company','$truename','$mobile','$areaid','$address','$postcode','$email','$qq','$content','$DT_TIME','$_username','$DT_IP')");

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -18,15 +18,18 @@ class remote {
 	var $uptime = 0;
 	var $adduserid = true;
 
-    function remote($file, $savepath, $savename = '') {
+    function __construct($file, $savepath, $savename = '') {
 		global $DT, $_userid;
-		$this->file = $file;
+		$this->file = strip_sql($file, 0);
 		$this->userid = $_userid;
 		$this->ext = file_ext($file);
-		in_array($this->ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp')) or $this->ext = 'jpg';
 		$this->maxsize = $DT['uploadsize'] ? $DT['uploadsize']*1024 : 2048*1024;
 		$this->savepath = $savepath;
 		$this->savename = $savename;
+    }
+
+    function remote($file, $savepath, $savename = '') {
+		$this->__construct($file, $savepath, $savename);
     }
 
 	function save() {
@@ -51,8 +54,12 @@ class remote {
 	}
 
     function is_allow() {
-		if(strlen($this->file) < 18 || strpos($this->file, '://') === false) return false;
-		return true;
+		if($this->ext) {
+			if(!in_array($this->ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) return false;
+		} else {
+			$this->ext = 'jpg';
+		}
+		return preg_match("/^(http|https)\:\/\/[A-Za-z0-9_\-\/\.\#\&\?\;\,\=\%\:]{10,}$/", $this->file);
     }
 
     function set_savepath($savepath) {
@@ -67,8 +74,8 @@ class remote {
             $this->savename = $this->adduserid ? str_replace('.'.$this->ext, $this->userid.'.'.$this->ext, $savename) : $savename;
         } else {
 			$this->uptime = $DT_TIME;
-            $name = date('H-i-s', $this->uptime).'-'.rand(10, 99);
-            $this->savename = $this->adduserid ? $name.'-'.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
+            $name = date('His', $this->uptime).rand(10, 99);
+            $this->savename = $this->adduserid ? $name.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
         }
 		$this->saveto = $this->savepath.$this->savename;		
         if(!$this->overwrite && is_file(DT_ROOT.'/'.$this->saveto)) {

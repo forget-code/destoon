@@ -4,19 +4,14 @@
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="Tab0"><a href="javascript:Tab(0);"><span>常用设置</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="Tab1"><a href="javascript:Tab(1);"><span>导航菜单</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="Tab2"><a href="javascript:Tab(2);"><span>侧边栏</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="Tab3"><a href="javascript:Tab(3);"><span>首页设置</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 <td class="tab" id="Tab4"><a href="javascript:Tab(4);"><span>其他设置</span></a></td>
-<td class="tab_nav">&nbsp;</td>
 </tr>
 </table>
 </div>
-<form method="post" action="home.php" id="dform">
+<form method="post" action="?" id="dform">
 <input type="hidden" name="tab" id="tab" value="{$tab}"/>
 <div id="Tabs0" style="display:;">
 <table cellspacing="1" cellpadding="6" class="tb">
@@ -127,7 +122,7 @@ function UpdateURL() {
 <div id="Tabs1" style="display:none;">
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr style="display:{if $MG[home_menu]}{else}none{/if};">
-<td class="tl">菜单设置<br/><br/><br/><a href="home.php?action=reset&item=menu" class="t" onclick="return confirm('确定要恢复菜单设置为默认吗？');">恢复默认</a></td>
+<td class="tl">菜单设置<br/><br/><br/><a href="?action=reset&item=menu" class="t" onclick="return confirm('确定要恢复菜单设置为默认吗？');">恢复默认</a></td>
 <td class="tr">
 <table cellpadding="3" cellspacing="3">
 <tr align="center">
@@ -187,7 +182,7 @@ function UpdateURL() {
 </td>
 </tr>
 <tr style="display:{if $MG[home_side]}{else}none{/if};">
-<td class="tl">侧栏设置<br/><br/><br/><a href="home.php?action=reset&item=side" class="t" onclick="return confirm('确定要恢复侧栏位置为默认吗？');">恢复默认</a></td>
+<td class="tl">侧栏设置<br/><br/><br/><a href="?action=reset&item=side" class="t" onclick="return confirm('确定要恢复侧栏位置为默认吗？');">恢复默认</a></td>
 <td class="tr">
 <table cellpadding="3" cellspacing="3">
 <tr align="center">
@@ -225,7 +220,7 @@ function UpdateURL() {
 
 <div id="Tabs3" style="display:none;">
 <table cellspacing="1" cellpadding="6" class="tb"><tr style="display:{if $MG[home_main]}{else}none{/if};">
-<td class="tl">首页主栏设置<br/><br/><br/><a href="home.php?action=reset&item=main" class="t" onclick="return confirm('确定要恢复首页主栏为默认吗？');">恢复默认</a></td>
+<td class="tl">首页主栏设置<br/><br/><br/><a href="?action=reset&item=main" class="t" onclick="return confirm('确定要恢复首页主栏为默认吗？');">恢复默认</a></td>
 <td class="tr">
 <table cellpadding="3" cellspacing="3">
 <tr align="center">
@@ -283,17 +278,44 @@ function UpdateURL() {
 {php include DT_ROOT.'/api/map/'.$api_map.'/post.inc.php';}
 {/if}
 {if $api_stats && $MG[stats]}
-{php include DT_ROOT.'/api/stats/'.$api_stats.'/post.inc.php';}
+{php include DT_ROOT.'/api/stats/these.name.php';}
+<tr>
+<td class="tl">统计类型</td>
+<td class="tr">
+<select name="setting[stats_type]" id="stats_type_s" onchange="stats_type(this.value)">
+{loop $api_stats $v}
+<option value="{$v}">{$names[$v]}</option>
+{/loop}
+</select>
+</td>
+</tr>
+{loop $api_stats $v}
+{php include DT_ROOT.'/api/stats/'.$v.'/post.inc.php';}
+{/loop}
 {/if}
+
 {if $api_kf && $MG[kf]}
-{php include DT_ROOT.'/api/kf/'.$api_kf.'/post.inc.php';}
+{php include DT_ROOT.'/api/kf/these.name.php';}
+<tr>
+<td class="tl">客服类型</td>
+<td class="tr">
+<select name="setting[kf_type]" id="kf_type_s" onchange="kf_type(this.value)">
+{loop $api_kf $v}
+<option value="{$v}">{$names[$v]}</option>
+{/loop}
+</select>
+</td>
+</tr>
+{loop $api_kf $v}
+{php include DT_ROOT.'/api/kf/'.$v.'/post.inc.php';}
+{/loop}
 {/if}
 </table>
 </div>
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="30"><input type="submit" name="submit" value=" 保 存 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value=" 恢复默认 " class="btn" onclick="if(confirm('确定要恢复默认设置吗？商铺所有设置将被清空')){this.form.action='home.php?reset=1';}else{return false;}"/></td>
+<td class="tr" height="30"><input type="submit" name="submit" value=" 保存设置 " class="btn_g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="submit" value=" 清空设置 " class="btn" onclick="if(confirm('确定要清空设置吗？商铺所有设置将被清空')){this.form.action='?reset=1';}else{return false;}"/></td>
 </tr>
 </table>
 </form>
@@ -304,6 +326,50 @@ s('homepage');
 Tab({$tab});
 {else}
 m('Tab0');
+{/if}
+{if $api_stats && $MG[stats]}
+function stats_type(type) {
+	var stats_types = [{loop $api_stats $k $v}{if $k},{/if}'{$v}'{/loop}];
+	var stats_pass = 0;
+	for(var i = 0; i < stats_types.length; i++) {
+		if(type == stats_types[i]) {
+			stats_pass = 1;
+			break;
+		}
+	}
+	if(stats_pass == 0) type = stats_types[0];
+	for(var i = 0; i < stats_types.length; i++) {
+		if(type == stats_types[i]) {
+			Ds('stats_post_'+stats_types[i]);
+		} else {
+			Dh('stats_post_'+stats_types[i]);
+		}
+	}
+	$('#stats_type_s').val(type);
+}
+stats_type('{$stats_type}');
+{/if}
+{if $api_kf && $MG[kf]}
+function kf_type(type) {
+	var kf_types = [{loop $api_kf $k $v}{if $k},{/if}'{$v}'{/loop}];
+	var kf_pass = 0;
+	for(var i = 0; i < kf_types.length; i++) {
+		if(type == kf_types[i]) {
+			kf_pass = 1;
+			break;
+		}
+	}
+	if(kf_pass == 0) type = kf_types[0];
+	for(var i = 0; i < kf_types.length; i++) {
+		if(type == kf_types[i]) {
+			Ds('kf_post_'+kf_types[i]);
+		} else {
+			Dh('kf_post_'+kf_types[i]);
+		}
+		$('#kf_type_s').val(type);
+	}
+}
+kf_type('{$kf_type}');
 {/if}
 </script>
 {template 'footer', 'member'}

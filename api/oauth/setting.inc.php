@@ -7,7 +7,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td>
 <input type="radio" name="oauth[qq][enable]" value="1" <?php if($qq['enable']) echo 'checked';?> onclick="Dd('oa_qq').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[qq][enable]" value="0" <?php if(!$qq['enable']) echo 'checked';?> onclick="Dd('oa_qq').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/qq/ico.png" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://connect.opensns.qq.com/" target="_blank" class="t">帐号申请</a>
+<img src="<?php echo DT_PATH;?>api/oauth/qq/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://connect.qq.com/" target="_blank" class="t">帐号申请</a>
 </td>
 </tr>
 <tbody style="display:<?php echo $qq['enable'] ? '' : 'none';?>" id="oa_qq">
@@ -32,7 +32,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td>
 <input type="radio" name="oauth[qq][sync]" value="1"  <?php if($qq['sync']) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[qq][sync]" value="0"  <?php if(!$qq['sync']) echo 'checked';?>/> 关闭&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91OpenAPI%E6%9D%83%E9%99%90%E7%94%B3%E8%AF%B7" target="_blank" class="t" title="需要开通的权限get_user_info,add_t,add_pic_t,add_share">[申请开通]</a>
+<a href="<?php echo DT_PATH;?>api/redirect.php?url=http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91OpenAPI%E6%9D%83%E9%99%90%E7%94%B3%E8%AF%B7" target="_blank" class="t" title="需要开通的权限get_user_info,add_t,add_pic_t,add_share">[申请开通]</a>
 </td>
 </tr>
 </tbody>
@@ -42,7 +42,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td>
 <input type="radio" name="oauth[sina][enable]" value="1" <?php if($sina['enable']) echo 'checked';?> onclick="Dd('oa_sina').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[sina][enable]" value="0" <?php if(!$sina['enable']) echo 'checked';?> onclick="Dd('oa_sina').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/sina/ico.png" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://open.t.sina.com.cn/" target="_blank" class="t">帐号申请</a>
+<img src="<?php echo DT_PATH;?>api/oauth/sina/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://open.t.sina.com.cn/" target="_blank" class="t">帐号申请</a>
 </td>
 </tr>
 <tbody style="display:<?php echo $sina['enable'] ? '' : 'none';?>" id="oa_sina">
@@ -76,7 +76,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td>
 <input type="radio" name="oauth[baidu][enable]" value="1" <?php if($baidu['enable']) echo 'checked';?> onclick="Dd('oa_baidu').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[baidu][enable]" value="0" <?php if(!$baidu['enable']) echo 'checked';?> onclick="Dd('oa_baidu').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/baidu/ico.png" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://developer.baidu.com/ms/oauth/" target="_blank" class="t">帐号申请</a>
+<img src="<?php echo DT_PATH;?>api/oauth/baidu/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://developer.baidu.com/ms/oauth/" target="_blank" class="t">帐号申请</a>
 </td>
 </tr>
 <tbody style="display:<?php echo $baidu['enable'] ? '' : 'none';?>" id="oa_baidu">
@@ -103,7 +103,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td>
 <input type="radio" name="oauth[netease][enable]" value="1" <?php if($netease['enable']) echo 'checked';?> onclick="Dd('oa_netease').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[netease][enable]" value="0" <?php if(!$netease['enable']) echo 'checked';?> onclick="Dd('oa_netease').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/netease/ico.png" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://reg.163.com/help/help_oauth2.html" target="_blank" class="t">帐号申请</a>
+<img src="<?php echo DT_PATH;?>api/oauth/netease/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://reg.163.com/help/help_oauth2.html" target="_blank" class="t">帐号申请</a>
 </td>
 </tr>
 <tbody style="display:<?php echo $netease['enable'] ? '' : 'none';?>" id="oa_netease">
@@ -126,11 +126,65 @@ defined('IN_DESTOON') or exit('Access Denied');
 </tbody>
 
 <tr>
+<td class="tl">微信登录</td>
+<td>
+<input type="radio" name="oauth[wechat][enable]" value="1" <?php if($wechat['enable']) echo 'checked';?> onclick="Dd('oa_wechat').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="oauth[wechat][enable]" value="0" <?php if(!$wechat['enable']) echo 'checked';?> onclick="Dd('oa_wechat').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="<?php echo DT_PATH;?>api/oauth/wechat/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=https://open.weixin.qq.com/cgi-bin/frame?t=home/web_tmpl&lang=zh_CN" target="_blank" class="t">帐号申请</a>
+</td>
+</tr>
+<tbody style="display:<?php echo $wechat['enable'] ? '' : 'none';?>" id="oa_wechat">
+<tr>
+<td class="tl">显示名称</td>
+<td><input type="text" size="30" name="oauth[wechat][name]" value="<?php echo $wechat['name'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">显示顺序</td>
+<td><input type="text" size="2" name="oauth[wechat][order]" value="<?php echo $wechat['order'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">AppID</td>
+<td><input type="text" size="40" name="oauth[wechat][id]" value="<?php echo $wechat['id'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">AppSecret</td>
+<td><input type="text" size="40" name="oauth[wechat][key]" value="<?php echo $wechat['key'];?>"/></td>
+</tr>
+</tbody>
+
+<tr>
+<td class="tl">淘宝登录</td>
+<td>
+<input type="radio" name="oauth[taobao][enable]" value="1" <?php if($taobao['enable']) echo 'checked';?> onclick="Dd('oa_taobao').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="oauth[taobao][enable]" value="0" <?php if(!$taobao['enable']) echo 'checked';?> onclick="Dd('oa_taobao').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="<?php echo DT_PATH;?>api/oauth/taobao/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://open.taobao.com/" target="_blank" class="t">帐号申请</a>
+</td>
+</tr>
+<tbody style="display:<?php echo $taobao['enable'] ? '' : 'none';?>" id="oa_taobao">
+<tr>
+<td class="tl">显示名称</td>
+<td><input type="text" size="30" name="oauth[taobao][name]" value="<?php echo $taobao['name'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">显示顺序</td>
+<td><input type="text" size="2" name="oauth[taobao][order]" value="<?php echo $taobao['order'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">AppID</td>
+<td><input type="text" size="40" name="oauth[taobao][id]" value="<?php echo $taobao['id'];?>"/></td>
+</tr>
+<tr>
+<td class="tl">AppSecret</td>
+<td><input type="text" size="40" name="oauth[taobao][key]" value="<?php echo $taobao['key'];?>"/></td>
+</tr>
+</tbody>
+
+<tr>
 <td class="tl">MSN</td>
 <td>
 <input type="radio" name="oauth[msn][enable]" value="1" <?php if($msn['enable']) echo 'checked';?> onclick="Dd('oa_msn').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="oauth[msn][enable]" value="0" <?php if(!$msn['enable']) echo 'checked';?> onclick="Dd('oa_msn').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/msn/ico.png" align="absmiddle"/> <a href="<?php echo $MODULE[3]['linkurl'];?>redirect.php?url=http://manage.dev.live.com/" target="_blank" class="t">帐号申请</a>
+<img src="<?php echo DT_PATH;?>api/oauth/msn/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://manage.dev.live.com/" target="_blank" class="t">帐号申请</a>
 </td>
 </tr>
 <tbody style="display:<?php echo $msn['enable'] ? '' : 'none';?>" id="oa_msn">

@@ -6,10 +6,14 @@ class grade {
 	var $table;
 	var $errmsg = errmsg;
 
-    function grade() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'upgrade';
 		$this->db = &$db;
+    }
+
+    function grade() {
+		$this->__construct();
     }
 
 	function get_one($condition = '') {
@@ -25,6 +29,7 @@ class grade {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

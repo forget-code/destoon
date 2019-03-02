@@ -8,7 +8,7 @@ class page {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function page() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'page';
 		$this->table_data = $db->pre.'page_data';
@@ -16,11 +16,16 @@ class page {
 		$this->fields = array('title','style','status','username','addtime','editor','edittime','linkurl','listorder','note');
     }
 
+    function page() {
+		$this->__construct();
+    }
+
 	function pass($post) {
 		global $L;
 		if(!is_array($post)) return false;
 		if(!$post['title']) return $this->_($L['pass_title']);
 		if(!$post['content']) return $this->_($L['pass_content']);
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
@@ -66,6 +71,7 @@ class page {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

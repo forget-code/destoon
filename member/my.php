@@ -9,10 +9,11 @@ if($mid) {
 	isset($admin_user) or $admin_user = false;
 	$show_oauth = $MST['oauth'];
 	$show_menu = $MST['show_menu'] ? true : false;
+	$viewport = 0;
 	if(!$_userid) $action = 'add';//Guest
 	if($_groupid > 5 && !$_edittime && $action == 'add') dheader('edit.php?tab=2');
-	if($_groupid > 4 && (($MST['vemail'] && $MG['vemail']) || ($MST['vmobile'] && $MG['vmobile']) || ($MST['vtruename'] && $MG['vtruename']) || ($MST['vcompany'] && $MG['vcompany']))) {
-		$V = $db->get_one("SELECT vemail,vmobile,vtruename,vcompany FROM {$DT_PRE}member WHERE userid=$_userid");
+	if($_groupid > 4 && (($MST['vemail'] && $MG['vemail']) || ($MST['vmobile'] && $MG['vmobile']) || ($MST['vtruename'] && $MG['vtruename']) || ($MST['vcompany'] && $MG['vcompany']) || ($MST['deposit'] && $MG['vdeposit']))) {
+		$V = $db->get_one("SELECT vemail,vmobile,vtruename,vcompany,deposit FROM {$DT_PRE}member WHERE userid=$_userid");
 		if($MST['vemail'] && $MG['vemail']) {
 			$V['vemail'] or dheader('validate.php?action=email&itemid=1');
 		}
@@ -24,6 +25,9 @@ if($mid) {
 		}
 		if($MST['vcompany'] && $MG['vcompany']) {
 			$V['vcompany'] or dheader('validate.php?action=company&itemid=1');
+		}
+		if($MST['deposit'] && $MG['vdeposit']) {
+			$V['deposit'] > 99 or dheader('deposit.php?action=add&itemid=1');
 		}
 	}
 	if($_credit < 0 && $MST['credit_less'] && $action == 'add') dheader('credit.php?action=less');
@@ -57,10 +61,9 @@ if($mid) {
 			if($m['moduleid'] == 9 && in_array(-9, $MYMODS)) $MENUMODS[] = -9;
 		}
 	}
-
 	$vid = $mid;
 	if($mid == 9 && isset($resume)) $vid = -9;
-	if(!$MYMODS || !in_array($vid, $MYMODS)) message('', $MODULE[2]['linkurl'].$DT['file_my']);
+	if(!$MYMODS || !in_array($vid, $MYMODS)) dheader($MODULE[2]['linkurl'].$DT['file_my']);
 
 	$IMVIP = isset($MG['vip']) && $MG['vip']; 
 	$moduleid = $mid;

@@ -8,12 +8,16 @@ class spread {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function spread() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'spread';
 		$this->table_price = $DT_PRE.'spread_price';
 		$this->db = &$db;
 		$this->fields = array('mid','tid', 'word','price','currency','addtime','fromtime','totime','editor','edittime','username','company','status','note');
+    }
+
+    function spread() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -33,7 +37,6 @@ class spread {
 		$post['addtime'] = $DT_TIME;
 		$post['edittime'] = $DT_TIME;
 		$post['editor'] = $_username;
-		$post['word'] = trim($post['word']);
 		$post['price'] = dround($post['price']);
 		$post['fromtime'] = strtotime($post['fromtime'].' 0:0:0');
 		$post['totime'] = strtotime($post['totime'].' 23:59:59');
@@ -55,6 +58,7 @@ class spread {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

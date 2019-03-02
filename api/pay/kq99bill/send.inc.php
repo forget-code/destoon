@@ -3,7 +3,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 //人民币网关账号，该账号为11位人民币网关商户编号+01,该参数必填。
 $merchantAcctId = $PAY[$bank]['partnerid']."01";
 //编码方式，1代表 UTF-8; 2 代表 GBK; 3代表 GB2312 默认为1,该参数必填。
-$inputCharset = strtoupper(DT_CHARSET) == 'GBK' ? "2" : "1";
+$inputCharset = DT_CHARSET == 'GBK' ? "2" : "1";
 //接收支付结果的页面地址，该参数一般置为空即可。
 $pageUrl = "";
 //服务器接收支付结果的后台地址，该参数务必填写，不能为空。
@@ -27,7 +27,7 @@ $orderAmount = $charge*100;
 //订单提交时间，格式：yyyyMMddHHmmss，如：20071117020101，不能为空。
 $orderTime = date("YmdHis", $DT_TIME);
 //商品名称，可以为空。
-$productName= $charge_title ? $charge_title : $DT['sitename'].' - 会员['.$_username.']帐户充值'; 
+$productName= $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')'; 
 //商品数量，可以为空。
 $productNum = "1";
 //商品代码，可以为空。

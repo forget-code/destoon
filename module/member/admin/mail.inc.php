@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('mail', 1);
 $menus = array (
     array('添加邮件', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -56,7 +56,7 @@ switch($action) {
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
-		$type_select   = type_select('mail', 1, 'typeid', '请选择分类', $typeid);
+		$type_select   = type_select($TYPE, 1, 'typeid', '请选择分类', $typeid);
 		$order_select  = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
@@ -113,7 +113,7 @@ switch($action) {
 	break;
 	default:
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
-		$type_select = type_select('mail', 1, 'typeid', '请选择分类', $typeid);
+		$type_select = type_select($TYPE, 1, 'typeid', '请选择分类', $typeid);
 		$condition = '1';
 		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
 		if($typeid > 0) $condition .= " AND typeid=$typeid";

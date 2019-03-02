@@ -7,11 +7,15 @@ class guestbook {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function guestbook() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'guestbook';
 		$this->db = &$db;
 		$this->fields = array( 'title','areaid','content','truename','telephone','email','qq','msn','ali','skype','hidden','status','username','addtime', 'ip', 'reply','editor','edittime');
+    }
+
+    function guestbook() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -23,7 +27,7 @@ class guestbook {
 
 	function set($post) {
 		global $DT_TIME, $_username, $DT_IP, $TYPE;
-		$post['content'] = trim(strip_tags($post['content']));
+		$post['content'] = strip_tags($post['content']);
 		$post['title'] = in_array($post['type'], $TYPE) ? '['.$post['type'].']' : '';
 		$post['title'] .= dsubstr($post['content'], 30);
 		$post['title'] = daddslashes($post['title']);
@@ -32,7 +36,6 @@ class guestbook {
 			$post['status'] = $post['status'] == 2 ? 2 : 3;
 			$post['editor'] = $_username;
 			$post['edittime'] = $DT_TIME;
-			$post['reply'] = trim($post['reply']);
 		} else {
 			$post['username'] = $_username;
 			$post['addtime'] =  $DT_TIME;
@@ -58,6 +61,7 @@ class guestbook {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

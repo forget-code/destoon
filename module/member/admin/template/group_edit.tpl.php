@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -14,7 +14,7 @@ show_menu($menus);
 <td class="tl"><span class="f_red">*</span> 会员组名称</td>
 <td><input type="text" size="20" name="groupname" id="groupname" value="<?php echo $groupname;?>"/> <span id="dgroupname" class="f_red"></span></td>
 </tr>
-<tr>
+<tr id="mode" style="display:;">
 <td class="tl"><span class="f_red">*</span> 会员模式</td>
 <td>
 <input type="radio" name="setting[fee_mode]" value="1" <?php if($fee_mode) echo 'checked';?> onclick="Ds('mode_1');Dh('mode_0');"/> 收费会员&nbsp;&nbsp;
@@ -28,17 +28,20 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> <?php echo VIP;?>指数</td>
-<td><input type="text" size="20" name="vip" id="vip" value="<?php echo $vip;?>"/> <span class="f_gray">免费会员请填0，收费会员请填1-9数字</span> <span id="dvip" class="f_red"></span></td>
+<td><input type="text" size="2" name="vip" id="vip" value="<?php echo $vip;?>"/> <span class="f_gray">免费会员请填0，收费会员请填1-9数字</span> <span id="dvip" class="f_red"></span></td>
 </tr>
 </tbody>
 <tr id="mode_0" style="display:<?php echo $fee_mode ? 'none' : '';?>">
 <td class="tl"><span class="f_red">*</span> 享受折扣</td>
-<td><input type="text" size="20" name="setting[discount]" id="discount" value="<?php echo $discount;?>"/> % 折扣仅限系统收费，不针对会员产品</td>
+<td><input type="text" size="2" name="setting[discount]" id="discount" value="<?php echo $discount;?>"/> % <span class="f_gray">折扣仅限系统收费，不针对会员产品</span></td>
 </tr>
-
+<tr>
+<td class="tl"><span class="f_red">*</span> 交易佣金</td>
+<td><input type="text" size="2" name="setting[commission]" id="commission" value="<?php echo $commission;?>"/> % <span class="f_gray">会员通过商城、供应、团购完成交易后，系统扣除交易额一定比例作为网站服务费用</span></td>
+</tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 显示顺序</td>
-<td><input type="text" size="5" name="listorder" id="listorder" value="<?php echo $listorder;?>"/>  <span class="f_gray">数字越小越靠前</span></td>
+<td><input type="text" size="2" name="listorder" id="listorder" value="<?php echo $listorder;?>"/>  <span class="f_gray">数字越小越靠前</span></td>
 </tr>
 </table>
 <div class="tt">会员权限</div>
@@ -95,6 +98,10 @@ show_menu($menus);
 <tr>
 <td class="tl">24小时上传数量限制</td>
 <td><input name="setting[uploadday]" type="text" value="<?php echo $uploadday;?>" size="5"/> <?php tips('24小时内最大文件上传数量限制，0为不限制<br/>此项会增加服务器压力，且在开启上传记录的情况下有效');?></td>
+</tr>
+<tr>
+<td class="tl">上传一张图片扣积分</td>
+<td><input name="setting[uploadcredit]" type="text" value="<?php echo $uploadcredit;?>" size="5"/> <?php tips('积分不足时将无法上传，0为不限制');?></td>
 </tr>
 <tr>
 <td class="tl">产品图片数量限制</td>
@@ -265,7 +272,6 @@ show_menu($menus);
 <input type="text" name="setting[type_limit]" size="5" value="<?php echo $type_limit;?>"/>
 </td>
 </tr>
-
 </table>
 
 <div class="tt">公司主页</div>
@@ -506,8 +512,14 @@ show_menu($menus);
 开启之后，公司认证成功才可以发布信息
 </td>
 </tr>
-
-
+<tr>
+<td class="tl">开启强制缴纳保证金</td>
+<td>
+<input type="radio" name="setting[vdeposit]" value="1" <?php if($vdeposit){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[vdeposit]" value="0" <?php if(!$vdeposit){ ?>checked <?php } ?>/> 否&nbsp;&nbsp;
+开启之后，公司缴纳保证金才可以发布信息
+</td>
+</tr>
 <tr>
 <td class="tl">允许删除信息</td>
 <td>
@@ -771,6 +783,42 @@ show_menu($menus);
 <input type="text" name="setting[down_free_limit]" size="5" value="<?php echo $down_free_limit;?>"/>
 </td>
 </tr>
+
+
+<tr>
+<td class="tl">创建商圈总数限制</td>
+<td>
+<input type="text" name="setting[club_group_limit]" size="5" value="<?php echo $club_group_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">商圈每日回复数量</td>
+<td>
+<input type="text" name="setting[club_reply_limit]" size="5" value="<?php echo $club_reply_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">加入商圈总数限制</td>
+<td>
+<input type="text" name="setting[club_join_limit]" size="5" value="<?php echo $club_join_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">商圈发帖总数限制</td>
+<td>
+<input type="text" name="setting[club_limit]" size="5" value="<?php echo $club_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费商圈发帖数量</td>
+<td>
+<input type="text" name="setting[club_free_limit]" size="5" value="<?php echo $club_free_limit;?>"/>
+</td>
+</tr>
 </table>
 
 <div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -787,6 +835,9 @@ function check() {
 	}
 	return true;
 }
+<?php if($groupid == 5 || $groupid == 6) { ?>
+Dh('mode');
+<?php } ?>
 </script>
 <script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

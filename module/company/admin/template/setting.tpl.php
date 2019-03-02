@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('基本设置'),
@@ -42,9 +42,9 @@ show_menu($menus);
 <a href="?file=split&mid=<?php echo $moduleid;?>&action=merge" target="_blank" class="t" onclick="return confirm('确定要合并内容吗？合并成功之后请立即关闭内容分表\n\n建议在合并之前备份一次数据库');">[合并内容]</a>
 </span>
 <span style="display:none;" id="split_b">
-<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？合并成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
+<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？拆分成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
 </span>
-&nbsp;<?php tips('如果开启内容分表，内容表将根据id号50万数据创建一个分区<br/>如果你的数据少于50万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 500000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
+&nbsp;<?php tips('如果开启内容分表，内容表将根据id号10万数据创建一个分区<br/>如果你的数据少于10万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 100000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
 <input type="hidden" name="maxid" value="<?php echo $maxid;?>"/>
 </td>
 </tr>
@@ -129,15 +129,11 @@ tips('位于./api/map/目录,一个目录即为一个地图接口，请注意配
 <tr>
 <td class="tl">公司主页统计接口</td>
 <td>
-<select name="setting[stats]">
-<option value="">请选择</option>
 <?php
 $dirs = list_dir('api/stats');
 foreach($dirs as $v) {
-	$selected = ($stats && $v['dir'] == $stats) ? 'selected' : '';
-	echo "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
+	echo '<input type="checkbox" name="setting[stats][]" value="'.$v['dir'].'"'.(strpos(','.$stats.',', ','.$v['dir'].',') !== false ? ' checked' : '').'/> '.$v['name'].' ';
 }
-echo '</select>';
 tips('位于./api/stats/目录,一个目录即为一个统计接口<br/>请不要频繁更换接口，以免用户的设置失效。');
 ?>
 </td> 
@@ -146,15 +142,11 @@ tips('位于./api/stats/目录,一个目录即为一个统计接口<br/>请不�
 <tr>
 <td class="tl">公司主页客服接口</td>
 <td>
-<select name="setting[kf]">
-<option value="">请选择</option>
 <?php
 $dirs = list_dir('api/kf');
 foreach($dirs as $v) {
-	$selected = ($kf && $v['dir'] == $kf) ? 'selected' : '';
-	echo "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
+	echo '<input type="checkbox" name="setting[kf][]" value="'.$v['dir'].'"'.(strpos(','.$kf.',', ','.$v['dir'].',') !== false ? ' checked' : '').'/> '.$v['name'].' ';
 }
-echo '</select>';
 tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要频繁更换接口，以免用户的设置失效。');
 ?>
 </td> 

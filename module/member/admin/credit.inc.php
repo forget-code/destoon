@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 isset($username) or $username = '';
 $menus = array (
     array($DT['credit_name'].'奖惩', '?moduleid='.$moduleid.'&file='.$file.'&username='.$username.'&action=add'),

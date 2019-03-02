@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = $L['ad_type'];
 $AREA or $AREA = cache_read('area.php');
 require MD_ROOT.'/ad.class.php';
@@ -11,6 +11,7 @@ $menus = array (
     array('广告管理', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list\', \'广告管理\');'),
     array('广告审核', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list&job=check\', \'广告审核\');'),
     array('更新广告', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
+    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
     array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
 );
 $menusad = array (
@@ -18,6 +19,7 @@ $menusad = array (
     array('广告管理', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=list'),
     array('广告审核', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=list&job=check'),
 );
+if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 $do = new ad();
 $do->pid = $pid;
 $do->aid = $aid;
@@ -84,8 +86,8 @@ switch($action) {
 	case 'list':
 		$job = isset($job) ? $job : '';
 		$P = $do->get_place();
-		$sfields = array('按条件', '广告名称', '广告介绍', '会员名');
-		$dfields = array('title', 'title', 'introduce', 'username');
+		$sfields = array('按条件', '广告名称', '广告介绍', '广告代码', '关键词', '文字链接名称', '文字链接地址', '文字链接提示', '图片地址', '图片链接地址', '图片链接提示', 'Flash地址', 'Flash链接地址', '会员名', '备注');
+		$dfields = array('title', 'title', 'introduce', 'code', 'key_word', 'text_name', 'text_url', 'text_title', 'image_src', 'image_url', 'image_alt', 'flash_src', 'flash_url', 'username', 'note');
 		$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '开始时间降序', '开始时间升序', '结束时间降序', '结束时间升序', '浏览次数降序', '浏览次数升序');
 		$dorder  = array('pid DESC,listorder ASC,addtime ASC', 'addtime DESC', 'addtime ASC', 'fromtime DESC', 'fromtime ASC', 'totime DESC', 'totime ASC', 'hits DESC', 'hits ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
@@ -140,10 +142,12 @@ switch($action) {
 		if($pid) {
 			$p = $do->get_one_place();
 			$head_title = '广告位 ['.$p['name'].'] 预览';
+			$title = $p['name'];
 			$typeid = $p['typeid'];
 		} else if($aid) {
 			$a = $do->get_one();
 			$head_title = '广告 ['.$a['title'].'] 预览';
+			$title = $a['title'];
 			$pid = $a['pid'];
 			$typeid = $a['typeid'];
 			if($typeid > 5) {

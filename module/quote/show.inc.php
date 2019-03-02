@@ -35,17 +35,18 @@ if($fee) {
 	$user_status = 3;
 }
 $pages = '';
-if(strpos($content, '[pagebreak]') !== false) {
-	$content = explode('[pagebreak]', $content);
+if(strpos($content, '<hr class="de-pagebreak" />') !== false) {
+	$content = explode('<hr class="de-pagebreak" />', $content);
 	$total = count($content);
-	$pages = showpages($item, $total, $page);
+	$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
+	if($pages) $pages = substr($pages, 0, strpos($pages, '<cite>'));
 	$content = $content[$page-1];
 }
 if($MOD['keylink']) $content = keylink($content, $moduleid);
 include DT_ROOT.'/include/update.inc.php';
 $seo_file = 'show';
 include DT_ROOT.'/include/seo.inc.php';
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
 $template = $item['template'] ? $item['template'] : ($CAT['show_template'] ? $CAT['show_template'] : 'show');
 include template($template, $module);
 ?>

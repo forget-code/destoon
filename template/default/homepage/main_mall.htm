@@ -8,7 +8,7 @@
 <div class="thumb" onmouseover="this.className='thumb thumb_on';" onmouseout="this.className='thumb';">
 	<a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=mall&itemid='.$t['itemid'], $domain)}{/if}"><img src="{$t[thumb]}" width="100" height="100" alt="{$t[alt]}"/></a>
 	<div><a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=mall&itemid='.$t['itemid'], $domain)}{/if}" title="{$t[alt]}">{$t[title]}</a></div>
-	<span class="f_price">￥{$t[price]}</span>
+	<span class="f_price">{$DT[money_sign]}{$t[price]}</span>
 </div>
 </td>
 {if $i%5==4}</tr>{/if}

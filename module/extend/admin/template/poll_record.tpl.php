@@ -1,7 +1,7 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-//show_menu($menus);
+show_menu($menus);
 ?>
 <form action="?">
 <div class="tt">记录搜索</div>
@@ -12,8 +12,8 @@ include tpl('header');
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>
-&nbsp;
-<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="会员或IP"/>&nbsp;
+&nbsp;<?php echo $fields_select;?>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
 <select name="itemid">
 <option value="0">投票选项</option>
 <?php
@@ -27,13 +27,13 @@ foreach($I as $k=>$v) {
 &nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&pollid=<?php echo $pollid;?>');"/>&nbsp;&nbsp;
+<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&pollid=<?php echo $pollid;?>&itemid=<?php echo $itemid;?>');"/>&nbsp;&nbsp;
 <input type="button" value=" 关 闭 " class="btn" onclick="window.parent.cDialog();"/>
 </td>
 </tr>
 </table>
 </form>
-<div class="tt">[<?php echo $P['title'];?>] 投票记录</div>
+<div class="tt">投票记录</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>IP</th>

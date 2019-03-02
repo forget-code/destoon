@@ -6,7 +6,7 @@
 {if $i%5==0}<tr align="center">{/if}
 <td valign="top" width="20%" height="180">
 <div class="thumb" onmouseover="this.className='thumb thumb_on';" onmouseout="this.className='thumb';">
-	<a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=sell&itemid='.$t['itemid'], $domain)}{/if}"><img src="{imgurl($t[thumb])}" width="100" height="100" alt="{$t[alt]}"/></a>
+	<a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=sell&itemid='.$t['itemid'], $domain)}{/if}"><img src="{imgurl($t[thumb], 100)}" width="100" height="100" alt="{$t[alt]}"/></a>
 	<div><a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=sell&itemid='.$t['itemid'], $domain)}{/if}" title="{$t[alt]}">{$t[title]}</a></div>
 	<p>{timetodate($t[edittime], 3)}</p>
 </div>

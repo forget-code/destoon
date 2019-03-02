@@ -1,14 +1,14 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 if(!isset($CFG['edittpl']) || !$CFG['edittpl']) msg('系统禁止了在线修改模板，请FTP修改根目录config.inc.php<br/>$CFG[\'edittpl\'] = \'0\'; 修改为 $CFG[\'edittpl\'] = \'1\';');
 $menus = array (
-    array('添加CSS', '?file=skin&action=add'),
-    array('风格管理', '?file=skin'),
+    array('新建样式', '?file=skin&action=add'),
     array('模板管理', '?file=template'),
+    array('风格管理', '?file=skin'),
     array('标签向导', '?file=tag'),
 );
 $this_forward = '?file='.$file;
@@ -26,7 +26,7 @@ switch($action) {
 			if(!$content) msg('风格内容不能为空');
 			$dfile = $skin_root.$fileid.'.css';
 			if(isset($nowrite) && is_file($dfile)) msg('文件已经存在');
-			file_put($dfile, stripslashes($content));
+			file_put($dfile,  strip_sql(stripslashes($content), 0));
 			dmsg('风格添加成功', $this_forward);
 		} else {
 			include tpl('skin_add');
@@ -49,7 +49,7 @@ switch($action) {
 					}
 				}
 			}
-			file_put($nfile, stripslashes($content));
+			file_put($nfile,  strip_sql(stripslashes($content), 0));
 			if($dfileid != $fileid) file_del($dfile);
 			dmsg('风格修改成功', $forward);
 		} else {

@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 a.konw_a:link,a.konw_a:active,a.konw_a:visited {color:#225588;text-decoration:none;}
@@ -26,7 +26,7 @@ a.konw_a:hover {color:#FF6600;text-decoration:none;}
 
 .know_show {border:#DDDDDD 1px solid;margin-bottom:10px;}
 .know_show table {width:100%;border-collapse:collapse;border-spacing:0;}
-.know_show_l {width:150px;background:#F2F8FD;}
+.know_show_l {width:150px;background:#FAFAFA;}
 .know_show_l li {padding:10px 0 0 0;text-align:center;}
 .know_info {padding:5px 10px 8px 10px;border-bottom:#EEEEEE 1px solid;}
 

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -33,7 +33,7 @@ show_menu($menus);
 <th>升级组</th>
 <th>已付金额</th>
 <th>申请IP</th>
-<th width="110">申请时间</th>
+<th width="130">申请时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
@@ -47,8 +47,7 @@ show_menu($menus);
 <td><a href="javascript:_ip('<?php echo $v['ip'];?>');"><?php echo $v['ip'];?></a></td>
 <td class="px11"><?php echo $v['adddate'];?></td>
 <td>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>&nbsp;
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&itemid=<?php echo $v['itemid'];?>" onclick="return _delete();"><img src="admin/image/delete.png" width="16" height="16" title="删除" alt=""/></a>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>
 </td>
 </tr>
 <?php }?>

@@ -26,5 +26,6 @@ if(isset($MODULE[16])) {
 		$db->free_result($result);
 	}
 }
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file;
 include template('credit', $template);
 ?>

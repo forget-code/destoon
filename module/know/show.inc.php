@@ -35,10 +35,30 @@ if($fee) {
 } else {
 	$user_status = 3;
 }
-$best = $aid ? $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid") : array();
-$E = ($best && $best['expert']) ? $db->get_one("SELECT * FROM {$table}_expert WHERE username='$best[username]'") : array();
+$answers = $best = $E = array();
+if($page == 1) {
+	if($aid) $best = $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid");
+	if($best && $best['expert']) $E = $db->get_one("SELECT * FROM {$table}_expert WHERE username='$best[username]'");
+}
+$pages = '';
+if($process == 0 || $process == 3) {
+	if($MOD['answer_pagesize']) {
+		$pagesize = $MOD['answer_pagesize'];
+		$offset = ($page-1)*$pagesize;
+	}
+	$items = $answer;
+	if($aid) $items--;
+	if($items > 0) {
+		$pages =  pages($items, $page, $pagesize, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
+		$result = $db->query("SELECT * FROM {$table}_answer WHERE qid=$itemid AND status=3 ORDER BY itemid ASC LIMIT $offset,$pagesize");
+		while($r = $db->fetch_array($result)) {
+			if($r['itemid'] == $aid) continue;
+			$answers[] = $r;
+		}
+	}
+}
 include DT_ROOT.'/include/update.inc.php';
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
 $seo_file = 'show';
 include DT_ROOT.'/include/seo.inc.php';
 $template = $item['template'] ? $item['template'] : ($CAT['show_template'] ? $CAT['show_template'] : 'show');

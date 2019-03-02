@@ -1,18 +1,21 @@
-<table cellpadding="0" cellspacing="0" width="700" align="center" style="font-family:Verdana,Arial;">
+<table cellpadding="0" cellspacing="0" width="700" align="center">
 <tr>
-<td style="background:#62B81B;line-height:30px;font-size:14px;font-weight:bold;color:#FFFFFF;">&nbsp;&nbsp;{$title}</td>
+<td><a href="{DT_PATH}" target="_blank"><img src="{if $DT[logo]}{$DT[logo]}{else}{DT_SKIN}image/logo.gif{/if}" style="margin:10px 0;border:none;" alt="{$DT[sitename]} LOGO" title="{$DT[sitename]}"/></a></td>
 </tr>
 <tr>
-<td style="border:#CCCCCC 1px solid;padding:20px 20px 20px 20px;line-height:180%;font-size:13px;">
-<strong>尊敬的{$username}</strong>：<br/>
-您好！<br/>
-欢迎您加入{$DT[sitename]}，您的会员帐号为：<br/>
+<td style="border-top:solid 1px #DDDDDD;border-bottom:solid 1px #DDDDDD;padding:10px 0;line-height:200%;font-family:'Microsoft YaHei',Verdana,Arial;font-size:14px;color:#333333;">
+尊敬的会员：<br/>
+恭喜您成功注册成为{$DT[sitename]}会员！<br/>
+以下为您的会员帐号信息：<br/>
 <strong>户名：</strong>{$username}<br/>
-<strong>密码：</strong>{if isset($post[password])}{$post[password]} 请您妥善保存，勿告诉他人。{else}<i>已加密</i> (如果您忘记了密码，<a href="{linkurl($MODULE[2][linkurl], 1)}send.php" target="_blank">请点这里找回</a>){/if}<br/>
-本站网址：<a href="{DT_PATH}" target="_blank">{DT_PATH}</a><br/>
+<strong>密码：</strong>{if isset($post[password])}{$post[password]}{else}<i>已加密</i> (如果您忘记了密码，<a href="{$MODULE[2][linkurl]}send.php" target="_blank" style="color:#005590;">请点这里找回</a>){/if}<br/>
+请您妥善保存，切勿告诉他人。<br/>
+如果您在使用过程中遇到任何问题，欢迎随时与我们取得联系。<br/>
 </td>
 </tr>
 <tr>
-<td style="background:#333333;padding:10px;line-height:180%;font-size:12px;color:#FFFFFF;">请注意：此邮件系 <a href="{DT_PATH}" target="_blank" style="color:#FFFFFF;">{$DT[sitename]}</a> 自动发送，请勿直接回复。<br/>如果此邮件不是您请求的，请忽略并删除！</td>
+<td style="line-height:22px;padding:10px 0;font-family:'Microsoft YaHei',Verdana,Arial;font-size:12px;color:#666666;">
+请注意：此邮件系 <a href="{DT_PATH}" target="_blank" style="color:#005590;">{$DT[sitename]}</a> 自动发送，请勿直接回复。如果此邮件不是您请求的，请忽略并删除
+</td>
 </tr>
 </table>

@@ -18,14 +18,15 @@ switch($action) {
 				$post['userid'] = $_userid;
 				$post['addtime'] = $DT_TIME;
 				$do->add($post);
-				dmsg($L['op_add_success'], 'favorite.php');
+				dmsg($L['op_add_success'], '?action=index');
 			} else {
 				message($do->errmsg);
 			}
 		} else {
 			$title = isset($title) ? trim($title) : '';
 			$url = isset($url) ? trim($url) : '';
-			$type_select = type_select('favorite-'.$_userid, 0, 'post[typeid]', $L['default_type']);
+			$typeid = 0;
+			$type_select = type_select($TYPE, 0, 'post[typeid]', $L['default_type']);
 			$head_title = $L['favorite_title_add'];
 		}
 	break;
@@ -43,7 +44,7 @@ switch($action) {
 			}
 		} else {
 			extract($r);
-			$type_select = type_select('favorite-'.$_userid, 0, 'post[typeid]', $L['default_type'], $typeid);
+			$type_select = type_select($TYPE, 0, 'post[typeid]', $L['default_type'], $typeid);
 			$head_title = $L['favorite_title_edit'];
 		}
 	break;
@@ -61,7 +62,7 @@ switch($action) {
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
-		$type_select = type_select('favorite-'.$_userid, 0, 'typeid', $L['default_type'], $typeid, '', $L['all_type']);
+		$type_select = type_select($TYPE, 0, 'typeid', $L['default_type'], $typeid, '', $L['all_type']);
 		$condition = "userid=$_userid";
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($typeid > -1) $condition .= " AND typeid=$typeid";

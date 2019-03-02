@@ -3,21 +3,18 @@
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
-<td class="tab" id="add"><a href="{$DT[file_my]}?mid={$mid}&action=add"><span>添加{$MOD[name]}</span></a></td>
+<td class="tab" id="add"><a href="?mid={$mid}&action=add"><span>添加{$MOD[name]}</span></a></td>
 {if $_userid}
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s3"><a href="{$DT[file_my]}?mid={$mid}"><span>已发布<span class="px10">({$nums[3]})</span></span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s2"><a href="{$DT[file_my]}?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s1"><a href="{$DT[file_my]}?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
+<td class="tab" id="s3"><a href="?mid={$mid}"><span>已发布<span class="px10">({$nums[3]})</span></span></a></td>
+<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
+<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
 {/if}
 </tr>
 </table>
 </div>
 {if $action=='add' || $action=='edit'}
 <iframe src="" name="send" id="send" style="display:none;"></iframe>
-<form method="post" action="{$DT[file_my]}" id="dform" target="send" onsubmit="return check();">
+<form method="post" action="?" id="dform" target="send" onsubmit="return check();">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
@@ -50,7 +47,7 @@
 <td class="tl">标题图片</td>
 <td class="tr"><input name="post[thumb]" id="thumb" type="text" size="60" value="{$thumb}" readonly/>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="Dthumb({$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb').value, true);" class="t">[上传]</a>&nbsp;&nbsp;<span onclick="_preview(Dd('thumb').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('thumb').value='';" class="jt">[删除]</span> <span id="dthumb" class="f_red"></span></td>
 </tr>
-{if $MOD[swfu]==1 && $MG[upload] && check_group($_groupid, $MOD[group_upload])}
+{if $MOD[swfu]==1 && $MG[upload] && !$DT_TOUCH && check_group($_groupid, $MOD[group_upload])}
 <tr>
 <td class="tl"><span class="f_red">*</span> 文件地址</td>
 <td class="tr"><div style="float:left;"><input name="post[fileurl]" id="fileurl" type="text" size="60" value="{$fileurl}"/>&nbsp;&nbsp;</div><div style="width:34px;height:20px;float:left;"><span id="spanButtonPlaceHolder"></span></div><table cellspacing="0" style="display:none;">
@@ -105,7 +102,7 @@
 	/* window.onload = function() { */
 		var settings = {
 			flash_url : "{$MODULE[1][linkurl]}api/swfupload/swfupload.swf",
-			upload_url: "{$MODULE[1][linkurl]}upload.php",
+			upload_url: UPPath,
 			post_params: {"from": "file", "width": "100", "height": "100", "swf_userid": "{$_userid}", "swf_username": "{$_username}", "swf_groupid": "{$_groupid}", "swf_company": "{$_company}", "swf_auth": "{md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP)}", "swfupload": "1"},
 			file_size_limit : "1000 MB",
 			/* file_types : "*.*", */
@@ -169,7 +166,6 @@ var property_itemid = {$itemid};
 var property_admin = 0;
 </script>
 <script type="text/javascript" src="{DT_STATIC}file/script/property.js"></script>
-{if $itemid}<script type="text/javascript">setTimeout("load_property()", 1000);</script>{/if}
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -177,7 +173,7 @@ var property_admin = 0;
 {if $FD}{fields_html('<td class="tl">', '<td class="tr">', $item)}{/if}
 <tr>
 <td class="tl">{$MOD[name]}说明</td>
-<td class="tr"><textarea name="post[content]" id="content" class="dsn">{$content}</textarea>{deditor($moduleid, 'content', $group_editor, '98%', 350)}</td>
+<td class="tr"><textarea name="post[content]" id="content" class="dsn">{$content}</textarea>{deditor($moduleid, 'content', $group_editor, '100%', 350)}</td>
 </tr>
 {if $fee_add}
 <tr>
@@ -222,7 +218,7 @@ var property_admin = 0;
 {/if}
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 提 交 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 提 交 " class="btn_g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
 </tr>
 </table>
 </form>
@@ -234,13 +230,13 @@ var property_admin = 0;
 {/if}
 {else}
 <div class="tt">
-<form action="{$DT[file_my]}">
+<form action="?">
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="status" value="{$status}"/>
-&nbsp;{category_select('catid', '不限分类', $catid, $moduleid)}&nbsp;
+&nbsp;{category_select('catid', '所有分类', $catid, $moduleid)}&nbsp;
 <input type="text" size="50" name="kw" value="{$kw}" title="关键词"/>&nbsp;
 <input type="submit" value=" 搜 索 " class="btn"/>
-<input type="button" value=" 重 置 " class="btn" onclick="Go('{$DT[file_my]}?mid={$mid}&status={$status}');"/>
+<input type="button" value=" 重 置 " class="btn" onclick="Go('?mid={$mid}&status={$status}');"/>
 </form>
 </div>
 <div class="ls">
@@ -260,7 +256,7 @@ var property_admin = 0;
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="{$v[itemid]}"/></td>
 <td><img src="{DT_PATH}file/ext/{$v[fileext]}.gif"/></td>
-<td align="left" title="{$v[alt]}">&nbsp;{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="{$DT[file_my]}?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</td>
+<td align="left" title="{$v[alt]}">&nbsp;{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</td>
 <td>&nbsp;&nbsp;<a href="{$v[caturl]}" target="_blank">{$v[catname]}</a>&nbsp;&nbsp;</td>
 {if $timetype=='add'}
 <td class="f_gray px11" title="更新时间 {$v[editdate]}">{$v[adddate]}</td>
@@ -270,8 +266,8 @@ var property_admin = 0;
 <td class="f_gray px11">{$v[download]}</td>
 <td class="f_gray px11">{$v[hits]}</td>
 <td>
-<a href="{$DT[file_my]}?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
-{if $MG[delete]}&nbsp;<a href="{$DT[file_my]}?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
+<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
+{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
 </td>
 </tr>
 {/loop}
@@ -328,6 +324,7 @@ function check() {
 		return false;
 	}
 	{if $FD}{fields_js()}{/if}
+	{if $CP}{property_js()}{/if}
 {if $need_password}
 	f = 'password';
 	l = Dd(f).value.length;
@@ -368,21 +365,21 @@ function auto_type() {
 	var file_type = '';
 	if('rar|zip'.indexOf(file_ext) != -1) {
 		file_type = 'rar';
-	} else if('jpg|png|gif|bmp'.indexOf(file_ext) != -1) {
+	} else if('jpg|jpeg|png|gif|bmp'.indexOf(file_ext) != -1) {
 		file_type = 'img';
-	} else if('wma|wav|rm|rmvb|ram|mp4|mov'.indexOf(file_ext) != -1) {
+	} else if('wma|wav|rm|rmvb|ram|mp4|flv|mov'.indexOf(file_ext) != -1) {
 		file_type = 'mov';
 	} else if('ext|pdf|doc|xls|ppt|swf|chm|hlp'.indexOf(file_ext) != -1) {
 		file_type = file_ext;
 	} else if('docx|xlsx|pptx'.indexOf(file_ext) != -1) {
 		file_type = file_ext.substring(0, 3);
 	}
-	if(file_type) select_op('fileext', file_type);
+	if(file_type) $('#fileext').val(file_type);
 }
 function initd(file_size) {
 	auto_type();
 	Dd('filesize').value = file_size;
-	select_op('unit', 'M');
+	$('#unit').val('M');
 }
 var destoon_oauth = '{$EXT[oauth]}';
 </script>

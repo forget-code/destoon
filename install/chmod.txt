@@ -1,6 +1,6 @@
 about/
-announce/
 file/*
-install/index.php
+baidunews.xml
 config.inc.php
 index.html
+sitemaps.xml

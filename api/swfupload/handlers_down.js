@@ -57,7 +57,7 @@ function uploadSuccess(file, serverData) {
 			if(file_size) {
 				var t = file_size.split(' ');
 				if(t[0] > 0) Dd('filesize').value = t[0];
-				if(t[1].length == 2) select_op('unit', t[1].substring(0, 1));
+				if(t[1].length == 2) $('#unit').val(t[1].substring(0, 1));
 			}
 		} else {
 			Dd('tdPercentUploaded').innerHTML = '0%';

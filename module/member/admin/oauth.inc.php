@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('一键登录', '?moduleid='.$moduleid.'&file='.$file),
     array('接口设置', '?moduleid='.$moduleid.'&file=setting&tab=5'),

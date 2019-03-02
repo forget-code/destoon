@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS `destoon_404`;
 CREATE TABLE `destoon_404` (
   `itemid` int(10) unsigned NOT NULL auto_increment,
   `url` varchar(255) NOT NULL default '',
+  `refer` varchar(255) NOT NULL,
   `robot` varchar(20) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
   `ip` varchar(50) NOT NULL default '',
@@ -77,6 +78,7 @@ DROP TABLE IF EXISTS `destoon_address`;
 CREATE TABLE `destoon_address` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `truename` varchar(30) NOT NULL default '',
+  `areaid` int(10) unsigned NOT NULL default '0',
   `address` varchar(255) NOT NULL default '',
   `postcode` varchar(10) NOT NULL default '',
   `telephone` varchar(30) NOT NULL default '',
@@ -190,7 +192,7 @@ CREATE TABLE `destoon_article_21` (
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
   `fee` float NOT NULL default '0',
-  `subtitle` text NOT NULL,
+  `subtitle` mediumtext NOT NULL,
   `introduce` varchar(255) NOT NULL default '',
   `tag` varchar(100) NOT NULL default '',
   `keyword` varchar(255) NOT NULL default '',
@@ -229,14 +231,15 @@ DROP TABLE IF EXISTS `destoon_ask`;
 CREATE TABLE `destoon_ask` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `typeid` int(10) unsigned NOT NULL default '0',
+  `qid` bigint(20) unsigned NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
-  `content` text NOT NULL,
+  `content` mediumtext NOT NULL,
   `username` varchar(30) NOT NULL default '',
   `addtime` int(10) unsigned NOT NULL default '0',
-  `admin` varchar(30) NOT NULL default '',
-  `admintime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL,
+  `edittime` int(10) unsigned NOT NULL default '0',
   `status` tinyint(1) unsigned NOT NULL default '0',
-  `reply` text NOT NULL,
+  `reply` mediumtext NOT NULL,
   `star` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='客服中心';
@@ -447,15 +450,22 @@ CREATE TABLE `destoon_category_value` (
 
 DROP TABLE IF EXISTS `destoon_chat`;
 CREATE TABLE `destoon_chat` (
-  `chatid` char(32) NOT NULL default '',
-  `fromuser` char(50) NOT NULL default '',
+  `chatid` varchar(32) NOT NULL,
+  `fromuser` varchar(30) NOT NULL,
   `fgettime` int(10) unsigned NOT NULL default '0',
   `freadtime` int(10) unsigned NOT NULL default '0',
-  `touser` char(50) NOT NULL default '',
+  `fnew` int(10) unsigned NOT NULL default '0',
+  `touser` varchar(30) NOT NULL,
   `tgettime` int(10) unsigned NOT NULL default '0',
   `treadtime` int(10) unsigned NOT NULL default '0',
-  `forward` char(255) NOT NULL default '',
-  UNIQUE KEY `chatid` (`chatid`)
+  `tnew` int(10) unsigned NOT NULL default '0',
+  `lastmsg` varchar(255) NOT NULL,
+  `lasttime` int(10) unsigned NOT NULL default '0',
+  `forward` varchar(255) NOT NULL,
+  UNIQUE KEY `chatid` (`chatid`),
+  KEY `fromuser` (`fromuser`),
+  KEY `touser` (`touser`),
+  KEY `lasttime` (`lasttime`)
 ) TYPE=MyISAM COMMENT='在线聊天';
 
 DROP TABLE IF EXISTS `destoon_city`;
@@ -475,6 +485,141 @@ CREATE TABLE `destoon_city` (
   KEY `domain` (`domain`)
 ) TYPE=MyISAM COMMENT='城市分站';
 
+DROP TABLE IF EXISTS `destoon_club`;
+CREATE TABLE `destoon_club` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `catid` int(10) unsigned NOT NULL default '0',
+  `areaid` int(10) unsigned NOT NULL default '0',
+  `gid` bigint(20) unsigned NOT NULL default '0',
+  `video` tinyint(1) unsigned NOT NULL default '0',
+  `ontop` tinyint(1) unsigned NOT NULL default '0',
+  `level` tinyint(1) unsigned NOT NULL default '0',
+  `title` varchar(100) NOT NULL default '',
+  `style` varchar(50) NOT NULL default '',
+  `fee` float NOT NULL default '0',
+  `message` tinyint(1) unsigned NOT NULL default '0',
+  `introduce` varchar(255) NOT NULL default '',
+  `keyword` varchar(255) NOT NULL default '',
+  `pptword` varchar(255) NOT NULL default '',
+  `hits` int(10) unsigned NOT NULL default '0',
+  `reply` int(10) unsigned NOT NULL default '0',
+  `thumb` varchar(255) NOT NULL default '',
+  `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `replyuser` varchar(30) NOT NULL,
+  `replyer` varchar(30) NOT NULL,
+  `replytime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL default '',
+  `edittime` int(10) unsigned NOT NULL default '0',
+  `ip` varchar(50) NOT NULL default '',
+  `template` varchar(30) NOT NULL default '0',
+  `status` tinyint(1) NOT NULL default '0',
+  `linkurl` varchar(255) NOT NULL default '',
+  `filepath` varchar(255) NOT NULL default '',
+  `note` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`itemid`),
+  KEY `addtime` (`addtime`),
+  KEY `catid` (`catid`),
+  KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='商圈帖子';
+
+DROP TABLE IF EXISTS `destoon_club_data`;
+CREATE TABLE `destoon_club_data` (
+  `itemid` bigint(20) unsigned NOT NULL default '0',
+  `content` longtext NOT NULL,
+  PRIMARY KEY  (`itemid`)
+) TYPE=MyISAM COMMENT='商圈帖子内容';
+
+DROP TABLE IF EXISTS `destoon_club_fans`;
+CREATE TABLE `destoon_club_fans` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `gid` bigint(20) unsigned NOT NULL default '0',
+  `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
+  `reason` mediumtext NOT NULL,
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `status` tinyint(1) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`itemid`),
+  KEY `gid` (`gid`),
+  KEY `username` (`username`),
+  KEY `status` (`status`)
+) TYPE=MyISAM COMMENT='商圈粉丝';
+
+DROP TABLE IF EXISTS `destoon_club_group`;
+CREATE TABLE `destoon_club_group` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `catid` int(10) unsigned NOT NULL default '0',
+  `areaid` int(10) unsigned NOT NULL default '0',
+  `level` tinyint(1) unsigned NOT NULL default '0',
+  `title` varchar(100) NOT NULL,
+  `style` varchar(50) NOT NULL default '',
+  `post` int(10) unsigned NOT NULL default '0',
+  `fans` int(10) unsigned NOT NULL default '0',
+  `thumb` varchar(255) NOT NULL,
+  `manager` varchar(255) NOT NULL,
+  `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL default '',
+  `edittime` int(10) unsigned NOT NULL default '0',
+  `ip` varchar(50) NOT NULL,
+  `template` varchar(30) NOT NULL,
+  `show_template` varchar(30) NOT NULL,
+  `status` tinyint(1) unsigned NOT NULL default '0',
+  `linkurl` varchar(255) NOT NULL,
+  `filepath` varchar(255) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `join_type` tinyint(1) unsigned NOT NULL default '0',
+  `list_type` tinyint(1) unsigned NOT NULL default '0',
+  `show_type` tinyint(1) unsigned NOT NULL default '0',
+  `post_type` tinyint(1) unsigned NOT NULL default '0',
+  `reply_type` tinyint(1) unsigned NOT NULL default '0',
+  `reason` mediumtext NOT NULL,
+  PRIMARY KEY  (`itemid`),
+  KEY `username` (`username`),
+  KEY `addtime` (`addtime`),
+  KEY `status` (`status`)
+) TYPE=MyISAM COMMENT='商圈圈子';
+
+DROP TABLE IF EXISTS `destoon_club_manage`;
+CREATE TABLE `destoon_club_manage` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `gid` bigint(20) unsigned NOT NULL default '0',
+  `tid` bigint(20) unsigned NOT NULL default '0',
+  `rid` bigint(20) unsigned NOT NULL default '0',
+  `username` varchar(30) NOT NULL default '',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `totime` int(10) unsigned NOT NULL default '0',
+  `typeid` tinyint(1) unsigned NOT NULL default '0',
+  `title` varchar(255) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `reason` mediumtext NOT NULL,
+  `message` tinyint(1) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`itemid`),
+  KEY `username` (`username`),
+  KEY `addtime` (`addtime`)
+) TYPE=MyISAM COMMENT='商圈管理';
+
+DROP TABLE IF EXISTS `destoon_club_reply`;
+CREATE TABLE `destoon_club_reply` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `tid` bigint(20) unsigned NOT NULL default '0',
+  `gid` bigint(20) unsigned NOT NULL default '0',
+  `fid` int(10) unsigned NOT NULL default '0',
+  `content` mediumtext NOT NULL,
+  `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL default '',
+  `edittime` int(10) unsigned NOT NULL default '0',
+  `ip` varchar(50) NOT NULL default '',
+  `status` tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (`itemid`),
+  KEY `tid` (`tid`),
+  KEY `status` (`status`)
+) TYPE=MyISAM COMMENT='商圈回复';
+
 DROP TABLE IF EXISTS `destoon_comment`;
 CREATE TABLE `destoon_comment` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
@@ -487,6 +632,7 @@ CREATE TABLE `destoon_comment` (
   `qid` bigint(20) unsigned NOT NULL default '0',
   `quotation` mediumtext NOT NULL,
   `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
   `hidden` tinyint(1) NOT NULL default '0',
   `addtime` int(10) unsigned NOT NULL default '0',
   `reply` mediumtext NOT NULL,
@@ -590,6 +736,21 @@ CREATE TABLE `destoon_company_setting` (
   `item_value` text NOT NULL,
   KEY `userid` (`userid`)
 ) TYPE=MyISAM COMMENT='公司设置';
+
+DROP TABLE IF EXISTS `destoon_cron`;
+CREATE TABLE `destoon_cron` (
+  `itemid` smallint(6) unsigned NOT NULL auto_increment,
+  `title` varchar(30) NOT NULL,
+  `type` tinyint(1) unsigned NOT NULL default '0',
+  `name` varchar(20) NOT NULL,
+  `schedule` varchar(255) NOT NULL,
+  `lasttime` int(10) unsigned NOT NULL default '0',
+  `nexttime` int(10) unsigned NOT NULL default '0',
+  `status` tinyint(1) unsigned NOT NULL default '0',
+  `note` text NOT NULL,
+  PRIMARY KEY  (`itemid`),
+  KEY `nexttime` (`nexttime`)
+) TYPE=MyISAM COMMENT='计划任务';
 
 DROP TABLE IF EXISTS `destoon_down_15`;
 CREATE TABLE `destoon_down_15` (
@@ -735,7 +896,7 @@ CREATE TABLE `destoon_fetch` (
   `sitename` varchar(100) NOT NULL default '',
   `domain` varchar(255) NOT NULL default '',
   `title` varchar(255) NOT NULL default '',
-  `content` mediumtext NOT NULL,
+  `content` text NOT NULL,
   `encode` varchar(30) NOT NULL default '',
   `editor` varchar(30) NOT NULL default '',
   `edittime` int(10) unsigned NOT NULL default '0',
@@ -786,6 +947,8 @@ CREATE TABLE `destoon_finance_cash` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `username` varchar(30) NOT NULL default '',
   `bank` varchar(50) NOT NULL default '',
+  `banktype` tinyint(1) unsigned NOT NULL default '0',
+  `branch` varchar(100) NOT NULL,
   `account` varchar(30) NOT NULL default '',
   `truename` varchar(30) NOT NULL default '',
   `amount` decimal(10,2) unsigned NOT NULL default '0.00',
@@ -812,6 +975,7 @@ CREATE TABLE `destoon_finance_charge` (
   `receivetime` int(10) unsigned NOT NULL default '0',
   `editor` varchar(30) NOT NULL default '',
   `status` tinyint(1) unsigned NOT NULL default '0',
+  `reason` varchar(255) NOT NULL,
   `note` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`itemid`),
   KEY `username` (`username`)
@@ -830,6 +994,19 @@ CREATE TABLE `destoon_finance_credit` (
   PRIMARY KEY  (`itemid`),
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='积分流水';
+
+DROP TABLE IF EXISTS `destoon_finance_deposit`;
+CREATE TABLE `destoon_finance_deposit` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `username` varchar(30) NOT NULL default '',
+  `amount` decimal(10,2) NOT NULL default '0.00',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL,
+  `reason` varchar(255) NOT NULL default '',
+  `note` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`itemid`),
+  KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='保证金';
 
 DROP TABLE IF EXISTS `destoon_finance_pay`;
 CREATE TABLE `destoon_finance_pay` (
@@ -891,6 +1068,72 @@ CREATE TABLE `destoon_finance_sms` (
   PRIMARY KEY  (`itemid`),
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='短信增减';
+
+DROP TABLE IF EXISTS `destoon_form`;
+CREATE TABLE `destoon_form` (
+  `itemid` int(10) unsigned NOT NULL auto_increment,
+  `typeid` int(10) unsigned NOT NULL default '0',
+  `areaid` int(10) unsigned NOT NULL default '0',
+  `level` tinyint(1) unsigned NOT NULL default '0',
+  `title` varchar(100) NOT NULL default '',
+  `style` varchar(50) NOT NULL default '',
+  `content` mediumtext NOT NULL,
+  `groupid` varchar(255) NOT NULL,
+  `verify` tinyint(1) unsigned NOT NULL default '0',
+  `display` tinyint(1) unsigned NOT NULL default '0',
+  `question` int(10) unsigned NOT NULL default '0',
+  `answer` int(10) unsigned NOT NULL default '0',
+  `hits` int(10) unsigned NOT NULL default '0',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `fromtime` int(10) unsigned NOT NULL default '0',
+  `totime` int(10) unsigned NOT NULL default '0',
+  `editor` varchar(30) NOT NULL default '',
+  `edittime` int(10) unsigned NOT NULL default '0',
+  `linkurl` varchar(255) NOT NULL default '',
+  `template` varchar(30) NOT NULL,
+  PRIMARY KEY  (`itemid`),
+  KEY `addtime` (`addtime`)
+) TYPE=MyISAM COMMENT='表单';
+
+DROP TABLE IF EXISTS `destoon_form_answer`;
+CREATE TABLE `destoon_form_answer` (
+  `aid` bigint(20) unsigned NOT NULL auto_increment,
+  `fid` bigint(20) unsigned NOT NULL default '0',
+  `rid` bigint(20) unsigned NOT NULL default '0',
+  `qid` bigint(20) unsigned NOT NULL default '0',
+  `username` varchar(30) NOT NULL default '',
+  `ip` varchar(50) NOT NULL default '',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `content` mediumtext NOT NULL,
+  `other` varchar(255) NOT NULL,
+  `item` varchar(100) NOT NULL,
+  PRIMARY KEY  (`aid`)
+) TYPE=MyISAM COMMENT='表单回复';
+
+DROP TABLE IF EXISTS `destoon_form_question`;
+CREATE TABLE `destoon_form_question` (
+  `qid` bigint(20) unsigned NOT NULL auto_increment,
+  `fid` int(10) unsigned NOT NULL default '0',
+  `type` tinyint(1) unsigned NOT NULL default '0',
+  `name` varchar(255) NOT NULL default '',
+  `value` mediumtext NOT NULL,
+  `required` varchar(30) NOT NULL,
+  `extend` mediumtext NOT NULL,
+  `listorder` smallint(4) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`qid`),
+  KEY `fid` (`fid`)
+) TYPE=MyISAM COMMENT='表单选项';
+
+DROP TABLE IF EXISTS `destoon_form_record`;
+CREATE TABLE `destoon_form_record` (
+  `rid` bigint(20) unsigned NOT NULL auto_increment,
+  `fid` bigint(20) unsigned NOT NULL default '0',
+  `username` varchar(30) NOT NULL default '',
+  `ip` varchar(50) NOT NULL default '',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `item` varchar(100) NOT NULL,
+  PRIMARY KEY  (`rid`)
+) TYPE=MyISAM COMMENT='表单回复记录';
 
 DROP TABLE IF EXISTS `destoon_friend`;
 CREATE TABLE `destoon_friend` (
@@ -1037,14 +1280,17 @@ CREATE TABLE `destoon_group_order` (
   `buyer_postcode` varchar(10) NOT NULL default '',
   `buyer_phone` varchar(30) NOT NULL default '',
   `buyer_mobile` varchar(30) NOT NULL default '',
-  `buyer_receive` varchar(50) NOT NULL default '',
   `send_type` varchar(50) NOT NULL default '',
   `send_no` varchar(50) NOT NULL default '',
+  `send_status` tinyint(1) unsigned NOT NULL default '0',
   `send_time` varchar(20) NOT NULL default '',
   `send_days` int(10) unsigned NOT NULL default '0',
+  `add_time` smallint(6) unsigned NOT NULL default '0',
   `addtime` int(10) unsigned NOT NULL default '0',
   `updatetime` int(10) unsigned NOT NULL default '0',
   `editor` varchar(30) NOT NULL default '',
+  `buyer_reason` mediumtext NOT NULL,
+  `refund_reason` mediumtext NOT NULL,
   `note` varchar(255) NOT NULL default '',
   `status` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`itemid`),
@@ -1082,7 +1328,7 @@ CREATE TABLE `destoon_honor` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
-  `content` text NOT NULL,
+  `content` mediumtext NOT NULL,
   `authority` varchar(100) NOT NULL default '',
   `thumb` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
@@ -1093,6 +1339,7 @@ CREATE TABLE `destoon_honor` (
   `editor` varchar(30) NOT NULL default '',
   `edittime` int(10) unsigned NOT NULL default '0',
   `status` tinyint(1) NOT NULL default '0',
+  `linkurl` varchar(255) NOT NULL,
   `note` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`itemid`),
   KEY `username` (`username`),
@@ -1189,6 +1436,7 @@ CREATE TABLE `destoon_job` (
   `minage` smallint(2) unsigned NOT NULL default '0',
   `maxage` smallint(2) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
+  `thumb` varchar(255) NOT NULL,
   `apply` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
   `groupid` smallint(4) unsigned NOT NULL default '0',
@@ -1315,6 +1563,7 @@ CREATE TABLE `destoon_know` (
   `thumb` varchar(255) NOT NULL default '',
   `answer` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
   `ask` varchar(30) NOT NULL,
   `expert` varchar(30) NOT NULL,
   `addtime` int(10) unsigned NOT NULL default '0',
@@ -1342,6 +1591,7 @@ CREATE TABLE `destoon_know_answer` (
   `content` mediumtext NOT NULL,
   `vote` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
   `expert` tinyint(1) unsigned NOT NULL default '0',
   `hidden` tinyint(1) unsigned NOT NULL default '0',
   `addtime` int(10) unsigned NOT NULL default '0',
@@ -1371,6 +1621,7 @@ CREATE TABLE `destoon_know_expert` (
   `best` int(10) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
   `addtime` int(10) unsigned NOT NULL default '0',
   `editor` varchar(30) NOT NULL default '',
   `edittime` int(10) unsigned NOT NULL default '0',
@@ -1387,6 +1638,7 @@ CREATE TABLE `destoon_know_vote` (
   `qid` bigint(20) unsigned NOT NULL default '0',
   `aid` bigint(20) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
+  `passport` varchar(30) NOT NULL,
   `addtime` int(10) unsigned NOT NULL default '0',
   `ip` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`itemid`)
@@ -1419,6 +1671,7 @@ CREATE TABLE `destoon_login` (
   `logid` bigint(20) unsigned NOT NULL auto_increment,
   `username` varchar(30) NOT NULL default '',
   `password` varchar(32) NOT NULL default '',
+  `passsalt` varchar(8) NOT NULL,
   `admin` tinyint(1) unsigned NOT NULL default '0',
   `loginip` varchar(50) NOT NULL default '',
   `logintime` int(10) unsigned NOT NULL default '0',
@@ -1480,7 +1733,9 @@ CREATE TABLE `destoon_mall` (
   `introduce` varchar(255) NOT NULL default '',
   `brand` varchar(100) NOT NULL default '',
   `price` decimal(10,2) unsigned NOT NULL default '0.00',
+  `step` mediumtext NOT NULL,
   `amount` int(10) unsigned NOT NULL default '0',
+  `unit` varchar(20) NOT NULL,
   `tag` varchar(100) NOT NULL default '',
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
@@ -1512,6 +1767,7 @@ CREATE TABLE `destoon_mall` (
   `express_name_3` varchar(100) NOT NULL,
   `fee_start_3` decimal(10,2) unsigned NOT NULL,
   `fee_step_3` decimal(10,2) unsigned NOT NULL,
+  `cod` tinyint(1) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
   `groupid` smallint(4) unsigned NOT NULL default '0',
   `company` varchar(100) NOT NULL default '',
@@ -1600,6 +1856,7 @@ CREATE TABLE `destoon_mall_express` (
 DROP TABLE IF EXISTS `destoon_mall_order`;
 CREATE TABLE `destoon_mall_order` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `mid` smallint(6) unsigned NOT NULL default '16',
   `mallid` bigint(20) unsigned NOT NULL default '0',
   `buyer` varchar(30) NOT NULL default '',
   `seller` varchar(30) NOT NULL default '',
@@ -1615,13 +1872,14 @@ CREATE TABLE `destoon_mall_order` (
   `buyer_postcode` varchar(10) NOT NULL default '',
   `buyer_phone` varchar(30) NOT NULL default '',
   `buyer_mobile` varchar(30) NOT NULL default '',
-  `buyer_receive` varchar(50) NOT NULL default '',
   `buyer_star` tinyint(1) unsigned NOT NULL default '0',
   `seller_star` tinyint(1) unsigned NOT NULL default '0',
   `send_type` varchar(50) NOT NULL default '',
   `send_no` varchar(50) NOT NULL default '',
+  `send_status` tinyint(1) unsigned NOT NULL default '0',
   `send_time` varchar(20) NOT NULL default '',
   `send_days` int(10) unsigned NOT NULL default '0',
+  `cod` tinyint(1) unsigned NOT NULL default '0',
   `trade_no` varchar(50) NOT NULL default '',
   `add_time` smallint(6) NOT NULL default '0',
   `addtime` int(10) unsigned NOT NULL default '0',
@@ -1659,7 +1917,9 @@ CREATE TABLE `destoon_member` (
   `passport` varchar(30) NOT NULL default '',
   `company` varchar(100) NOT NULL default '',
   `password` varchar(32) NOT NULL default '',
+  `passsalt` varchar(8) NOT NULL,
   `payword` varchar(32) NOT NULL default '',
+  `paysalt` varchar(8) NOT NULL,
   `email` varchar(50) NOT NULL default '',
   `message` smallint(6) unsigned NOT NULL default '0',
   `chat` smallint(6) unsigned NOT NULL default '0',
@@ -1684,8 +1944,10 @@ CREATE TABLE `destoon_member` (
   `sms` int(10) NOT NULL default '0',
   `credit` int(10) NOT NULL default '0',
   `money` decimal(10,2) NOT NULL default '0.00',
-  `locking` decimal(10,2) unsigned NOT NULL default '0.00',
+  `deposit` decimal(10,2) unsigned NOT NULL default '0.00',
   `bank` varchar(30) NOT NULL default '',
+  `banktype` tinyint(1) unsigned NOT NULL default '0',
+  `branch` varchar(100) NOT NULL,
   `account` varchar(30) NOT NULL default '',
   `edittime` int(10) unsigned NOT NULL default '0',
   `regip` varchar(50) NOT NULL default '',
@@ -1707,12 +1969,23 @@ CREATE TABLE `destoon_member` (
   `trade` varchar(50) NOT NULL default '',
   `support` varchar(50) NOT NULL default '',
   `inviter` varchar(30) NOT NULL default '',
+  `note` text NOT NULL,
   PRIMARY KEY  (`userid`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `passport` (`passport`),
   KEY `groupid` (`groupid`)
 ) TYPE=MyISAM COMMENT='会员';
+
+DROP TABLE IF EXISTS `destoon_member_check`;
+CREATE TABLE `destoon_member_check` (
+  `userid` bigint(20) unsigned NOT NULL auto_increment,
+  `username` varchar(30) NOT NULL default '',
+  `content` mediumtext NOT NULL,
+  `addtime` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`userid`),
+  UNIQUE KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='会员资料审核';
 
 DROP TABLE IF EXISTS `destoon_member_group`;
 CREATE TABLE `destoon_member_group` (
@@ -1905,10 +2178,9 @@ CREATE TABLE `destoon_poll` (
   `level` tinyint(1) unsigned NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
-  `content` text NOT NULL,
-  `seo_title` varchar(255) NOT NULL default '',
-  `seo_keywords` varchar(255) NOT NULL default '',
-  `seo_description` varchar(255) NOT NULL default '',
+  `content` mediumtext NOT NULL,
+  `groupid` varchar(255) NOT NULL,
+  `verify` tinyint(1) unsigned NOT NULL default '0',
   `thumb_width` smallint(6) unsigned NOT NULL default '0',
   `thumb_height` smallint(6) unsigned NOT NULL default '0',
   `poll_max` smallint(6) unsigned NOT NULL default '0',
@@ -2364,6 +2636,7 @@ CREATE TABLE `destoon_style` (
 DROP TABLE IF EXISTS `destoon_type`;
 CREATE TABLE `destoon_type` (
   `typeid` bigint(20) unsigned NOT NULL auto_increment,
+  `parentid` bigint(20) unsigned NOT NULL default '0',
   `listorder` smallint(4) NOT NULL default '0',
   `typename` varchar(255) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
@@ -2662,7 +2935,9 @@ CREATE TABLE `destoon_vote` (
   `level` tinyint(1) unsigned NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
-  `content` text NOT NULL,
+  `content` mediumtext NOT NULL,
+  `groupid` varchar(255) NOT NULL,
+  `verify` tinyint(1) unsigned NOT NULL default '0',
   `choose` tinyint(1) unsigned NOT NULL default '0',
   `vote_min` smallint(2) unsigned NOT NULL default '0',
   `vote_max` smallint(2) unsigned NOT NULL default '0',
@@ -2734,3 +3009,50 @@ CREATE TABLE `destoon_webpage` (
   `template` varchar(30) NOT NULL default '',
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='单网页';
+
+DROP TABLE IF EXISTS `destoon_weixin_bind`;
+CREATE TABLE `destoon_weixin_bind` (
+  `username` varchar(30) NOT NULL default '',
+  `sid` int(10) unsigned NOT NULL default '0',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  UNIQUE KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='微信扫码绑定';
+
+DROP TABLE IF EXISTS `destoon_weixin_chat`;
+CREATE TABLE `destoon_weixin_chat` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `editor` varchar(30) NOT NULL,
+  `openid` varchar(255) NOT NULL default '',
+  `type` varchar(20) NOT NULL,
+  `event` tinyint(1) unsigned NOT NULL default '0',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `content` mediumtext NOT NULL,
+  `misc` mediumtext NOT NULL,
+  PRIMARY KEY  (`itemid`),
+  KEY `openid` (`openid`),
+  KEY `addtime` (`addtime`),
+  KEY `event` (`event`)
+) TYPE=MyISAM COMMENT='微信消息';
+
+DROP TABLE IF EXISTS `destoon_weixin_user`;
+CREATE TABLE `destoon_weixin_user` (
+  `itemid` bigint(20) unsigned NOT NULL auto_increment,
+  `username` varchar(30) NOT NULL default '',
+  `openid` varchar(255) NOT NULL default '',
+  `nickname` varchar(255) NOT NULL default '',
+  `sex` tinyint(1) unsigned NOT NULL default '0',
+  `city` varchar(100) NOT NULL,
+  `province` varchar(100) NOT NULL,
+  `country` varchar(100) NOT NULL,
+  `language` varchar(100) NOT NULL,
+  `headimgurl` varchar(255) NOT NULL,
+  `edittime` int(10) unsigned NOT NULL default '0',
+  `addtime` int(10) unsigned NOT NULL default '0',
+  `visittime` int(10) unsigned NOT NULL default '0',
+  `credittime` int(10) unsigned NOT NULL default '0',
+  `subscribe` tinyint(1) unsigned NOT NULL default '1',
+  `push` tinyint(1) unsigned NOT NULL default '1',
+  PRIMARY KEY  (`itemid`),
+  UNIQUE KEY `openid` (`openid`),
+  KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='微信用户';

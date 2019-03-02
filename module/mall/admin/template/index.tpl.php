@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -30,6 +30,9 @@ show_menu($menus);
 <?php echo ajax_area_select('areaid', '所在地区', $areaid);?>&nbsp;
 ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&nbsp;
 <input type="checkbox" name="elite" value="1"<?php echo $elite ? ' checked' : '';?>/>橱窗&nbsp;
+<input type="checkbox" name="cod" value="1"<?php echo $cod ? ' checked' : '';?>/>货到付款&nbsp;
+<input type="checkbox" name="mp" value="1"<?php echo $mp ? ' checked' : '';?>/>阶梯价格&nbsp;
+<input type="checkbox" name="rl" value="1"<?php echo $rl ? ' checked' : '';?>/>关联商品&nbsp;
 </td>
 </tr>
 <tr>
@@ -82,7 +85,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 <?php } ?>
 </td>
 <td class="f_price"><?php echo $v['price'];?></td>
-<td class="px11"><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=order&mallid=<?php echo $v['itemid'];?>', '[<?php echo $v['alt'];?>] 订单列表');"><?php echo $v['orders'];?></a></td>
+<td class="px11"><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=order&id=<?php echo $v['itemid'];?>', '[<?php echo $v['alt'];?>] 订单列表');"><?php echo $v['orders'];?></a></td>
 <td class="px11"><?php echo $v['sales'];?></td>
 <td class="px11"><?php echo $v['amount'];?></td>
 <td class="px11"><?php echo $v['comments'];?></td>
@@ -95,6 +98,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 </tr>
 <?php } ?>
 </table>
+<?php include tpl('notice_chip');?>
 <div class="btns">
 
 <?php if($action == 'check') { ?>
@@ -120,17 +124,17 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中商品吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="submit" value=" 还 原 " class="btn" onclick="if(confirm('确定要还原选中商品吗？状态将被设置为已通过')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=restore'}else{return false;}"/>&nbsp;
-<input type="submit" value=" 清 空 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear';"/>
+<input type="submit" value=" 清 空 " class="btn" onclick="if(confirm('确定要清空回收站吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear';}else{return false;}"/>
 
 <?php } else { ?>
 
 <input type="submit" value="刷新信息" class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refresh';" title="刷新时间为最新"/>&nbsp;
 <input type="submit" value=" 更新信息 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=update';"/>&nbsp;
-<?php if($MOD['show_html']) { ?><input type="submit" value=" 生成网页 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=tohtml';"/>&nbsp;<?php } ?>
+<?php if($MOD['show_html']) { ?><input type="submit" value=" 生成网页 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=tohtml';"/>&nbsp; <?php } ?>
 <input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中商品吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="submit" value=" 移动分类 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=move';"/>&nbsp;
-<input type="submit" value=" 批量下架 " class="btn" onclick="if(confirm('确定要批量下架选中商品吗？')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=expire'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 批量下架 " class="btn" onclick="if(confirm('确定要批量下架选中商品吗？')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=unsale'}else{return false;}"/>&nbsp;
 <?php echo level_select('level', '设置级别为</option><option value="0">取消', 0, 'onchange="this.form.action=\'?moduleid='.$moduleid.'&file='.$file.'&action=level\';this.form.submit();"');?>&nbsp;
 <?php } ?>
 </div>

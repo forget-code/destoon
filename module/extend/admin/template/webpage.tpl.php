@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -38,7 +38,7 @@ show_menu($menus);
 <th>地 址</th>
 <th>浏览次数</th>
 <?php if($itemid) { ?><th>分组标识</th><?php } ?>
-<th width="120">更新时间</th>
+<th width="130">更新时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>

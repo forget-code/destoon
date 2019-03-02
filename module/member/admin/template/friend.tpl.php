@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -31,7 +31,7 @@ show_menu($menus);
 <th>公司</th>
 <th colspan="8">联系方式</th>
 <th>会员ID</th>
-<th width="120">添加时间</th>
+<th width="130">添加时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>

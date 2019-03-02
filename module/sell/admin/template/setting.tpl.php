@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('基本设置'),
@@ -68,7 +68,7 @@ X
 </select>
 </td>
 </tr>
-<tr>
+<tr style="display:<?php echo $sphinx ? 'none' : '';?>;">
 <td class="tl">信息排序方式</td>
 <td>
 <input type="text" size="50" name="setting[order]" value="<?php echo $order;?>" id="order"/>
@@ -142,9 +142,9 @@ X
 <a href="?file=split&mid=<?php echo $moduleid;?>&action=merge" target="_blank" class="t" onclick="return confirm('确定要合并内容吗？合并成功之后请立即关闭内容分表\n\n建议在合并之前备份一次数据库');">[合并内容]</a>
 </span>
 <span style="display:none;" id="split_b">
-<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？合并成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
+<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？拆分成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
 </span>
-&nbsp;<?php tips('如果开启内容分表，内容表将根据id号50万数据创建一个分区<br/>如果你的数据少于50万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 500000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
+&nbsp;<?php tips('如果开启内容分表，内容表将根据id号10万数据创建一个分区<br/>如果你的数据少于10万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 100000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
 <input type="hidden" name="maxid" value="<?php echo $maxid;?>"/>
 </td>
 </tr>
@@ -171,7 +171,7 @@ X
 </tr>
 </tbody>
 
-<tr>
+<tr style="display:<?php echo $sphinx ? 'none' : '';?>;">
 <td class="tl">普通全文搜索</td>
 <td>
 <input type="radio" name="setting[fulltext]" value="1" <?php if($fulltext==1){ ?>checked <?php } ?>/> LIKE&nbsp;&nbsp;&nbsp;
@@ -186,7 +186,7 @@ X
 <br/>用 | 分隔不同别名 依次对应 1|2|3|4|5|6|7|8|9 级 <?php echo level_select('post[level]', '提交后点此预览效果');?>
 </td>
 </tr>
-<tr>
+<tr style="display:<?php echo DT_EDITOR == 'fckeditor' ? '' : 'none';?>">
 <td class="tl">编辑器批量传图</td>
 <td>
 <input type="radio" name="setting[swfu]" value="0"  <?php if($swfu==0) echo 'checked';?>/> 关闭&nbsp;&nbsp;&nbsp;&nbsp;
@@ -194,6 +194,18 @@ X
 <input type="radio" name="setting[swfu]" value="2"  <?php if($swfu==2) echo 'checked';?>/> 后台开启 <?php tips('开启后，编辑器下将增加批量传图功能，方便内容插入图片');?>
 </td>
 </tr>
+
+<tr>
+<td class="tl">在线购买</td>
+<td>
+<select name="setting[checkorder]">
+<option value="2"<?php if($checkorder == '2') echo ' selected';?>>关闭</option>
+<option value="1"<?php if($checkorder == '1') echo ' selected';?>>开启，订单需要卖家确认</option>
+<option value="0"<?php if($checkorder == '0') echo ' selected';?>>开启，订单不需要卖家确认</option>
+</select>
+</td>
+</tr>
+
 <tr>
 <td class="tl">会员必须上传一张产品图</td>
 <td>
@@ -380,7 +392,7 @@ X
 </td>
 </tr>
 <tr>
-<td class="tl">询价启用验问题</td>
+<td class="tl">询价验证问题</td>
 <td>
 <input type="radio" name="setting[question_inquiry]" value="2"  <?php if($question_inquiry == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[question_inquiry]" value="1"  <?php if($question_inquiry == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -404,7 +416,7 @@ X
 </td>
 </tr>
 <tr>
-<td class="tl">发布信息启用验问题</td>
+<td class="tl">发布信息验证问题</td>
 <td>
 <input type="radio" name="setting[question_add]" value="2"  <?php if($question_add == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[question_add]" value="1"  <?php if($question_add == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

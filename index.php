@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require 'common.inc.php';
@@ -15,10 +15,18 @@ if(isset($homepage) && check_name($homepage)) {
 	} else {
 		$whost = $host;
 	}
-	if(strpos(DT_PATH, $host) === false) {
-		$www = str_replace($CFG['com_domain'], '', $host);
-		if(check_name($www)) {
-			$username = $homepage = $www;
+	if($host && strpos(DT_PATH, $host) === false) {
+		if(substr($host, -strlen($CFG['com_domain'])) == $CFG['com_domain']) {
+			$www = substr($host, 0, -strlen($CFG['com_domain']));
+			if(check_name($www)) {
+				$username = $homepage = $www;
+			} else {
+				include load('company.lang');
+				$head_title = $L['not_company'];
+				if($DT_BOT) dhttp(404, $DT_BOT);
+				include template('com-notfound', 'message');
+				exit;
+			}
 		} else {
 			if($whost == $host) {//301 xxx.com to www.xxx.com
 				$w3 = 'www.'.$host;
@@ -55,7 +63,8 @@ if($username) {
 		if(is_file($html_file)) exit(include($html_file));
 	}
 	$AREA or $AREA = cache_read('area.php');
-	if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'];
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'];
+	$index = 1;
 	$seo_title = $DT['seo_title'];
 	$head_keywords = $DT['seo_keywords'];
 	$head_description = $DT['seo_description'];

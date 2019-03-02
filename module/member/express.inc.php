@@ -17,7 +17,7 @@ switch($action) {
 			if($do->pass($post)) {
 				$post['username'] = $_username;
 				$do->add($post);
-				dmsg($L['op_add_success'], $MOD['linkurl'].'express.php');
+				dmsg($L['op_add_success'], '?action=index');
 			} else {
 				message($do->errmsg);
 			}
@@ -62,7 +62,7 @@ switch($action) {
 			dmsg($L['op_success'], '?action=area&itemid='.$itemid);
 		} else {
 			$lists = $do->get_list("parentid=$itemid");
-			if($r['items'] != $nums) $db->query("UPDATE {$DT_PRE}mall_express SET items=$nums WHERE itemid=$itemid");
+			if($r['items'] != $items) $db->query("UPDATE {$DT_PRE}mall_express SET items=$items WHERE itemid=$itemid");
 			$area_select = ajax_area_select('post[0][areaid]', $L['choose']);
 		}
 	break;
@@ -70,7 +70,7 @@ switch($action) {
 		$condition = "username='$_username' AND parentid=0";
 		if($keyword) $condition .= " AND express LIKE '%$keyword%'";
 		$lists = $do->get_list($condition);
-		$limit_used = $nums;
+		$limit_used = $items;
 		$limit_free = $MG['express_limit'] && $MG['express_limit'] > $limit_used ? $MG['express_limit'] - $limit_used : 0;	
 	break;
 }

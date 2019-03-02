@@ -8,30 +8,46 @@
 <li><input type="{$type}" name="vote[]" value="{$k}" id="vote_{$itemid}_{$k}"/> <label for="vote_{$itemid}_{$k}"> {$v}</label></li>
 {/loop}
 </ul>
+{if $verify == 1}
+<p>验证码&nbsp;&nbsp;
+{template 'captcha', 'chip'}</p>
+{/if}
+{if $verify == 2}
+<p>验证问题&nbsp;&nbsp;{template 'question', 'chip'}</p>
+{/if}
 <p><input type="submit" value="投票"/>
 <input type="button" value="结果" onclick="Go('{$linkurl}');"/></p>
 </form>
 </div>
 <script type="text/javascript">
 function check_vote_{$itemid}() {
-	var inputs = Dd('vote_{$itemid}').getElementsByTagName('input');
-	var inputs_length = inputs.length;
-	var selected = 0;
-	for(var i = 0; i < inputs_length; i++) {
-		if(inputs[i].type == '{$type}' && inputs[i].checked == true) selected++;
-	}
+	var c = checked_count('vote_{$itemid}');
 	{if $type=='radio'}
-	if(selected == 0) {
+	if(c == 0) {
 		alert('请选择投票选项');
 		return false;
 	}
 	{else}
-	if(selected < {$vote_min}) {
+	if(c < {$vote_min}) {
 		alert('最少需要选择{$vote_min}个投票选项');
 		return false;
 	}
-	if(selected > {$vote_max}) {
+	if(c > {$vote_max}) {
 		alert('最多可选择{$vote_max}个投票选项');
+		return false;
+	}
+	{/if}
+	{if $verify == 1}
+	if(!is_captcha(Dd('captcha').value)) {
+		alert('请填写验证码');
+		Dd('captcha').focus();
+		return false;
+	}
+	{/if}
+	{if $verify == 2}
+	if(Dd('answer').value == '') {
+		alert('请回答验证问题');
+		Dd('answer').focus();
 		return false;
 	}
 	{/if}

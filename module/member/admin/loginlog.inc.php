@@ -1,22 +1,18 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('登录日志', '?moduleid='.$moduleid.'&file='.$file),
-    array('日志清理', '?moduleid='.$moduleid.'&file='.$file.'&action=clear', 'onclick="if(!confirm(\'为了系统安全,系统仅删除90天之前的日志\n此操作不可撤销，请谨慎操作\')) return false"'),
+    array('日志清理', '?moduleid='.$moduleid.'&file='.$file.'&action=clear', 'onclick="if(!confirm(\'为了系统安全,系统仅删除30天之前的日志\n此操作不可撤销，请谨慎操作\')) return false"'),
 );
 switch($action) {
 	case 'clear':
-		$time = $today_endtime - 90*86400;
+		$time = $today_endtime - 30*86400;
 		$db->query("DELETE FROM {$DT_PRE}login WHERE logintime<$time");
 		dmsg('清理成功', $forward);
 	break;
-	case 'md':
-		echo md5(md5($password));
-		exit;
-	break;
 	case 'cp':
-		$r = $db->get_one("SELECT password FROM {$DT_PRE}login WHERE logid='$logid'");
-		echo $r['password'] == $password ? '匹配' : '不匹配';
+		$r = $db->get_one("SELECT password,passsalt FROM {$DT_PRE}login WHERE logid='$logid'");
+		echo ($r['password'] == dpassword($password, $r['passsalt'])) ? '匹配' : '不匹配';
 		exit;
 	break;
 	default:

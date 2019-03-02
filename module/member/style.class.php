@@ -7,11 +7,15 @@ class style {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function style() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'style';
 		$this->db = &$db;
 		$this->fields = array('typeid','title','skin','template','author','groupid','fee','currency','hits', 'addtime','editor','edittime');
+    }
+
+    function style() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -35,6 +39,7 @@ class style {
 		$post['editor'] = $_username;		
 		$post['groupid'] = (isset($post['groupid']) && $post['groupid']) ? ','.implode(',', $post['groupid']).',' : '';
 		$post['fee'] = dround($post['fee']);
+		$post = dhtmlspecialchars($post);
 		return array_map("trim", $post);
 	}
 
@@ -51,6 +56,7 @@ class style {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$GROUP = cache_read('group.php');
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");

@@ -1,11 +1,11 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 isset($auth) or exit;
-$d = decrypt($auth);
+$d = decrypt($auth, DT_KEY.'SYNC');
 strpos($d, '-') !== false or exit;
 $t = explode('-', $d);
 $moduleid = intval($t[0]);

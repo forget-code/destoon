@@ -45,7 +45,7 @@ if($verify_result) {//验证成功
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//请在这里加上商户的业务逻辑程序代
 	
-	//——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
+	//――请根据您的业务逻辑来编写程序（以下代码仅作参考）――
     //获取支付宝的通知返回参数，可参考技术文档中服务器异步通知参数列表
     $out_trade_no	= intval($_POST['out_trade_no']);	    //获取订单号
     $trade_no		= $_POST['trade_no'];	    	//获取支付宝交易号
@@ -87,6 +87,12 @@ if($verify_result) {//验证成功
 			$db->query("UPDATE {$DT_PRE}mall_order SET trade_no='$trade_no',status=2,updatetime=$DT_TIME WHERE itemid=$itemid");
 			$db->query("UPDATE {$DT_PRE}member SET trade='$seller_email',vtrade=1 WHERE username='$seller' AND vtrade=0");
 			$db->query("UPDATE {$DT_PRE}member SET trade='$buyer_email',vtrade=1 WHERE username='$buyer' AND vtrade=0");
+			//更新商品数据
+			if($td['mid'] == 16) {
+				$db->query("UPDATE {$DT_PRE}mall SET orders=orders+1,sales=sales+$td[number],amount=amount-$td[number] WHERE itemid=$mallid");
+			} else {
+				$db->query("UPDATE ".get_table($td['mid'])." SET amount=amount-$td[number] WHERE itemid=$mallid");
+			}
 
 			$myurl = userurl($td['buyer']);
 			$_username = $td['seller'];
@@ -147,9 +153,6 @@ if($verify_result) {//验证成功
 			//如果有做过处理，不执行商户的业务程序
 		if($td['status'] == 3) {
 			$db->query("UPDATE {$DT_PRE}mall_order SET status=4,updatetime=$DT_TIME WHERE itemid=$itemid");
-			//更新商品数据
-			$db->query("UPDATE {$DT_PRE}mall SET orders=orders+1,sales=sales+$td[number],amount=amount-$td[number] WHERE itemid=$mallid");
-
 			$myurl = userurl($td['buyer']);
 			$_username = $td['seller'];			
 			//send message
@@ -186,7 +189,7 @@ if($verify_result) {//验证成功
         //logResult ("这里写入想要调试的代码变量值，或其他运行的结果记录");
     }
 
-	//——请根据您的业务逻辑来编写程序（以上代码仅作参考）——
+	//――请根据您的业务逻辑来编写程序（以上代码仅作参考）――
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -121,10 +121,17 @@ $L['poll_error_6'] = '投票尚未开始';
 $L['poll_error_7'] = '投票已经结束';
 $L['poll_error_8'] = '您已经投过此票';
 $L['poll_error_9'] = '最多可投{V0}票';
+$L['form_title'] = '表单问卷';
+$L['form_repeat'] = '您已经参与过，请勿重复提交';
+$L['form_other'] = '其他';
+$L['form_choose'] = '请选择{V0}';
+$L['form_min_word'] = '{V0}最少{V1}字';
+$L['form_max_word'] = '{V0}最多{V1}字';
+$L['form_min_choose'] = '{V0}最少选择{V1}项';
+$L['form_max_choose'] = '{V0}最多选择{V1}项';
 $L['rss_title'] = 'RSS订阅';
 $L['rss_area'] = '选择地区';
 $L['rss_close'] = '系统未开启RSS订阅';
 $L['sitemap_title'] = '网站地图';
 $L['view_title'] = '查看大图';
-$L['mobile_title'] = '手机浏览';
 ?>

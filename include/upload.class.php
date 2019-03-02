@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -23,7 +23,7 @@ class upload {
 	var $uptime = 0;
 	var $adduserid = true;
 
-    function upload($_file, $savepath, $savename = '', $fileformat = '') {
+    function __construct($_file, $savepath, $savename = '', $fileformat = '') {
 		global $DT, $_userid;
 		foreach($_file as $file) {
 			$this->file = $file['tmp_name'];
@@ -38,6 +38,10 @@ class upload {
 		$this->maxsize = $DT['uploadsize'] ? $DT['uploadsize']*1024 : 2048*1024;
 		$this->savepath = $savepath;
 		$this->savename = $savename;
+    }
+
+    function upload($_file, $savepath, $savename = '', $fileformat = '') {
+		$this->__construct($_file, $savepath, $savename, $fileformat);
     }
 
 	function save() {
@@ -78,8 +82,8 @@ class upload {
             $this->savename = $this->adduserid ? str_replace('.'.$this->ext, $this->userid.'.'.$this->ext, $savename) : $savename;
         } else {
 			$this->uptime = $DT_TIME;
-            $name = date('H-i-s', $this->uptime).'-'.rand(10, 99);
-            $this->savename = $this->adduserid ? $name.'-'.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
+            $name = date('His', $this->uptime).mt_rand(10, 99);
+            $this->savename = $this->adduserid ? $name.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
         }
 		$this->saveto = $this->savepath.$this->savename;		
         if(!$this->overwrite && is_file(DT_ROOT.'/'.$this->saveto)) {

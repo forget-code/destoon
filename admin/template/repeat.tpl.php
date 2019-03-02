@@ -1,10 +1,11 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <div class="tt">检测条件</div>
-<form method="post" action="?">
+<form action="?">
+<input type="hidden" name="ok" value="1"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>

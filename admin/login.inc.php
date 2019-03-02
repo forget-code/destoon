@@ -1,12 +1,11 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $DT_LICENSE = md5(file_get(DT_ROOT.'/license.txt'));
-#exit($DT_LICENSE);
-if($DT_LICENSE != 'ede11fdcdb179260657dba4f3fc42b0e' && $DT_LICENSE != '624100e3dd1887d79ef4c713f0f30cb2') msg('网站根目录license.txt不允许修改或删除，请检查');
+if($DT_LICENSE != '15b4b2ae1be9e2020f8de85fc4d81148' && $DT_LICENSE != '49ced4ae66626e1d9d261a7dcaac2ff9') msg('网站根目录license.txt不允许修改或删除，请检查');
 if(!$forward) $forward = '?';
 if($_destoon_admin && $_userid && $_destoon_admin == $_userid) dheader($forward);
 if($DT['admin_area']) {
@@ -41,7 +40,7 @@ if($submit) {
 	if($user) {
 		if($user['groupid'] != 1 || $user['admin'] < 1) msg('您无权限访问后台', $MODULE[2]['linkurl'].'logout.php?forward='.urlencode(DT_PATH));
 		if($user['userid'] != $CFG['founderid']) {
-			if(($DT['admin_week'] && !check_period($DT['admin_week'])) || ($DT['admin_hour'] && !check_period($DT['admin_hour']))) {
+			if(($DT['admin_week'] && !check_period(','.$DT['admin_week'])) || ($DT['admin_hour'] && !check_period($DT['admin_hour']))) {
 				set_cookie('auth', '');
 				dalert('未被允许的管理时间', $MODULE[2]['linkurl'].'logout.php?forward='.urlencode(DT_PATH));
 			}
@@ -55,10 +54,10 @@ if($submit) {
 		$admin = new admin;
 		$admin->cache_right($user['userid']);
 		$admin->cache_menu($user['userid']);
-		if($DT['login_log']) $do->login_log($username, $password, 1);
+		if($DT['login_log']) $do->login_log($username, $password, $user['passsalt'], 1);
 		dheader($forward);
 	} else {
-		if($DT['login_log']) $do->login_log($username, $password, 1, $do->errmsg);
+		if($DT['login_log']) $do->login_log($username, $password, $user['passsalt'], 1, $do->errmsg);
 		msg($do->errmsg);
 	}
 } else {

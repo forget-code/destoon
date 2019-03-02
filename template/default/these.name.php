@@ -5,6 +5,7 @@ $names = array (
   'buy' => '求购模板',
   'chip' => '模板片断',
   'city' => '城市分站',
+  'club' => '商圈模板',
   'company' => '公司模板',
   'down' => '下载模板',
   'exhibit' => '展会模板',
@@ -21,13 +22,12 @@ $names = array (
   'mall' => '商城模板',
   'member' => '商务中心',
   'message' => '提示信息',
+  'mobile' => '手机版',
   'photo' => '图库模板',
   'quote' => '行情模板',
   'sell' => '供应模板',
   'special' => '专题模板',
   'tag' => '标签模板',
-  'touch' => '手机触屏版',
   'video' => '视频模板',
-  'wap' => '手机普通版',
 );
 ?>

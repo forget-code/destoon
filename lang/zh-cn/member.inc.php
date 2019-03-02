@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -23,8 +23,6 @@ $L['limit_add'] = '最多可添加{V0}条记录,当前已添加{V1}条记录';
 $L['default_type'] = '默认';
 $L['all_type'] = '所有分类';
 $L['choose_type'] = '请选择分类';
-$L['check_auth'] = '您的请求未通过系统验证';//global.func
-$L['auth_time'] = '您的请求已经过期';
 $L['check_sign'] = '数据校验失败';
 $L['goto'] = '转到';
 $L['job_name'] = '招聘';
@@ -51,6 +49,10 @@ $L['pass_content'] = '请填写内容';
 $L['pass_typeid'] = '请选择分类';
 $L['pass_url'] = '请填写网址';
 
+$L['address_title'] = '收货地址';
+$L['address_title_add'] = '添加地址';
+$L['address_title_edit'] = '修改地址';
+
 $L['alert_pass'] = '您至少选择"关键字"或"所在行业"其中的一项';
 $L['alert_title'] = '贸易提醒';
 $L['alert_add_title'] = '添加提醒';
@@ -61,13 +63,16 @@ $L['ask_title_show'] = '问题查看';
 $L['ask_title_edit'] = '修改问题';
 $L['ask_title_add'] = '提交新问题';
 $L['ask_msg_edit'] = '此问题不可再修改';
-$L['ask_msg_star'] = '请选择您的满意程度';
-$L['ask_star_type'] = array('', '<span style="color:red;">不满意</span>', '基本满意', '<span style="color:green;">非常满意</span>');
+$L['ask_star_type'] = array('未评分', '<span style="color:red;">不满意</span>', '基本满意', '<span style="color:green;">非常满意</span>');
 $L['ask_star_success'] = '评分成功';
 $L['ask_add_success'] = '提交成功';
 
 $L['avatar_title'] = '管理头像';
 $L['avatar_delete'] = '删除成功';
+$L['avatar_img_t'] = '图片格式错误';
+$L['avatar_img_w'] = '图片宽度小于128px';
+$L['avatar_img_h'] = '图片高度小于128px';
+$L['avatar_img_e'] = '上传失败，请重试';
 
 $L['cash_status'] = array('<span style="color:blue;">等待受理</span>', '<span style="color:#666666;">拒绝申请</span>', '<span style="color:red;">支付失败</span>', '<span style="color:green;">付款成功</span>');
 $L['cash_title_record'] = '提现记录';
@@ -75,22 +80,24 @@ $L['cash_title_setting'] = '帐号设置';
 $L['cash_title_confirm'] = '提现确认';
 $L['cash_title'] = '申请提现';
 $L['cash_pass_bank'] = '请选择收款方式';
+$L['cash_pass_branch'] = '请填写开户网点';
 $L['cash_pass_account'] = '请填写收款帐号';
 $L['cash_pass_amount'] = '请填写提现金额';
 $L['cash_pass_amount_min'] = '单次提现最小金额为:';
 $L['cash_pass_amount_max'] = '单次提现最大金额为:';
-$L['cash_pass_amount_day'] = '24小时内最多可提现{v0}次，请稍候再操作';
+$L['cash_pass_amount_day'] = '24小时内最多可提现{V0}次，请稍候再操作';
 $L['cash_pass_amount_large'] = '提现金额大于可用余额';
 $L['cash_msg_success'] = '您的提现申请已经提交，请等待工作人员的处理<br/>在此期间，该笔'.$DT['money_name'].'将被冻结';
 $L['cash_msg_account'] = '请先设置收款帐号';
 
 $L['charge'] = '充值';
+$L['charge_id'] = '流水号';
 $L['charge_online'] = '在线充值';
 $L['charge_card'] = '充值卡充值';
 $L['charge_reward'] = '充值奖励';
 $L['charge_card_name'] = '充值卡';
 $L['charge_card_number'] = '卡号';
-$L['charge_status'] = array('<span style="color:blue;">未知</span>', '<span style="color:red;">失败</span>', '<span style="color:#FF00FF;">作废</span>', '<span style="color:green;">成功</span>', '<span style="color:green;">人工</span>');
+$L['charge_status'] = array('<span style="color:blue;">等待支付</span>', '<span style="color:red;">支付失败</span>', '<span style="color:red;">支付失败</span>', '<span style="color:green;">支付成功</span>', '<span style="color:green;">支付成功</span>');
 $L['charge_title_record'] = '充值记录';
 $L['charge_title_confirm'] = '充值确认';
 $L['charge_title_pay'] = '帐户充值';
@@ -110,19 +117,23 @@ $L['charge_msg_card_success'] = '充值卡充值成功';
 $L['charge_msg_order_fail'] = '订单状态为失败，ID:';
 $L['charge_msg_order_cancel'] = '订单状态为作废，ID:';
 $L['charge_msg_not_order'] = '未找到充值纪录';
+$L['charge_reason_deposit'] = '保证金';
+$L['charge_reason_credit'] = '积分购买';
+$L['charge_reason_vip'] = VIP.'续费';
+$L['charge_reason_muti'] = '批量付款';
 
-$L['honor_title_add'] = '添加证书';
-$L['honor_title_edit'] = '修改证书';
-$L['honor_title'] = '荣誉资质';
-$L['honor_pass_title'] = '请填写证书名称';
-$L['honor_pass_authority'] = '请填写发证机构';
-$L['honor_pass_thumb'] = '请上传证书图片';
-$L['honor_pass_fromdate'] = '请选择证书发证时间';
-$L['honor_pass_fromdate_error'] = '证书发证时间必须在当前时间之前';
-$L['honor_pass_todate'] = '请选择证书到期时间';
-$L['honor_pass_todate_error'] = '证书到期时间必须在当前时间之后';
-$L['honor_reward_reason'] = '证书上传';
-$L['honor_punish_reason'] = '证书删除';
+$L['chat_title'] = '站内交谈';
+$L['chat_online'] = '[在线]';
+$L['chat_offline'] = '[离线]';
+$L['chat_empty'] = '暂无对话';
+$L['chat_record'] = '与【{V0}】聊天记录';
+$L['chat_with'] = '与【{V0}】交谈中';
+$L['chat_msg_black'] = '未指定屏蔽对象';
+$L['chat_msg_black_success'] = '屏蔽成功';
+$L['chat_msg_self'] = '不能与自己对话';
+$L['chat_msg_no_rights'] = '您所在的会员组没有权限发起对话';
+$L['chat_msg_user'] = '会员不存在';
+$L['chat_msg_refuse'] = '对方拒绝与您对话';
 
 $L['credit_exchange_title'] = $DT['credit_name'].'兑换';
 $L['credit_buy_title'] = $DT['credit_name'].'购买';
@@ -134,6 +145,9 @@ $L['credit_msg_active'] = '您的帐号未在论坛激活';
 $L['credit_msg_buy_amount'] = '请选择购买额度';
 $L['credit_msg_buy_success'] = '购买成功';
 $L['credit_fields'] = array($L['search_by'], '金额', '事由', $L['search_by_note']);
+
+$L['deposit_title'] = '保证金记录';
+$L['deposit_title_add'] = '保证金增资';
 
 $L['edit_title'] = '修改资料';
 $L['edit_invite'] = '会员推广';
@@ -176,6 +190,20 @@ $L['home_title'] = '商铺设置';
 $L['home_msg_reset'] = '恢复成功';
 $L['home_msg_save'] = '保存成功';
 
+$L['honor_title_add'] = '添加证书';
+$L['honor_title_edit'] = '修改证书';
+$L['honor_title'] = '荣誉资质';
+$L['honor_pass_title'] = '请填写证书名称';
+$L['honor_pass_authority'] = '请填写发证机构';
+$L['honor_pass_thumb'] = '请上传证书图片';
+$L['honor_pass_fromdate'] = '请选择证书发证时间';
+$L['honor_pass_fromdate_error'] = '证书发证时间必须在当前时间之前';
+$L['honor_pass_todate'] = '请选择证书到期时间';
+$L['honor_pass_todate_error'] = '证书到期时间必须在当前时间之后';
+$L['honor_reward_reason'] = '证书上传';
+$L['honor_punish_reason'] = '证书删除';
+$L['honor_msg_choose'] = '请选择证书';
+
 $L['index_msg_logout'] = '注销成功';
 $L['index_msg_note_limit'] = '便笺限1000字';
 
@@ -210,10 +238,10 @@ $L['member_username_match'] = '会员名应为小写字母(a-z)、数字(0-9)、
 $L['member_username_len'] = '会员登录名长度应在{V0}-{V1}之间';
 $L['member_username_ban'] = '此登录名已经被禁止注册';
 $L['member_username_reg'] = '会员登录名已经被注册';
-$L['member_passport_len'] = '通行证长度应在{V0}-{V1}之间';
-$L['member_passport_char'] = '通行证名不能含有特殊符号';
-$L['member_passport_ban'] = '此通行证名已经被禁止注册';
-$L['member_passport_reg'] = '通行证名已经被注册';
+$L['member_passport_len'] = '昵称长度应在{V0}-{V1}之间';
+$L['member_passport_char'] = '昵称不能含有特殊符号';
+$L['member_passport_ban'] = '此昵称已经被禁止注册';
+$L['member_passport_reg'] = '昵称已经被注册';
 $L['member_password_null'] = '会员登录密码不能为空';
 $L['member_password_match'] = '两次输入的密码不一致';
 $L['member_password_len'] = '登录密码长度应在{V0}-{V1}之间';
@@ -292,6 +320,9 @@ $L['news_record_add'] = '新闻发布';
 $L['news_record_del'] = '新闻删除';
 $L['news_msg_choose'] = '请选择新闻';
 
+$L['oauth_title'] = '一键登录';
+$L['oauth_quit'] = '解除成功';
+
 $L['page_title'] = '公司单页';
 $L['page_title_add'] = '添加单页';
 $L['page_title_edit'] = '修改单页';
@@ -299,17 +330,12 @@ $L['page_record_add'] = '单页发布';
 $L['page_record_del'] = '单页删除';
 $L['page_msg_choose'] = '请选择单页';
 
-$L['address_title'] = '收货地址';
-$L['address_title_add'] = '添加地址';
-$L['address_title_edit'] = '修改地址';
-$L['address_record_add'] = '地址发布';
-$L['address_record_del'] = '地址删除';
-$L['address_msg_choose'] = '请选择地址';
-
 $L['pay_title'] = '站内支付';
 $L['pay_record_view'] = '信息查看';
 $L['pay_record_back'] = '信息返利';
 $L['pay_msg_fee'] = '支付金额错误';
+
+$L['profile_title'] = '账户详情';
 
 $L['record_title'] = $DT['money_name'].'流水';
 $L['record_title_login'] = '登录记录';
@@ -320,18 +346,13 @@ $L['register_title'] = '会员注册';
 $L['register_msg_close'] = '管理员关闭了用户注册';
 $L['register_msg_agent'] = '您的客户端信息已经被网站屏蔽<br/>如有疑问，请与我们联系';
 $L['register_msg_ip'] = '同一IP{V0}小时内只能注册一次';
-$L['register_msg_passport'] = '通行证名已经存在\n\n如果此通行证名是您注册的，请填写正确的密码\n\n如果不是您注册的，请更换通行证名';
+$L['register_msg_passport'] = '昵称已经存在\n\n如果此会员是您注册的，请填写正确的密码\n\n如果不是您注册的，请更换昵称再试';
 $L['register_msg_activate'] = $DT['sitename'].'用户注册激活信';
 $L['register_msg_welcome'] = '欢迎加入'.$DT['sitename'];
 $L['register_pass_groupid'] = '请选择会员组';
-$L['register_msg_emailcode'] = $DT['sitename'].'用户注册邮件验证码';
+$L['register_msg_emailcode'] = $DT['sitename'].'用户邮件验证码';
 $L['register_pass_emailcode'] = '邮件验证码错误';
 $L['register_pass_mobilecode'] = '手机验证码错误';
-
-$L['renew_title'] = VIP.'服务续费';
-$L['renew_msg_fee'] = '支付金额错误';
-$L['renew_msg_success'] = '续费成功';
-$L['renew_record'] = '{V0}年,{V1}到期';
 
 $L['send_mail_close'] = '系统未开启邮件发送';
 $L['send_sms_close'] = '系统未开启短信发送';
@@ -355,7 +376,7 @@ $L['send_email_title'] = '修改Email';
 $L['send_mobile_exist'] = '手机号码已经被占用，请更换';
 $L['send_mobile_fail'] = '短信发送失败，请重试';
 $L['send_mobile_success'] = '手机修改成功';
-$L['send_mobile_code_error'] = '认证码错误';
+$L['send_mobile_code_error'] = '验证码错误';
 $L['send_mobile_bad'] = '手机号码格式不正确';
 $L['send_mobile_record'] = '修改手机';
 $L['send_mobile_title'] = '修改手机';
@@ -364,6 +385,7 @@ $L['send_password_checking'] = '您的帐号尚未通过审核';
 $L['send_password_error'] = '提供的信息不匹配';
 $L['send_password_mail'] = $DT['sitename'].'用户找回密码';
 $L['send_password_title'] = '找回密码';
+$L['send_passport_title'] = '修改昵称';
 
 $L['sendmail_title'] = '发送电子邮件';
 $L['sendmail_content'] = '您的好友 <strong><a href="{V0}" target="_blank">{V1}</a></strong> 向您推荐如下信息:<br/><br/>{V2}<br/><a href="{V3}" target="_blank">{V3}</a><br/><br/>附言：';
@@ -372,6 +394,8 @@ $L['sendmail_pass_mailto'] = '请填写正确的收件人地址';
 $L['sendmail_success'] = '邮件已发送至{V0}';
 $L['sendmail_fail'] = '邮件发送失败，请重试';
 
+$L['sms_code'] = '验证码';
+$L['sms_msg_max'] = '今日已达发送上限，请明日再试';
 $L['sms_msg_validate'] = '请先认证您的手机号码';
 $L['sms_msg_buy'] = '请先购买短信';
 $L['sms_msg_mobile'] = '请填写正确的手机号码';
@@ -389,10 +413,6 @@ $L['sms_record_title'] = '接收记录';
 $L['sms_send_title'] = '发送记录';
 $L['sms_title'] = '短信记录';
 $L['sms_sfields'] = array($L['search_by'], '金额', '事由', $L['search_by_note']);
-
-$L['type_title'] = '{V0}分类管理';
-$L['type_names'] = array('friend'=>'商友', 'favorite'=>'收藏', 'product'=>'供应', 'mall'=>'商品', 'news'=>'新闻');
-$L['type_msg_limit'] = '最多可添加{V0}个分类';
 
 $L['style_title'] = '模板设置';
 $L['style_title_buy'] = '模板购买';
@@ -413,111 +433,14 @@ $L['style_pass_template_match'] = '只能使用字母(A-Z,a-z)、数字(0-9)、�
 $L['style_pass_dir'] = '模板目录不存在';
 $L['style_pass_groupid'] = '请选择会员组';
 
-$L['trade_status'] = array(
-	'<span style="color:#0000FF;">买家发起订单<br/>等待卖家确认</span>',
-	'<span style="color:#FF6600;">等待买家付款</span>',
-	'<span style="color:#008080;">买家已付款<br/>等待卖家发货</span>',
-	'<span style="color:#FF0000;">卖家已发货<br/>等待买家确认</span>',
-	'<span style="color:#008000;">交易成功</span>',
-	'<span style="color:#FF0000;text-decoration:underline;">买家申请退款</span>',
-	'<span style="color:#0000FF;text-decoration:underline;">已退款给买家</span>',
-	'<span style="color:#FF6600;text-decoration:underline;">已付款给卖家</span>',
-	'<span style="color:#888888;text-decoration:line-through;">买家关闭交易</span>',
-	'<span style="color:#888888;text-decoration:line-through;">卖家关闭交易</span>',
-);
-$L['trade_dstatus'] = array(
-	'买家发起订单,等待卖家确认',
-	'等待买家付款',
-	'买家已付款,等待卖家发货',
-	'卖家已发货,等待买家确认',
-	'交易成功',
-	'买家申请退款',
-	'已退款给买家',
-	'已付款给卖家',
-	'买家关闭交易',
-	'卖家关闭交易',
-);
-$L['trade_msg_deny'] = '您无权进行此操作';
-$L['trade_msg_null'] = '订单不存在';
-$L['trade_price_fee_null'] = '请填写附加金额';
-$L['trade_price_fee_name'] = '请填写附加金额名称';
-$L['trade_price_edit_success'] = '订单修改成功';
-$L['trade_price_title'] = '修改价格';
-$L['trade_detail_title'] = '订单详情';
-$L['trade_confirm_success'] = '订单已确认，请等待买家付款';
-$L['trade_pay_order_success'] = '支付成功，金额暂时被锁定，请等待卖家发货';
-$L['trade_pay_order_title'] = '订单支付';
-$L['trade_refund_reason'] = '请填写理由及证据';
-$L['trade_refund_success'] = '您的退款申请已经提交，请等待网站处理';
-$L['trade_refund_title'] = '申请退款';
-$L['trade_send_success'] = '已经确认发货，请等待买家确认收货';
-$L['trade_send_title'] = '确认发货';
-$L['trade_receive_title'] = '确认到货';
-$L['trade_addtime_null'] = '请填写延长的时间';
-$L['trade_addtime_success'] = '买家确认时间延长成功';
-$L['trade_addtime_title'] = '延长买家确认时间';
-$L['trade_success'] = '恭喜！此订单交易成功';
-$L['trade_close_success'] = '交易已关闭';
-$L['trade_delete_success'] = '订单删除成功';
-$L['trade_pay_seller'] = '请填写收款会员名';
-$L['trade_pay_self'] = '收款人不能是自己';
-$L['trade_pay_seller_bad'] = '收款会员名不存在，请确认';
-$L['trade_pay_amount'] = '请填写付款金额';
-$L['trade_pay_note'] = '请填写付款说明';
-$L['trade_pay_goods'] = '请填写商品或服务名称';
-$L['trade_pay_title'] = '我要付款';
-$L['trade_pay1_success'] = '直接付款成功，会员[{V0}]将直接收到您的付款';
-$L['trade_pay0_success'] = '订单已经发出，请等待卖家确认';
-$L['trade_order_sfields'] = array('按条件', '商品', '金额', '附加金额', '附加名称', '卖家', '发货方式', '物流号码', '备注');
-$L['trade_order_title'] = '发出的订单';
-$L['trade_sfields'] = array('按条件', '商品', '金额', '附加金额', '附加名称', '买家', '买家姓名', '买家地址', '买家邮编', '买家手机', '买家电话', '发货方式', '物流号码', '备注');
-$L['trade_title'] = '收到的订单';
-$L['trade_record_pay'] = '订单货到付款';
-$L['trade_record_payfor'] = '站内付款';
-$L['trade_record_receive'] = '站内收款';
-$L['trade_record_new'] = '通知卖家确认订单';
-$L['trade_order_id'] = '订单号:';
-$L['trade_buyer_timeout'] = '订单号{V0}[买家超时]';
-$L['trade_sms_confirm'] = '通知买家付款';
-$L['trade_sms_pay'] = '通知卖家发货';
-$L['trade_sms_send'] = '通知买家已发货';
-$L['trade_sms_income'] = '站内付款通知';
-$L['trade_sms_receive'] = '通知卖家已收货';
-$L['trade_message_t1'] = '站内交易提醒，您有一笔交易需要付款(T{V0})';
-$L['trade_message_c1'] = '卖家 <a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 更新了您的订单<br/><a href="{V3}" class="t" target="_blank">&raquo; 请点这里立即处理或查看详情</a>';
-$L['trade_message_t2'] = '站内交易提醒，您有一笔交易需要发货(T{V0})';
-$L['trade_message_c2'] = '买家 <a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 支付了您的订单<br/><a href="{V3}" class="t" target="_blank">&raquo; 请点这里立即处理或查看详情</a>';
-$L['trade_message_t3'] = '站内交易提醒，您有一笔交易需要收货(T{V0})';
-$L['trade_message_c3'] = '卖家 <a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 已经发货<br/><a href="{V3}" class="t" target="_blank">&raquo; 请点这里立即处理或查看详情</a>';
-$L['trade_message_t4'] = '站内交易提醒，您有一笔交易已经成功(T{V0})';
-$L['trade_message_c4'] = '买家 <a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 确认收货，交易完成<br/><a href="{V3}" class="t" target="_blank">&raquo; 请点这里立即处理或查看详情</a>';
-$L['trade_message_t5'] = '站内收入提醒，您收到一笔付款';
-$L['trade_message_c5'] = '<a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 向您支付了 <span class="f_blue">{V3}'.$DT['money_unit'].'</span> 的站内付款<br/>备注：<span class="f_gray">{V4}</span>';
-$L['trade_message_t6'] = '站内交易提醒，您有一笔交易需要确认(T{V0})';
-$L['trade_message_c6'] = '<a href="{V0}" class="t">{V1}</a> 于 <span class="f_gray">{V2}</span> 向您订购了：<br/>{V3}<br/>订单编号：<span class="f_red">T{V4}</span> &nbsp;订单金额为：<span class="f_blue f_b">{V5}'.$DT['money_unit'].'</span><br/><a href="{V6}" class="t" target="_blank">&raquo; 请点这里立即处理或查看详情</a>';
+$L['support_title'] = '客服专员';
+$L['support_error_1'] = '系统暂未为您分配客服专员';
+$L['support_error_2'] = '客服专员不存在，请与网站联系';
 
-$L['group_status'] = array(
-	'<span style="color:#0000FF;">已付款</span>',
-	'<span style="color:#FF0000;">已发货</span>',
-	'<span style="color:#FF6600;">已消费</span>',
-	'<span style="color:#008000;">交易成功</span>',
-	'<span style="color:#888888;text-decoration:line-through;">已退款</span>',
-);
-$L['group_dstatus'] = array(
-	'已付款',
-	'已发货',
-	'已消费',
-	'交易成功',
-	'已退款',
-);
-$L['group_detail_title'] = '订单详情';
-
-$L['group_title'] = '收到的团购订单';
-$L['group_sfields'] = array('按条件', '商品', '金额', '密码', '买家', '买家姓名', '买家地址', '买家邮编', '买家手机', '买家电话', '发货方式', '物流号码', '备注');
-
-$L['group_order_title'] = '团购订单';
-$L['group_order_sfields'] = array('按条件', '商品', '金额', '密码', '卖家', '发货方式', '物流号码', '备注');
-$L['group_send_title'] = '商家发货';
+$L['type_title'] = '{V0}分类管理';
+$L['type_names'] = array('friend'=>'商友', 'favorite'=>'收藏', 'product'=>'供应', 'mall'=>'商品', 'news'=>'新闻');
+$L['type_msg_limit'] = '最多可添加{V0}个分类';
+$L['type_parent'] = '上级分类';
 
 $L['validate_email_exist'] = 'Email地址已经被使用，请更换';
 $L['validate_email_success'] = '您的邮件认证成功';
@@ -528,7 +451,7 @@ $L['validate_mobile_exist'] = '手机号码已经被占用，请更换';
 $L['validate_mobile_title'] = '手机认证';
 $L['validate_mobile_success'] = '您的手机认证成功';
 $L['validate_mobile_fail'] = '短信发送失败，请重试';
-$L['validate_mobile_code_error'] = '认证码错误';
+$L['validate_mobile_code_error'] = '验证码错误';
 $L['validate_mobile_bad'] = '手机号码格式不正确';
 $L['validate_mobile_record'] = '手机认证';
 $L['validate_truename_title'] = '实名认证';
@@ -541,10 +464,19 @@ $L['validate_company_image'] = '请上传证件图片';
 $L['validate_company_success'] = '提交成功';
 $L['validate_bank_title'] = '银行帐号认证';
 
-$L['oauth_title'] = '一键登录';
-$L['oauth_quit'] = '解除成功';
+$L['vip_title'] = VIP.'信息';
+$L['vip_renew'] = VIP.'服务续费';
+$L['vip_msg_fee'] = '支付金额错误';
+$L['vip_msg_success'] = '续费成功';
+$L['vip_record'] = '{V0}年,{V1}到期';
 
-$L['support_title'] = '客服专员';
-$L['support_error_1'] = '系统暂未为您分配客服专员';
-$L['support_error_2'] = '客服专员不存在，请与网站联系';
+$L['weixin_title'] = '微信关注';
+$L['weixin_push_open'] = '开启成功';
+$L['weixin_push_close'] = '关闭成功';
+
+#R20151125+
+$L['send_too_many'] = '尝试次数过多，请稍后再试';
+$L['send_too_quick'] = '发送频率过快，请稍后再试';
+$L['send_bad_email'] = '邮件地址不存在';
+$L['send_bad_mobile'] = '认证手机号码不存在';
 ?>

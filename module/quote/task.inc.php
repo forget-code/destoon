@@ -44,10 +44,11 @@ if($html == 'show') {
 			$content = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 			$content = $content['content'];
 			if($user_status == 2) $description = get_description($content, $MOD['pre_view']);
-			if(strpos($content, '[pagebreak]') !== false) {
-				$content = explode('[pagebreak]', $content);
+			if(strpos($content, '<hr class="de-pagebreak" />') !== false) {
+				$content = explode('<hr class="de-pagebreak" />', $content);
 				$total = count($content);
-				$pages = showpages($item, $total, $page);
+				$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
+				if($pages) $pages = substr($pages, 0, strpos($pages, '<cite>'));
 				$content = $content[$page-1];
 			}
 			if($MOD['keylink']) $content = keylink($content, $moduleid);
@@ -58,7 +59,7 @@ if($html == 'show') {
 	$update = '';
 	include DT_ROOT.'/include/update.inc.php';
 	echo 'Inner("hits", \''.$item['hits'].'\');';
-	if($MOD['show_html'] && $edittime > @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl'])) tohtml('show', $module);
+	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
 	if($MOD['list_html'] && $task_list && $CAT) {

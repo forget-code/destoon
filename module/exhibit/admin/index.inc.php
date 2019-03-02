@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/exhibit.class.php';
 $do = new exhibit($moduleid);
 $menus = array (
@@ -24,10 +24,10 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '展出城市', '展出地址', '展馆名称', '主办单位', '承办单位', '联系人', '会员名', 'IP');
-	$dfields = array('keyword', 'title', 'city', 'address', 'hallname', 'sponsor', 'undertaker', 'truename', 'username', 'ip');
-	$sorder  = array('结果排序方式', '开始时间降序', '开始时间升序', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'fromtime DESC', 'fromtime ASC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊', '标题', '展出城市', '展出地址', '展馆名称', '主办单位', '承办单位', '联系人', '会员名', '编辑', 'IP', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'city', 'address', 'hallname', 'sponsor', 'undertaker', 'truename', 'username', 'editor', 'ip', 'filepath', 'template');
+	$sorder  = array('结果排序方式', '开始时间降序', '开始时间升序', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序', '报名人数降序', '报名人数升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'fromtime DESC', 'fromtime ASC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC', 'orders DESC', 'orders ASC', 'itemid DESC', 'itemid ASC');
 	$level = isset($level) ? intval($level) : 0;
 	$process = isset($process) ? intval($process) : 0;
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
@@ -45,7 +45,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$itemid or $itemid = '';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level);
+	$level_select = level_select('level', '级别', $level, 'all');
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -54,7 +54,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
-	if($level) $condition .= " AND level=$level";
+	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 	if($fromtime) $condition .= " AND `$datetype`>=$fromtime";
 	if($totime) $condition .= " AND `$datetype`<=$totime";
 	if($thumb) $condition .= " AND thumb<>''";
@@ -67,7 +67,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	} else if($process == 3) {
 		$condition .= " AND totime<$DT_TIME";
 	}
-	if($level) $condition .= " AND level=$level";
+	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 
 	$timetype = strpos($dorder[$order], 'edit') === false ? 'add' : '';
 }
@@ -94,7 +94,6 @@ switch($action) {
 			$addtime = timetodate($DT_TIME);
 			$item = array();
 			$menuid = 0;
-			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -125,7 +124,6 @@ switch($action) {
 			$addtime = timetodate($addtime);
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
-			$tname = '修改'.$MOD['name'];
 			include tpl($action, $module);
 		}
 	break;
@@ -141,7 +139,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 6;
-			include tpl($action, $module);
+			include tpl($action);
 		}
 	break;
 	case 'update':
@@ -156,7 +154,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('更新成功', $forward);
+		dmsg('生成成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择'.$MOD['name']);

@@ -20,11 +20,15 @@ switch($action) {
 				$need_check =  $MOD['page_check'] == 2 ? $MG['check'] : $MOD['page_check'];
 				$post['status'] = get_status(3, $need_check);
 				$do->add($post);
-				dmsg($L['op_add_success'], $MOD['linkurl'].'page.php?status='.$post['status']);
+				dmsg($L['op_add_success'], '?status='.$post['status']);
 			} else {
 				message($do->errmsg);
 			}
 		} else {
+			foreach($do->fields as $v) {
+				$$v = '';
+			}
+			$content = '';	
 			$head_title = $L['page_title_add'];
 		}
 	break;
@@ -51,10 +55,13 @@ switch($action) {
 	break;
 	case 'delete':
 		$itemid or message($L['page_msg_choose']);
-		$do->itemid = $itemid;
-		$r = $do->get_one();
-		if(!$r || $r['username'] != $_username) message();
-		$do->recycle($itemid);
+		$itemids = is_array($itemid) ? $itemid : array($itemid);
+		foreach($itemids as $itemid) {
+			$do->itemid = $itemid;
+			$item = $do->get_one();
+			if(!$item || $item['username'] != $_username) message();
+			$do->recycle($itemid);
+		}
 		dmsg($L['op_del_success'], $forward);
 	break;
 	default:

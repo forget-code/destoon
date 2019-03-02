@@ -9,12 +9,16 @@ class company {
 	var $table_company_data;
 	var $errmsg = errmsg;
 
-    function company($username = '') {
+    function __construct($username = '') {
 		global $db;
 		$this->table_member = $db->pre.'member';
 		$this->table_company = $db->pre.'company';
 		$this->table_company_data = $db->pre.'company_data';
 		$this->db = &$db;
+    }
+
+    function company($username = '') {
+		$this->__construct($username);
     }
 
 	function get_one($username = '') {
@@ -30,13 +34,14 @@ class company {
 			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table_company} WHERE $condition", $cache);
 			$items = $r['num'];
 		}
-		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);		
-		$members = array();
+		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
+		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table_company} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
-			$members[] = $r;
+			$lists[] = $r;
 		}
-		return $members;
+		return $lists;
 	}
 
 	function update($userid) {

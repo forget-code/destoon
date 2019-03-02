@@ -1,6 +1,6 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-$filename = DT_ROOT.'/'.$MOD['moduledir'].'/index.inc.html';
+$filename = DT_CACHE.'/htm/company.htm';
 if(!$MOD['index_html']) {
 	if(is_file($filename)) file_del($filename);
 	return false;
@@ -15,7 +15,7 @@ $seo_file = 'index';
 include DT_ROOT.'/include/seo.inc.php';
 $destoon_task = "moduleid=$moduleid&html=index";
 if($page == 1) $head_canonical = $MOD['linkurl'];
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, 0, $page);
 ob_start();
 include template('index', $module);
 $data = ob_get_contents();

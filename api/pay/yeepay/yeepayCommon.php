@@ -156,12 +156,6 @@ return md5($k_opad . pack("H*",md5($k_ipad . $data)));
 
 function logstr($orderid,$str,$hmac)
 {
-//DT include 'merchantProperties.php';
-return;
-global $p1_MerId,$merchantKey,$logName;
-$james=fopen($logName,"a+");
-fwrite($james,"\r\n".date("Y-m-d H:i:s")."|orderid[".$orderid."]|str[".$str."]|hmac[".$hmac."]");
-fclose($james);
+	log_write($orderid.'|'.$str.'|'.$hmac, 'yeepay');
 }
-
 ?> 

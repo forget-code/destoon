@@ -1,10 +1,10 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
-$L['sms_code'] = '您的短信认证码为:{V0},有效期{V1}天';
+$L['sms_code'] = '您的短信验证码为:{V0},有效期{V1}分钟,切勿透露给他人';
 $L['sms_inquiry'] = '您的产品[{V0}](ID:{V1}),收到询价.联系人:{V2},电话:{V3}';
 $L['sms_price'] = '您的求购[{V0}](ID:{V1}),收到报价.联系人:{V2},电话:{V3}';
 $L['sms_message'] = '您发布的[{V0}](ID:{V1}),收到留言.联系人:{V2},电话:{V3}';

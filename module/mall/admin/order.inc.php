@@ -1,44 +1,29 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('商品管理', '?moduleid='.$moduleid),
     array('订单管理', '?moduleid='.$moduleid.'&file='.$file),
+    array('快递管理', '?moduleid='.$moduleid.'&file='.$file.'&action=express'),
     array('统计报表', '?moduleid='.$moduleid.'&file='.$file.'&action=stats'),
 );
-$_status = array(
-	'<span style="color:#0000FF;">买家发起订单<br/>等待卖家确认</span>',
-	'<span style="color:#FF6600;">卖家已确认订单<br/>等待买家付款</span>',
-	'<span style="color:#008080;">买家已付款<br/>等待卖家发货</span>',
-	'<span style="color:#FF0000;">卖家已发货<br/>等待买家确认</span>',
-	'<span style="color:#008000;">交易成功</span>',
-	'<span style="color:#FF0000;text-decoration:underline;">买家申请退款</span>',
-	'<span style="color:#0000FF;text-decoration:underline;">已退款给买家</span>',
-	'<span style="color:#FF6600;text-decoration:underline;">已付款给卖家</span>',
-	'<span style="color:#888888;text-decoration:line-through;">买家关闭交易</span>',
-	'<span style="color:#888888;text-decoration:line-through;">卖家关闭交易</span>',
-);
-$dstatus = array(
-	'买家发起订单,等待卖家确认',
-	'卖家已确认订单,等待买家付款',
-	'买家已付款,等待卖家发货',
-	'卖家已发货,等待买家确认',
-	'交易成功',
-	'买家申请退款',
-	'已退款给买家',
-	'已付款给卖家',
-	'买家关闭交易',
-	'卖家关闭交易',
-);
+include load('order.lang');
+$_status = $L['trade_status'];
+$dstatus = $L['trade_dstatus'];
+$_send_status = $L['send_status'];
+$dsend_status = $L['send_dstatus'];
 $STARS = $L['star_type'];
 $table = $DT_PRE.'mall_order';
 if($action == 'refund' || $action == 'show' || $action == 'comment') {
 	$itemid or msg('未指定记录');
-	$item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid ");
-	$item or msg('记录不存在');
-	$item['linkurl'] = $EXT['linkurl'].'redirect.php?mid='.$moduleid.'&itemid='.$item['mallid'];
-	$item['money'] = $item['amount'] + $item['fee'];
-	$item['addtime'] = timetodate($item['addtime'], 6);
-	$item['updatetime'] = timetodate($item['updatetime'], 6);
+	$td = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
+	$td or msg('记录不存在');
+	$td['mid'] == $moduleid or msg('记录不存在');
+	$td['linkurl'] = DT_PATH.'api/redirect.php?mid='.$td['mid'].'&itemid='.$td['mallid'];
+	$td['money'] = $td['amount'] + $td['fee'];
+	$td['adddate'] = timetodate($td['addtime'], 6);
+	$td['updatedate'] = timetodate($td['updatetime'], 6);
+	$td['par'] = '';
+	if(strpos($td['note'], '|') !== false) list($td['note'], $td['par']) = explode('|', $td['note']);
 }
 switch($action) {
 	case 'stats':
@@ -55,7 +40,7 @@ switch($action) {
 				$chart_data .= $i;
 				$F = strtotime($year.'-'.$month.'-'.$i.' 00:00:00');
 				$T = strtotime($year.'-'.$month.'-'.$i.' 23:59:59');
-				$condition = "addtime>=$F AND addtime<=$T";
+				$condition = "mid=$moduleid AND addtime>=$F AND addtime<=$T";
 				if($seller) $condition .= " AND seller='$seller'";
 				$t = $db->get_one("SELECT SUM(`amount`) AS num1,SUM(`fee`) AS num2 FROM {$table} WHERE {$condition} AND status=4");
 				$num1 = $t['num1'] ? dround($t['num1']) : 0;
@@ -84,7 +69,7 @@ switch($action) {
 				$chart_data .= $i;
 				$F = strtotime($year.'-'.$i.'-01 00:00:00');
 				$T = strtotime($year.'-'.$i.'-'.date('t', $F).' 23:59:59');
-				$condition = "addtime>=$F AND addtime<=$T";
+				$condition = "mid=$moduleid AND addtime>=$F AND addtime<=$T";
 				if($seller) $condition .= " AND seller='$seller'";
 				$t = $db->get_one("SELECT SUM(`amount`) AS num1,SUM(`fee`) AS num2 FROM {$table} WHERE {$condition} AND status=4");
 				$num1 = $t['num1'] ? dround($t['num1']) : 0;
@@ -111,36 +96,95 @@ switch($action) {
 		include tpl('order_stats', $module);
 	break;
 	case 'refund':
-		if($item['status'] != 5) msg('此交易无需受理');
+		if($td['status'] != 5) msg('此交易无需受理');
 		if($submit) {
 			isset($status) or msg('请指定受理结果');
-			$content or msg('请填写操作理由');
+			strlen($content) > 5 or msg('请填写操作理由');
+			$content .= '[网站]';
+			clear_upload($content);
+			$content = dsafe(addslashes(save_remote(save_local(stripslashes($content)))));
 			if($status == 6) {//已退款，买家胜 退款
-				$db->query("UPDATE {$DT_PRE}member SET money=money+$item[money],locking=locking-$item[money] WHERE username='$item[buyer]'");
-				$msg = '受理成功，交易状态已经改变为 已退款给买家';
-			} else if($status == 7) {//已退款，卖家胜 付款
-				$db->query("UPDATE {$DT_PRE}member SET locking=locking-$item[money] WHERE username='$item[buyer]'");
-				money_record($item['buyer'], -$item['money'], '站内', 'system', '订单货到付款', '订单号:'.$itemid);
-				money_add($item['seller'], $item['money']);
-				money_record($item['seller'], $item['money'], '站内', 'system', '订单货到付款', '订单号:'.$itemid);
-				$msg = '受理成功，交易状态已经改变为 已付款给卖家';
+				money_add($td['buyer'], $td['money']);
+				money_record($td['buyer'], $td['money'], $L['in_site'], 'system', '订单退款', '单号:'.$itemid.'[网站]');
+				$_msg = '受理成功，交易状态已经改变为 已退款给买家';
+				//更新商品数据 增加库存
+				if($td['mid'] == 16) {
+					$db->query("UPDATE {$DT_PRE}mall SET orders=orders-1,sales=sales-$td[number],amount=amount+$td[number] WHERE itemid=$itemid");
+				} else {
+					$db->query("UPDATE ".get_table($td['mid'])." SET amount=amount+$td[number] WHERE itemid=$itemid");
+				}
+			} else if($status == 4) {//已退款，卖家胜 付款
+				money_add($td['seller'], $td['money']);
+				money_record($td['seller'], $td['money'], $L['in_site'], 'system', '交易成功', '单号:'.$itemid.'[网站]');
+				//网站服务费
+				$G = $db->get_one("SELECT groupid FROM {$DT_PRE}member WHERE username='".$td['seller']."'");
+				$SG = cache_read('group-'.$G['groupid'].'.php');
+				if($SG['commission']) {
+					$fee = dround($money*$SG['commission']/100);
+					if($fee > 0) {
+						money_add($td['seller'], -$fee);
+						money_record($td['seller'], -$fee, $L['in_site'], 'system', $L['trade_fee'], $L['trade_order_id'].$itemid);	
+					}
+				}
+				$_msg = '受理成功，交易状态已经改变为 交易成功';
 			} else {
 				msg();
 			}
 			$db->query("UPDATE {$table} SET status=$status,editor='$_username',updatetime=$DT_TIME,refund_reason='$content' WHERE itemid=$itemid");
-			msg($msg, $forward, 5);
+			$msg = isset($msg) ? 1 : 0;
+			$eml = isset($eml) ? 1 : 0;
+			$sms = isset($sms) ? 1 : 0;
+			$wec = isset($wec) ? 1 : 0;
+			if($msg == 0) $sms = $wec = 0;
+			if($msg || $eml || $sms || $wec) {
+				$reason = $content;
+				$linkurl = $MODULE[2]['linkurl'].'trade.php?action=update&step=detail&itemid='.$itemid;
+
+				$result = ($status == 6 ? '退款成功' : '退款失败');
+				$subject = '您的[订单]'.dsubstr($td['title'], 30, '...').'(单号:'.$td['itemid'].')'.$result;
+				$content = '尊敬的会员：<br/>您的[订单]'.$td['title'].'(单号:'.$td['itemid'].')'.$result.'！<br/>';
+				if($reason) $content .= '操作原因：<br/>'.$reason.'<br/>';
+				$content .= '请点击下面的链接查看订单详情：<br/>';
+				$content .= '<a href="'.$linkurl.'" target="_blank">'.$linkurl.'</a><br/>';
+				$content .= '如果您对此操作有异议，请及时与网站联系。<br/>';
+				$user = userinfo($td['buyer']);
+				if($msg) send_message($user['username'], $subject, $content);
+				if($eml) send_mail($user['email'], $subject, $content);
+				if($sms) send_sms($user['mobile'], $subject.$DT['sms_sign']);
+				if($wec) send_weixin($user['username'], $subject);
+
+				$result = ($status == 6 ? '已经退款给买家' : '未退款给买家，交易成功');
+				$subject = '您的[订单]'.dsubstr($td['title'], 30, '...').'(单号:'.$td['itemid'].')'.$result;
+				$content = '尊敬的会员：<br/>您的[订单]'.$td['title'].'(单号:'.$td['itemid'].')'.$result.'！<br/>';
+				if($reason) $content .= '操作原因：<br/>'.$reason.'<br/>';
+				$content .= '请点击下面的链接查看订单详情：<br/>';
+				$content .= '<a href="'.$linkurl.'" target="_blank">'.$linkurl.'</a><br/>';
+				$content .= '如果您对此操作有异议，请及时与网站联系。<br/>';
+				$user = userinfo($td['seller']);
+				if($msg) send_message($user['username'], $subject, $content);
+				if($eml) send_mail($user['email'], $subject, $content);
+				if($sms) send_sms($user['mobile'], $subject.$DT['sms_sign']);
+				if($wec) send_weixin($user['username'], $subject);
+			}
+			msg($_msg, $forward, 3);
 		} else {
 			include tpl('order_refund', $module);
 		}
 	break;
 	case 'show':
-		$cm = $db->get_one("SELECT * FROM {$DT_PRE}mall_comment WHERE itemid=$itemid");
+		if($td['mid'] == 16) {
+			$cm = $db->get_one("SELECT * FROM {$DT_PRE}mall_comment WHERE itemid=$itemid");
+		} else {
+			$cm = array();
+		}
+		$id = isset($id) ? intval($id) : 0;
 		include tpl('order_show', $module);
 	break;
 	case 'comment':
+		$td['mid'] == 16 or msg('此订单不支持评价');
 		$cm = $db->get_one("SELECT * FROM {$DT_PRE}mall_comment WHERE itemid=$itemid");
 		$cm or msg('评论不存在');
-		$mallid = $item['mallid'];
+		$mallid = $td['mallid'];
 		$post['seller_ctime'] = $post['seller_ctime'] ? strtotime($post['seller_ctime']) : 0;
 		$post['seller_rtime'] = $post['seller_rtime'] ? strtotime($post['seller_rtime']) : 0;
 		$post['buyer_ctime'] = $post['buyer_ctime'] ? strtotime($post['buyer_ctime']) : 0;
@@ -172,18 +216,55 @@ switch($action) {
 	case 'delete':
 		$itemid or msg('未选择记录');
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$db->query("DELETE FROM {$table} WHERE itemid IN ($itemids)");
+		$db->query("DELETE FROM {$table} WHERE itemid IN ($itemids) AND mid=$moduleid");
 		dmsg('删除成功', $forward);
 	break;
+	case 'express':
+		$sfields = array('按条件', '商品名称', '卖家', '买家', '订单金额', '附加金额', '附加名称', '买家名称', '买家地址', '买家邮编', '买家电话', '买家手机', '发货快递', '发货单号', '备注');
+		$dfields = array('title', 'title', 'seller', 'buyer', 'amount', 'fee', 'fee_name', 'buyer_name', 'buyer_address', 'buyer_postcode', 'buyer_phone', 'buyer_mobile', 'send_type', 'send_no', 'note');
+		isset($fields) && isset($dfields[$fields]) or $fields = 0;
+		$status = isset($status) && isset($dsend_status[$status]) ? intval($status) : '';
+		$itemid or $itemid = '';
+		$mallid = isset($mallid) && $mallid ? intval($mallid) : '';
+		isset($seller) or $seller = '';
+		isset($buyer) or $buyer = '';
+		isset($send_no) or $send_no = '';
+		$fields_select = dselect($sfields, 'fields', '', $fields);
+		$status_select = dselect($dsend_status, 'status', '状态', $status, '', 1, '', 1);
+		$condition = "mid=$moduleid AND send_no<>''";
+		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
+		if($status !== '') $condition .= " AND send_status='$status'";
+		if($seller) $condition .= " AND seller='$seller'";
+		if($buyer) $condition .= " AND buyer='$buyer'";
+		if($itemid) $condition .= " AND itemid=$itemid";
+		if($mallid) $condition .= " AND mallid=$mallid";
+		if($send_no) $condition .= " AND send_no='$send_no'";
+		if($page > 1 && $sum) {
+			$items = $sum;
+		} else {
+			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
+			$items = $r['num'];
+		}
+		$pages = pages($items, $page, $pagesize);	
+		$lists = array();
+		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
+		while($r = $db->fetch_array($result)) {
+			$r['addtime'] = timetodate($r['addtime'], 5);
+			$r['updatetime'] = timetodate($r['updatetime'], 5);
+			$lists[] = $r;
+		}
+		include tpl('order_express', $module);
+	break;
 	default:
-		$sfields = array('按条件', '商品名称', '卖家', '买家', '订单金额', '附加金额', '附加名称', '买家名称', '买家地址', '买家邮编', '买家电话', '买家手机', '买家物流', '发货物流', '发货单号', '备注');
-		$dfields = array('title', 'title', 'seller', 'buyer', 'amount', 'fee', 'fee_name', 'buyer_name', 'buyer_address', 'buyer_postcode', 'buyer_phone', 'buyer_mobile', 'buyer_receive', 'send_type', 'send_no', 'note');
+		$sfields = array('按条件', '商品名称', '卖家', '买家', '订单金额', '附加金额', '附加名称', '买家名称', '买家地址', '买家邮编', '买家电话', '买家手机', '发货快递', '发货单号', '备注');
+		$dfields = array('title', 'title', 'seller', 'buyer', 'amount', 'fee', 'fee_name', 'buyer_name', 'buyer_address', 'buyer_postcode', 'buyer_phone', 'buyer_mobile', 'send_type', 'send_no', 'note');
 		$sorder  = array('排序方式', '下单时间降序', '下单时间升序', '更新时间降序', '更新时间升序', '商品单价降序', '商品单价升序', '购买数量降序', '购买数量升序', '订单金额降序', '订单金额升序', '附加金额降序', '附加金额升序');
 		$dorder  = array('itemid DESC', 'addtime DESC', 'addtime ASC', 'updatetime DESC', 'updatetime ASC', 'price DESC', 'price ASC', 'number DESC', 'number ASC', 'amount DESC', 'amount ASC', 'fee DESC', 'fee ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$status = isset($status) && isset($dstatus[$status]) ? intval($status) : '';
 		$itemid or $itemid = '';
 		$mallid = isset($mallid) && $mallid ? intval($mallid) : '';
+		$id = isset($id) ? intval($id) : 0;
 		$seller_star = isset($seller_star) ? intval($seller_star) : 0;
 		$buyer_star = isset($buyer_star) ? intval($buyer_star) : 0;
 		isset($seller) or $seller = '';
@@ -201,7 +282,7 @@ switch($action) {
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$status_select = dselect($dstatus, 'status', '状态', $status, 'style="width:200px;"', 1, '', 1);
 		$order_select = dselect($sorder, 'order', '', $order);
-		$condition = '1';
+		$condition = "mid=$moduleid";
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
 		if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
@@ -210,6 +291,7 @@ switch($action) {
 		if($buyer) $condition .= " AND buyer='$buyer'";
 		if($itemid) $condition .= " AND itemid=$itemid";
 		if($mallid) $condition .= " AND mallid=$mallid";
+		if($id) $condition .= " AND mallid=$id";
 		if($seller_star) $condition .= " AND seller_star=$seller_star";
 		if($buyer_star) $condition .= " AND buyer_star=$buyer_star";
 		if($mtype == 'money') $mtype = "`amount`+`fee`";
@@ -228,7 +310,7 @@ switch($action) {
 		while($r = $db->fetch_array($result)) {
 			$r['addtime'] = str_replace(' ', '<br/>', timetodate($r['addtime'], 5));
 			$r['updatetime'] = str_replace(' ', '<br/>', timetodate($r['updatetime'], 5));
-			$r['linkurl'] = $EXT['linkurl'].'redirect.php?mid='.$moduleid.'&itemid='.$r['mallid'];
+			$r['linkurl'] = DT_PATH.'api/redirect.php?mid='.$r['mid'].'&itemid='.$r['mallid'];
 			$r['dstatus'] = $_status[$r['status']];
 			$r['money'] = $r['amount'] + $r['fee'];
 			$amount += $r['amount'];

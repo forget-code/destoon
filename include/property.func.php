@@ -1,15 +1,16 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function property_update($post_ppt, $moduleid, $catid, $itemid) {
 	global $db;
+	$catid = intval($catid);
 	if(!$post_ppt || !$moduleid || !$catid || !$itemid) return;
 	$OP = property_option($catid);
 	if(!$OP) return;
-	if(!defined('DT_ADMIN')) $post_ppt = dhtmlspecialchars($post_ppt);	
+	$post_ppt = dhtmlspecialchars($post_ppt);	
 	$db->query("DELETE FROM {$db->pre}category_value WHERE moduleid=$moduleid AND itemid=$itemid");
 	$ppt = array();
 	foreach($OP as $v) {
@@ -33,11 +34,21 @@ function property_update($post_ppt, $moduleid, $catid, $itemid) {
 }
 
 function property_check($post_ppt) {
-	//
+	global $post;
+	include load('include.lang');
+	$OP = $post['catid'] ? property_option($post['catid']) : array();
+	if(!$OP) return;
+	foreach($OP as $v) {
+		if($v['required'] && !$post_ppt[$v['oid']]) {
+			$msg = lang($v['type'] > 1 ? $L['fields_choose'] : $L['fields_input'], array($v['name']));
+			defined('DT_ADMIN') ? msg($msg) : dalert($msg);
+		}
+	}
 }
 
 function property_option($catid) {
 	global $db;
+	$catid = intval($catid);
 	$lists = array();
 	$result = $db->query("SELECT * FROM {$db->pre}category_option WHERE catid=$catid ORDER BY listorder ASC,oid ASC");
 	while($r = $db->fetch_array($result)) {
@@ -58,6 +69,7 @@ function property_value($moduleid, $itemid) {
 
 function property_condition($catid) {
 	global $db;
+	$catid = intval($catid);
 	$lists = array();
 	$result = $db->query("SELECT * FROM {$db->pre}category_option WHERE catid=$catid AND type>1 AND search>0 ORDER BY listorder ASC,oid ASC");
 	while($r = $db->fetch_array($result)) {
@@ -67,13 +79,20 @@ function property_condition($catid) {
 	return $lists;
 }
 
+function property_js() {
+	include template('property_js', 'chip');
+}
+
 function property_html($var, $oid, $type, $value, $extend = '') {
 	global $L;
 	$str = '';
 	if($type == 0) {
-		$str = '<input type="text" size="50" name="post_ppt['.$oid.']" id="property-'.$oid.'" value="'.($var ? $var : $value).'" '.$extend.'/>';
+		if(strpos($extend, 'size=') === false) $extend .= ' size="50"';
+		$str = '<input type="text" name="post_ppt['.$oid.']" id="property-'.$oid.'" value="'.($var ? $var : $value).'" '.$extend.'/>';
 	} else if($type == 1) {
-		$str = '<textarea name="post_ppt['.$oid.']" id="property-'.$oid.'" rows="5" cols="80" '.$extend.'>'.($var ? $var : $value).'</textarea><br/>';
+		if(strpos($extend, 'rows=') === false) $extend .= ' rows="5"';
+		if(strpos($extend, 'cols=') === false) $extend .= ' cols="80"';
+		$str = '<textarea name="post_ppt['.$oid.']" id="property-'.$oid.'" '.$extend.'>'.($var ? $var : $value).'</textarea><br/>';
 	} else if($type == 2) {
 		$str = '<select name="post_ppt['.$oid.']" id="property-'.$oid.'" '.$extend.'><option value="">'.$L['choose'].'</option>';
 		$ops = explode('|', $value);

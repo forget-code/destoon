@@ -1,22 +1,22 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
+$qid = isset($qid) ? intval($qid) : 0;
 require MD_ROOT.'/answer.class.php';
 $do = new answer();
 $menus = array (
-    array('答案列表', '?moduleid='.$moduleid.'&file='.$file),
-    array('答案审核', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
+    array('答案列表', '?moduleid='.$moduleid.'&file='.$file.'&qid='.$qid),
+    array('答案审核', '?moduleid='.$moduleid.'&file='.$file.'&qid='.$qid.'&action=check'),
 );
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('内容', '会员名', 'IP', '问题ID', '答案ID', '参考资料');
-	$dfields = array('content', 'username', 'ip', 'qid', 'itemid', 'linkurl');
+	$sfields = array('内容', '会员名', '昵称', 'IP', '问题ID', '答案ID', '参考资料');
+	$dfields = array('content', 'username', 'passport', 'ip', 'qid', 'itemid', 'linkurl');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '投票次数降序', '投票次数升序');
 	$dorder  = array('itemid desc', 'addtime DESC', 'addtime ASC', 'vote DESC', 'vote ASC');
 
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	isset($ip) or $ip = '';
-	$qid = isset($qid) ? intval($qid) : 0;
 	$expert = isset($expert) ? intval($expert) : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -35,7 +35,7 @@ show_menu($menus);
 <th>流水号</th>
 <th>收件地址</th>
 <th>标题</th>
-<th width="110">发送时间</th>
+<th width="130">发送时间</th>
 <th>结果</th>
 <th>备注</th>
 <th width="40">重发</th>

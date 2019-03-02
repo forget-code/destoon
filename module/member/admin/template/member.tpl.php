@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -29,9 +29,10 @@ show_menu($menus);
 <option value="logintime" <?php if($timetype == 'logintime') echo 'selected';?>>登录时间</option>
 </select>&nbsp;
 <?php echo dcalendar('fromtime', $fromtime);?> 至 <?php echo dcalendar('totime', $totime);?>&nbsp;
-<?php echo $DT['money_name'];?>：<input type="text" size="3" name="minmoney" value="<?php echo $minmoney;?>"/> ~ <input type="text" size="3" name="maxmoney" value="<?php echo $maxmoney;?>"/>&nbsp;
-<?php echo $DT['credit_name'];?>：<input type="text" size="3" name="mincredit" value="<?php echo $mincredit;?>"/> ~ <input type="text" size="3" name="maxcredit" value="<?php echo $maxcredit;?>"/>&nbsp;
-短信：<input type="text" size="3" name="minsms" value="<?php echo $minsms;?>"/> ~ <input type="text" size="3" name="maxsms" value="<?php echo $maxsms;?>"/>&nbsp;
+<?php echo $DT['money_name'];?>：<input type="text" size="2" name="minmoney" value="<?php echo $minmoney;?>"/>~<input type="text" size="2" name="maxmoney" value="<?php echo $maxmoney;?>"/>&nbsp;
+<?php echo $DT['credit_name'];?>：<input type="text" size="2" name="mincredit" value="<?php echo $mincredit;?>"/>~<input type="text" size="2" name="maxcredit" value="<?php echo $maxcredit;?>"/>&nbsp;
+短信：<input type="text" size="2" name="minsms" value="<?php echo $minsms;?>"/>~<input type="text" size="2" name="maxsms" value="<?php echo $maxsms;?>"/>&nbsp;
+保证金：<input type="text" size="2" name="mindeposit" value="<?php echo $mindeposit;?>"/>~<input type="text" size="2" name="maxdeposit" value="<?php echo $maxdeposit;?>"/>&nbsp;
 </td>
 </tr>
 <tr>
@@ -44,7 +45,8 @@ show_menu($menus);
 <?php echo $vcompany_select;?> 
 <?php echo $vtrade_select;?> 
 <?php echo $avatar_select;?> 
-会员名：<input type="text" name="username" value="<?php echo $username;?>" size="8"/>&nbsp;
+会员名：<input type="text" name="username" value="<?php echo $username;?>" size="6"/>&nbsp;
+昵称：<input type="text" name="passport" value="<?php echo $passport;?>" size="6"/>&nbsp;
 会员ID：<input type="text" name="uid" value="<?php echo $uid;?>" size="4"/>
 </td>
 </tr>
@@ -79,7 +81,7 @@ show_menu($menus);
 <td class="px11"><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=sms&username=<?php echo $v['username'];?>&action=record', '[<?php echo $v['username'];?>] 短信记录');"><?php echo $v['sms'];?></a></td>
 <td><?php echo gender($v['gender']);?></td>
 <td><a href="?moduleid=<?php echo $moduleid;?>&groupid=<?php echo $v['groupid'];?>"><?php echo $GROUP[$v['groupid']]['groupname'];?></a></td>
-<td class="px11"><?php echo $v['regdate'];?></td>
+<td class="px11" title="修改时间:<?php echo $v['edittime'] ? timetodate($v['edittime']) : '无';?>"><?php echo $v['regdate'];?></td>
 <td class="px11"><?php echo $v['logindate'];?></td>
 <td class="px11"><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=loginlog&username=<?php echo $v['username'];?>&action=record', '[<?php echo $v['username'];?>] 登录记录');"><?php echo $v['logintimes'];?></a></td>
 <td>
@@ -114,7 +116,19 @@ show_menu($menus);
 <a name="#editusername"></a>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td>&nbsp;当前会员名： <input type="text" name="cusername" size="20" value="<?php echo $username;?>"/> &nbsp; 新会员名： <input type="text" name="nusername" size="20"<?php if($catid) echo ' style="color:#FF6600;" value="请输入新会员名" onclick="if(this.value==\'请输入新会员名\')this.value=\'\';"';?>/>  &nbsp; <input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;<span class="f_gray">如无特殊情况，建议不要频繁修改会员名</span>
+<td>&nbsp;当前户名： <input type="text" name="cusername" size="20" value="<?php echo $username;?>"/> &nbsp; 新户名： <input type="text" name="nusername" size="20"<?php if($catid==1) echo ' style="color:#FF6600;" value="请输入新会员名" onclick="if(this.value==\'请输入新会员名\')this.value=\'\';"';?>/>  &nbsp; <input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;<span class="f_gray">如无特殊情况，建议不要频繁修改会员名</span>
+</td>
+</tr>
+</table>
+</form>	<div class="tt">修改会员昵称</div>
+<form method="post" action="?">
+<input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
+<input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="action" value="passport"/>
+<a name="#editpassport"></a>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td>&nbsp;当前昵称： <input type="text" name="cpassport" size="20" value="<?php echo $passport;?>"/> &nbsp; 新昵称： <input type="text" name="npassport" size="20"<?php if($catid==2) echo ' style="color:#FF6600;" value="请输入新昵称" onclick="if(this.value==\'请输入新昵称\')this.value=\'\';"';?>/>  &nbsp; <input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;<span class="f_gray">如无特殊情况，建议不要频繁修改会员昵称</span>
 </td>
 </tr>
 </table>

@@ -89,7 +89,7 @@ $(document).ready(function(){
 					t.photolist.find('li img:eq('+i+')').css({border:'1px solid #FF6600',background:'#FF6600'});
 					t.photo.imgOnload({loading:t.pload,src:t.photoarr[i][0]});
 					t.pintro.html(t.photoarr[i][2]);
-					t.vbig.attr('href', EXPath+'view.php?img='+t.photoarr[i][0]);
+					t.vbig.attr('href', DTPath+'api/view.php?img='+t.photoarr[i][0]);
 					t.imgpos(i);
 					t.scroll();
 				}
@@ -104,7 +104,7 @@ $(document).ready(function(){
 					t.photo.imgOnload({loading:t.pload,src:t.photoarr[i][0]});
 					$('.count_a').html(i+1);
 					t.pintro.html(t.photoarr[i][2]);	
-					t.vbig.attr('href',EXPath+'view.php?img='+t.photoarr[i][0]);		
+					t.vbig.attr('href',DTPath+'api/view.php?img='+t.photoarr[i][0]);		
 					t.imgpos(i);
 					t.imgnum(i);
 					t.scroll();

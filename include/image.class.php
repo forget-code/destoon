@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -25,7 +25,7 @@ class image {
     var $t_y = 0;
 	var $make = true;
 
-	function image($g_img) {
+	function __construct($g_img) {
 		global $DT;
 		$this->g_img = $g_img;
 		$info = getimagesize($this->g_img);
@@ -61,6 +61,10 @@ class image {
 		$this->text_font = DT_ROOT.'/file/font/'.($DT['water_font'] ? $DT['water_font'] : 'simhei.ttf');
 		$this->text_color = $DT['water_fontcolor'] ? $DT['water_fontcolor'] : '#000000';
 		$this->water_margin = $DT['water_margin'] ? $DT['water_margin'] : 10;
+	}
+
+	function image($g_img) {
+		$this->__construct($g_img);
 	}
 
     function waterimage($save_name = '') {
@@ -281,8 +285,8 @@ class image {
                 $p_y = $this->g_h - $p_h - $this->water_margin;
                 break;
             default:
-                $p_x = rand($this->water_margin, ($this->g_w - $p_w - $this->water_margin)); 
-                $p_y = rand($this->water_margin, ($this->g_h - $p_h - $this->water_margin)); 
+                $p_x = mt_rand($this->water_margin, ($this->g_w - $p_w - $this->water_margin)); 
+                $p_y = mt_rand($this->water_margin, ($this->g_h - $p_h - $this->water_margin)); 
                 break;     
         }
 		return array('dest_x'=>$p_x, 'dest_y'=>$p_y);

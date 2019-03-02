@@ -9,12 +9,12 @@ $COM = userinfo($username);
 if(!$COM || ($COM['groupid'] < 5 && $COM['groupid'] > 1)) {
 	userclean($username);
 	$head_title = $L['not_company'];
-	dhttp(404, $DT_BOT);
+	if($DT_BOT) dhttp(404, $DT_BOT);
 	include template('com-notfound', 'message');
 	exit;
 }
 if(!$COM['edittime'] && !$MOD['openall']) {
-	dhttp(404, $DT_BOT);
+	if($DT_BOT) dhttp(404, $DT_BOT);
 	$head_title = $COM['company'];
 	include template('com-opening', 'message');
 	exit;
@@ -93,7 +93,7 @@ if($rewrite) {
 	$page = isset($page) ? max(intval($page), 1) : 1;
 	$catid = isset($catid) ? intval($catid) : 0;
 	$itemid = isset($itemid) ? (is_array($itemid) ? $itemid : intval($itemid)) : 0;
-	$kw = isset($kw) ? strip_kw($kw) : '';
+	$kw = isset($kw) ? strip_kw($kw, $DT['max_kw']) : '';
 	if(strlen($kw) < $DT['min_kw'] || strlen($kw) > $DT['max_kw']) $kw = '';
 	$keyword = $kw ? str_replace(array(' ', '*'), array('%', '%'), $kw) : '';
 }
@@ -238,6 +238,19 @@ $announce = isset($HOME['announce']) ? $HOME['announce'] : '';
 $map = isset($HOME['map']) ? $HOME['map'] : '';
 $stats = isset($HOME['stats']) ? $HOME['stats'] : '';
 $kf = isset($HOME['kf']) ? $HOME['kf'] : '';
+$comment_proxy = '';
+if($domain) {
+	$comment_proxy = 'http://'.$domain.'/';
+} else {
+	if($CFG['com_domain']) {
+		$comment_proxy = $linkurl;
+		$comment_proxy = substr($CFG['com_domain'], 0, 1) == '.' ? $linkurl : 'http://'.$CFG['com_domain'].'/';
+	} else {
+		$comment_proxy = DT_PATH;
+	}
+}
+$comment_proxy = encrypt($comment_proxy, DT_KEY.'PROXY');
+
 $album_js = 0;
 $head_title = $MENU[$menuid]['name'];
 $seo_keywords = isset($HOME['seo_keywords']) ? $HOME['seo_keywords'] : '';

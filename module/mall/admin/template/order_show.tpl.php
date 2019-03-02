@@ -1,127 +1,145 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-if(!$mallid) show_menu($menus);
+if(!$id) show_menu($menus);
 ?>
-<div class="tt">交易详情</div>
+<div class="tt">商品信息</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">订单单号</td>
-<td><?php echo $item['itemid'];?> <?php if($DT['trade']) { ?>(<?php echo $DT['trade_nm'];?>订单单号:<a href="https://lab.alipay.com/consume/queryTradeDetail.htm?tradeNo=<?php echo $item['trade_no'];?>" target="_blank" class="t"><?php echo $item['trade_no'];?></a>)<?php } ?></td>
+<td><?php echo $td['itemid'];?> <?php if($DT['trade']) { ?>(<?php echo $DT['trade_nm'];?>订单单号:<a href="https://lab.alipay.com/consume/queryTradeDetail.htm?tradeNo=<?php echo $td['trade_no'];?>" target="_blank" class="t"><?php echo $td['trade_no'];?></a>)<?php } ?></td>
 </tr>
 <tr>
 <td class="tl">商品名称</td>
-<td class="tr"><a href="<?php echo $item['linkurl'];?>" target="_blank" class="t"><?php echo $item['title'];?></a></td>
+<td class="tr"><a href="<?php echo $td['linkurl'];?>" target="_blank" class="t"><?php echo $td['title'];?></a></td>
 </tr>
 <tr>
 <td class="tl">商品图片</td>
-<td class="tr"><a href="<?php echo $item['linkurl'];?>" target="_blank"><img src="<?php if($item['thumb']) { ?><?php echo $item['thumb'];?><?php } else { ?><?php echo DT_SKIN;?>image/nopic60.gif<?php } ?>" width="60" height="60"/></a></td>
+<td class="tr"><a href="<?php echo $td['linkurl'];?>" target="_blank"><img src="<?php if($td['thumb']) { ?><?php echo $td['thumb'];?><?php } else { ?><?php echo DT_SKIN;?>image/nopic60.gif<?php } ?>" width="60" height="60"/></a></td>
 </tr>
+<?php if($td['par']) { ?>
 <tr>
-<td class="tl">卖家</td>
-<td><?php if($DT['im_web']) { ?><?php echo im_web($item['seller']);?>&nbsp;<?php } ?><a href="javascript:_user('<?php echo $item['seller'];?>');" class="t"><?php echo $item['seller'];?></a></td>
-</tr>
-<tr>
-<td class="tl">买家</td>
-<td><?php if($DT['im_web']) { ?><?php echo im_web($item['buyer']);?>&nbsp;<?php } ?><a href="javascript:_user('<?php echo $item['buyer'];?>');" class="t"><?php echo $item['buyer'];?></a></td>
-</tr>
-</table>
-<div class="tt">物流信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td class="tl">邮编</td>
-<td><?php echo $item['buyer_postcode'];?></td>
-</tr>
-<tr>
-<td class="tl">地址</td>
-<td><?php echo $item['buyer_address'];?></td>
-</tr>
-<tr>
-<td class="tl">姓名</td>
-<td><?php echo $item['buyer_name'];?></td>
-</tr>
-<tr>
-<td class="tl">电话</td>
-<td><?php echo $item['buyer_phone'];?></td>
-</tr>
-<tr>
-<td class="tl">手机</td>
-<td><?php echo $item['buyer_mobile'];?></td>
-</tr>
-<?php if($item['send_time']>0) { ?>
-<tr>
-<td class="tl">物流类型</td>
-<td><?php echo $item['send_type'];?></td>
-</tr>
-<tr>
-<td class="tl">物流号码</td>
-<td><?php echo $item['send_no'];?><?php if($item['send_no']) { ?> &nbsp;<a href="<?php echo DT_PATH;?>api/express.php?e=<?php echo urlencode($item['send_type']);?>&n=<?php echo $item['send_no'];?>" target="_blank" class="t">[物流追踪]</a><?php } ?></td>
+<td class="tl">规格参数</td>
+<td><?php echo $td['par'];?></td>
 </tr>
 <?php } ?>
 <tr>
-<td class="tl">备注说明</td>
-<td><?php echo $item['note'];?></td>
+<td class="tl">卖家</td>
+<td><?php if($DT['im_web']) { ?><?php echo im_web($td['seller']);?>&nbsp;<?php } ?><a href="javascript:_user('<?php echo $td['seller'];?>');" class="t"><?php echo $td['seller'];?></a></td>
+</tr>
+<tr>
+<td class="tl">买家</td>
+<td><?php if($DT['im_web']) { ?><?php echo im_web($td['buyer']);?>&nbsp;<?php } ?><a href="javascript:_user('<?php echo $td['buyer'];?>');" class="t"><?php echo $td['buyer'];?></a></td>
+</tr>
+</table>
+<div class="tt">快递信息</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">邮编</td>
+<td><?php echo $td['buyer_postcode'];?></td>
+</tr>
+<tr>
+<td class="tl">地址</td>
+<td><?php echo $td['buyer_address'];?></td>
+</tr>
+<tr>
+<td class="tl">姓名</td>
+<td><?php echo $td['buyer_name'];?></td>
+</tr>
+<tr>
+<td class="tl">电话</td>
+<td><?php echo $td['buyer_phone'];?></td>
+</tr>
+<tr>
+<td class="tl">手机</td>
+<td><?php echo $td['buyer_mobile'];?></td>
+</tr>
+<?php if($td['send_time'] > 0) { ?>
+<tr>
+<td class="tl">快递类型</td>
+<td><a href="<?php echo DT_PATH;?>api/express/home.php?e=<?php echo urlencode($td['send_type']);?>&n=<?php echo $td['send_no'];?>" target="_blank"><?php echo $td['send_type'];?></a></td>
+</tr>
+<tr>
+<td class="tl">快递单号</td>
+<td><a href="<?php echo DT_PATH;?>api/express.php?e=<?php echo urlencode($td['send_type']);?>&n=<?php echo $td['send_no'];?>" target="_blank"><?php echo $td['send_no'];?></a></td>
+</tr>
+<?php if($td['send_type'] && $td['send_no']) { ?>
+<tr>
+<td class="tl">追踪结果</td>
+<td style="line-height:200%;"><div id="express"><img src="<?php echo DT_SKIN;?>image/loading.gif" align="absmiddle"/> 正在查询...</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#express').load(AJPath+'?action=express&moduleid=2&auth=<?php echo encrypt('mall|'.$td['send_type'].'|'.$td['send_no'].'|'.$td['send_status'].'|'.$td['itemid'], DT_KEY.'EXPRESS');?>');
+});
+</script>
+</td>
+</tr>
+<?php } ?>
+<?php } ?>
+<tr>
+<td class="tl">买家留言</td>
+<td><?php echo $td['note'];?></td>
 </tr>
 </table>
 <div class="tt">价格信息</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">单价</td>
-<td>￥<?php echo $item['price'];?></td>
+<td><?php echo $DT['money_sign'];?><?php echo $td['price'];?></td>
 </tr>
 <tr>
 <td class="tl">数量</td>
-<td><?php echo $item['number'];?></td>
+<td><?php echo $td['number'];?></td>
 </tr>
-<?php if($item['fee']>0) { ?>
+<?php if($td['fee']>0) { ?>
 <tr>
-<td class="tl"><?php echo $item['fee_name'];?></td>
-<td>￥<?php echo $item['fee'];?></td>
+<td class="tl"><?php echo $td['fee_name'];?></td>
+<td><?php echo $DT['money_sign'];?><?php echo $td['fee'];?></td>
 </tr>
 <?php } ?>
 <tr>
 <td class="tl">总额</td>
-<td class="f_red">￥<?php echo $item['money'];?></td>
+<td class="f_red"><?php echo $DT['money_sign'];?><?php echo $td['money'];?></td>
 </tr>
 </table>
 <div class="tt">订单状态</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">下单时间</td>
-<td><?php echo $item['addtime'];?></td>
+<td><?php echo $td['adddate'];?></td>
 </tr>
 <tr>
 <td class="tl">更新时间</td>
-<td><?php echo $item['updatetime'];?></td>
+<td><?php echo $td['updatedate'];?></td>
 </tr>
-<?php if($item['send_time']>0) { ?>
+<?php if($td['send_time']>0) { ?>
 <tr>
 <td class="tl">发货时间</td>
-<td><?php echo $item['send_time'];?></td>
+<td><?php echo $td['send_time'];?></td>
 </tr>
 <?php } ?>
 <tr>
 <td class="tl">交易状态</td>
-<td><?php echo $_status[$item['status']];?></td>
+<td><?php echo $_status[$td['status']];?></td>
 </tr>
-<?php if($item['buyer_reason']) { ?>
+<?php if($td['buyer_reason']) { ?>
 <tr>
-<td class="tl">买家理由或证据</td>
-<td><?php echo $item['buyer_reason'];?></td>
+<td class="tl">退款原因</td>
+<td><?php echo $td['buyer_reason'];?></td>
 </tr>
 <?php } ?>
-<?php if($item['refund_reason']) { ?>
+<?php if($td['refund_reason']) { ?>
 <tr>
-<td class="tl">操作理由或证据</td>
-<td><?php echo $item['refund_reason'];?></td>
+<td class="tl">操作原因</td>
+<td><?php echo $td['refund_reason'];?></td>
 </tr>
 <tr>
 <td class="tl">操作人</td>
-<td><?php echo $item['editor'];?></td>
+<td><?php echo $td['editor'];?></td>
 </tr>
 <tr>
 <td class="tl">操作时间</td>
-<td><?php echo $item['updatetime'];?></td>
+<td><?php echo $td['updatetime'];?></td>
 </tr>
 <?php } ?>
 </table>

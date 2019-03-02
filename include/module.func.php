@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -19,28 +19,35 @@ function keyword($kw, $items, $moduleid) {
 	global $db, $DT_TIME, $DT;
 	if(!$DT['search_kw'] || $items < 2 || strlen($kw) < 3 || strlen($kw) > 30 || strpos($kw, ' ') !== false || strpos($kw, '%') !== false) return;
 	$kw = addslashes($kw);
-	$r = $db->get_one("SELECT * FROM {$db->pre}keyword WHERE moduleid=$moduleid AND word='$kw'");
+	$r = $db->get_one("SELECT * FROM {$db->pre}keyword WHERE moduleid=$moduleid AND word='$kw' ORDER BY itemid ASC");
 	if($r) {
 		$items = $items > $r['items'] ? $items : $r['items'];
 		$month_search = date('Y-m', $r['updatetime']) == date('Y-m', $DT_TIME) ? 'month_search+1' : '1';
 		$week_search = date('W', $r['updatetime']) == date('W', $DT_TIME) ? 'week_search+1' : '1';
 		$today_search = date('Y-m-d', $r['updatetime']) == date('Y-m-d', $DT_TIME) ? 'today_search+1' : '1';
 		$db->query("UPDATE {$db->pre}keyword SET items='$items',updatetime='$DT_TIME',total_search=total_search+1,month_search=$month_search,week_search=$week_search,today_search=$today_search WHERE itemid=$r[itemid]");
+		$db->query("DELETE FROM {$db->pre}keyword WHERE moduleid=$moduleid AND word='$kw' AND itemid>$r[itemid]");
 	} else {
-		$letter = gb2py($kw);
+		$letter = trim(gb2py($kw));
 		$status = $DT['search_check_kw'] ? 2 : 3;
+		if(strlen($letter) < 2) $status = 2;
 		$db->query("INSERT INTO {$db->pre}keyword (moduleid,word,keyword,letter,items,updatetime,total_search,month_search,week_search,today_search,status) VALUES ('$moduleid','$kw','$kw','$letter','$items','$DT_TIME','1','1','1','1','$status')");
 	}
 }
 
 function money_add($username, $amount) {
 	global $db;
-	if($username && $amount) $db->query("UPDATE {$db->pre}member SET money=money+{$amount} WHERE username='$username'");
-}
-
-function money_lock($username, $amount) {
-	global $db;
-	if($username && $amount) $db->query("UPDATE {$db->pre}member SET locking=locking+{$amount} WHERE username='$username'");
+	if($username && $amount) {
+		if($amount < 0) {
+			$r = $db->get_one("SELECT money FROM {$db->pre}member WHERE username='$username'");
+			if($r['money'] < abs($amount)) {
+				set_cookie('auth', '');
+				dhttp(403, 0);
+				dalert('HTTP 403 Forbidden - Bad Data', DT_PATH);
+			}
+		}
+		$db->query("UPDATE {$db->pre}member SET money=money+{$amount} WHERE username='$username'");
+	}
 }
 
 function money_record($username, $amount, $bank, $editor, $reason, $note = '') {
@@ -138,13 +145,9 @@ function get_module_setting($moduleid, $key = '') {
 }
 
 function anti_spam($string) {
-	global $MODULE, $DT;
+	global $DT;
 	if($DT['anti_spam'] && preg_match("/^[a-z0-9_@\-\s\/\.\,\(\)\+]+$/i", $string)) {
-		do {
-			$tmp = encrypt($string);
-			if(strpos($tmp, '0x') === false) break;
-		} while(1);
-		return '<img src="'.$MODULE[3]['linkurl'].'image.php?auth='.rawurlencode($tmp).'" align="absmddle"/>';
+		return '<img src="'.DT_PATH.'api/image.png.php?auth='.encrypt($string, DT_KEY.'SPAM').'" align="absmddle"/>';
 	} else {
 		return $string;
 	}
@@ -178,7 +181,7 @@ function check_sign($string, $sign) {
 
 function crypt_sign($string) {
 	global $DT_IP;
-	return strtoupper(md5(md5($DT_IP.$string.DT_KEY)));
+	return strtoupper(md5(md5($DT_IP.$string.DT_KEY.'SIGN')));
 }
 
 function cache_hits($moduleid, $itemid) {
@@ -227,9 +230,9 @@ function gender($gender, $type = 0) {
 	return $gender == 1 ? $L['sir'] : $L['lady'];
 }
 
-function online($userid) {
+function online($user, $type = 0) {
 	global $db;
-	$r = $db->get_one("SELECT online FROM {$db->pre}online WHERE userid=$userid");
+	$r = $db->get_one("SELECT online FROM {$db->pre}online WHERE `".($type ? 'username' : 'userid')."`='$user'");
 	if($r) return $r['online'] ? 1 : -1;
 	return 0;
 }
@@ -246,9 +249,9 @@ function vip_year($fromtime) {
 
 function get_albums($item, $type = 0) {
 	$imgs = array();
-	if($item['thumb'] && !preg_match("/^[a-z0-9\-\.\:\/]{50,}$/i", $item['thumb'])) $item['thumb'] = '';
-	if($item['thumb1'] && !preg_match("/^[a-z0-9\-\.\:\/]{50,}$/i", $item['thumb1'])) $item['thumb1'] = '';
-	if($item['thumb2'] && !preg_match("/^[a-z0-9\-\.\:\/]{50,}$/i", $item['thumb2'])) $item['thumb2'] = '';
+	if($item['thumb'] && !preg_match("/^[a-z0-9\-\.\:\/]{30,}$/i", $item['thumb'])) $item['thumb'] = '';
+	if($item['thumb1'] && !preg_match("/^[a-z0-9\-\.\:\/]{30,}$/i", $item['thumb1'])) $item['thumb1'] = '';
+	if($item['thumb2'] && !preg_match("/^[a-z0-9\-\.\:\/]{30,}$/i", $item['thumb2'])) $item['thumb2'] = '';
 	if($type == 0) {
 		$nopic = DT_SKIN.'image/nopic60.gif';
 		$imgs[] = $item['thumb'] ? $item['thumb'] : $nopic;
@@ -268,11 +271,32 @@ function xml_linkurl($linkurl, $modurl = '') {
 	return str_replace('&', '&amp;', $linkurl);
 }
 
-function highlight($str) {
-	return '<span class="highlight">'.$str.'</span>';
-}
-
 function img_lazy($content) {
 	return preg_replace("/src=([\"|']?)([^ \"'>]+\.(jpg|jpeg|gif|png|bmp))\\1/i", "src=\"".DT_SKIN."image/lazy.gif\" class=\"lazy\" original=\"\\2\"", $content);
+}
+
+function sort_type($TYPE) {
+	$p = $c = array();
+	foreach($TYPE as $v) {
+		if($v['parentid']) {
+			$c[$v['parentid']][] = $v;
+		} else {
+			$p[] = $v;
+		}
+	}
+	return array($p, $c);
+}
+
+function update_user($member, $item, $fileds = array('groupid','vip','validated','company','areaid','truename','telephone','mobile','address','qq','msn','ali','skype')) {
+	$update = '';
+	foreach($fileds as $v) {
+		if(isset($item[$v]) && $item[$v] != $member[$v]) $update .= ",$v='".addslashes($member[$v])."'";
+	}
+	if(isset($item['email']) && $item['email'] != $member['mail']) $update .= ",email='".addslashes($member['mail'])."'";
+	return $update;
+}
+
+function highlight($str) {
+	return '<span class="highlight">'.$str.'</span>';
 }
 ?>

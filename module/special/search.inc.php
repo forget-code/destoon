@@ -82,7 +82,7 @@ if($DT_QST) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
 			if($kw) $r['title'] = str_replace($replacef, $replacet, $r['title']);
-			$r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
+			if(!$r['islink']) $r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
 			$tags[] = $r;
 		}
 		$db->free_result($result);

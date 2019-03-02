@@ -34,7 +34,11 @@
 		{else}
 		<span class="f_gray">面议</span><br/>
 		{/if}
+		{if SELL_ORDER && $t[username] && $t[price]>0 && $t[minamount]>0 && $t[amount]>0 && $t[unit]}
+		<img src="{DT_SKIN}image/buy.gif" alt="购买" class="iq_btn" onclick="Go('{$MODULE[$moduleid][linkurl]}{rewrite('buy.php?itemid='.$t['itemid'])}');"/>
+		{else}
 		<img src="{DT_SKIN}image/inquiry.gif" alt="询价" class="iq_btn" onclick="Go('{$MODULE[$moduleid][linkurl]}{rewrite('inquiry.php?itemid='.$t['itemid'])}');"/>
+		{/if}
 		</td>
 	</tr>
 	</table>

@@ -1,13 +1,14 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-if(!$mallid) show_menu($menus);
+if(!$id) show_menu($menus);
 ?>
 <script type="text/javascript">var errimg = '<?php echo DT_SKIN;?>image/nopic50.gif';</script>
 <div class="tt">记录搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="id" value="<?php echo $id;?>"/>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
@@ -17,9 +18,10 @@ if(!$mallid) show_menu($menus);
 <?php echo $order_select;?>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&mallid=<?php echo $maillid;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&id=<?php echo $id;?>');"/>
 </td>
 </tr>
+<?php if(!$id) { ?>
 <tr>
 <td>&nbsp;
 <select name="timetype">
@@ -58,9 +60,9 @@ if(!$mallid) show_menu($menus);
 商品单号：<input type="text" name="mallid" value="<?php echo $mallid;?>" size="10"/>&nbsp;
 卖家：<input type="text" name="seller" value="<?php echo $seller;?>" size="10"/>&nbsp;
 买家：<input type="text" name="buyer" value="<?php echo $buyer;?>" size="10"/>&nbsp;
-
 </td>
 </tr>
+<?php } ?>
 </table>
 </form>
 <form method="post">
@@ -93,13 +95,13 @@ if(!$mallid) show_menu($menus);
 <td class="px11">
 <a href="javascript:_user('<?php echo $v['seller'];?>');"><?php echo $v['seller'];?></a><br/>
 <?php if($v['seller_star'] > 0) {?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&mallid=<?php echo $mallid;?>&itemid=<?php echo $v['itemid'];?>#comment1"><img src="<?php echo DT_PATH;?>file/image/star<?php echo $v['seller_star'];?>.gif" width="36" height="12" title="买家评价卖家：<?php echo $STARS[$v['seller_star']];?> 点击查看详情"/></a>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>#comment1"><img src="<?php echo DT_PATH;?>file/image/star<?php echo $v['seller_star'];?>.gif" width="36" height="12" title="买家评价卖家：<?php echo $STARS[$v['seller_star']];?> 点击查看详情"/></a>
 <?php } ?>
 </td>
 <td class="px11">
 <a href="javascript:_user('<?php echo $v['buyer'];?>');"><?php echo $v['buyer'];?></a><br/>
 <?php if($v['buyer_star'] > 0) {?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&mallid=<?php echo $mallid;?>&itemid=<?php echo $v['itemid'];?>#comment2"><img src="<?php echo DT_PATH;?>file/image/star<?php echo $v['buyer_star'];?>.gif" width="36" height="12" title="卖家评价买家：<?php echo $STARS[$v['buyer_star']];?> 点击查看详情"/></a>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>#comment2"><img src="<?php echo DT_PATH;?>file/image/star<?php echo $v['buyer_star'];?>.gif" width="36" height="12" title="卖家评价买家：<?php echo $STARS[$v['buyer_star']];?> 点击查看详情"/></a>
 <?php } ?>
 </td>
 <td class="px11"><?php echo $v['addtime'];?></td>
@@ -107,9 +109,9 @@ if(!$mallid) show_menu($menus);
 <td><?php echo $v['dstatus'];?></td>
 <td>
 <?php if($v['status'] == 5) {?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund&mallid=<?php echo $mallid;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>
 <?php } else { ?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&mallid=<?php echo $mallid;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
 <?php } ?>
 </td>
 </tr>

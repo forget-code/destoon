@@ -1,15 +1,16 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
+    array('文件备份', '?file=patch'),
     array('木马扫描', '?file=scan'),
-    array('文件校验', '?file='.$file),
+    array('文件校验', '?file=md5'),
 );
-$sys = array('admin', 'api', 'include', 'javascript', 'lang', 'module', 'template', 'wap');
-$fbs = array('file', 'cache');
+$sys = array('admin', 'api', 'include', 'lang', 'module', 'template', 'mobile');
+$fbs = array('file');
 switch($action) {
 	case 'delete':
 		preg_match("/^[0-9]{4}[\-]{1}[0-9]{2}[\-]{1}[0-9]{2}[\s]{1}[0-9]{2}[\.]{1}[0-9]{2}$/", $mirror) or msg('请选择镜像文件');

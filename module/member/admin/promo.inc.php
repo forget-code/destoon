@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('生成优惠码', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('优惠码管理', '?moduleid='.$moduleid.'&file='.$file),

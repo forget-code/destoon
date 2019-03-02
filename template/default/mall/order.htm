@@ -10,7 +10,7 @@
 	{loop $lists $k $v}
 	<tr align="center"{if $k%2==1} bgcolor="#F6F6F6"{/if}>
 	<td>{hide_name($v[buyer])}</td>
-	<td class="f_price">{$v[price]}</td>
+	<td class="f_price">{$DT[money_sign]}{$v[price]}</td>
 	<td class="px11">{$v[number]}</td>
 	<td>{$v[updatetime]}</td>
 	<td class="f_green">成交</td>

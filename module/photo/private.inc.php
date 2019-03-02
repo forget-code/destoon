@@ -12,7 +12,7 @@ $pass = false;
 $_key = $open == 2 ? $password : $answer;
 $error = '';
 if($submit) {
-	if($key && $key == $_key) {
+	if(isset($key) && $key == $_key) {
 		$pass = true;
 		set_cookie('photo_'.$itemid, md5(md5($DT_IP.$open.$_key.DT_KEY)), $DT_TIME + 86400);
 	} else {

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -17,7 +17,7 @@ show_menu($menus);
 提问ID <input type="text" size="5" name="qid" value="<?php echo $qid;?>"/>&nbsp;
 <input type="checkbox" name="expert" value="1"<?php echo $expert ? ' checked' : '';?>/>专家&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&qid=<?php echo $qid;?>');"/>
 </td>
 </tr>
 </table>
@@ -28,25 +28,23 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
-<th width="100">ID</th>
 <th>答案内容</th>
-<th width="50">操作</th>
+<th width="60">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
-<td><?php echo $v['itemid'];?></td>
 <td align="left" style="padding:10px;">
 <div>
 <span class="f_r f_gray">
-<?php if($v['expert']) {?><span class="f_red">[专家]</span>&nbsp;|&nbsp;<?php } ?>票数 (<?php echo $v['vote'];?>) &nbsp;|&nbsp;<a href="<?php echo $EXT['linkurl'];?>redirect.php?mid=<?php echo $moduleid;?>&itemid=<?php echo $v['qid'];?>" target="_blank">原文</a>
+<?php if($v['expert']) {?><span class="f_red">专家</span>&nbsp;|&nbsp;<?php } ?>票数 (<?php echo $v['vote'];?>)
 </span>
 <span class="px11 f_blue">
 <?php echo $v['adddate'];?>
 </span>
 &nbsp;
 <?php if($v['username']) { ?>
-<a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a> 
+<a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['passport'];?></a> 
 <?php } else { ?>
 Guest
 <?php } ?>
@@ -60,11 +58,11 @@ Guest
 </div>
 
 <div class="b5 c_b"> </div>
-<div><strong>IP:</strong><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&ip=<?php echo $v['ip'];?>"><?php echo $v['ip'];?></a> <span class="f_dblue">来自:<?php echo ip2area($v['ip']);?></span></div>
+<div><a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $moduleid;?>&itemid=<?php echo $v['qid'];?>" target="_blank"><img src="admin/image/link.gif" width="16" height="16" title="点击打开原问题" alt="" align="absmiddle"/></a> IP:<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&ip=<?php echo $v['ip'];?>"><?php echo $v['ip'];?></a> - <?php echo ip2area($v['ip']);?></div>
 
 <?php if($v['linkurl']) { ?>
 <div class="b5 c_b"> </div>
-<div>参考资料：<a href="<?php echo $EXT['linkurl'];?>redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['linkurl'];?></a></div>
+<div>参考资料：<a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['linkurl'];?></a></div>
 <?php } ?>
 </td>
 <td>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -12,7 +12,8 @@ show_menu($menus);
 <tr>
 <td>
 &nbsp;<?php echo $fields_select;?>&nbsp;
-<input type="text" size="50" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo ajax_area_select('areaid', '所在地区', $areaid);?>&nbsp;
 会员名:<input type="text" name="username" value="<?php echo $username;?>" size="5"/>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
@@ -28,11 +29,9 @@ show_menu($menus);
 <th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>会员</th>
 <th>地址</th>
-<th>邮编</th>
 <th>姓名</th>
 <th>手机</th>
-<th>电话</th>
-<th width="120">添加时间</th>
+<th width="130">添加时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
@@ -40,10 +39,8 @@ show_menu($menus);
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a></td>
 <td align="left" title="备注:<?php echo $v['note'];?>">&nbsp;<?php echo $v['address'];?></td>
-<td><?php echo $v['postcode'];?></td>
 <td><?php echo $v['truename'];?></td>
 <td><a href="javascript:_mobile('<?php echo $v['mobile'];?>')"><?php echo $v['mobile'];?></a></td>
-<td><?php echo $v['telephone'];?></td>
 <td class="px11" title="修改时间:<?php echo $v['editdate'];?>"><?php echo $v['adddate'];?></td>
 <td>
 <a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;

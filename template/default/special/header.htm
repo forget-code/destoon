@@ -52,7 +52,7 @@ document.onselectstart=function(e){return false;};
 			<ul>
 			{if $DT[city]}<li class="h_city">[<span id="destoon_city">{$city_name}</span>] <a href="{DT_PATH}api/city.php" title="点击切换城市" rel="nofollow">切换</a></li>{/if}
 			<li class="h_fav"><a href="{$MODULE[1][linkurl]}">返回首页</a></li>
-			{if $EXT[wap_enable]}<li class="h_wap"><a href="{$EXT[wap_url]}mobile.php">手机版</a></li>{/if}
+			{if $EXT[mobile_enable]}<li class="h_mobile"><a href="{$EXT[mobile_url]}mobile.php">手机版</a></li>{/if}
 			{if $MODULE[16]}<li class="h_cart"><a href="{$MODULE[16][linkurl]}cart.php" rel="nofollow">购物车</a>(<span class="head_t" id="destoon_cart">0</span>)</li>{/if}
 			</ul>
 		</div>

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -100,7 +100,7 @@ class captcha {
 	function mk_str() {
 		$str = '';
 		if($this->cn) {
-			$step = strtoupper(DT_CHARSET) == 'UTF-8' ? 3 : 2;
+			$step = DT_CHARSET == 'UTF-8' ? 3 : 2;
 			$text = substr(file_get(DT_ROOT.'/file/config/cncaptcha.inc.php'), 13);
 			$max = strlen($text) - 1 - $step;
 			while(1) {

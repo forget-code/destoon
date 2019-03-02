@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('添加会员', '?moduleid='.$moduleid.'&action=add'),
     array('会员列表', '?moduleid='.$moduleid),
@@ -9,7 +9,7 @@ $menus = array (
     array('公司列表', '?moduleid=4'),
     array(VIP.'列表', '?moduleid=4&file=vip'),
 );
-$sfields = array('按条件', '公司名', '会员名', '通行证名','姓名', '部门', '职位', '手机号码','电话号码','传真号码', '详细地址', '邮政编码', '公司类型', '公司规模', '销售', '采购', '主营行业', '经营模式', 'Email', 'QQ', 'MSN', '阿里旺旺', 'Skype', '注册IP', '登录IP', '推荐人');
+$sfields = array('按条件', '公司名', '会员名', '昵称','姓名', '部门', '职位', '手机号码','电话号码','传真号码', '详细地址', '邮政编码', '公司类型', '公司规模', '销售', '采购', '主营行业', '经营模式', 'Email', 'QQ', 'MSN', '阿里旺旺', 'Skype', '注册IP', '登录IP', '推荐人');
 $dfields = array('m.username', 'm.company', 'm.username', 'm.passport', 'm.truename', 'm.department', 'm.career', 'm.mobile', 'c.telephone', 'c.fax', 'c.address', 'c.postcode', 'c.type', 'c.size', 'c.sell', 'c.buy', 'c.business', 'c.mode', 'm.email', 'm.qq', 'm.msn', 'm.ali', 'm.skype', 'm.regip', 'm.loginip', 'm.inviter');
 $sorder  = array('结果排序方式', '注册时间降序', '注册时间升序', '登录时间降序', '登录时间升序', '登录次数降序', '登录次数升序', '账户'.$DT['money_name'].'降序', '账户'.$DT['money_name'].'升序', '会员'.$DT['credit_name'].'降序', '会员'.$DT['credit_name'].'升序', '短信余额降序', '短信余额升序', VIP.'指数降序', VIP.'指数升序', '注册年份降序', '注册年份升序', '注册资本降序', '注册资本升序', '服务开始降序', '服务开始升序', '服务结束降序', '服务结束升序','浏览人气降序','浏览人气升序');
 $dorder  = array('m.userid DESC', 'm.regtime DESC', 'm.regtime ASC', 'm.logintime DESC', 'm.logintime ASC', 'm.logintimes DESC', 'm.logintimes ASC', 'm.money DESC', 'm.money ASC', 'm.credit DESC', 'm.credit ASC', 'm.sms DESC', 'm.sms ASC', 'c.vip DESC', 'c.vip ASC', 'c.regyear DESC', 'c.regyear ASC', 'c.capital DESC', 'c.capital ASC', 'c.fromtime DESC', 'c.fromtime ASC', 'c.totime DESC', 'c.totime ASC', 'c.hits DESC', 'c.hits ASC');
@@ -100,7 +100,7 @@ if($minsms) $condition .= " AND m.sms>=$minsms";
 if($maxsms) $condition .= " AND m.sms<=$maxsms";
 if($valid) $condition .= $valid == 1 ? " AND c.validated=1" : " AND c.validated=0";
 if($catid) $condition .= " AND c.catids LIKE '%,".$catid.",%'";
-if($areaid) $condition .= ($AREA[$areaid]['child']) ? " AND c.areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND c.areaid=$areaid";
+if($areaid) $condition .= ($ARE['child']) ? " AND c.areaid IN (".$ARE['arrchildid'].")" : " AND c.areaid=$areaid";
 if($mode) $condition .= " AND c.mode LIKE '%$modes[$mode]%'";
 if($type) $condition .= " AND c.type='$types[$type]'";
 if($size) $condition .= " AND c.size='$sizes[$size]'";

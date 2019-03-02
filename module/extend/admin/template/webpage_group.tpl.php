@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -20,5 +20,5 @@ show_menu($menus);
 </table>
 <div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
-<script type="text/javascript">Menuon(2);</script>
+<script type="text/javascript">Menuon(3);</script>
 <?php include tpl('footer');?>

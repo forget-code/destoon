@@ -9,10 +9,10 @@ if($action == 'add') {
 	if($kw) {
 		$word = $kw;
 	} else {
-		$word = isset($word) ? htmlspecialchars(trim($word)) : '';
+		$word = isset($word) ? dhtmlspecialchars(trim($word)) : '';
 	}
 	if($word && in_array($mid, array(4, 5, 6))) {
-		$word = htmlspecialchars(trim($word));
+		$word = dhtmlspecialchars(trim($word));
 		$this_month = date('n', $DT_TIME);
 		$this_year  = date('Y', $DT_TIME);
 		$next_month = $this_month == 12 ? 1 : $this_month + 1;

@@ -7,11 +7,15 @@ class friend {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function friend() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'friend';
 		$this->db = &$db;
 		$this->fields = array('listorder', 'userid','typeid','username','truename','style','company','career','telephone','mobile','homepage','email','msn','qq','ali','skype','note','addtime');
+    }
+
+    function friend() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -42,6 +46,7 @@ class friend {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

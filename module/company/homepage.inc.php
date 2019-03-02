@@ -34,7 +34,7 @@ foreach($main_order as $k=>$v) {
 	if($main_num[$k] < 1 || $main_num[$k] > 50) $main_num[$k] = 10;
 }
 $HMAIN = $_HMAIN;
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid=4&username='.$username;
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username;
 $seo_title = isset($HOME['seo_title']) && $HOME['seo_title'] ? $HOME['seo_title'] : '';
 $head_title = '';
 include template('index', $template);

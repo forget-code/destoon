@@ -1,6 +1,6 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
-$tb = isset($tb) ? trim($tb) : '';
+defined('DT_ADMIN') or exit('Access Denied');
+$tb = isset($tb) ? strip_sql(trim($tb), 0) : '';
 $tb or msg();
 $len = strlen($DT_PRE);
 if(substr($tb, 0, $len) == $DT_PRE) $tb = substr($tb, $len);
@@ -68,11 +68,15 @@ class fields {
 	var $table;
 	var $errmsg = errmsg;
 
-    function fields() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->pre = $DT_PRE;
 		$this->table = $DT_PRE.'fields';
 		$this->db = &$db;
+    }
+
+    function fields() {
+		$this->__construct();
     }
 
 	function pass($post) {

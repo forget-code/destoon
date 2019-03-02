@@ -31,21 +31,21 @@ if($submit) {
 	preg_match("/^[0-9\,]{1,}$/", $itemids) or dalert($L['inquiry_itemid'], 'goback');
 	captcha($captcha, $need_captcha);
 	question($answer, $need_question);
-	$title = htmlspecialchars(trim($title));
+	$title = dhtmlspecialchars(trim($title));
 	if(!$title) message($L['msg_type_title']);
-	$content = htmlspecialchars(trim($content));
+	$content = dhtmlspecialchars(trim($content));
 	if(!$content) message($L['msg_type_content']);
 	if(!$_userid) {
-		$truename = htmlspecialchars(trim($truename));
+		$truename = dhtmlspecialchars(trim($truename));
 		if(!$truename) message($L['msg_type_truename']);
-		$telephone = htmlspecialchars(trim($telephone));
+		$telephone = dhtmlspecialchars(trim($telephone));
 		if(!$telephone) message($L['msg_type_telephone']);
-		$email = htmlspecialchars(trim($email));
-		$company = htmlspecialchars(trim($company));
-		$qq = htmlspecialchars(trim($qq));
-		$msn = htmlspecialchars(trim($msn));
+		$email = dhtmlspecialchars(trim($email));
+		$company = dhtmlspecialchars(trim($company));
+		$qq = dhtmlspecialchars(trim($qq));
+		$msn = dhtmlspecialchars(trim($msn));
 	}
-	$type = htmlspecialchars(implode(',', $type));
+	$type = dhtmlspecialchars(implode(',', $type));
 	$content = nl2br($content);
 	if($type) $content = $L['content_type'].$type.'<br/>'.$content;
 	if($company) $content .= '<br/>'.$L['content_company'].$company;
@@ -69,7 +69,7 @@ if($submit) {
 		if($DT['sms'] && $_sms && $r['username'] && isset($sendsms)) {
 			$touser = userinfo($r['username']);
 			if($touser['mobile']) {
-				$message = lang('sms->sms_inquiry', array($r['tag'], $r['itemid'], $truename, $telephone));
+				$message = lang('sms->sms_inquiry', array($r['tag'] ? $r['tag'] : $r['title'], $r['itemid'], $truename, $telephone));
 				$message = strip_sms($message);
 				$word = word_count($message);
 				$sms_num = ceil($word/$DT['sms_len']);

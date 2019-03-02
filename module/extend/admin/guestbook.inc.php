@@ -1,9 +1,10 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/guestbook.class.php';
 $do = new guestbook();
 $menus = array (
     array('留言列表', '?moduleid='.$moduleid.'&file='.$file),
+    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
     array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';

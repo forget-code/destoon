@@ -54,7 +54,7 @@ if($_username && $_username == $item['username']) $user_status = 3;
 $description = '';
 if($print) {
 	if($user_status != 3) dheader($linkurl);
-	include template('print_resume', $module);
+	include template('print', $module);
 } else {
 	$db->query("UPDATE {$table} SET hits=hits+1 WHERE itemid=$itemid");
 	include DT_ROOT.'/include/seo.inc.php';

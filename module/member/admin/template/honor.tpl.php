@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -23,7 +23,7 @@ show_menu($menus);
 </table>
 </form>
 <form method="post">
-<div class="tt">管理证书</div>
+<div class="tt"><?php echo $menus[$menuid][0];?></div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
@@ -33,7 +33,7 @@ show_menu($menus);
 <th>发证日期</th>
 <th>到期日期</th>
 <th>会员</th>
-<th width="110">添加时间</th>
+<th width="130">添加时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
@@ -53,13 +53,34 @@ show_menu($menus);
 </tr>
 <?php }?>
 </table>
+<?php include tpl('notice_chip');?>
 <div class="btns">
+<?php if($action == 'recycle') { ?>
+<input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中证书吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 还 原 " class="btn" onclick="if(confirm('确定要还原选中证书吗？状态将被设置为已通过')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=restore'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 清 空 " class="btn" onclick="if(confirm('确定要清空回收站吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=clear';}else{return false;}"/>
+<?php } else if($action == 'reject') { ?>
+<input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
+<input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中证书吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<?php } else if($action == 'exprie') { ?>
+<span class="f_red f_r">批量删除过期 <input type="text" size="3" name="days" id="days" value="60"/> 
+天的信息 <input type="submit" value="删 除" class="btn" onclick="if(Dd('days').value==''){alert('请填写天数');return false;}if(confirm('确定要删除过期'+Dd('days').value+'天的证书信息吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=expire&refresh=1&delete=1'}else{return false;}"/></span>
+<input type="submit" value="刷新过期" class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=expire&refresh=1';" name="submit"/>&nbsp;
+<input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
+<input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中证书吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<?php } else if($action == 'check') { ?>
+<input type="submit" value=" 通过审核 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=check';"/>&nbsp;
+<input type="submit" value=" 拒 绝 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=reject';"/>&nbsp;
+<input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
+<input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中证书吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<?php } else { ?>
 <input type="submit" value=" 回收站 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&recycle=1';"/>&nbsp;
 <input type="submit" value=" 彻底删除 " class="btn" onclick="if(confirm('确定要删除选中证书吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="submit" value="刷新过期" class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=expire&refresh=1';"/>
+<?php } ?>
 </div>
 </form>
 <div class="pages"><?php echo $pages;?></div>
 <br/>
-<script type="text/javascript">Menuon(1);</script>
+<script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menusad);
 ?>
@@ -77,7 +77,7 @@ show_menu($menusad);
 <td><input type="text" size="60" name="ad[image_url]" value="<?php echo $image_url;?>" id="image_url"/> <span id="dimage_url" class="f_red"></span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 标题</td>
+<td class="tl"><span class="f_hid">*</span> 标题ALT</td>
 <td><input type="text" size="60" name="ad[image_alt]" value="<?php echo $image_alt;?>"/></td>
 </tr>
 <?php } ?>
@@ -159,9 +159,9 @@ show_menu($menusad);
 </select>&nbsp;<span id="dtime" class="f_red"></span></td>
 </tr>
 <?php if($DT['city']) { ?>
-<tr>
+<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
-<td><?php echo ajax_area_select('ad[areaid]', $L['allcity'], $areaid);?></td>
+<td><?php echo ajax_area_select('ad[areaid]', '请选择', $areaid);?></td>
 </tr>
 <?php } ?>
 <tr>

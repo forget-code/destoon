@@ -4,7 +4,7 @@ login();
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $DT['sms'] or dheader($MOD['linkurl']);
 if(!$MG['sms']) dalert(lang('message->without_permission_and_upgrade'), 'goback');
-$_user = $db->get_one("SELECT * FROM {$DT_PRE}member WHERE userid=$_userid");
+$_user = $db->get_one("SELECT mobile,vmobile FROM {$DT_PRE}member WHERE userid=$_userid");
 if(!$_user['mobile'] || !$_user['vmobile']) message($L['sms_msg_validate'], 'validate.php?action=mobile');
 require DT_ROOT.'/include/post.func.php';
 $mobile = $_user['mobile'];
@@ -17,7 +17,6 @@ switch($action) {
 			$message = trim($content);
 			$message or message($L['sms_msg_content']);
 			$mob = explode("\n", $mob);
-			$DT['sms_sign'] = '';
 			$message = strip_sms($message);
 			$word = word_count($message);
 			$sms_num = ceil($word/$DT['sms_len']);
@@ -40,7 +39,7 @@ switch($action) {
 		} else {
 			$mob = isset($mob) ? $mob : '';
 			if(isset($auth)) {
-				$auth = decrypt($auth);
+				$auth = decrypt($auth, DT_KEY.'SMS');
 				if(is_mobile($auth)) $mob = $auth;
 			}
 			$head_title = $L['sms_add_title'];
@@ -62,7 +61,7 @@ switch($action) {
 					sms_add($_username, $total);
 					sms_record($_username, $total, 'system', $L['sms_buy_record'], $amount.$DT['money_unit']);
 				}
-				dmsg($L['sms_buy_success'], 'sms.php');
+				dmsg($L['sms_buy_success'], '?action=index');
 			}
 		} else {
 			message($L['sms_msg_no_price']);

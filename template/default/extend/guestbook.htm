@@ -5,19 +5,19 @@
 	<td valign="top" class="left_menu">
 		<ul>
 		<li class="left_menu_li"><a href="{$MODULE[1][linkurl]}">网站首页</a></li>
-		<li class="left_menu_on" id="type_guestbook"><a href="./">网站留言</a></li>
+		<li class="left_menu_on" id="type_guestbook"><a href="{$EXT[guestbook_url]}">网站留言</a></li>
 		</ul>
 	</td>
 	<td valign="top">
 		<div class="left_box">		
-			<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="./">网站留言</a></div>
+			<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$EXT[guestbook_url]}">网站留言</a></div>
 			<div class="pd20">
-			<form action="index.php" method="post" onsubmit="return check();">
+			<form action="{$EXT[guestbook_url]}index.php" method="post" onsubmit="return check();">
 			<table width="100%" cellpadding="8" cellspacing="1" bgcolor="#E3EEF5">
 			<tr>
 			<td bgcolor="#F1F7FC" width="90" align="right">留言类型&nbsp;&nbsp;</td>
 			<td bgcolor="#FFFFFF">
-			<select name="post[type]">
+			<select name="post[type]" id="type">
 			<option value="">请选择</option>
 			{loop $TYPE $k $v}
 			<option value="{$v}">{$v}</option>
@@ -107,11 +107,11 @@
 			{if $lists}
 			<div class="b10">&nbsp;</div><div class="b10">&nbsp;</div>
 			<div class="fsearch">
-			<form action="index.php">
+			<form action="{$EXT[guestbook_url]}index.php">
 			<strong>关键词：</strong>
 			<input type="text" size="50" name="kw" value="{$kw}"/> 
 			<input type="submit" value="搜索"/>
-			<input type="button" value="重置" onclick="Go('./');"/>
+			<input type="button" value="重置" onclick="Go('{$EXT[guestbook_url]}');"/>
 			</form>
 			</div>
 			{loop $lists $k $v}
@@ -146,7 +146,6 @@ function check() {
 	l = Dd(f).value.length;
 	if(l < 5 || l > 1000) {
 		Dmsg('内容应为5-1000字，当前已输入'+l+'字', f);
-		Dd(f).focus();
 		return false;
 	}
 	{if $MOD[guestbook_captcha]}
@@ -154,11 +153,14 @@ function check() {
 	l = Dd(f).value;
 	if(!is_captcha(l)) {
 		Dmsg('请填写验证码', f);
-		Dd(f).focus();
 		return false;
 	}
 	{/if}
 	return true;
 }
+{if $action == 'report'}
+$('#type').val('不良信息');
+Dd('content').value = Dd('content').value+"\n-------------------------------\n举报理由：\n";
+{/if}
 </script>
 {template 'footer'}

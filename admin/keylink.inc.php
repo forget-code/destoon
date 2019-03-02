@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 isset($item) or msg();
 $menus = array(
     array('关联链接', '?file='.$file.'&item='.$item),
@@ -58,10 +58,14 @@ class keylink {
 	var $table;
 	var $errmsg = errmsg;
 
-	function keylink() {
+	function __construct() {
 		global $db;
 		$this->db = &$db;
 		$this->table = $this->db->pre.'keylink';
+	}
+
+	function keylink() {
+		$this->__construct();
 	}
 
 	function get_list($condition) {

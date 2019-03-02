@@ -8,7 +8,7 @@ class news {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function news() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'news';
 		$this->table_data = $db->pre.'news_data';
@@ -16,11 +16,16 @@ class news {
 		$this->fields = array('title','typeid','level','style','status','username','addtime','editor','edittime','linkurl','note');
     }
 
+    function news() {
+		$this->__construct();
+    }
+
 	function pass($post) {
 		global $L;
 		if(!is_array($post)) return false;
 		if(!$post['title']) return $this->_($L['pass_title']);
 		if(!$post['content']) return $this->_($L['pass_content']);
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
@@ -63,6 +68,7 @@ class news {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -85,7 +91,7 @@ class news {
         $sqlv = substr($sqlv, 1);
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
-		$this->db->query("INSERT INTO {$this->table_data} (itemid,content) VALUES ('$this->itemid', '$post[content]')");		
+		$this->db->query("REPLACE INTO {$this->table_data} (itemid,content) VALUES ('$this->itemid', '$post[content]')");		
 		$this->update($this->itemid);
 		if($post['username'] && $MOD['credit_add_news']) {
 			credit_add($post['username'], $MOD['credit_add_news']);

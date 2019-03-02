@@ -1,13 +1,15 @@
 <?php
+$_SERVER['REQUEST_URI'] = '';
 $_DPOST = $_POST;
-require '../../.../common.inc.php';
+$_DGET = $_GET;
+require '../../../common.inc.php';
 $_POST = $_DPOST;
-if(!$_POST) exit('fail');
+$_GET = $_DGET;
+if(!$_POST && !$_GET) exit('fail');
 $bank = 'chinapay';
 $PAY = cache_read('pay.php');
 if(!$PAY[$bank]['enable']) exit('fail');
 if(!$PAY[$bank]['partnerid']) exit('fail');
-//if(!$PAY[$bank]['keycode']) exit('fail');
 $receive_url = '';
 require DT_ROOT."/api/pay/".$bank."/netpayclient_config.php";
 //加载 netpayclient 组件
@@ -41,18 +43,7 @@ if($flag) {
 				$charge_amount = $r['amount'];
 				$editor = 'N'.$bank;
 				if($amount == padstr($charge_money*100, 12)) {
-					$db->query("UPDATE {$DT_PRE}finance_charge SET status=3,money=$charge_money,receivetime='$DT_TIME',editor='$editor' WHERE itemid=$charge_orderid");
-					require DT_ROOT.'/include/module.func.php';
-					money_add($r['username'], $r['amount']);
-					money_record($r['username'], $r['amount'], $PAY[$bank]['name'], 'system', '在线充值', '订单ID:'.$charge_orderid);
-					$MOD = cache_read('module-2.php');
-					if($MOD['credit_charge'] > 0) {
-						$credit = intval($r['amount']*$MOD['credit_charge']);
-						if($credit > 0) {
-							credit_add($r['username'], $credit);
-							credit_record($r['username'], $credit, 'system', '充值奖励', '充值'.$r['amount'].$DT['money_unit']);
-						}
-					}
+					require DT_ROOT.'/api/pay/success.inc.php';
 					exit('success');
 				} else {
 					$note = '充值金额不匹配S:'.$charge_money.'R:'.$amount;

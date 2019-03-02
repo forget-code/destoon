@@ -7,16 +7,21 @@ class address {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function address() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'address';
 		$this->db = &$db;
-		$this->fields = array('address','postcode','truename','telephone','mobile','username','addtime','editor','edittime','listorder','note');
+		$this->fields = array('areaid','address','postcode','truename','telephone','mobile','username','addtime','editor','edittime','listorder','note');
+    }
+
+    function address() {
+		$this->__construct();
     }
 
 	function pass($post) {
 		global $L;
 		if(!is_array($post)) return false;
+		if(!$post['areaid']) return $this->_($L['pass_areaid']);
 		if(!$post['address']) return $this->_($L['pass_address']);
 		if(!$post['postcode']) return $this->_($L['pass_postcode']);
 		if(!$post['truename']) return $this->_($L['pass_truename']);
@@ -26,7 +31,8 @@ class address {
 
 	function set($post) {
 		global $DT_TIME, $_username;
-		if(isset($post['areaid'])) $post['address'] = area_pos($post['areaid'], '').$post['address'];
+		$pos = area_pos($post['areaid'], '');
+		if(substr($post['address'], 0, strlen($pos)) == $pos) $post['address'] = substr($post['address'], strlen($pos));
 		$post['edittime'] = $DT_TIME;
 		$post['editor'] = $_username;
 		$post['listorder'] = intval($post['listorder']);
@@ -52,18 +58,19 @@ class address {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
+			if($r['areaid']) $r['address'] = area_pos($r['areaid'], '').$r['address'];
 			$lists[] = $r;
 		}
 		return $lists;
 	}
 
 	function add($post) {
-		global $MOD, $L;
 		$post = $this->set($post);
 		$sqlk = $sqlv = '';
 		foreach($post as $k=>$v) {
@@ -88,7 +95,6 @@ class address {
 	}
 
 	function delete($itemid, $all = true) {
-		global $MOD, $L;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->delete($v); }
 		} else {

@@ -17,17 +17,21 @@ switch($action) {
 		if($submit) {
 			if($do->pass($post)) {
 				$post['username'] = $_username;
-				$post['level'] = 0;
+				$post['level'] = $post['addtime'] = 0;
 				$need_check =  $MOD['news_check'] == 2 ? $MG['check'] : $MOD['news_check'];
 				$post['status'] = get_status(3, $need_check);
 				$do->add($post);
-				dmsg($L['op_add_success'], $MOD['linkurl'].'news.php?status='.$post['status']);
+				dmsg($L['op_add_success'], '?status='.$post['status']);
 			} else {
 				message($do->errmsg);
 			}
 		} else {
-			$addtime = timetodate($DT_TIME);
-			$type_select = type_select('news-'.$_userid, 0, 'post[typeid]', $L['default_type']);
+			foreach($do->fields as $v) {
+				$$v = '';
+			}
+			$content = '';
+			$typeid = 0;
+			$type_select = type_select($TYPE, 0, 'post[typeid]', $L['default_type']);
 			$head_title = $L['news_title_add'];
 		}
 	break;
@@ -50,23 +54,26 @@ switch($action) {
 		} else {
 			extract($r);
 			$addtime = timetodate($addtime);
-			$type_select = type_select('news-'.$_userid, 0, 'post[typeid]', $L['default_type'], $typeid);
+			$type_select = type_select($TYPE, 0, 'post[typeid]', $L['default_type'], $typeid);
 			$head_title = $L['news_title_edit'];
 		}
 	break;
 	case 'delete':
 		$itemid or message($L['news_msg_choose']);
-		$do->itemid = $itemid;
-		$r = $do->get_one();
-		if(!$r || $r['username'] != $_username) message();
-		$do->recycle($itemid);
+		$itemids = is_array($itemid) ? $itemid : array($itemid);
+		foreach($itemids as $itemid) {
+			$do->itemid = $itemid;
+			$item = $do->get_one();
+			if(!$item || $item['username'] != $_username) message();
+			$do->recycle($itemid);
+		}
 		dmsg($L['op_del_success'], $forward);
 	break;
 	default:
 		$status = isset($status) ? intval($status) : 3;
 		in_array($status, array(1, 2, 3)) or $status = 3;
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
-		$type_select = type_select('news-'.$_userid, 0, 'typeid', $L['default_type'], $typeid, '', $L['all_type']);
+		$type_select = type_select($TYPE, 0, 'typeid', $L['default_type'], $typeid, '', $L['all_type']);
 		$condition = "username='$_username' AND status=$status";
 		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
 		if($typeid > -1) $condition .= " AND typeid=$typeid";

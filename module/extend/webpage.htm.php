@@ -11,6 +11,7 @@ $head_title = $seo_title ? $seo_title : $title;
 $head_keywords = $seo_keywords;
 $head_description = $seo_description;
 $destoon_task = "moduleid=$moduleid&html=webpage&itemid=$itemid";
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'about.php?itemid='.$itemid;
 $template = $item['template'] ? $item['template'] : 'webpage';
 ob_start();
 include template($template, $module);

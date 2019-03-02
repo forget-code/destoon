@@ -72,7 +72,7 @@ a.t:hover{text-decoration:underline;}
 .pages a:hover{background:#FFFFFF;border:#2E6AB1 1px solid;color:#FF6600;padding:1px;text-decoration:none;}
 .pages strong{background:#2E6AB1;padding:1px;border:#1D589E 1px solid;color:#FFFFFF;}
 .pages_inp{border:#2E6AB1 1px solid;padding:1px;width:30px;text-align:center;color:#666666;}
-.pages_btn{width:26px;background:#F1F7FC;border:#2E6AB1 1px solid;color:#004499;font-weight:bold;font-size:11px;}
+.pages_btn{width:30px;background:#F1F7FC;border:#2E6AB1 1px solid;color:#004499;font-weight:bold;font-size:11px;}
 .pages label{background:#FFFFFF;border:#2E6AB1 1px solid;color:#004499;padding:1px 5px 1px 5px;}
 .pages label em{color:red;font-weight:bold;font-style:normal;}
 .pages label span{font-weight:bold;}
@@ -106,4 +106,7 @@ dd a{width:100%;display:block;}
 .side{width:7px;height:100%;font-size:1px;background:#E3ECF7 url('side.gif') repeat-y;cursor:pointer;}
 .side_on{width:7px;height:51px;background:url('side_off.gif') no-repeat 1px center;}
 .side_off{width:7px;height:51px;background:url('side_on.gif') no-repeat 1px center;}
+.back2top {width:38px;height:38px;position:fixed;_position:absolute;right:10px;bottom:10px;_bottom:auto;cursor:pointer;display:none;}
+.back2top a {display:block;width:100%;height:100%;background:url('back2top.png') no-repeat;}
+.back2top a:hover {background:url('back2top.png') no-repeat -38px 0;}
 #msgbox{z-index:1000;position:absolute;background:url('msgbox.gif') no-repeat;top:8px;right:1px;height:18px;overflow:hidden;color:#FFFFFF;padding:2px 15px 0 20px;line-height:15px;letter-spacing:1px;cursor:pointer;}

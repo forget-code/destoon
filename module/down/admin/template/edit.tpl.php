@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $tname;?></div>
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
@@ -79,7 +79,7 @@ show_menu($menus);
 	//window.onload = function() {
 		var settings = {
 			flash_url : "<?php echo DT_PATH;?>api/swfupload/swfupload.swf",
-			upload_url: "<?php echo DT_PATH;?>upload.php",
+			upload_url: UPPath,
 			post_params: {"from": "file", "width": "100", "height": "100", "swf_userid": "<?php echo $_userid;?>", "swf_username": "<?php echo $_username;?>", "swf_groupid": "<?php echo $_groupid;?>", "swf_company": "<?php echo $_company;?>", "swf_auth": "<?php echo md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP);?>", "swfupload": "1"},
 			file_size_limit : "1000 MB",
 			//file_types : "*.*",
@@ -147,7 +147,6 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
-<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -156,7 +155,7 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 下载说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 
@@ -261,16 +260,7 @@ function check() {
 		return false;
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	if(Dd('property_require') != null) {
-		var ptrs = Dd('property_require').getElementsByTagName('option');
-		for(var i = 0; i < ptrs.length; i++) {		
-			f = 'property-'+ptrs[i].value;
-			if(Dd(f).value == 0 || Dd(f).value == '') {
-				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
-				return false;
-			}
-		}
-	}
+	<?php echo $CP ? property_js() : '';?>
 	return true;
 }
 function auto_type() {
@@ -279,21 +269,21 @@ function auto_type() {
 	var file_type = '';
 	if('rar|zip'.indexOf(file_ext) != -1) {
 		file_type = 'rar';
-	} else if('jpg|png|gif|bmp'.indexOf(file_ext) != -1) {
+	} else if('jpg|jpeg|png|gif|bmp'.indexOf(file_ext) != -1) {
 		file_type = 'img';
-	} else if('wma|wav|rm|rmvb|ram|mp4|mov'.indexOf(file_ext) != -1) {
+	} else if('wma|wav|rm|rmvb|ram|mp4|flv|mov'.indexOf(file_ext) != -1) {
 		file_type = 'mov';
 	} else if('ext|pdf|doc|xls|ppt|swf|chm|hlp'.indexOf(file_ext) != -1) {
 		file_type = file_ext;
 	} else if('docx|xlsx|pptx'.indexOf(file_ext) != -1) {
 		file_type = file_ext.substring(0, 3);
 	}
-	if(file_type) select_op('fileext', file_type);
+	if(file_type) $('#fileext').val(file_type);
 }
 function initd(file_size) {
 	auto_type();
 	Dd('filesize').value = file_size;
-	select_op('unit', 'M');
+	$('#unit').val('M');
 }
 </script>
 <script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>

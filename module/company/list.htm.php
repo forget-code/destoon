@@ -39,7 +39,7 @@ for(; $page <= $total; $page++) {
 	$seo_file = 'list';
 	include DT_ROOT.'/include/seo.inc.php';
 	$destoon_task = "moduleid=$moduleid&html=list&catid=$catid&page=$page";
-	if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&catid='.$catid.($page > 1 ? '&page='.$page : '');
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, $catid, 0, $page);
 	$filename = DT_ROOT.'/'.$MOD['moduledir'].'/'.listurl($CAT, $page);
 	ob_start();
 	include template($template, $module);

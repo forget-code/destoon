@@ -37,7 +37,8 @@ switch($action) {
 			$message['typeid'] = $typeid;
 			clear_upload($message['content']);
 			if($do->send($message)) {
-				dmsg(isset($message['save']) ? $L['message_msg_save_draft'] : $L['message_msg_send'], '?action=send');
+				if($forward && strpos($forward, 'message.php') !== false) $forward = '?action=send';
+				dmsg(isset($message['save']) ? $L['message_msg_save_draft'] : $L['message_msg_send'], $forward);
 			} else {
 				message($do->errmsg);
 			}
@@ -74,19 +75,23 @@ switch($action) {
 		$itemid or message($L['message_msg_choose']);
 		$recycle = isset($recycle) ? 0 : 1;
 		$do->itemid = $itemid;
-		$message = $do->delete($recycle);
+		$do->delete($recycle);
 		dmsg($L['op_del_success'], $forward);
 	break;
 	case 'mark':
 		$itemid or message($L['message_msg_choose']);
 		$do->itemid = $itemid;
-		$message = $do->mark();
+		$do->mark();
+		dmsg($L['message_msg_mark'], $forward);
+	break;
+	case 'markall':
+		$message = $do->markall();
 		dmsg($L['message_msg_mark'], $forward);
 	break;
 	case 'restore':
 		$itemid or message($L['message_msg_choose']);
 		$do->itemid = $itemid;
-		$message = $do->restore();
+		$do->restore();
 		dmsg($L['message_msg_restore'], $forward);
 	break;
 	case 'color':
@@ -202,9 +207,9 @@ switch($action) {
 	case 'last':
 		if($_message) {
 			$item = $db->get_one("SELECT itemid,feedback FROM {$DT_PRE}message WHERE touser='$_username' AND status=3 AND isread=0 ORDER BY itemid DESC");
-			if($item) dheader($MOD['linkurl'].'message.php?action=show&itemid='.$item['itemid'].($item['feedback'] ? '&feedback=1' : ''));
+			if($item) dheader('?action=show&itemid='.$item['itemid'].($item['feedback'] ? '&feedback=1' : ''));
 		} 
-		dheader('message.php');
+		dheader('?action=index');
 	break;
 	default:
 		if($MG['inbox_limit']) {

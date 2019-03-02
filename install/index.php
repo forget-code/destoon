@@ -1,12 +1,13 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 error_reporting(0);
 set_time_limit(0);
-set_magic_quotes_runtime(0);
+if(function_exists('set_magic_quotes_runtime')) @set_magic_quotes_runtime(0);
 define('IN_DESTOON', true);
+define('DT_ADMIN', true);
 define('DT_DEBUG', 0);
 define('IN_ROOT', str_replace("\\", '/', dirname(__FILE__)));
 define('DT_ROOT', substr(IN_ROOT, 0, -8));
@@ -34,7 +35,7 @@ switch($step) {
 	case '1'://协议
 		$license = file_get_contents(DT_ROOT.'/license.txt');
 		$DT_LICENSE = md5($license);
-		if($DT_LICENSE != 'ede11fdcdb179260657dba4f3fc42b0e' && $DT_LICENSE != '624100e3dd1887d79ef4c713f0f30cb2') {
+		if($DT_LICENSE != '15b4b2ae1be9e2020f8de85fc4d81148' && $DT_LICENSE != '49ced4ae66626e1d9d261a7dcaac2ff9') {
 			$msg = '请检查网站根目录下 license.txt 文件是否存在或被修改<br/>使用Destoon B2B网站管理系统，必须同意license.txt内容，并保留此文件<br/>如果使用FTP上传文件，请使用二进制模式上传 license.txt';
 			include IN_ROOT.'/msg.tpl.php';
 			exit;
@@ -51,6 +52,9 @@ switch($step) {
 		}
 		$PHP_MYSQL = '';
 		if(extension_loaded('mysql')) {
+			$PHP_MYSQL = '支持';
+			$mysql_pass = true;
+		} elseif(extension_loaded('mysqli')) {
 			$PHP_MYSQL = '支持';
 			$mysql_pass = true;
 		} else {
@@ -104,6 +108,13 @@ switch($step) {
 		include IN_ROOT.'/step_'.$step.'.tpl.php';
 	break;
 	case '4'://数据库
+		if(extension_loaded('mysql')) {
+			//
+		} elseif(extension_loaded('mysqli')) {
+			$c = file_get(DT_ROOT.'/config.inc.php');
+			$c = str_replace($CFG['database'], 'mysqli', $c);
+			file_put(DT_ROOT.'/config.inc.php', $c);
+		}
 		$DT_URL = get_env('url');
 		$DT_URL = substr($DT_URL, 0, strpos($DT_URL, '?') === false ? -17 : -18);
 		$percent = '60%';
@@ -117,10 +128,20 @@ switch($step) {
 		if(!preg_match("/^[a-z0-9]+$/i", $username) || strlen($username) < 4) dexit('请填写正确的超级管理员户名');
 		if(strlen($password) < 6) dexit('超级管理员密码最少6位');
 		if(strlen($email) < 6 || !preg_match("/^[\w\-\.]+@[\w\-\.]+(\.\w+)+$/", $email)) dexit('请填写正确的超级管理员Email');
-		if(!mysql_connect($db_host, $db_user, $db_pass)) dexit('无法连接到数据库服务器，请检查配置');
 		$db_name or dexit('请填写数据库名');
-		if(!mysql_select_db($db_name)) {
-			if(!mysql_query("CREATE DATABASE $db_name")) dexit('指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库');
+		if($CFG['database'] == 'mysqli') {
+			@list($db_host, $db_port) = explode(':', $db_host);
+			$db_port or $db_port = 3306;
+			$connid = mysqli_init();
+			if(!mysqli_real_connect($connid, $db_host, $db_user, $db_pass, false, $db_port)) dexit('无法连接到数据库服务器，请检查配置');
+			if(!mysqli_select_db($connid, $db_name)) {
+				if(!mysqli_query($connid, "CREATE DATABASE $db_name")) dexit('指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库');
+			}
+		} else {
+			if(!mysql_connect($db_host, $db_user, $db_pass)) dexit('无法连接到数据库服务器，请检查配置');
+			if(!mysql_select_db($db_name)) {
+				if(!mysql_query("CREATE DATABASE $db_name")) dexit('指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库');
+			}
 		}
 
 		$config = array();
@@ -132,7 +153,7 @@ switch($step) {
 		$config['url'] = $CFG['url'] = $url;
 		$config['cache_pre'] = $CFG['cache_pre'] = 'c'.strtolower(random(2)).'_';
 		$config['cookie_pre'] = $CFG['cookie_pre'] = 'c'.strtolower(random(2)).'_';
-		$config['authkey'] = $CFG['authkey'] = random(15);
+		$config['authkey'] = $CFG['authkey'] = random(16);
 		//保存配置文件
 		$tmp = file_get_contents(DT_ROOT.'/config.inc.php');
 		foreach($config as $k=>$v)	{
@@ -151,14 +172,16 @@ switch($step) {
 		define('errmsg', 'Invalid Request');
 
 		//创建数据
-		require DT_ROOT.'/include/db_mysql.class.php';
+		require DT_ROOT.'/include/db_'.$CFG['database'].'.class.php';
+		require DT_ROOT.'/include/post.func.php';
 		require DT_ROOT.'/include/sql.func.php';
 		require DT_ROOT.'/admin/global.func.php';
-		$db = new db_mysql();
+		$db_class = 'db_'.$CFG['database'];
+		$db = new $db_class;
 		$db->connect($db_host, $db_user, $db_pass, $db_name, $CFG['db_expires'], $CFG['db_charset'], $CFG['pconnect']);
 		$db->pre = $DT_PRE;
 		sql_execute(file_get_contents(IN_ROOT.'/table.sql'));
-		sql_execute(file_get_contents(IN_ROOT.'/data.sql'));
+		sql_execute(file_get_contents(IN_ROOT.'/query.sql'));
 
 		//Setting
 		$DT = array();
@@ -180,14 +203,19 @@ switch($step) {
 		$content = str_replace('http://demo.destoon.com/v'.DT_VERSION.'/', $CFG['url'], $content);
 		cache_write('ad_14_0.htm', $content, 'htm');
 
-		$pay = include DT_ROOT.'/file/setting/pay.php';		
+		$pay = include DT_ROOT.'/file/setting/pay.php';
 		foreach($pay as $k=>$v) {
 			update_setting('pay-'.$k, $v);
 		}
-		$oauth = include DT_ROOT.'/file/setting/oauth.php';		
+		$oauth = include DT_ROOT.'/file/setting/oauth.php';
 		foreach($oauth as $k=>$v) {
 			update_setting('oauth-'.$k, $v);
 		}
+		$weixin = include DT_ROOT.'/file/setting/weixin.php';
+		update_setting('weixin', $weixin);
+		$weixin_menu = include DT_ROOT.'/file/setting/weixin-menu.php';
+		$weixin_menu[2][0]['key'] = $CFG['url'].'mobile/';
+		update_setting('weixin-menu', array('menu' => serialize($weixin_menu)));
 		for($i = 1; $i <= 7; $i++) {
 			$setting = include DT_ROOT.'/file/setting/group-'.$i.'.php';
 			if($setting) {
@@ -200,9 +228,13 @@ switch($step) {
 		//模块安装时间
 		$db->query("UPDATE {$DT_PRE}module SET installtime='$DT_TIME'");
 
-		//设置管理员
-		$md5_password = md5(md5($password));
-		$db->query("UPDATE {$DT_PRE}member SET username='$username',passport='$username',password='$md5_password',payword='$md5_password',email='$email',regip='$DT_IP',regtime='$DT_TIME',loginip='$DT_IP',logintime='$DT_TIME' WHERE userid=1");
+		//设置管理员	
+		$paysalt = random(8);
+		$payword = dpassword($password, $paysalt);
+		$passsalt = random(8);
+		$_password = dpassword($password, $passsalt);
+
+		$db->query("UPDATE {$DT_PRE}member SET username='$username',passport='$username',password='$_password',passsalt='$passsalt',payword='$payword',paysalt='$paysalt',email='$email',regip='$DT_IP',regtime='$DT_TIME',loginip='$DT_IP',logintime='$DT_TIME' WHERE userid=1");
 		$userurl = $CFG['url'].'index.php?homepage='.$username;
 		$db->query("UPDATE {$DT_PRE}company SET username='$username',linkurl='$userurl' WHERE userid=1");
 
@@ -263,15 +295,31 @@ switch($step) {
 		file_put(DT_ROOT.'/install/index.php', '<script type="text/javascript">window.location="../?success="+Math.random();</script>');
 	break;
 	case 'db_test':
-		if(!mysql_connect($tdb_host, $tdb_user, $tdb_pass)) exit('<script>alert("无法连接到数据库服务器，请检查配置");</script>');
-		if(!mysql_select_db($tdb_name)) {
-			if(!mysql_query("CREATE DATABASE $tdb_name")) exit('<script>alert("指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库");</script>');
-			mysql_select_db($tdb_name);
-		}
-		$tables = array();
-		$query = mysql_list_tables($tdb_name);
-		while($r = mysql_fetch_row($query)) {
-			$tables[] = $r[0];
+		if($CFG['database'] == 'mysqli') {
+			@list($tdb_host, $tdb_port) = explode(':', $tdb_host);
+			$tdb_port or $tdb_port = 3306;
+			$connid = mysqli_init();
+			if(!mysqli_real_connect($connid, $tdb_host, $tdb_user, $tdb_pass, false, $tdb_port)) exit('<script>alert("无法连接到数据库服务器，请检查配置");</script>');
+			if(!mysqli_select_db($connid, $tdb_name)) {
+				if(!mysqli_query($connid, "CREATE DATABASE $tdb_name")) exit('<script>alert("指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库");</script>');
+				mysqli_select_db($connid, $tdb_name);
+			}
+			$tables = array();
+			$result = mysqli_query($connid, "SHOW TABLES FROM `".$tdb_name."`");
+			while($r = mysqli_fetch_row($result)) {
+				if($r[0]) $tables[] = $r[0];
+			}
+		} else {
+			if(!mysql_connect($tdb_host, $tdb_user, $tdb_pass)) exit('<script>alert("无法连接到数据库服务器，请检查配置");</script>');
+			if(!mysql_select_db($tdb_name)) {
+				if(!mysql_query("CREATE DATABASE $tdb_name")) exit('<script>alert("指定的数据库不存在\n\n系统尝试创建失败，请通过其他方式建立数据库");</script>');
+				mysql_select_db($tdb_name);
+			}
+			$tables = array();
+			$result = mysql_query("SHOW TABLES FROM `".$tdb_name."`");
+			while($r = mysql_fetch_row($result)) {
+				if($r[0]) $tables[] = $r[0];
+			}
 		}
 		if(is_array($tables) && in_array($ttb_pre."company_setting", $tables)) {
 			if($ttb_test) {

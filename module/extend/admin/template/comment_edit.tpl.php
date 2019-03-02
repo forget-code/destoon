@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -13,7 +13,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 评论人</td>
-<td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $username : 'Guest';?></a> <input type="checkbox" name="post[hidden]" value="1" <?php if($hidden) echo 'checked';?>/> 匿名评论</td>
+<td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $passport : 'Guest';?></a> <input type="checkbox" name="post[hidden]" value="1" <?php if($hidden) echo 'checked';?>/> 匿名评论</td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> IP</td>
@@ -21,7 +21,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 评论原文</td>
-<td><a href="<?php echo $EXT['linkurl'];?>redirect.php?mid=<?php echo $item_mid;?>&itemid=<?php echo $item_id;?>" target="_blank" class="t"><?php echo $item_title;?></a></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?mid=<?php echo $item_mid;?>&itemid=<?php echo $item_id;?>" target="_blank" class="t"><?php echo $item_title;?></a></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 引用内容</td>

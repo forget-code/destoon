@@ -7,11 +7,15 @@ class alert {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function alert() {
+    function __construct() {
 		global $db;
 		$this->db = &$db;
 		$this->table = $this->db->pre.'alert';
 		$this->fields = array('word','email','mid','catid','areaid','rate','username','addtime','editor','edittime','status');
+    }
+
+    function alert() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -42,6 +46,7 @@ class alert {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -44,7 +44,7 @@ foreach($MODULE as $m) {
 <th>分类</th>
 <th width="14"> </th>
 <th>标题</th>
-<th width="120">添加时间</th>
+<th width="130">添加时间</th>
 <th>浏览</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>

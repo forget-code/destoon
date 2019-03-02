@@ -12,7 +12,7 @@
 </tr>
 {loop $tags $t}
 <tr bgcolor="#FFFFFF" align="center">
-	<td><a href="{$MODULE[10][linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}"{if $target} target="{$target}"{/if}><img src="{useravatar($t[username])}"/></a></td>
+	<td><a href="{$MODULE[10][linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}"{if $target} target="{$target}"{/if}><img src="{useravatar($t[username])}" width="48" height="48"/></a></td>
 	<td><a href="{$MODULE[10][linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}"{if $target} target="{$target}"{/if} class="b"><strong>{$t[title]}</strong></a></td>
 	<td>{$t[major]}</td>
 	<td>{$t[hits]}</td>

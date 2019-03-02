@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array(
     array('问题验证', '?file='.$file),
 );
@@ -22,10 +22,14 @@ class question {
 	var $db;
 	var $table;
 
-	function question() {
+	function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'question';
 		$this->db = &$db;
+	}
+
+	function question() {
+		$this->__construct();
 	}
 
 	function get_list($condition) {

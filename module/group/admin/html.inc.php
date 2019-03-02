@@ -1,9 +1,9 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('生成网页', '?moduleid='.$moduleid.'&file='.$file),
-    array('数据统计', 'javascript:Dwidget(\'?file=count&itemid=1&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
-    array('模块前台', $MOD['linkurl'], ' target="_blank"'),
+    array('数据统计', 'javascript:Dwidget(\'?file=count&action=stats&&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
+    array('模块首页', $MOD['linkurl'], ' target="_blank"'),
 );
 $all = (isset($all) && $all) ? 1 : 0;
 $one = (isset($one) && $one) ? 1 : 0;
@@ -49,7 +49,7 @@ switch($action) {
 		$update = (isset($update) && $update) ? 1 : 0;
 		if(!$update && !$MOD['show_html']) {
 			if($one) dheader( '?file=html&action=back&mid='.$moduleid);
-			$all ? msg($MOD['name'].'生成成功', $this_forward) : dmsg($MOD['name'].'生成成功', $this_forward);
+			$all ? msg('帖子生成成功', $this_forward) : dmsg('帖子生成成功', $this_forward);
 		}
 		$catid = isset($catid) ? intval($catid) : '';
 		$sql = $catid ? " AND catid=$catid" : '';
@@ -83,10 +83,10 @@ switch($action) {
 				$all ? msg('', '?moduleid='.$moduleid.'&file='.$file.'&action=index&all=1&one='.$one) : dmsg('更新成功', $this_forward);
 			} else {
 				if($one) dheader( '?file=html&action=back&mid='.$moduleid);
-				$all ? msg($MOD['name'].'生成成功', $this_forward) : dmsg($MOD['name'].'生成成功', $this_forward);
+				$all ? msg('帖子生成成功', $this_forward) : dmsg('帖子生成成功', $this_forward);
 			}
 		}
-		msg('ID从'.$fid.'至'.($itemid-1).$MOD['name'].($update ? '更新' : '生成').'成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&update=$update&all=$all&one=$one");
+		msg('ID从'.$fid.'至'.($itemid-1).'帖子'.($update ? '更新' : '生成').'成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&update=$update&all=$all&one=$one");
 	break;
 	case 'cate':
 		$catid or msg('请选择分类');

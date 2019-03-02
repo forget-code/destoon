@@ -5,6 +5,7 @@ $names = array (
   'list-buy' => '求购列表',
   'list-cat' => '分类列表',
   'list-child' => '子分类列表',
+  'list-club' => '帖子列表',
   'list-com' => '公司名列表',
   'list-company' => '公司列表',
   'list-down' => '下载列表',

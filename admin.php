@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 @set_time_limit(0);
@@ -20,10 +20,11 @@ if($DT['city']) {
 	$_aid < 1 or dalert('系统未开启分站功能，您的分站管理帐号暂不可用', $MODULE[2]['linkurl'].'logout.php');
 }
 require DT_ROOT.'/admin/global.func.php';
+require DT_ROOT.'/admin/license.func.php';
 require DT_ROOT.'/include/post.func.php';
 require_once DT_ROOT.'/include/cache.func.php';
 isset($file) or $file = 'index';
-$secretkey = 'admin_'.strtolower(substr(DT_KEY, -6));
+$secretkey = 'a'.strtolower(substr(md5(DT_KEY), -6));
 if($CFG['authadmin'] == 'cookie') {
 	$_destoon_admin = get_cookie($secretkey);
 	$_destoon_admin = $_destoon_admin ? intval($_destoon_admin) : 0;
@@ -44,6 +45,7 @@ if($file != 'login') {
 }
 if($DT['admin_log'] && $action != 'import') admin_log();
 if($DT['admin_online']) admin_online();
+if(isset($reason) && is_array($itemid)) admin_notice();
 $widget = isset($widget) ? intval($widget) : 0;
 $psize = isset($psize) ? intval($psize) : 0;
 if($psize > 0 && $psize != $pagesize) {

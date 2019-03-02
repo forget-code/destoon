@@ -5,19 +5,13 @@ $success = 0;
 $DS = array();
 if($_SESSION['access_token']) {
 	$url = 'https://apis.live.net/v5.0/me?access_token='.$_SESSION['access_token'];
-	$cur = curl_init($url);
-	curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
-	curl_setopt($cur, CURLOPT_HEADER, 0);
-	curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
-	$rec = curl_exec($cur);
-	curl_close($cur);
+	$rec = dcurl($url);
 	$arr = json_decode($rec, true);
 	if(isset($arr['id'])) {
 		$success = 1;
 		$openid = $arr['id'];
 		if($arr['first_name']) {
-			$nickname = convert($arr['first_name'], 'utf-8', DT_CHARSET);
+			$nickname = convert($arr['first_name'], 'UTF-8', DT_CHARSET);
 		} else {
 			$nickname = $arr['emails']['account'];
 			$nickname = str_replace(strstr($nickname, '@'), '', $nickname);

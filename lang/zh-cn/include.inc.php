@@ -1,11 +1,12 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 /* fields.func.php */
 $L['fields_input'] = '请填写{V0}';
+$L['fields_choose'] = '请选择{V0}';
 $L['fields_valid'] = '请填写正确的{V0}';
 $L['fields_area'] = '请选择地区';
 $L['fields_less'] = '{V0}不能少于{V1}字符';
@@ -33,8 +34,6 @@ $L['url_php'] = '动态';
 $L['url_htm'] = '静态';
 $L['url_rewrite'] = '伪静态';
 $L['url_eg'] = '例';
-/* tree.class.php */
-$L['tree_icon'] = array('│','├','└');
 /* upload.class.php */
 $L['upload_size_limit'] = '文件大小超过了限制';
 $L['upload_not_allow'] = '不允许上传此类文件';

@@ -1,5 +1,5 @@
 <?php 
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $edition = edition(1);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -43,7 +43,13 @@ $edition = edition(1);
 		</tr>
 		<tr>
 		<td>&nbsp;密&nbsp;&nbsp;&nbsp;码</td>
-		<td><?php include template('password', 'chip');?></td>
+		<td><input name="password" type="password" class="inp" style="width:140px;" id="password"<?php if(isset($password)) { ?> value="<?php echo $password;?>"<?php } ?>/>&nbsp;
+		<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/keyboard.js"></script>
+		<img src="<?php echo DT_STATIC;?>file/image/keyboard.gif" title="密码键盘" alt="" class="c_p" onclick="_k('password', 'kb', this);"/>
+		<div id="kb" style="display:none;"></div>
+		<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/md5.js"></script>
+		<script type="text/javascript">init_md5();</script>
+		</td>
 		</tr>
 		<?php if($DT['captcha_admin']) { ?>
 		<tr>
@@ -53,7 +59,7 @@ $edition = edition(1);
 		<?php } ?>
 		<tr>
 		<td></td>
-		<td><input type="submit" name="submit" value="登 录" class="btn" tabindex="4"/>&nbsp;&nbsp;<input type="button" value="退 出" class="btn" onclick="top.Go('<?php echo DT_PATH;?>');"/>
+		<td><input type="submit" name="submit" value="登 录" class="btn" tabindex="4" id="submit"/>&nbsp;&nbsp;<input type="button" value="退 出" class="btn" onclick="top.Go('<?php echo DT_PATH;?>');"/>
 		</td>
 		</tr>
 		</table>
@@ -61,13 +67,13 @@ $edition = edition(1);
 		</div>
 	</div>
 	<?php if(strpos(get_env('self'), '/admin.php') !== false) { ?>
-	<div style="margin:10px 40px 0 40px;border:#FF8D21 1px solid;background:#FFFFDD;padding:8px;"><img src="admin/image/notice.gif" align="absmiddle"/> 提示：为了系统安全，请修改后台文件名admin.php</div>
+	<div style="margin:10px 40px 0 40px;border:#FF8D21 1px solid;background:#FFFFDD;padding:8px;display:none;" id="tips"><img src="admin/image/notice.gif" align="absmiddle"/> 提示：为了系统安全，请尽快修改后台地址 &nbsp;<a href="http://www.destoon.com/doc/use/34.html" target="_blank" style="color:#006699;">帮助&#187;</a></div>
+	<script type="text/javascript">$(function(){$('#tips').slideDown(300);});</script>
 	<?php } ?>
 </td>
 </tr>
 </table>
 <script type="text/javascript">
-if(Dd('password') == null) alert('看不到密码输入框？ 请检查file/cache目录是否可写');
 if(Dd('username').value == '') {
 	Dd('username').focus();
 } else {

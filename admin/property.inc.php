@@ -1,13 +1,14 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $CAT or msg('请指定分类ID');
 $menus = array (
     array('添加属性', '?file='.$file.'&catid='.$catid.'&action=add'),
     array('属性参数', '?file='.$file.'&catid='.$catid),
+    array('复制属性', '?file='.$file.'&catid='.$catid.'&action=copy'),
 );
 $TYPE = array('单行文本(text)', '多行文本(textarea)', '列表选择(select)', '复选框(checkbox)');
 $do = new property;
@@ -43,6 +44,30 @@ switch($action) {
 			include tpl('property_edit');
 		}
 	break;
+	case 'copy':
+		if($submit) {
+			if($type) {
+				$fromid = intval($fromid);
+				$fromid or msg('请选择来源分类');
+				$fromid != $catid or msg('来源分类不能与当前分类相同');
+				$id = $fromid;
+				$type = 1;
+			} else {
+				$pid = intval($pid);
+				$pid or msg('请填写属性ID');
+				$id = $pid;
+				$type = 0;
+			}
+			$name = $name ? 1 : 0;
+			if($do->copy($id, $type, $name)) {
+				dmsg('属性复制成功', '?file='.$file.'&catid='.$catid);
+			} else {
+				msg($do->errmsg);
+			}
+		} else {
+			include tpl('property_copy');
+		}
+	break;
 	case 'order':
 		$do->order($listorder, $pid);
 		dmsg('排序成功', $forward);
@@ -65,10 +90,14 @@ class property {
 	var $table;
 	var $errmsg = errmsg;
 
-	function property() {
+	function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'category_option';
 		$this->db = &$db;
+	}
+
+	function property() {
+		$this->__construct();
 	}
 
 	function pass($post) {
@@ -83,7 +112,7 @@ class property {
 	}
 
 	function set($post) {
-		$post['value'] = $post['type'] ? trim($post['value']) : '';
+		$post['value'] = trim($post['value']);
 		if($post['type'] < 2) $post['search'] = 0;
 		return $post;
 	}
@@ -109,6 +138,35 @@ class property {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE oid=$this->oid");
 		return true;
+	}
+
+	function copy($id, $type, $name) {
+		$i = 0;
+		$condition = $type ? "catid=$id" : "oid=$id";
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE {$condition}");
+		while($r = $this->db->fetch_array($result)) {
+			if($name) {
+				$n = daddslashes($r['name']);
+				$t = $this->db->get_one("SELECT * FROM {$this->table} WHERE catid=$this->catid AND name='$n'");
+				if($t) {
+					if($type) continue;
+					return $this->_('属性名称 ['.$r['name'].'] 已存在');
+				}
+			}
+			unset($r['oid']);
+			$r['catid'] = $this->catid;
+			$post = daddslashes($r);
+			$sqlk = $sqlv = '';
+			foreach($post as $k=>$v) {
+				$sqlk .= ','.$k; $sqlv .= ",'$v'";
+			}
+			$sqlk = substr($sqlk, 1);
+			$sqlv = substr($sqlv, 1);
+			$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+			$i++;
+		}
+		if($i) return true;
+		return $this->_('属性参数不存在或存在同名');
 	}
 
 	function get_one() {

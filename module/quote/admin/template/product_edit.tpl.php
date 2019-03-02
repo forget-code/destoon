@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -30,7 +30,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 产品简介</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -62,7 +62,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 主要市场</td>
-<td><input name="post[market]" type="text" size="60" value="<?php echo $market;?>"/><?php tips('多个市场请用|分割，用户可以在报价时选择市场，并按市场对比价格');?></td>
+<td><input name="post[market]" type="text" size="60" value="<?php echo $market;?>"/><?php tips('多个市场请用|分隔，用户可以在报价时选择市场，并按市场对比价格');?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> SEO标题</td>

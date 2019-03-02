@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,12 +7,13 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
+<input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>礼品</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 礼品分类</td>
-<td><?php echo type_select('gift', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?> <img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类" class="c_p" onclick="Dwidget('?file=type&item=<?php echo $file;?>', '礼品分类');"/> <span id="dtypeid" class="f_red"></span></td>
+<td><span id="type_box"><?php echo type_select('gift', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='gift',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $file;?>', '礼品分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 礼品标题</td>
@@ -22,9 +23,9 @@ show_menu($menus);
 <td class="tl"><span class="f_red">*</span> 标题图片</td>
 <td>
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
-	<table width="120">
+	<table width="130">
 	<tr align="center" height="120" class="c_p">
-	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,120, 90, Dd('thumb').value, true);}"/></td>
+	<td width="130"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,120, 90, Dd('thumb').value, true);}"/></td>
 	</tr>
 	<tr align="center" height="25">
 	<td><span onclick="Dalbum('',<?php echo $moduleid;?>,100, 100, Dd('thumb').value, true);" class="jt">[上传]</span>&nbsp;<span onclick="delAlbum('','wait');" class="jt">[删除]</span></td>
@@ -52,7 +53,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 详细说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr title="请保持时间格式">
@@ -60,7 +61,7 @@ show_menu($menus);
 <td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <?php if($DT['city']) { ?>
-<tr>
+<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
 <td><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?></td>
 </tr>

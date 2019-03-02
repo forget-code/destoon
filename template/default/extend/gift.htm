@@ -1,4 +1,4 @@
-{php $CSS = array('gift');}
+{php $CSS = array('extend');}
 {template 'header'}
 <div class="m">
 	<table cellpadding="0" cellspacing="0" width="100%">
@@ -6,10 +6,15 @@
 	<td valign="top" class="left_menu">
 		<ul>
 		<li class="left_menu_li"><a href="{$MODULE[1][linkurl]}">网站首页</a></li>
-		<li class="left_menu_li" id="type_0"><a href="./">积分换礼</a></li>
-		<li class="left_menu_li" id="type_my"><a href="{rewrite('index.php?action=my')}">我的订单</a></li>
-		{loop $TYPE $t}
-		<li class="left_menu_li" id="type_{$t[typeid]}"><a href="{rewrite('index.php?typeid='.$t['typeid'])}">{$t[typename]}</a></li>
+		<li class="left_menu_li" id="type_0"><a href="{$url}">积分换礼</a></li>
+		<li class="left_menu_li" id="type_my"><a href="{$url}index.php?action=my">我的订单</a></li>
+		{loop $_TP[0] $v0}
+		<li class="left_menu_li" id="type_{$v0[typeid]}"><a href="{$url}{list_url($v0[typeid])}">{$v0[typename]}</a></li>
+			{if isset($_TP[1][$v0[typeid]])}
+			{loop $_TP[1][$v0[typeid]] $v1}
+			<li class="left_menu_li" id="type_{$v1[typeid]}"><a href="{$url}{list_url($v1[typeid])}">&nbsp;|- {$v1[typename]}</a></li>
+			{/loop}
+			{/if}
 		{/loop}
 		</ul>
 	</td>
@@ -18,13 +23,13 @@
 		<div class="left_box">		
 			<div class="pos">
 			<span class="f_r">
-			<form action="index.php">
+			<form action="{$url}index.php">
 			<input type="text" name="kw" size="20" value="{if $kw}{$kw}{else}关键词{/if}" onfocus="if(this.value=='关键词')this.value='';" id="gift_kw"/>&nbsp;
 			<input type="submit" value=" 搜索 " onclick="if(Dd('gift_kw').value=='关键词' || Dd('gift_kw').value.length<2){Dd('gift_kw').focus();return false;}"/>
-			<input type="button" value=" 重搜 " onclick="Go('./');"/>
+			<input type="button" value=" 重搜 " onclick="Go('{$url}');"/>
 			</form>
 			</span>
-			当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="./">积分换礼</a>
+			当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$url}">积分换礼</a>{if $typeid} &raquo; <a href="{$url}{list_url($typeid)}">{$TYPE[$typeid][typename]}</a>{/if}
 			</div>
 			{if $action == 'my'}
 				<div class="b15">&nbsp;</div>
@@ -52,10 +57,10 @@
 			{else}
 				{if $itemid}
 				{if isset($success)}
-					<div class="g_success">
+					<div class="submit_success">
 					恭喜您，礼品兑换成功！请检查您的联系方式是否正确，以便工作人员与您取得联系&nbsp;&nbsp;
 					<a href="{$MODULE[2][linkurl]}edit.php" target="_blank">[更新联系方式]</a>
-					<a href="{rewrite('index.php?action=my')}">[查看订单]</a>
+					<a href="{$url}index.php?action=my">[查看订单]</a>
 					</div>
 				{/if}
 				<div class="g_info">			
@@ -87,7 +92,7 @@
 				<script type="text/javascript">
 				function Order() {
 					{if $process == 1}return confirm('抱歉，此兑换还没有开始');{/if}
-					{if $process == 2}if(confirm('确定要兑换吗？系统将扣除您{$credit}{$DT[credit_name]}')) Go('index.php?action=order&itemid={$itemid}'){/if}
+					{if $process == 2}if(confirm('确定要兑换吗？系统将扣除您{$credit}{$DT[credit_name]}')) Go('{$url}index.php?action=order&itemid={$itemid}'){/if}
 					{if $process == 3}return confirm('抱歉，此兑换已经过期');{/if}
 					{if $process == 4}return confirm('抱歉，此兑换名额用尽，已经结束');{/if}
 				}

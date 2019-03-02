@@ -33,7 +33,7 @@
 	{if $t[v2]}&nbsp;&nbsp;{$t[n2]}:{$t[v2]}{/if}
 	{if $t[v3]}&nbsp;&nbsp;{$t[n1]}:{$t[v3]}{/if}
 	</td>
-	<td class="t_c f_red">￥{$t[price]}</td>
+	<td class="t_c f_red">{$DT[money_sign]}{$t[price]}</td>
 	<td class="t_c">{$t[unit]}</td>
 	<td class="px11 t_c">{$t[item]}</td>
 	<td class="px11 t_c">{timetodate($t[edittime], 5)}</td>

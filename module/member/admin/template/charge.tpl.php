@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -58,11 +58,11 @@ foreach($PAY as $k=>$v) {
 <th>实收金额</th>
 <th>会员名称</th>
 <th>支付平台</th>
-<th width="110">下单时间</th>
-<th width="110">支付时间</th>
+<th width="130">下单时间</th>
+<th width="130">支付时间</th>
 <th>操作人</th>
 <th>状态</th>
-<th>备注</th>
+<th width="130">备注</th>
 </tr>
 <?php foreach($charges as $k=>$v) {?>
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
@@ -77,7 +77,7 @@ foreach($PAY as $k=>$v) {
 <td class="px11"><?php echo $v['receivetime'];?></td>
 <td><?php echo $v['editor'];?></td>
 <td><?php echo $v['dstatus'];?></td>
-<td title="<?php echo $v['note'];?>"><input type="text" size="10" value="<?php echo $v['note'];?>"/></td>
+<td title="<?php echo $v['note'];?>"><input type="text" size="15" value="<?php echo $v['note'];?>"/></td>
 </tr>
 <?php }?>
 <tr align="center">

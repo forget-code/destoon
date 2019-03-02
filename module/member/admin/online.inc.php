@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('在线会员', '?moduleid='.$moduleid.'&file=online'),
     array('在线管理员', '?moduleid='.$moduleid.'&file=online&action=admin'),

@@ -8,12 +8,16 @@ class comment {
 	var $table_ban;
 	var $errmsg = errmsg;
 
-    function comment() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'comment';
 		$this->table_stat = $db->pre.'comment_stat';
 		$this->table_ban = $db->pre.'comment_ban';
 		$this->db = &$db;
+    }
+
+    function comment() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -29,11 +33,9 @@ class comment {
 		$post['status'] = $post['status'] == 3 ? 3 : 2;
 		$post['star'] = intval($post['star']);
 		in_array($post['star'], array(1, 2, 3)) or $post['star'] = 3;
-		if($post['reply']) {
-			$post['replytime'] = $DT_TIME;
-			$post['reply'] = trim($post['reply']);
-		}
+		if($post['reply']) $post['replytime'] = $DT_TIME;
 		$post['editor'] = $_username;
+		$post = dhtmlspecialchars($post);
 		return array_map("trim", $post);
 	}
 
@@ -45,7 +47,8 @@ class comment {
 		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $items;
 		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 		$items = $r['num'];
-		$pages = pages($items, $page, $pagesize);		
+		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();		
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

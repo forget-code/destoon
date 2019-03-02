@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $release = isset($release) ? intval($release) : 0;
 $release or msg();
 $release_dir = DT_ROOT.'/file/update/'.$release;
@@ -11,13 +11,13 @@ switch($action) {
 	case 'download':
 		$PHP_URL = @get_cfg_var("allow_url_fopen");
 		if(!$PHP_URL) msg('当前服务器不支持URL打开文件，请修改php.ini中allow_url_fopen = on');
-		$url = 'http://www.destoon.com/update.php?product=b2b&release='.$release.'&charset='.DT_CHARSET.'&version='.DT_VERSION;
+		$url = 'http://www.destoon.com/update.php?product=b2b&release='.$release.'&version='.DT_VERSION.'&charset='.DT_CHARSET.'&lang='.DT_LANG.'&domain='.(DT_DOMAIN ? DT_DOMAIN : DT_PATH);
 		$code = @file_get_contents($url);
 		if($code) {
 			if(substr($code, 0, 8) == 'StatusOk') {
 				$code = substr($code, 8);
 			} else {
-				msg($code);
+				msg(convert($code, 'UTF-8', DT_CHARSET));
 			}
 		} else {
 			msg('无法连接官方服务器，请重试或稍后更新');
@@ -50,7 +50,10 @@ switch($action) {
 			$file_a = str_replace('file/update/'.$release.'/source/destoon/', '', $v);
 			$file_b = str_replace('source/destoon/', 'backup/', $v);
 			if(is_file($file_a)) file_copy($file_a, $file_b);
-			file_copy($v, $file_a) or msg('无法覆盖'.str_replace(DT_ROOT.'/', '', $file_a).'<br/>请设置此文件及上级目录属性为可写，然后刷新此页');
+		}
+		foreach($files as $v) {
+			$file_a = str_replace('file/update/'.$release.'/source/destoon/', '', $v);
+			file_copy($v, $file_a) or msg('因文件权限不可写，系统无法覆盖'.str_replace(DT_ROOT.'/', '', $file_a).'<br/>请通过FTP工具移动file/update/'.$release.'/source/destoon/目录内所有文件覆盖到站点根目录(Windows独立服务器可以直接复制->粘贴)<br/>Linux独立服务器执行\cp -rf '.DT_ROOT.'/file/update/'.$release.'/source/destoon/* '.DT_ROOT.'/');
 		}
 		msg('文件更新成功，开始运行更新..', '?file='.$file.'&action=cmd&release='.$release);
 	break;

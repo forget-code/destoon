@@ -19,7 +19,7 @@
 			{loop $tags $i $t}
 			<tr bgcolor="#FFFFFF" align="center">
 			<td><a href="{$MOD[linkurl]}{rewrite('price.php?itemid='.$t['itemid'])}" target="_blank" title="{$t[alt]}" class="b">{$t[title]}</a></td>
-			<td{if $i==0} width="96"{/if}><span class="f_red">￥{$t[price]}</span></td>
+			<td{if $i==0} width="96"{/if}><span class="f_red">{$DT[money_sign]}{$t[price]}</span></td>
 			<td{if $i==0} width="46"{/if}>{$t[unit]}</td>
 			<td{if $i==0} width="75"{/if}>{$t[item]}</td>
 			</tr>
@@ -28,7 +28,7 @@
 			</div>
 			{/if}
 			<div class="b10"></div>
-			<center><a href="{$MOD[linkurl]}product.php" title="{$t[alt]}">查看所有产品报价&raquo;</a></center>
+			<center><a href="{$MOD[linkurl]}product.php">查看所有产品报价&raquo;</a></center>
 		</td>
 		<td width="10"></td>
 		<td valign="top">

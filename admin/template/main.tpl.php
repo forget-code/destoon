@@ -1,14 +1,14 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <div id="tips_update" style="display:none;">
-<div class="tt">系统更新提示</div>
+<div class="tt">更新提示</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td><div style="padding:20px 30px 20px 20px;" title="当前版本V<?php echo DT_VERSION; ?> 更新时间<?php echo DT_RELEASE;?>"><img src="admin/image/tips_update.gif" width="32" height="32" align="absmiddle"/>&nbsp;&nbsp; <span class="f_red">您的当前软件版本有新的更新，请注意升级</span>&nbsp;&nbsp;最新版本：V<span id="last_v"><?php echo DT_VERSION; ?></span> 更新时间：<span id="last_r"><?php echo DT_RELEASE; ?></span>&nbsp;&nbsp;
-<input type="button" value="检查更新" class="btn" onclick="Go('?file=cloud&action=update');"/></div></td>
+<td><div style="padding:20px 30px 20px 20px;" title="当前版本V<?php echo DT_VERSION; ?> 更新时间<?php echo DT_RELEASE;?>"><img src="admin/image/tips_update.gif" width="32" height="32" align="absmiddle"/>&nbsp;&nbsp; <span class="f_red">您的当前软件版本有新的更新，请注意升级</span>&nbsp;&nbsp;&nbsp;&nbsp;最新版本：V<span id="last_v"><?php echo DT_VERSION; ?></span>&nbsp;&nbsp;更新时间：<span id="last_r"><?php echo DT_RELEASE; ?></span>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="?file=cloud&action=update" class="t">[立即检查]</a></div></td>
 </tr>
 </table>
 </div>
@@ -61,7 +61,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">程序信息</td>
-<td>&nbsp;<a href="?file=cloud&action=update" class="t">DESTOON B2B Version <?php echo DT_VERSION;?> Release <?php echo DT_RELEASE;?> <?php echo strtoupper(DT_CHARSET);?> <?php echo strtoupper(DT_LANG);?> [检查更新]</a></td>
+<td>&nbsp;<a href="?file=cloud&action=update" class="t">DESTOON B2B Version <?php echo DT_VERSION;?> Release <?php echo DT_RELEASE;?> <?php echo DT_CHARSET;?> <?php echo strtoupper(DT_LANG);?> [检查更新]</a></td>
 </tr>
 <tr>
 <td class="tl">软件版本</td>
@@ -84,8 +84,12 @@ show_menu($menus);
 <td>&nbsp;<a href="http://bbs.destoon.com/?tracert=AdminMain" target="_blank">http://bbs.destoon.com</a></td>
 </tr>
 <tr>
-<td class="tl">使用帮助</td>
-<td>&nbsp;<a href="http://help.destoon.com/?tracert=AdminMain" target="_blank">http://help.destoon.com</a></td>
+<td class="tl">帮助文档</td>
+<td>&nbsp;<a href="http://www.destoon.com/doc/?tracert=AdminMain" target="_blank">http://www.destoon.com/doc/</a></td>
+</tr>
+<tr>
+<td class="tl">专用主机</td>
+<td>&nbsp;<a href="http://www.destoon.com/host/?tracert=AdminMain" target="_blank">http://www.destoon.com/host/</a></td>
 </tr>
 <tr>
 <td class="tl">服务器时间</td>
@@ -103,29 +107,27 @@ show_menu($menus);
 <td class="tl">站点路径</td>
 <td>&nbsp;<?php echo DT_ROOT;?></td>
 </tr>
-<tr>
-<td class="tl">上次备份</td>
-<td>&nbsp;<a href="?file=database" title="点击备份数据库"><?php echo $backtime;?><?php if($backdays > 5) { ?> (<span class="f_red"><?php echo $backdays;?></span>天以前)<?php } ?></a></td>
-</tr>
 </table>
 <div class="tt">使用协议</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td style="padding:10px;"><textarea style="width:100%;height:100px;"><?php echo file_get(DT_ROOT.'/license.txt');?></textarea></td>
+<td style="padding:10px;"><textarea style="width:100%;height:100px;" onmouseover="this.style.height='600px';" onmouseout="this.style.height='100px';"><?php echo file_get(DT_ROOT.'/license.txt');?></textarea></td>
 </tr>
 </table>
 <script type="text/javascript" src="<?php echo $notice_url;?>"></script>
 <script type="text/javascript">
-var destoon_release = <?php echo DT_RELEASE;?>;
-var destoon_version = <?php echo DT_VERSION;?>;
-if(typeof destoon_lastrelease != 'undefined') {
-	var lastrelease = parseInt(destoon_lastrelease.replace('-', '').replace('-', ''));
-	if(destoon_lastversion == destoon_version && destoon_release < lastrelease) {
-		Dd('tips_update').style.display = '';
-		Dd('last_v').innerHTML = destoon_lastversion;
-		Dd('last_r').innerHTML = destoon_lastrelease;
+$(function(){
+	var destoon_release = <?php echo DT_RELEASE;?>;
+	var destoon_version = <?php echo DT_VERSION;?>;
+	if(typeof destoon_lastrelease != 'undefined') {
+		var lastrelease = parseInt(destoon_lastrelease.replace('-', '').replace('-', ''));
+		if(destoon_lastversion == destoon_version && destoon_release < lastrelease) {
+			$('#last_v').html(destoon_lastversion);
+			$('#last_r').html(destoon_lastrelease);
+			$('#tips_update').slideDown(600);
+		}
 	}
-}
+});
 </script>
 <?php } ?>
 <script type="text/javascript">Menuon(0);</script>

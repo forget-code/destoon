@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -31,6 +31,25 @@ show_menu($menus);
 <td><input type="text" size="5" name="num" value="1000"/></td>
 <td>
 <input type="submit" value=" 更新公司 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&update=1';"/>
+</td>
+</tr>
+</table>
+</form>
+<form method="post">
+<div class="tt">更新昵称</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<th>起始ID</th>
+<th>结束ID</th>
+<th width="200">每轮生成数量</th>
+<th width="200">操作</th>
+</tr>
+<tr align="center">
+<td><input type="text" size="6" name="fid" value="<?php echo $fid;?>"/></td>
+<td><input type="text" size="6" name="tid" value="<?php echo $tid;?>"/></td>
+<td><input type="text" size="5" name="num" value="1000"/></td>
+<td>
+<input type="submit" value=" 更新昵称 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=passport';"/>
 </td>
 </tr>
 </table>

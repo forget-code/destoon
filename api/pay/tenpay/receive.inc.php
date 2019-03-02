@@ -51,8 +51,8 @@ if($resHandler->isTenpaySign()) {
 			if($out_trade_no != $charge_orderid) {
 				$charge_status = 2;
 				$charge_errcode = '订单号不匹配';
-				$note = $charge_errcode.'S:'.$charge_orderid.'R:'.$out_trade_no;
-				log_write($note, 'rtenpay');
+				#$note = $charge_errcode.'S:'.$charge_orderid.'R:'.$out_trade_no;
+				#log_write($note, 'rtenpay');
 			} else if($total_fee != $charge_money) {
 				$charge_status = 2;
 				$charge_errcode = '充值金额不匹配';
@@ -60,29 +60,7 @@ if($resHandler->isTenpaySign()) {
 				log_write($note, 'rtenpay');
 			} else {
 				$charge_status = 1;
-				$db->query("UPDATE {$DT_PRE}finance_charge SET status=3,money=$charge_money,receivetime='$DT_TIME',editor='$editor' WHERE itemid=$charge_orderid");
-				money_add($r['username'], $r['amount']);
-				money_record($r['username'], $r['amount'], $PAY[$bank]['name'], 'system', $L['charge_online'], 'ID:'.$charge_orderid);
-				if($MOD['credit_charge'] > 0) {
-					$credit = intval($r['amount']*$MOD['credit_charge']);
-					if($credit > 0) {
-						credit_add($r['username'], $credit);
-						credit_record($r['username'], $credit, 'system', $L['charge_reward'], $L['charge'].$r['amount'].$DT['money_unit']);
-					}
-				}
-				$show = $MOD['linkurl'].'charge.php';
-				if($tradeid) {						
-					$td = $db->get_one("SELECT * FROM {$DT_PRE}mall_order WHERE itemid=$tradeid");
-					if($td['status'] == 1 && $td['buyer'] == $_username && $td['amount'] + $td['fee'] == $_money + $r['amount']) {
-						$show = $MOD['linkurl'].'trade.php?action=update&step=pay&itemid='.$tradeid;
-					} else {
-						$tradeid = 0;
-						set_cookie('tradeid', '0');
-					}						
-				}
-				$resHandler->doShow($show);
-			}
-			
+			}			
 			#echo "<br/>" . "即时到帐支付成功" . "<br/>";
 	
 		} else {

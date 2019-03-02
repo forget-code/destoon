@@ -23,7 +23,6 @@ $editdate = timetodate($edittime, 3);
 $fileurl = $linkurl;
 $linkurl = $MOD['linkurl'].$linkurl;
 $maincat = get_maincat(0, $moduleid);
-$auth = encrypt("$itemid");
 $fee = get_fee($item['fee'], $MOD['fee_view']);
 $user_status = 4;
 include DT_ROOT.'/file/config/filetype.inc.php';

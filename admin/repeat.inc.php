@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('重名检测', '?file='.$file),
 );
@@ -12,7 +12,8 @@ $key = isset($key) ? trim($key) : 'title';
 $num = isset($num) ? intval($num) : 100;
 $status = isset($status) ? intval($status) : 3;
 $lists = array();
-if($submit) {
+if(isset($ok)) {
+	$submit = 1;
 	$act = '';
 	if($status == 4) $act = 'expire';
 	if($status == 2) $act = 'check';

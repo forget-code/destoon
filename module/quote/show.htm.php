@@ -28,8 +28,8 @@ if($fee) {
 }
 $pages = '';
 $total = 1;
-if(strpos($content, '[pagebreak]') !== false) {
-	$contents = explode('[pagebreak]', $content);
+if(strpos($content, '<hr class="de-pagebreak" />') !== false) {
+	$contents = explode('<hr class="de-pagebreak" />', $content);
 	$total = count($contents);	
 }
 $seo_file = 'show';
@@ -37,10 +37,11 @@ include DT_ROOT.'/include/seo.inc.php';
 $template = $item['template'] ? $item['template'] : ($CAT['show_template'] ? $CAT['show_template'] : 'show');
 for(; $page <= $total; $page++) {
 	$destoon_task = "moduleid=$moduleid&html=show&itemid=$itemid&page=$page";
-	if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
 	$filename = $total == 1 ? DT_ROOT.'/'.$MOD['moduledir'].'/'.$fileurl : DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, $page);
 	if($total > 1) {
-		$pages = showpages($item, $total, $page);
+		$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
+		if($pages) $pages = substr($pages, 0, strpos($pages, '<cite>'));
 		$content = $contents[$page-1];
 	}
 	if($MOD['keylink']) $content = keylink($content, $moduleid);

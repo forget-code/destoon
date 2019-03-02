@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $tab = isset($tab) ? intval($tab) : 0;
 $all = isset($all) ? intval($all) : 0;
 if($submit) {

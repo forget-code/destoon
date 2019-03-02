@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -26,7 +26,6 @@ function tag($parameter, $expires = 0) {
 		}
 	}
 	$parameter = str_replace(array('&amp;', '%'), array('', '##'), $parameter);
-	$parameter = strip_sql($parameter);
 	parse_str($parameter, $par);
 	if(!is_array($par)) return '';
 	$par = dstripslashes($par);
@@ -93,7 +92,7 @@ function tag($parameter, $expires = 0) {
 			$condition .= " AND areaid IN ($areaid)";
 		}
 	}
-	$table = isset($table) ? $prefix.$table : get_table($moduleid);
+	$table = isset($table) ? $prefix.$table : get_table($moduleid);	
 	$offset or $offset = ($page-1)*$pagesize;
 	$percent = dround(100/$cols).'%';
 	$num = 0;

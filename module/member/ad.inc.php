@@ -10,7 +10,7 @@ $TYPE = $L['ad_type'];
 if($action == 'add') {
 	$pid = isset($pid) ? intval($pid) : 0;
 	if($pid) {
-		$EXT['ad_buy'] or dheader($MOD['linkurl'].'ad.php');
+		$EXT['ad_buy'] or dheader('?action=index');
 		$currency = $EXT['ad_currency'];
 		$unit = $currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
 		$p = $db->get_one("SELECT * FROM {$DT_PRE}ad_place WHERE pid=$pid");
@@ -120,5 +120,10 @@ if($action == 'add') {
 	}
 }
 $head_title = $L['ad_buy_title'];
+$nums = array();
+for($i = 2; $i < 4; $i++) {
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}ad WHERE username='$_username' AND status=$i");
+	$nums[$i] = $r['num'];
+}
 include template('ad', $module);
 ?>

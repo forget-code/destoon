@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -46,7 +46,7 @@ show_menu($menus);
 <th>证件3</th>
 <th>会员</th>
 <th>IP</th>
-<th width="120">提交时间</th>
+<th width="130">提交时间</th>
 <th>操作人</th>
 <th>状态</th>
 </tr>
@@ -69,11 +69,13 @@ show_menu($menus);
 <table>
 <tr>
 <td>
-&nbsp;<textarea style="width:300px;height:40px;" name="reason" id="reason" onfocus="if(this.value=='')this.value='操作原因';"/>操作原因</textarea> 
+&nbsp;<textarea style="width:300px;height:16px;" name="reason" id="reason" onfocus="if(this.value=='操作原因')this.value='';"/>操作原因</textarea> 
 </td>
 <td>
-<input type="checkbox" name="msg" id="msg" value="1" checked/> 消息通知
-<input type="checkbox" name="sms" id="sms" value="1"/> 短信通知
+<input type="checkbox" name="msg" id="msg" value="1" onclick="Dn();" checked/><label for="msg"> 站内通知</label>
+<input type="checkbox" name="eml" id="eml" value="1" onclick="Dn();"/><label for="eml"> 邮件通知</label>
+<input type="checkbox" name="sms" id="sms" value="1" onclick="Dn();"/><label for="sms"> 短信通知</label>
+<input type="checkbox" name="wec" id="wec" value="1" onclick="Dn();"/><label for="wec"> 微信通知</label>
 </td>
 </tr>
 </table>
@@ -93,22 +95,22 @@ function _check() {
 	return true;
 }
 function _reject() {
-	if((Dd('msg').checked || Dd('sms').checked) && !is_reason()) {
+	if((Dd('msg').checked || Dd('eml').checked) && !is_reason()) {
 		alert('请填写操作原因或者取消通知');
 		return false;
 	}
-	if(is_reason() && (!Dd('msg').checked && !Dd('sms').checked)) {
+	if(is_reason() && (!Dd('msg').checked && !Dd('eml').checked)) {
 		alert('至少需要选择一种通知方式');
 		return false;
 	}
 	return true;
 }
 function _cancel() {
-	if((Dd('msg').checked || Dd('sms').checked) && !is_reason()) {
+	if((Dd('msg').checked || Dd('eml').checked) && !is_reason()) {
 		alert('请填写操作原因或者取消通知');
 		return false;
 	}
-	if(is_reason() && (!Dd('msg').checked && !Dd('sms').checked)) {
+	if(is_reason() && (!Dd('msg').checked && !Dd('eml').checked)) {
 		alert('至少需要选择一种通知方式');
 		return false;
 	}

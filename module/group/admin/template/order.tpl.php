@@ -1,13 +1,14 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-if(!$gid) show_menu($menus);
+if(!$id) show_menu($menus);
 ?>
 <script type="text/javascript">var errimg = '<?php echo DT_SKIN;?>image/nopic50.gif';</script>
 <div class="tt">记录搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="id" value="<?php echo $id;?>"/>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
@@ -16,15 +17,16 @@ if(!$gid) show_menu($menus);
 <?php echo $status_select;?>&nbsp;
 <?php echo $order_select;?>&nbsp;
 <select name="logistic">
-<option value="-1">物流</option>
+<option value="-1">快递</option>
 <option value="0" <?php if($logistic == 0) echo 'selected';?>>不需要</option>
 <option value="1" <?php if($logistic == 1) echo 'selected';?>>需要</option>
 </select>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&id=<?php echo $id;?>');"/>
 </td>
 </tr>
+<?php if(!$id) { ?>
 <tr>
 <td>&nbsp;
 <select name="timetype">
@@ -48,9 +50,9 @@ if(!$gid) show_menu($menus);
 商品单号：<input type="text" name="gid" value="<?php echo $gid;?>" size="10"/>&nbsp;
 卖家：<input type="text" name="seller" value="<?php echo $seller;?>" size="10"/>&nbsp;
 买家：<input type="text" name="buyer" value="<?php echo $buyer;?>" size="10"/>&nbsp;
-
 </td>
 </tr>
+<?php } ?>
 </table>
 </form>
 <form method="post">
@@ -92,7 +94,11 @@ if(!$gid) show_menu($menus);
 <td class="px11"><?php echo $v['updatetime'];?></td>
 <td><?php echo $v['dstatus'];?></td>
 <td>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
+<?php if($v['status'] == 4) {?>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>
+<?php } else { ?>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
+<?php } ?>
 </td>
 </tr>
 <?php }?>
@@ -105,8 +111,7 @@ if(!$gid) show_menu($menus);
 </tr>
 </table>
 <div class="btns">
-<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
-<input type="submit" value=" 批量退款 " class="btn" onclick="if(confirm('确定要退款选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund'}else{return false;}"/>
+<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
 </div>
 </form>
 <div class="pages"><?php echo $pages;?></div>

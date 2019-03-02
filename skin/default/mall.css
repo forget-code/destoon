@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 .sell_tip {width:180px;height:70px;background:url('image/sell_tip.gif') no-repeat;overflow:hidden;z-index:1000;position:absolute;}
@@ -41,6 +41,9 @@
 .relate_1 a:link,.relate_1 a:visited,.relate_1 a:active {display:block;width:50px;height:50px;border:#CCCCCC 2px solid;}
 .relate_1 a:hover {border:#C90000 2px solid;}
 .relate_2 a:link,.relate_2 a:visited,.relate_2 a:active,.relate_2 a:hover {display:block;width:50px;height:50px;border:#C90000 2px solid;}
+
+.step_price {background:#EEEEEE;text-align:center;}
+.step_price td {border-right:#DDDDDD 1px solid;}
 
 .nv_1,.nv_2,.nv_3 {float:left;padding:5px;margin:0 5px 5px 0;cursor:pointer;}
 .nv_1 {border:#CCCCCC 2px solid;}

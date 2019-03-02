@@ -3,14 +3,13 @@
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
-<td class="tab" id="Tab0"><a href="style.php?action=view"><span>当前模板</span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="Tab1"><a href="style.php"><span>模板设置</span></a></td>
+<td class="tab" id="Tab0"><a href="?action=view"><span>当前模板</span></a></td>
+<td class="tab" id="Tab1"><a href="?action=index"><span>模板设置</span></a></td>
 </tr>
 </table>
 </div>
 {if $action == 'buy'}
-<form method="post" action="style.php" onsubmit="return check();">
+<form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
 <table cellspacing="1" cellpadding="6" class="tb">
@@ -51,7 +50,7 @@
 {/if}
 <tr>
 <td class="tl"> </td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 确 定 " class="btn"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 立即购买 " class="btn_g"/></td>
 </tr>
 </table>
 </form>
@@ -86,7 +85,7 @@ s('style');m('Tab1');
 <br/>效果预览</a></div>
 <script type="text/javascript">s('style');m('Tab0');</script>
 {else}
-<form action="style.php">
+<form action="?">
 <input type="hidden" name="all" id="all" value="{$all}"/>
 <div class="tt">
 &nbsp;{$fields_select}&nbsp;
@@ -102,11 +101,11 @@ s('style');m('Tab1');
 </select>&nbsp;
 {$order_select}&nbsp; 
 <input type="submit" value=" 搜 索 " class="btn"/>
-<input type="button" value=" 重 置 " class="btn" onclick="Go('style.php');"/>
+<input type="button" value=" 重 置 " class="btn" onclick="Go('?action=index');"/>
 {if $all}
-<input type="submit" value=" 显示可用 " class="btn" onclick="Dd('all').value=0;"/>
+<input type="submit" value=" 显示可用 " class="btn_g" onclick="Dd('all').value=0;"/>
 {else}
-<input type="submit" value=" 显示全部 " class="btn" onclick="Dd('all').value=1;"/>
+<input type="submit" value=" 显示全部 " class="btn_b" onclick="Dd('all').value=1;"/>
 {/if}
 </div>
 </form>
@@ -115,7 +114,7 @@ s('style');m('Tab1');
 {loop $lists $k $v}
 {if $k%3==0}<tr>{/if}
 <td width="33%" valign="top">
-<table cellpadding="2" cellspacing="2" width="220" align="center"{if $c[skin] == $v[skin]} bgcolor="#E7ECFF"{/if}>
+<table cellpadding="2" cellspacing="2" width="220" align="center"{if $c[skin] == $v[skin]} bgcolor="#F7F7F7"{/if}>
 <tr>
 <td><a href="{DT_PATH}index.php?homepage={$_username}&preview={$v[itemid]}" target="_blank"><img src="{$v[thumb]}" style="border:#EEEEEE 2px solid;padding:5px;margin:0 0 10px 0;" title="点击预览"/></a></td>
 </tr>

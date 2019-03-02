@@ -10,7 +10,7 @@ class special {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function special($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -20,36 +20,43 @@ class special {
 		$this->fields = array('catid','areaid','level','title','style','introduce','thumb','banner','cfg_photo','cfg_video','cfg_type','seo_title','seo_keywords','seo_description','tag','status','hits','username','addtime', 'editor','edittime','ip','template','islink','linkurl','filepath','domain','note');
     }
 
+    function special($moduleid) {
+		$this->__construct($moduleid);
+    }
+
 	function pass($post) {
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_catid'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
-		if(!$post['thumb']) return $this->_(lang('message->pass_thumb'));
+		if(!is_url($post['thumb'])) return $this->_(lang('message->pass_thumb'));
 		if(isset($post['islink']) && !$post['linkurl']) return $this->_(lang('message->pass_linkurl'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		is_url($post['banner']) or $post['banner'] = '';
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['islink'] = isset($post['islink']) ? 1 : 0;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
 		$post['cfg_photo'] = intval($post['cfg_photo']);
 		$post['cfg_video'] = intval($post['cfg_video']);
 		$post['cfg_type'] = intval($post['cfg_type']);
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
+		$post['content'] = save_local($post['content']);
 		if($post['content'] && isset($post['clear_link']) && $post['clear_link']) $post['content'] = clear_link($post['content']);
 		if($post['content'] && isset($post['save_remotepic']) && $post['save_remotepic']) $post['content'] = save_remote($post['content']);
 		if($MOD['introduce_length']) $post['introduce'] = addslashes(get_intro($post['content'], $MOD['introduce_length']));
 		if($this->itemid) {
 			$post['editor'] = $_username;
 			$new = $post['content'];
-			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'">';
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			if($post['banner']) $new .= '<img src="'.$post['banner'].'">';
 			$r = $this->get_one();
 			$old = $r['content'];
-			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'">';
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			if($r['banner']) $old .= '<img src="'.$r['banner'].'">';
 			delete_diff($new, $old);
 		} else {
@@ -60,12 +67,19 @@ class special {
 		unset($post['content']);
 		$post = dhtmlspecialchars($post);
 		$post['content'] = addslashes(dsafe($content));
-		return $post;
+		return array_map("trim", $post);
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'addtime DESC', $cache = '') {
@@ -77,6 +91,7 @@ class special {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
@@ -115,7 +130,7 @@ class special {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -135,7 +150,7 @@ class special {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'].$post['banner'], $this->itemid);
 		if($post['status'] == 3) $this->tohtml($this->itemid, $post['catid']);
@@ -242,7 +257,7 @@ class special {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}

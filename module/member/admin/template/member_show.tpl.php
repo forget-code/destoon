@@ -1,18 +1,13 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
-if(isset($dialog)) {
-?>
-<?php
-} else {
-	show_menu($menus);
-}
+if(!isset($dialog)) show_menu($menus);
 ?>
 <div class="tt">会员资料</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td rowspan="9" align="center" width="160" class="f_gray">
-<img src="<?php echo useravatar($username, 'large');?>"/>
+<img src="<?php echo useravatar($username, 'large');?>" width="128" height="128"/>
 <div style="padding:5px 0 0 0;">
 <a href="?moduleid=<?php echo $moduleid;?>&action=login&userid=<?php echo $userid;?>" class="t" target="_blank" title="点击登入会员商务中心">会员前台</a> | 
 <a href="?moduleid=<?php echo $moduleid;?>&action=edit&userid=<?php echo $userid;?>" class="t"<?php if(isset($dialog)) {?> target="_blank"<?php } ?>>修改资料</a>
@@ -26,9 +21,9 @@ if(isset($dialog)) {
 <a href="javascript:Dwidget('?moduleid=2&file=sendmail&email=<?php echo $email;?>', '发送邮件');"><img width="16" height="16" src="<?php echo DT_SKIN;?>image/email.gif" title="发送邮件 <?php echo $email;?>" align="absmiddle"/></a> 
 <?php if($mobile) { ?><a href="javascript:Dwidget('?moduleid=2&file=sendsms&mobile=<?php echo $mobile;?>', '发送短信');"><img src="<?php echo DT_SKIN;?>image/mobile.gif" title="发送短信" align="absmiddle"/></a> <?php } ?>
 <a href="javascript:Dwidget('?moduleid=2&file=message&action=send&touser=<?php echo $username;?>', '发送消息');"><img width="16" height="16" src="<?php echo DT_SKIN;?>image/msg.gif" title="发送消息" align="absmiddle"/></a>
-<?php echo im_qq($qq);?>  
-<?php echo im_ali($ali);?> 
-<?php echo im_msn($msn);?> 
+<?php echo im_qq($qq);?>
+<?php echo im_ali($ali);?>
+<?php echo im_msn($msn);?>
 <?php echo im_skype($skype);?>
 </td>
 <td class="tl">会员名</td>
@@ -40,7 +35,7 @@ if(isset($dialog)) {
 
 </tr>
 <tr>
-<td class="tl">通行证名</td>
+<td class="tl">昵称</td>
 <td>&nbsp;<?php echo $passport;?></td>
 <td class="tl">会员组</td>
 <td class="f_red">&nbsp;<?php echo $GROUP[$groupid]['groupname'];?></td>
@@ -80,22 +75,60 @@ if(isset($dialog)) {
 </tr>
 <tr>
 <td class="tl"><?php echo $DT['money_name'];?>余额</td>
-<td>&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&file=record&username=<?php echo $username;?>" target="_blank"><strong class="f_red"><?php echo $money;?></strong></a> <?php echo $DT['money_unit'];?></td>
-<td class="tl"><?php echo $DT['money_name'];?>锁定</td>
-<td>&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&file=record&username=<?php echo $username;?>" target="_blank"><strong class="f_gray"><?php echo $locking;?></strong></a> <?php echo $DT['money_unit'];?></td>
+<td>&nbsp;<a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=record&username=<?php echo $username;?>', '<?php echo $DT['money_name'];?>流水');"><strong class="f_red"><?php echo $money;?></strong></a> <?php echo $DT['money_unit'];?></td>
+<td class="tl">保证金</td>
+<td>&nbsp;<a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=deposit&username=<?php echo $username;?>', '保证金流水');"><strong class="f_blue"><?php echo $deposit;?></strong></a> <?php echo $DT['money_unit'];?></td>
 </tr>
 <tr>
 <td class="tl">短信余额</td>
-<td>&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&file=sms&action=record&username=<?php echo $username;?>" target="_blank"><strong class="f_red"><?php echo $sms;?></strong></a> 条</td>
+<td>&nbsp;<a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=sms&action=record&username=<?php echo $username;?>', '短信记录');"><strong class="f_red"><?php echo $sms;?></strong></a> 条</td>
 <td class="tl">会员<?php echo $DT['credit_name'];?></td>
-<td>&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&file=credit&kw=<?php echo $username;?>" target="_blank"><strong class="f_blue"><?php echo $credit;?></strong></a> <?php echo $DT['credit_unit'];?></td>
+<td>&nbsp;<a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=credit&username=<?php echo $username;?>', '<?php echo $DT['credit_name'];?>流水');"><strong class="f_blue"><?php echo $credit;?></strong></a> <?php echo $DT['credit_unit'];?></td>
 </tr>
+</table>
+<div class="tt">备注信息</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<?php
+	if($note) {
+		echo '<tr><th>时间</th><th>内容</th><th width="150">管理员</th></tr>';
+		$N = explode('--------------------', $note);
+		foreach($N as $n) {
+			if(strpos($n, '|') === false) continue;
+			list($_time, $_name, $_note) = explode('|', $n);
+			if(strlen(trim($_time)) == 16 && check_name($_name) && $_note) echo '<tr><td align="center">'.trim($_time).'</td><td style="padding:6px 10px;line-height:24px;">'.nl2br(trim($_note)).'</td><td align="center"><a href="javascript:_user(\''.$_name.'\')">'.$_name.'</a></td></tr>';
+		}
+	}
+?>
+<form method="post" action="?">
+<input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
+<input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="action" value="note_add"/>
+<input type="hidden" name="userid" value="<?php echo $userid;?>"/>
+<tr>
+<td class="tl">追加备注</td>
+<td align="center">
+<textarea name="note" style="width:99%;height:20px;overflow:visible;padding:0;"></textarea></td>
+<td align="center" width="130"><input type="submit" name="submit" value="追加" class="btn"/><?php if($_admin == 1) {?>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:$('#edit_note').toggle();" class="t">修改</a><?php } ?></td>
+</tr>
+</form>
+<form method="post" action="?">
+<input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
+<input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="action" value="note_edit"/>
+<input type="hidden" name="userid" value="<?php echo $userid;?>"/>
+<tr id="edit_note" style="display:none;">
+<td class="tl">修改备注</td>
+<td align="center" class="f_gray">
+<textarea name="note" style="width:99%;height:100px;overflow:visible;padding:0;"><?php echo $note;?></textarea><br/>请只修改备注文字，不要改动 | 和 - 符号以及时间和管理员</td>
+<td align="center"><input type="submit" name="submit" value="修改" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&action=note_edit&userid=<?php echo $userid;?>&note=" class="t" onclick="return confirm('确定要清空此会员的备注信息吗？此操作将不可撤销');">清空</a></td>
+</tr>
+</form>
 </table>
 <div class="tt">公司资料</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">公司主页</td>
-<td colspan="3">&nbsp;<a href="<?php echo $linkurl;?>" target="_blank" style="color:red;"><?php echo $linkurl;?></a></td>
+<td colspan="3">&nbsp;<a href="<?php echo $linkurl;?>" target="_blank" class="t"><?php echo $linkurl;?></a></td>
 </tr>
 <tr>
 <td class="tl">公司名</td>
@@ -150,7 +183,7 @@ if(isset($dialog)) {
 <td class="tl">姓 名</td>
 <td>&nbsp;<?php echo $truename;?></td>
 <td class="tl">手 机</td>
-<td>&nbsp;<?php if($mobile) { ?><a href="javascript:Dwidget('?moduleid=2&file=sendsms&mobile=<?php echo $mobile;?>', '发送短信');"><img src="<?php echo DT_SKIN;?>image/mobile.gif" title="发送短信" align="absmiddle"/></a> <?php } ?><?php echo $mobile;?> - <?php echo mobile2area($mobile);?></td>
+<td>&nbsp;<?php if($mobile) { ?><a href="javascript:Dwidget('?moduleid=2&file=sendsms&mobile=<?php echo $mobile;?>', '发送短信');"><img src="<?php echo DT_SKIN;?>image/mobile.gif" title="发送短信" align="absmiddle"/></a> <?php } ?><a href="javascript:_mobile('<?php echo $mobile;?>');" title="归属地查询"><?php echo $mobile;?></a></td>
 </tr>
 <tr>
 <td class="tl">部 门</td>
@@ -184,7 +217,7 @@ if(isset($dialog)) {
 </tr>
 <tr>
 <td class="tl">网 址</td>
-<td>&nbsp;<?php echo $homepage;?></td>
+<td>&nbsp;<a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo $homepage;?>" target="_blank"><?php echo $homepage;?></a></td>
 <td class="tl">邮 编</td>
 <td>&nbsp;<?php echo $postcode;?></td>
 </tr>
@@ -193,6 +226,35 @@ if(isset($dialog)) {
 <td colspan="3">&nbsp;<?php echo $address;?></td>
 </tr>
 </table>
+
+<div class="tt">财务信息</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">开户银行</td>
+<td>&nbsp;<?php echo $bank;?></td>
+</tr>
+<tr>
+<td class="tl">开户网点</td>
+<td>&nbsp;<?php echo $branch;?></td>
+</tr>
+<tr>
+<td class="tl">账户性质</td>
+<td>&nbsp;<?php echo $banktype ? '对公' : '对私';?></td>
+</tr>
+<tr>
+<td class="tl">收款户名</td>
+<td>&nbsp;<?php echo $banktype ? $company : $truename;?></td>
+</tr>
+<tr>
+<td class="tl">收款帐号</td>
+<td>&nbsp;<?php echo $account;?></td>
+</tr>
+<tr>
+<td class="tl"><?php echo $DT['trade_nm'];?></td>
+<td>&nbsp;<?php echo $trade;?></td>
+</tr>
+</table>
+
 <div class="tt">其他信息</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>

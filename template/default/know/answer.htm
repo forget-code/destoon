@@ -11,11 +11,10 @@
 <script type="text/javascript" src="{DT_STATIC}file/script/jquery.js"></script>
 <script type="text/javascript" src="{DT_STATIC}file/script/common.js"></script>
 <script type="text/javascript" src="{DT_STATIC}file/script/page.js"></script>
-<script type="text/javascript">
-if(parent.location == window.location) Go('{$linkurl}');
-</script>
+<script type="text/javascript">if(parent.location == window.location) Go('{$linkurl}');</script>
 </head>
-<body>
+<body oncontextmenu="return false">
+<iframe id="proxy_iframe" src="" style="display:none"></iframe>
 <div id="destoon_answer">
 {if $action == 'vote_show'}
 <div class="m">
@@ -36,9 +35,9 @@ if(parent.location == window.location) Go('{$linkurl}');
 匿名
 {else}
 	{if $v[username]}
-	<a href="{$MOD[linkurl]}{rewrite('search.php?username='.$v['username'])}" class="b" target="_blank" rel="nofollow">{$v[username]}</a>
+	<a href="{$MOD[linkurl]}{rewrite('search.php?username='.$v['username'])}" class="b" target="_blank" rel="nofollow">{$v[passport]}</a>
 	{else}
-	<span title="{hide_ip($v[ip])}">{ip2area($v[ip])}访客</span>
+	<span title="{hide_ip($v[ip])}">游客</span>
 	{/if}
 {/if}
 </td>
@@ -49,7 +48,7 @@ if(parent.location == window.location) Go('{$linkurl}');
 {/loop}
 </table>
 </div>
-<center><input type="button" value="返 回" onclick="Go('answer.php?itemid={$itemid}');" class="answer_btn"/></center>
+<center><input type="button" value="返 回" onclick="Go('?itemid={$itemid}');" class="answer_btn"/></center>
 <br/>
 </div>
 </div>
@@ -62,11 +61,11 @@ if(parent.location == window.location) Go('{$linkurl}');
 	<div class="question_op">
 	<div><span class="px14">如果已获得满意的回答，请及时采纳，感谢回答者。若还没有满意的回答，可以尝试以下操作： </span></div>	
 	{if $items>1}
-	<div><a href="answer.php?itemid={$itemid}&action=vote" onclick="return confirm('确定要举行投票吗？');" class="f_b px13" target="_top">举行投票</a><span class="f_gray"> - 不知道哪个回答最好，让网友投票来选出最佳答案;</span></div>
+	<div><a href="?itemid={$itemid}&action=vote" onclick="return confirm('确定要举行投票吗？');" class="f_b px13" target="_top">举行投票</a><span class="f_gray"> - 不知道哪个回答最好，让网友投票来选出最佳答案;</span></div>
 	{/if}
 	<div><a href="javascript:" onclick="Ds('add_content');H();" class="f_b px13">补充问题</a><span class="f_gray"> - 补充提问细节，以得到更准确的答案;</span></div>
 	<div id="add_content" style="display:none;background:#F1F1F1;padding:15px;">
-	<form method="post" action="answer.php" target="_top">
+	<form method="post" action="?" target="_top">
 	<input type="hidden" name="itemid" value="{$itemid}"/>
 	<input type="hidden" name="action" value="addition"/>
 	<textarea name="content" id="content" style="width:90%;height:80px;margin:0 0 10px 0;">{$item[addition]}</textarea><br/>
@@ -77,7 +76,7 @@ if(parent.location == window.location) Go('{$linkurl}');
 	{if $item[raise] < $MOD[maxraise]}
 	<div><a href="javascript:" onclick="Ds('add_credit');H();" class="px13 f_b">提高悬赏</a><span class="f_gray"> - 提高悬赏，以提高问题的关注度;</span></div>
 	<div id="add_credit" style="display:none;background:#F1F1F1;padding:15px;">
-	<form method="post" action="answer.php" target="_top">
+	<form method="post" action="?" target="_top">
 	<input type="hidden" name="itemid" value="{$itemid}"/>
 	<input type="hidden" name="action" value="raise"/>
 	提问期内，可以追加悬赏 <strong class="f_red">{$MOD[maxraise]}</strong> 次(已追加<strong>{$item[raise]}</strong>次)。悬赏一次，可延长问题的有效期 <strong class="f_blue">{$MOD[raisedays]}</strong> 天。<br/> 
@@ -96,7 +95,7 @@ if(parent.location == window.location) Go('{$linkurl}');
 	</div>
 	</div>
 	{/if}
-	<div><a href="answer.php?itemid={$itemid}&action=close" onclick="return confirm('确定要关闭这个问题吗？');" class="f_b px13" target="_top">关闭问题</a><span class="f_gray"> - 没有满意的回答 ，可以直接结束提问，关闭问题;</span></div>
+	<div><a href="?itemid={$itemid}&action=close" onclick="return confirm('确定要关闭这个问题吗？');" class="f_b px13" target="_top">关闭问题</a><span class="f_gray"> - 没有满意的回答 ，可以直接结束提问，关闭问题;</span></div>
 	</div>
 	{/if}
 </div>
@@ -113,16 +112,16 @@ if(parent.location == window.location) Go('{$linkurl}');
 		<ul>
 		{if $v[hidden]}
 		<li id="u_{$v[itemid]}"><strong>匿名</strong></li>
-		<li><img src="{useravatar('', 'large')}" alt=""/></li>
+		<li><img src="{useravatar('', 'large')}" alt="" width="128" height="128"/></li>
 		{else}
 		<li id="u_{$v[itemid]}">
 			{if $v[username]}
-			<a href="{$MOD[linkurl]}{if $v[expert]}{rewrite('expert.php?username='.$v['username'])}{else}{rewrite('search.php?username='.$v['username'])}{/if}" target="_blank" class="b"><strong>{$v[username]}</strong></a>
+			<a href="{$MOD[linkurl]}{if $v[expert]}{rewrite('expert.php?username='.$v['username'])}{else}{rewrite('search.php?username='.$v['username'])}{/if}" target="_blank" class="b"><strong>{$v[passport]}</strong></a>
 			{else}
-			<strong title="{hide_ip($item[ip])}">{ip2area($item[ip])}访客</strong>
+			<strong title="{hide_ip($item[ip])}">游客</strong>
 			{/if}
 		</li>
-		<li><img src="{useravatar($v[username], 'large')}" alt=""/></li>
+		<li><img src="{useravatar($v[username], 'large')}" alt="" width="128" height="128"/></li>
 		{if $v[username] && $DT[im_web]}<li>{im_web($v[username], 1)}</li>{/if}
 		{/if}
 		{if $v[expert]}<li class="f_red">知道专家</li>{/if}
@@ -137,13 +136,13 @@ if(parent.location == window.location) Go('{$linkurl}');
 				{/if}
 				{if $item[process] == 2}
 					{if $could_admin}
-					<span onclick="if(confirm('确定要移除此投票选项吗？')) Dd('send').src='answer.php?itemid={$itemid}&aid={$v[itemid]}&action=vote_del';" class="c_p f_dblue"/>移除选项</span>&nbsp;
+					<span onclick="if(confirm('确定要移除此投票选项吗？')) Dd('send').src='?itemid={$itemid}&aid={$v[itemid]}&action=vote_del';" class="c_p f_dblue"/>移除选项</span>&nbsp;
 					{/if}
 					{if !$could_vote || $could_admin}
-					<span onclick="Go('answer.php?itemid={$itemid}&action=vote_show');" class="c_p f_dblue"/>投票结果</span>&nbsp;
+					<span onclick="Go('?itemid={$itemid}&action=vote_show');" class="c_p f_dblue"/>投票结果</span>&nbsp;
 					{/if}
 					{if $could_vote}
-					<span onclick="Dd('send').src='answer.php?itemid={$itemid}&aid={$v[itemid]}&action=vote_add';" class="c_p f_dblue"/>投一票</span>&nbsp;
+					<span onclick="Dd('send').src='?itemid={$itemid}&aid={$v[itemid]}&action=vote_add';" class="c_p f_dblue"/>投一票</span>&nbsp;
 					{/if}
 				{/if}
 				</span>
@@ -167,7 +166,7 @@ if(parent.location == window.location) Go('{$linkurl}');
 	<div class="left_head">采纳答案</div>
 	<div class="answer_body" id="choose_a"></div>
 	<div class="answer_foot" id="choose_u"></div>
-	<form method="post" action="answer.php" target="_top" onsubmit="return choose_check();">
+	<form method="post" action="?" target="_top" onsubmit="return choose_check();">
 	<input type="hidden" name="aid" id="aid" value="0"/>
 	<input type="hidden" name="action" value="choose"/>
 	<input type="hidden" name="itemid" value="{$itemid}"/>
@@ -222,20 +221,20 @@ if(parent.location == window.location) Go('{$linkurl}');
 	}
 	</script>
 
-	{if $could_answer}
+{if $could_answer}
 <div class="m">
 <div class="answer_box">
 	<div class="left_head">我来回答</div>
-	<form method="post" action="answer.php" target="send" id="dform" onsubmit="return check();">
+	<form method="post" action="?" target="send" id="dform" onsubmit="return check();">
 	<input type="hidden" name="items" value="{$items}"/>
 	<input type="hidden" name="itemid" value="{$itemid}"/>
 	<div class="px14">
 	<table width="100%" cellpadding="8" cellspacing="1">
 	<tr>
-	<td align="right" valign="top"><br/>我来回答：</td>
-	<td><textarea name="content" id="content" style="display:none;"></textarea>
-	<script type="text/javascript">var ModuleID = {$moduleid};var DTAdmin = 0;var EDPath = "{$MODULE[2][linkurl]}fckeditor/";var EDW = "98%";var FCKID = "content";</script><script type="text/javascript" src="{$MODULE[2][linkurl]}fckeditor/fckeditor.js"></script>	
-	<br/><span id="dcontent" class="f_red px12"></span>
+	<td align="right" valign="top">答案内容：</td>
+	<td>
+	<textarea name="content" id="content" style="width:500px;height:100px;"></textarea>	
+	<div style="padding-top:10px;"><a href="{$MODULE[2][linkurl]}{$DT[file_my]}?mid={$moduleid}&action=answer&itemid={$itemid}" target="_top" class="b" title="高级模式支持文字排版和图片上传，点击切换">高级模式</a> <span id="dcontent" class="f_red px12"></span></div>
 	</td>
 	</tr>
 	<tr>
@@ -281,13 +280,12 @@ if(parent.location == window.location) Go('{$linkurl}');
 	</div>
 </div>
 </div>
-	{load('clear.js')}
 	<script type="text/javascript">
 	function check() {
 		var l;
 		var f;
 		f = 'content';
-		l = FCKLen();
+		l = Dd(f).value.length;
 		if(l < 5) {
 			Dmsg('内容应最少5字，当前已输入'+l+'字', f);
 			return false;
@@ -317,14 +315,12 @@ if(parent.location == window.location) Go('{$linkurl}');
 		}
 		{/if}
 	}
-	try{parent.Dd('answer_btn').style.display = '';}catch(e){}
 	</script>
 	{/if}
 {/if}
 <script type="text/javascript">
 function H() {
-	try{parent.Dd('destoon_answer').style.height = Dd('destoon_answer').scrollHeight+'px';}
-	catch(e){}
+	Dd('proxy_iframe').src = '{$MOD[linkurl]}ajax.php?action=proxy&itemid=2#'+Dd('destoon_answer').scrollHeight+'|{if $could_answer}1{else}0{/if}';
 }
 function ImgZoom(i, m) {
 	var m = m ? m : 550; var w = i.width;
@@ -333,7 +329,7 @@ function ImgZoom(i, m) {
 	i.title = L['click_open'];
 	i.height = parseInt(h*m/w);
 	i.width = m;
-	i.onclick = function (e) {window.open(EXPath+'view.php?img='+i.src);}
+	i.onclick = function (e) {window.open(DTPath+'api/view.php?img='+i.src);}
 }
 function Z() {
 	try {
@@ -346,13 +342,9 @@ function Z() {
 	} catch(e) {}
 }
 window.onload = function() {
-{if $could_answer}
-var sBasePath = "{$MODULE[2][linkurl]}fckeditor/";var oFCKeditor = new FCKeditor("content");oFCKeditor.Width = "98%";oFCKeditor.Height = "200px";oFCKeditor.BasePath = sBasePath;oFCKeditor.ToolbarSet = "Basic";oFCKeditor.ReplaceTextarea();
-{/if}
-Z();
-H();
+	Z();
+	H();
 }
 </script>
-{if $could_answer}{load('fckeditor.js')}{/if}
 </body>
 </html>

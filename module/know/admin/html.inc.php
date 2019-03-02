@@ -1,9 +1,9 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('生成网页', '?moduleid='.$moduleid.'&file='.$file),
-    array('数据统计', 'javascript:Dwidget(\'?file=count&itemid=1&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
-    array('模块前台', $MOD['linkurl'], ' target="_blank"'),
+    array('数据统计', 'javascript:Dwidget(\'?file=count&action=stats&&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
+    array('模块首页', $MOD['linkurl'], ' target="_blank"'),
 );
 $all = (isset($all) && $all) ? 1 : 0;
 $one = (isset($one) && $one) ? 1 : 0;

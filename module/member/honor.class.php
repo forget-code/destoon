@@ -7,11 +7,15 @@ class honor {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function honor() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'honor';
 		$this->db = &$db;
 		$this->fields = array('title','style','content', 'authority','thumb','status','username','addtime','editor','edittime','fromtime','totime','note');
+    }
+
+    function honor() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -26,6 +30,7 @@ class honor {
 			if(!is_date($post['totime'])) return $this->_($L['honor_pass_todate']);
 			if(datetotime($post['totime'].' 23:59:59') < $DT_TIME) return $this->_($L['honor_pass_todate_error']);
 		}
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
@@ -35,7 +40,6 @@ class honor {
 		$post['edittime'] = $DT_TIME;
 		$post['fromtime'] = datetotime($post['fromtime'].' 00:00:00');
 		$post['totime'] = $post['totime'] ? datetotime($post['totime'].' 23:59:59') : 0;
-		$post['title'] = trim($post['title']);
 		clear_upload($post['content'].$post['thumb']);
 		if($this->itemid) {
 			$post['editor'] = $_username;
@@ -73,6 +77,7 @@ class honor {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {

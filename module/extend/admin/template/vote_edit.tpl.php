@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,12 +7,13 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
+<input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>投票</div>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 投票分类</td>
-<td><?php echo type_select('vote', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?> <img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类" class="c_p" onclick="Dwidget('?file=type&item=<?php echo $file;?>', '投票分类');"/> <span id="dtypeid" class="f_red"></span></td>
+<td><span id="type_box"><?php echo type_select('vote', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='vote',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $file;?>', '投票分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 投票标题</td>
@@ -29,7 +30,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 投票说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -59,6 +60,20 @@ show_menu($menus);
 <td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <tr>
+<td class="tl"><span class="f_hid">*</span> 限制会员</td>
+<td><?php echo group_checkbox('post[groupid][]', $groupid);?></td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 验证方式</td>
+<td>
+<select name="post[verify]">
+<option value="0"<?php if($verify == 0) echo ' selected';?>>不验证</option>
+<option value="1"<?php if($verify == 1) echo ' selected';?>>验证码</option> 
+<option value="2"<?php if($verify == 2) echo ' selected';?>>验证问题</option> 
+</select>
+</td>
+</tr>
+<tr>
 <td class="tl"><span class="f_hid">*</span> 投票模板</td>
 <td><?php echo tpl_select('vote', 'chip', 'post[template_vote]', '默认模板', $template_vote);?></td>
 </tr>
@@ -67,7 +82,7 @@ show_menu($menus);
 <td><?php echo tpl_select('vote', $module, 'post[template]', '默认模板', $template);?></td>
 </tr>
 <?php if($DT['city']) { ?>
-<tr>
+<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
 <td><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?></td>
 </tr>

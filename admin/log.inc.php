@@ -1,16 +1,16 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('操作日志', '?file='.$file),
-    array('日志清理', '?file='.$file.'&action=delete', 'onclick="if(!confirm(\'为了系统安全,系统仅删除90天之前的日志\')) return false"'),
+    array('日志清理', '?file='.$file.'&action=clear', 'onclick="if(!confirm(\'为了系统安全,系统仅删除30天之前的日志\')) return false"'),
 );
 switch($action) {
-	case 'delete':
-		$time = $today_endtime - 90*86400;
+	case 'clear':
+		$time = $today_endtime - 30*86400;
 		$db->query("DELETE FROM {$DT_PRE}admin_log WHERE logtime<$time");
 		dmsg('清理成功', '?file='.$file);
 	break;

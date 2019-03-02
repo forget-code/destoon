@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -39,6 +39,8 @@ $L['credit_record_resume_add'] = '简历发布';
 $L['credit_record_resume_del'] = '简历删除';
 $L['credit_record_answer_add'] = '回答问题';
 $L['credit_record_answer_del'] = '答案删除';
+$L['credit_record_reply_add'] = '回复帖子';
+$L['credit_record_reply_del'] = '回复删除';
 $L['refresh_total'] = '{V0}条信息';
 $L['refresh_success'] = '刷新成功{V0}条';
 $L['refresh_fail'] = '刷新失败{V0}条'; 

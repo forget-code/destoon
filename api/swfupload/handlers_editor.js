@@ -144,13 +144,22 @@ function uploadError(file, errorCode, message) {
 }
 
 function Add_IMG(o) {
-	var t = o.src.split('.thumb.');	
-	var oEditor = FCKeditorAPI.GetInstance('content');
-	if(oEditor.EditMode == FCK_EDITMODE_WYSIWYG) {
-		oEditor.InsertHtml('<img src="'+t[0]+'"/><br/>');
-		o.style.display = 'none';
-	} else {
-		alert(L['wysiwyg_mode']);
+	var t = o.src.split('.thumb.');
+	if(DTEditor == 'fckeditor') {
+		var oEditor = FCKeditorAPI.GetInstance('content');
+		if(oEditor.EditMode == FCK_EDITMODE_WYSIWYG) {
+			oEditor.InsertHtml('<img src="'+t[0]+'"/><br/>');
+			o.style.display = 'none';
+		} else {
+			alert(L['wysiwyg_mode']);
+		}
+	} else if(DTEditor == 'kindeditor') {
+		if(window.editor.designMode) {
+			window.editor.insertHtml('<img src="'+t[0]+'"/><br/>');
+			o.style.display = 'none';
+		} else {
+			alert(L['wysiwyg_mode']);
+		}
 	}
 }
 function Del_IMG(o) {

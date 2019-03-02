@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -60,7 +60,7 @@ show_menu($menus);
 <td><a href="?file=template&dir=<?php echo $v['template'];?>"><?php echo $v['template'];?></a></td>
 <td align="left">
 <div style="line-height:22px;padding:0 8px 0 8px;">
-分类：<?php echo $v['typeid'] ? $TYPE[$v['typeid']]['typename'] : '未分类';?><br/>
+分类：<?php echo isset($TYPE[$v['typeid']]) ? $TYPE[$v['typeid']]['typename'] : '未分类';?><br/>
 价格：<?php echo $v['fee'] ? ($v['currency'] == 'money' ? '<span class="f_red">'.$v['fee'].$DT['money_unit'].'/月</span>' : '<span class="f_blue">'.$v['fee'].$DT['credit_unit'].'/月</span>') : '<span class="f_green">免费</span>';?><br/>
 人气：<?php echo $v['hits'];?><br/>
 收益：<span class="f_red"><?php echo $v['money'].$DT['money_unit'];?></span>&nbsp;&nbsp;<span class="f_blue"><?php echo $v['credit'].$DT['credit_unit'];?></span><br/>

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -58,10 +58,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
-密码(明文)：<input type="text" size="15" name="password" id="password"/>
-<input type="button" value="加 密" class="btn" onclick="md();"/>
-加密结果： <input type="text" size="40" name="md5" id="md5"/>
-日志ID：<input type="text" size="5" name="logid" id="logid"/>
+密码(明文)：<input type="text" size="15" name="password" id="password"/> 日志ID：<input type="text" size="5" name="logid" id="logid"/>
 <input type="button" value="对 比" class="btn" onclick="cp();"/>&nbsp;
 <span id="cpr" class="f_red"></span>
 </td>
@@ -75,28 +72,13 @@ show_menu($menus);
 </form>
 <div class="pages"><?php echo $pages;?></div>
 <script type="text/javascript">
-function md() {
-	if(Dd('password').value == '') {
-		alert('请输入密码(明文)');
-		Dd('password').focus();
-		return;
-	}
-	makeRequest('file=<?php echo $file;?>&moduleid=<?php echo $moduleid;?>&action=md&password='+Dd('password').value, '?', '_md');
-}
-function _md() {    
-	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
-		if(xmlHttp.responseText) {
-			Dd('md5').value = xmlHttp.responseText;
-		}
-	}
-}
 function cp() {
 	Dd('cpr').innerHTML = '';
-	if(Dd('md5').value == '' || Dd('logid').value == '') {
-		alert('请加密密码或输入需要对比的日志ID');
+	if(Dd('password').value == '' || Dd('logid').value == '') {
+		alert('请加密密码和需要对比的日志ID');
 		return;
 	}
-	makeRequest('file=<?php echo $file;?>&moduleid=<?php echo $moduleid;?>&action=cp&password='+Dd('md5').value+'&logid='+Dd('logid').value, '?', '_cp');
+	makeRequest('file=<?php echo $file;?>&moduleid=<?php echo $moduleid;?>&action=cp&password='+Dd('password').value+'&logid='+Dd('logid').value, '?', '_cp');
 }
 function _cp() {    
 	if(xmlHttp.readyState==4 && xmlHttp.status==200) {

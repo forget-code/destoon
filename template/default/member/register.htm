@@ -12,10 +12,10 @@
 		<div style="padding:20px 50px 20px 50px;">
 			<div style="background:#FAFAFA;padding:10px 20px 10px 20px;line-height:24px;">
 				<span class="f_b">
-				&raquo; 已经是会员？请<a href="{$DT[file_login]}" class="b">点这里登录</a>&nbsp;
-				&raquo; 忘记了密码？请<a href="send.php" class="b">点这里找回</a>&nbsp;
+				&raquo; 已经是会员？请<a href="{$DT[file_login]}?forward={urlencode($forward)}" class="b">点这里登录</a>&nbsp;
+				&raquo; 忘记了密码？请<a href="send.php?forward={urlencode($forward)}" class="b">点这里找回</a>&nbsp;
 				{if $MOD[checkuser] == 2}
-				&raquo; <span class="f_red">未收到验证信？</span>请<a href="send.php?action=check" class="b">点这里重发</a>
+				&raquo; <span class="f_red">未收到验证信？</span>请<a href="send.php?action=check&forward={urlencode($forward)}" class="b">点这里重发</a>
 				{/if}
 				</span>
 				<br/>
@@ -55,7 +55,7 @@
 			</tr>
 			{if $MOD[passport] && $passport}
 			<tr onmouseover="Ds('tpassport');" onmouseout="Dh('tpassport');">
-			<td class="tl">通行证用户名 &nbsp;</td>
+			<td class="tl">昵称 &nbsp;</td>
 			<td><input type="text" class="reg_inp" style="width:200px;" name="post[passport]" id="passport" onblur="validator('passport');" autocomplete="off"{if $passport} value="{$passport}" readonly{/if}/></td>
 			<td>
 			<div class="tips" id="tpassport" style="display:none;">
@@ -76,7 +76,7 @@
 			</td>
 			</tr>
 			<tr onmouseover="Ds('tcpassword');" onmouseout="Dh('tcpassword');">
-			<td class="tl">重复输入密码 <span class="f_red">*</span></td>
+			<td class="tl">重复输入 <span class="f_red">*</span></td>
 			<td><input type="password" class="reg_inp" style="width:200px;" size="30" name="post[cpassword]" id="cpassword" onblur="validate('cpassword');" autocomplete="off"{if $password} value="{$password}" readonly{/if}/></td>
 			<td>
 			<div class="tips" id="tcpassword" style="display:none;">
@@ -92,7 +92,7 @@
 			<tr onmouseover="Ds('ttruename');" onmouseout="Dh('ttruename');">
 			<td class="tl">真实姓名 <span class="f_red">*</span></td>
 			<td width="220">
-			<input type="text" class="reg_inp" style="width:100px;" name="post[truename]" id="truename" onblur="validate('truename');"/>
+			<input type="text" class="reg_inp" style="width:80px;" name="post[truename]" id="truename" onblur="validate('truename');"/>
 			<input type="radio" name="post[gender]" value="1" checked id="gender_1"/><label for="gender_1"> 先生</label>
 			<input type="radio" name="post[gender]" value="2" id="gender_2"/><label for="gender_2"> 女士</label>
 			</td>
@@ -117,7 +117,7 @@
 				{if $MOD[checkuser] == 2}
 				<span class="f_red">系统设置了邮件验证注册，请确保当前的邮件地址真实有效<br/></span>
 				{/if}
-				请使用常用常用邮箱(E-mail)地址，地址不会被公开且可用于登录网站			
+				请使用常用常用邮箱(Email)地址，地址不会被公开且可用于登录网站			
 				</div>
 			</div>
 			<span id="demail" class="f_red"></span>&nbsp;	
@@ -252,27 +252,34 @@
 			{/if}
 			<tr>
 			<td class="tl">&nbsp;</td>
-			<td width="300"><input type="submit" name="submit" value="同意以下服务条款，提交" style="font-size:14px;padding:3px;"/></td>
+			<td width="300"><input type="checkbox" checked="checked" onclick="if(this.checked){Ds('sbm');}else{Dh('sbm');}"/> <a href="?read=1" target="_blank" class="b">我已阅读并同意服务条款</a></td>
+			<td>&nbsp;</td>
+			</tr>
+			<tr id="sbm">
+			<td class="tl"></td>
+			<td>
+			<input type="submit" name="submit" value="立即注册" style="background:#77C019;color:#FFFFFF;font-size:14px;width:120px;line-height:32px;border:none;border-radius:4px;text-align:center;"/>
+			</td>
 			<td>&nbsp;</td>
 			</tr>
 			</table>
 			</form>
-			<br/>
-			<div style="width:700px;height:100px;overflow-y:scroll;border:#9DBFDA 1px solid;background:#FAFAFA;margin:auto;line-height:180%;padding:10px;" id="agreement">
-			<center class="px14 f_b">请阅读本站服务条款</center>
-			{template 'agreement', $module}
-			</div>
-			<div style="text-align:right;padding:10px 100px 20px 0;"><a href="?print=1" target="_blank">可打印版本</a></div>
-			<br/>
 		</div>
 	</div>
 </div>
 <script type="text/javascript" src="{DT_STATIC}file/script/guest.js"></script>
 <script type="text/javascript">
 if(Dd('username').value == '') Dd('username').focus();
+{if $MOD[question_register]}Dd('answer').className = 'reg_inp';{/if}
+{if $MOD[captcha_register]}Dd('captcha').className = 'reg_inp';{/if}
 var vid = '';
+function dtrim(id) {
+	var str = Dd(id).value.trim();
+	if(Dd(id).value != str) Dd(id).value = str;
+}
 function validator(id) {
 	vid = id;
+	dtrim(id);
 	makeRequest('moduleid={$moduleid}&action=member&job='+id+'&value='+Dd(id).value, AJPath, '_validator');
 }
 function _validator() {
@@ -290,15 +297,15 @@ function validate(type) {
 		} else {
 			err_msg('', type);
 		}
-	}
-	if(type == 'truename') {
+	} else if(type == 'truename') {
+		dtrim(type);
 		if(Dd('truename').value.length < 2) {
 			err_msg('请输入真实姓名', type);
 		} else {
 			err_msg('', type);
 		}
-	}
-	if(type == 'telephone') {
+	} else if(type == 'telephone') {
+		dtrim(type);
 		if(Dd('telephone').value.match(/^[0-9\-\(\)\+\.]{7,}$/)) {
 			err_msg('', type);
 		} else {

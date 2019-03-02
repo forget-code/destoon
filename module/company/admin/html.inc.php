@@ -1,10 +1,10 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $all = (isset($all) && $all) ? 1 : 0;
 $menus = array (
     array('生成网页', '?moduleid='.$moduleid.'&file='.$file),
-    array('数据统计', 'javascript:Dwidget(\'?file=count&itemid=1&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
-    array('模块前台', $MOD['linkurl'], ' target="_blank"'),
+    array('数据统计', 'javascript:Dwidget(\'?file=count&action=stats&&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
+    array('模块首页', $MOD['linkurl'], ' target="_blank"'),
 );
 $all = (isset($all) && $all) ? 1 : 0;
 $one = (isset($one) && $one) ? 1 : 0;
@@ -89,6 +89,46 @@ switch($action) {
 			}
 		}
 		msg('ID从'.$fid.'至'.($userid-1).$MOD['name'].($update ? '更新' : '生成').'成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$userid&tid=$tid&num=$num&update=$update&all=$all&one=$one");
+	break;
+	case 'passport':
+		if(!isset($fid)) {
+			$r = $db->get_one("SELECT min(userid) AS fid FROM {$table}");
+			$fid = $r['fid'] ? $r['fid'] : 0;
+		}
+		isset($sid) or $sid = $fid;
+		if(!isset($tid)) {
+			$r = $db->get_one("SELECT max(userid) AS tid FROM {$table}");
+			$tid = $r['tid'] ? $r['tid'] : 0;
+		}
+		isset($num) or $num = 50;
+		if($fid <= $tid) {
+			$result = $db->query("SELECT userid,username FROM {$table} WHERE userid>=$fid ORDER BY userid LIMIT 0,$num ");
+			if($db->affected_rows($result)) {
+				while($r = $db->fetch_array($result)) {
+					$userid = $r['userid'];
+					$username = $r['username'];
+					$passport = get_user($userid, 'userid', 'passport');
+					$passport = addslashes($passport);
+
+					$db->query("UPDATE {$DT_PRE}comment SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}know SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}know_answer SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}know_expert SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}know_vote SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}club SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}club_fans SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}club_group SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}club_reply SET passport='$passport' WHERE username='$username'");
+					$db->query("UPDATE {$DT_PRE}club SET replyer='$passport' WHERE replyuser='$username'");
+				}
+				$userid += 1;
+			} else {
+				$userid = $fid + $num;
+			}
+		} else {
+			dmsg('更新成功', $this_forward);
+		}
+		msg('ID从'.$fid.'至'.($userid-1).'昵称更新成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$userid&tid=$tid&num=$num&all=$all&one=$one");
 	break;
 	case 'cate':
 		$catid or msg('请选择分类');

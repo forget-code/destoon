@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('信息支付', '?moduleid='.$moduleid.'&file='.$file),
     array('统计报表', '?moduleid='.$moduleid.'&file='.$file.'&action=stats'),

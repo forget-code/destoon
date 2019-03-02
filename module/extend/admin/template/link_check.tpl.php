@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -43,7 +43,7 @@ show_menu($menus);
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center" title="网站介绍:<?php echo $v['introduce'];?>">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><a href="<?php echo $v['typeurl'];?>" target="_blank"><?php echo $v['typename'];?></td>
-<td><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
+<td><a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
 <td><?php if($v['thumb']) {?><img src="<?php echo $v['thumb'];?>" width="88" /><?php } ?></td>
 <td><?php echo $v['thumb'] ? 'LOGO' : '文字';?></td>
 <td><?php echo $v['adddate'];?></td>

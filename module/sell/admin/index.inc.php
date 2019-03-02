@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/sell.class.php';
 $do = new sell($moduleid);
 $menus = array (
@@ -24,8 +24,8 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '产品品牌', '计量单位', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', 'IP', '参数名1', '参数名2', '参数名3', '参数值1', '参数值2', '参数值3');
-	$dfields = array('keyword', 'title', 'brand', 'unit', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3');
+	$sfields = array('模糊', '标题', '产品品牌', '计量单位', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', '编辑', 'IP', '参数名1', '参数名2', '参数名3', '参数值1', '参数值2', '参数值3', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'brand', 'unit', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'filepath', 'template');
 	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '产品单价降序', '产品单价升序', '供货总量降序', '供货总量升序', '最小起订降序', '最小起订升序', '浏览次数降序', '浏览次数升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'vip DESC', 'vip ASC', 'price DESC', 'price ASC', 'amount DESC', 'amount ASC', 'minamount DESC', 'minamount ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
 
@@ -65,7 +65,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$type_select = dselect($TYPE, 'typeid', $MOD['name'].'类型', $typeid);
-	$level_select = level_select('level', '级别', $level);
+	$level_select = level_select('level', '级别', $level, 'all');
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -76,7 +76,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 
 	if($typeid >=0) $condition .= " AND typeid=$typeid";
-	if($level) $condition .= " AND level=$level";
+	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 	if($thumb) $condition .= " AND thumb<>''";
 	if($guest) $condition .= " AND username=''";
 	if($elite) $condition .= " AND elite>0";
@@ -122,7 +122,6 @@ switch($action) {
 			$typeid = 0;
 			$item = array();
 			$menuid = 0;
-			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -152,7 +151,6 @@ switch($action) {
 			$totime = $totime ? timetodate($totime, 3) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
-			$tname = '修改'.$MOD['name'];
 			include tpl($action, $module);
 		}
 	break;
@@ -161,6 +159,7 @@ switch($action) {
 			$fromids or msg('请填写来源ID');
 			if($tocatid) {
 				$db->query("UPDATE {$table} SET catid=$tocatid WHERE `{$fromtype}` IN ($fromids)");
+				$db->query("UPDATE {$table_search} SET catid=$tocatid WHERE `{$fromtype}` IN ($fromids)");
 				dmsg('移动成功', $forward);
 			} else {
 				msg('请选择目标分类');
@@ -168,7 +167,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 6;
-			include tpl($action, $module);
+			include tpl($action);
 		}
 	break;
 	case 'update':
@@ -183,7 +182,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('更新成功', $forward);
+		dmsg('生成成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择'.$MOD['name']);

@@ -24,5 +24,5 @@ if(strpos($file, '/default') === false) {
 	$remote = file_get_contents($DT_ROOT.'file/avatar/remote.html');
 	if(strlen($remote) > 10) $file = str_replace('../../file/', $remote, $file);
 }
-header('location:'.$file);
+header('location:'.$file.(isset($_GET['time']) ? '?v='.time() : ''));
 ?>

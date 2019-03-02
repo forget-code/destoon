@@ -81,7 +81,7 @@
 			<!--{php $tags=tag("table=know_expert&condition=1&pagesize=".$MOD['page_iexpert']."&order=addtime desc&template=null");}-->
 			{loop $tags $t}
 			<div class="know_expert">
-			<a href="{$MOD[linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}" target="_blank"><img src="{useravatar($t[username], 'large')}" width="80" alt="{$t[alt]}"/></a><div><a href="{$MOD[linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}" target="_blank" title="{$t[alt]}" class="b"><strong>{$t[title]}</strong></a><br/>{dsubstr($t[introduce], 86, '..')}</div>
+			<a href="{$MOD[linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}" target="_blank"><img src="{useravatar($t[username], 'large')}" width="80" height="80" alt="{$t[alt]}"/></a><div><a href="{$MOD[linkurl]}{rewrite('expert.php?itemid='.$t['itemid'])}" target="_blank" title="{$t[alt]}" class="b"><strong>{$t[title]}</strong></a><br/>{dsubstr($t[introduce], 86, '..')}</div>
 			</div>
 			{/loop}
 		</div>

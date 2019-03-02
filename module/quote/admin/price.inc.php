@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $pid = isset($pid) ? intval($pid) : 0;
 $menus = array (
 	array('添加报价', '?file='.$file.'&moduleid='.$moduleid.'&pid='.$pid.'&action=add'),

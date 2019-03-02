@@ -1,4 +1,4 @@
-{php $CSS = array('spread');}
+{php $CSS = array('extend');}
 {template 'header'}
 <div class="m">
 <table cellpadding="0" cellspacing="0" width="100%">
@@ -56,7 +56,7 @@
 <td>{timetodate($v[totime], 3)}</td>
 <td>{$v[process]}</td>
 <td class="f_gray px11">{timetodate($v[addtime], 5)}</td>
-<td><a href="{$MODULE[3][linkurl]}redirect.php?mid={$v[mid]}&itemid={$v[tid]}" target="_blank" class="t">直达</a></td>
+<td><a href="{DT_PATH}api/redirect.php?mid={$v[mid]}&itemid={$v[tid]}" target="_blank" class="t">直达</a></td>
 </tr>
 {/loop}
 <tr>

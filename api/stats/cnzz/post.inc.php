@@ -1,14 +1,15 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-preg_match("/^http:\/\/s[0-9]{1,5}\.cnzz\.com\/stat\.php\?id=[0-9]{5,11}&web_id=[0-9]{5,11}$/", $stats) or $stats = '';
+$stats = str_replace('&amp;', '&', $stats);
+$stats_cnzz = preg_match("/^http:\/\/[a-z0-9]{1,5}\.cnzz\.com\/stat\.php\?id=[0-9]{5,11}&web_id=[0-9]{5,11}$/", $stats) ? $stats : '';
 ?>
-<tr>
+<tr id="stats_post_cnzz" style="display:none;">
 <td class="tl">流量统计地址</td>
 <td class="tr">
-<input type="text" name="setting[stats]" id="stats" value="<?php echo $stats;?>" size="70"/>&nbsp;&nbsp;
+<input type="text" name="stats[cnzz]" id="stats_cnzz" value="<?php echo $stats_cnzz;?>" size="70"/>&nbsp;&nbsp;
 <?php 
-	if($stats) {
-	$tmp = explode('web_id=', $stats);
+if($stats_cnzz) {
+	$tmp = explode('web_id=', $stats_cnzz);
 	$web_id = $tmp[1];
 ?>
 <a href="http://www.cnzz.com/stat/website.php?web_id=<?php echo $web_id;?>" class="t" target="_blank">查看统计</a>

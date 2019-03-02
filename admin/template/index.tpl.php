@@ -1,12 +1,12 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $edition = edition(1);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=<?php echo DT_CHARSET;?>"/>
-<title>管理中心 - <?php echo $DT['sitename']; ?> - Powered By DESTOON B2B <?php echo $edition;?> V<?php echo DT_VERSION; ?> R<?php echo DT_RELEASE;?> <?php echo strtoupper(DT_CHARSET);?> <?php echo strtoupper(DT_LANG);?></title>
+<title>管理中心 - <?php echo $DT['sitename']; ?> - Powered By DESTOON B2B <?php echo $edition;?> V<?php echo DT_VERSION; ?> R<?php echo DT_RELEASE;?> <?php echo DT_CHARSET;?> <?php echo strtoupper(DT_LANG);?></title>
 <meta name="robots" content="noindex,nofollow"/>
 <meta name="generator" content="DESTOON B2B - www.destoon.com"/>
 <meta http-equiv="x-ua-compatible" content="IE=8"/>

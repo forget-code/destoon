@@ -5,9 +5,7 @@ require DT_ROOT.'/include/post.func.php';
 include load($module.'.lang');
 include load('my.lang');
 $resume = isset($resume) ? 1 : 0;
-
 if($resume) {
-
 $MG['resume_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require MD_ROOT.'/resume.class.php';
 $do = new resume($moduleid);
@@ -17,7 +15,6 @@ if(in_array($action, array('add', 'edit'))) {
 	if($FD) require DT_ROOT.'/include/fields.func.php';
 	isset($post_fields) or $post_fields = array();
 }
-
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
@@ -93,9 +90,9 @@ switch($action) {
 			if($itemid) {
 				$MG['copy'] && $_userid or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 				$do->itemid = $itemid;
-				$r = $do->get_one();
-				if(!$r || $r['username'] != $_username) message();
-				extract($r);
+				$item = $do->get_one();
+				if(!$item || $item['username'] != $_username) message();
+				extract($item);
 				$thumb = '';
 				list($byear, $bmonth, $bday) = explode('-', $birthday);
 			} else {
@@ -145,10 +142,10 @@ switch($action) {
 				$post['addtime'] = timetodate($item['addtime']);
 				$post['level'] = $item['level'];
 				$post['fee'] = $item['fee'];
-				$post['style'] = $item['style'];
-				$post['template'] = $item['template'];
-				$post['filepath'] = $item['filepath'];
-				$post['note'] = $item['note'];
+				$post['style'] = addslashes($item['style']);
+				$post['template'] = addslashes($item['template']);
+				$post['filepath'] = addslashes($item['filepath']);
+				$post['note'] = addslashes($item['note']);
 				$need_check =  $MOD['check_add_resume'] == 2 ? $MG['check'] : $MOD['check_add_resume'];
 				$post['status'] = get_status($item['status'], $need_check);
 				$post['hits'] = $item['hits'];
@@ -172,7 +169,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username FROM {$table} WHERE itemid=$itemid");
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -206,7 +203,7 @@ switch($action) {
 		$MG['refresh_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 		$itemid or message();
 		$do->itemid = $itemid;
-		$item = $do->get_one();
+			$item = $db->get_one("SELECT username,edittime FROM {$table} WHERE itemid=$itemid");
 		if(!$item || $item['username'] != $_username) message();
 		if($MG['refresh_limit'] && $DT_TIME - $item['edittime'] < $MG['refresh_limit']) dalert(lang($L['refresh_limit'], array($MG['refresh_limit'])), $forward);
 		$do->refresh($itemid);
@@ -222,7 +219,6 @@ switch($action) {
 		$lists = $do->get_list($condition);
 	break;
 }
-$head_title = $L['resume_manage'];
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 4; $i++) {
@@ -232,15 +228,14 @@ if($_userid) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}job_apply WHERE apply_username ='$_username'");
 	$nums['apply'] = $r['num'];
 }
+$head_title = $L['resume_manage'];
 include template('my_resume', 'member');
 
 } else {
 
 $MG['job_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
-
 require MD_ROOT.'/job.class.php';
 $do = new job($moduleid);
-
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -249,7 +244,6 @@ if(in_array($action, array('add', 'edit'))) {
 	if($CP) require DT_ROOT.'/include/property.func.php';
 	isset($post_ppt) or $post_ppt = array();
 }
-
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
@@ -258,7 +252,6 @@ if(in_array($action, array('', 'add'))) {
 	$limit_free = $MG['job_limit'] > $limit_used ? $MG['job_limit'] - $limit_used : 0;
 }
 if(check_group($_groupid, $MOD['group_refresh'])) $MOD['credit_refresh'] = 0;
-
 switch($action) {
 	case 'add':
 		if($MG['job_limit'] && $limit_used >= $MG['job_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
@@ -306,20 +299,17 @@ switch($action) {
 				$post['status'] = get_status(3, $need_check);
 				$post['hits'] = 0;
 				$post['username'] = $_username;
-				
+				if($FD) fields_check($post_fields);
+				if($CP) property_check($post_ppt);				
 				if($could_color && $color && $_credit > $MOD['credit_color']) {
 					$post['style'] = $color;
 					credit_add($_username, -$MOD['credit_color']);
 					credit_record($_username, -$MOD['credit_color'], 'system', $L['title_color'], '['.$MOD['name'].']'.$post['title']);
 				}
-
-				if($FD) fields_check($post_fields);
-				if($CP) property_check($post_ppt);
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
 				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
-
 				if($fee_add) {
 					if($fee_currency == 'money') {
 						money_add($_username, -$fee_add);
@@ -334,7 +324,6 @@ switch($action) {
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
 				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
-				if(isset($post['sync_qzone']) && $post['sync_qzone']) $js .= sync_weibo('qzone', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
 					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
@@ -351,9 +340,9 @@ switch($action) {
 			if($itemid) {
 				$MG['copy'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 				$do->itemid = $itemid;
-				$r = $do->get_one();
-				if(!$r || $r['username'] != $_username) message();
-				extract($r);
+				$item = $do->get_one();
+				if(!$item || $item['username'] != $_username) message();
+				extract($item);
 				$thumb = '';
 				$totime = $totime ? timetodate($totime, 3) : '';
 			} else {
@@ -397,8 +386,8 @@ switch($action) {
 				$post['addtime'] = timetodate($item['addtime']);
 				$post['level'] = $item['level'];
 				$post['fee'] = $item['fee'];
-				$post['style'] = $item['style'];
-				$post['template'] = $item['template'];
+				$post['style'] = addslashes($item['style']);
+				$post['template'] = addslashes($item['template']);
 				$need_check =  $MOD['check_add'] == 2 ? $MG['check'] : $MOD['check_add'];
 				$post['status'] = get_status($item['status'], $need_check);
 				$post['hits'] = $item['hits'];
@@ -474,7 +463,6 @@ switch($action) {
 		$condition = '';
 		if($keyword) $condition .= " AND r.keyword LIKE '%$keyword%'";
 		if($catid) $condition .= ($CAT['child']) ? " AND r.catid IN (".$CAT['arrchildid'].")" : " AND r.catid=$catid";
-
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}job_talent t LEFT JOIN {$DT_PRE}resume r ON t.resumeid=r.itemid WHERE t.username='$_username' $condition");
 		$pages = pages($r['num'], $page, $pagesize);		
 		$lists = array();
@@ -491,7 +479,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username FROM {$table} WHERE itemid=$itemid");
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -505,7 +493,7 @@ switch($action) {
 		$s = $f = 0;
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $do->get_one();
+			$item = $db->get_one("SELECT username,edittime FROM {$table} WHERE itemid=$itemid");
 			$could_refresh = $item && $item['username'] == $_username;
 			if($could_refresh && $MG['refresh_limit'] && $DT_TIME - $item['edittime'] < $MG['refresh_limit']) $could_refresh = false;
 			if($could_refresh && $MOD['credit_refresh'] && $MOD['credit_refresh'] > $_credit) $could_refresh = false;
@@ -539,7 +527,6 @@ switch($action) {
 		$lists = $do->get_list($condition, $MOD['order']);
 	break;
 }
-$head_title = lang($L['module_manage'], array($MOD['name']));
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 5; $i++) {
@@ -551,6 +538,7 @@ if($_userid) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}job_apply WHERE job_username ='$_username' AND status>0");
 	$nums['resume'] = $r['num'];
 }
+$head_title = lang($L['module_manage'], array($MOD['name']));
 include template('my_job', 'member');
 
 }

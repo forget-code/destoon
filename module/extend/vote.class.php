@@ -8,12 +8,16 @@ class vote {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function vote() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'vote';
 		$this->table_record = $DT_PRE.'vote_record';
 		$this->db = &$db;
-		$this->fields = array('typeid','areaid', 'title','style','level','linkto','content','addtime','fromtime','totime','editor','edittime','template_vote','template', 'vote_min', 'vote_max', 'linkurl', 'choose', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10');
+		$this->fields = array('typeid','areaid', 'title','style','level','linkto','content','groupid','verify','addtime','fromtime','totime','editor','edittime','template_vote','template', 'vote_min', 'vote_max', 'linkurl', 'choose', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10');
+    }
+
+    function vote() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -39,6 +43,8 @@ class vote {
 		}
 		if($post['fromtime']) $post['fromtime'] = strtotime($post['fromtime'].' 0:0:0');
 		if($post['totime']) $post['totime'] = strtotime($post['totime'].' 23:59:59');
+		$post['groupid'] = implode(',', $post['groupid']);
+		$post['verify'] = intval($post['verify']);
 		return array_map("trim", $post);
 	}
 
@@ -55,6 +61,7 @@ class vote {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -65,7 +72,7 @@ class vote {
 			$r['fromdate'] = $r['fromtime'] ? timetodate($r['fromtime'], 3) : $L['timeless'];
 			$r['todate'] = $r['totime'] ? timetodate($r['totime'], 3) : $L['timeless'];
 			$r['typename'] = $TYPE[$r['typeid']]['typename'];
-			$r['typeurl'] = $MOD['vote_url'].rewrite('index.php?typeid='.$r['typeid']);
+			$r['typeurl'] = $MOD['vote_url'].list_url($r['typeid']);
 			$lists[] = $r;
 		}
 		return $lists;
@@ -80,6 +87,7 @@ class vote {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table_record} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -100,11 +108,9 @@ class vote {
         $sqlv = substr($sqlv, 1);
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
-		if(!$post['islink']) {
-			$linkurl = $this->linkurl($this->itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			tohtml('vote', $module, "itemid=$this->itemid");
-		}
+		$linkurl = $this->linkurl($this->itemid);
+		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		tohtml('vote', $module, "itemid=$this->itemid");
 		return $this->itemid;
 	}
 
@@ -117,27 +123,15 @@ class vote {
 		}
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
-		if(!$post['islink']) {
-			$linkurl = $this->linkurl($this->itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			tohtml('vote', $module, "itemid=$this->itemid");
-		}
-		return true;
-	}
-
-	function update() {
-		$result = $this->db->query("SELECT * FROM {$this->table}");
-		while($r = $this->db->fetch_array($result)) {
-			$itemid = $r['itemid'];
-			$linkurl = $this->linkurl($itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$itemid");
-		}
+		$linkurl = $this->linkurl($this->itemid);
+		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		tohtml('vote', $module, "itemid=$this->itemid");
 		return true;
 	}
 
 	function linkurl($itemid) {
 		global $MOD;
-		$linkurl = rewrite('index.php?itemid='.$itemid);
+		$linkurl = show_url($itemid);
 		return $MOD['vote_url'].$linkurl;
 	}
 

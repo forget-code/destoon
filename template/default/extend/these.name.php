@@ -8,6 +8,7 @@ $names = array (
   'comment' => '评论',
   'comment_list' => '评论列表',
   'feed' => 'RSS订阅',
+  'form' => '表单',
   'gift' => '积分换礼',
   'guestbook' => '留言本',
   'link' => '友情链接',

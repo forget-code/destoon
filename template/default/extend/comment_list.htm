@@ -1,11 +1,9 @@
 {php $CSS = array('comment');}
 {template 'header'}
+<div id="destoon_space" style="display:none;"></div>
 <div class="m">
 	<div class="nav"><span class="f_r"><a href="{$linkurl}" class="b">返回原文&raquo;</a></span>当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MODULE[$mid][linkurl]}">{$MODULE[$mid][name]}</a> &raquo; <a href="{$linkurl}">{$title}</a> &raquo; 评论列表</div>
 	<div id="destoon_comment">
-	{if $template == 'close'}
-	<div class="comment_close">[该评论已关闭]</div>
-	{else}
 	<h1 class="title"><a href="{$linkurl}"><strong>{$title}评论列表</strong></a></h1>
 	<div class="stat">
 	<table cellpadding="6" cellspacing="1" width="100%">
@@ -35,7 +33,7 @@
 	<tr>
 	<td class="comment_l" valign="top">
 	<div>
-	{if $v[uname]}<a href="{userurl($v[uname])}" target="_blank">{/if}<img src="{useravatar($v[uname])}" width="48" alt="" align="absmiddle"/>{if $v[uname]}</a>{/if}
+	{if $v[uname]}<a href="{userurl($v[uname])}" target="_blank">{/if}<img src="{useravatar($v[uname])}" width="48" height="48" alt="" align="absmiddle"/>{if $v[uname]}</a>{/if}
 	</div>
 	</td>
 	<td valign="top">
@@ -95,7 +93,16 @@
 	</tr>
 	{if $need_captcha}
 	<tr id="tr_captcha" style="display:none;">
-	<td><div class="comment_input">&nbsp;<span>*</span> 验证码：&nbsp;{template 'captcha', 'chip'}</div></td>
+	<td>
+	<div class="comment_input">
+	<table cellpadding="0" cellspacing="0">
+	<tr>
+	<td>&nbsp;<span>*</span> 验证码：</td>
+	<td>&nbsp;{template 'captcha', 'chip'}</td>
+	</tr>
+	</table>
+	</div>	
+	</td>
 	</tr>
 	{/if}
 	<tr>
@@ -109,18 +116,12 @@
 	</tr>
 	</table>
 	</form>
-	</div>	
-	<form method="post" action="{$EXT[guestbook_url]}index.php" id="r_form" target="_blank">
-	<input type="hidden" name="action" value="report"/>
-	<input type="hidden" name="content" id="r_content" value=""/>
-	</form>
-{/if}
+	</div>
 </div>
 </div>
 <script style="text/javascript">
 function R(id) {
-	Dd('r_content').value = '评论举报，评论ID:'+id+'\n评论内容:\n'+Dd('c_'+id).innerHTML+'\n--------------------------\n举报理由:\n';
-	Dd('r_form').submit();
+	SendReport('评论举报，评论ID:'+id+'\n评论内容:\n'+Dd('c_'+id).innerHTML);
 }
 {if $MOD[comment_vote]}
 var v_id = 0;

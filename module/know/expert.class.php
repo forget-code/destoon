@@ -7,11 +7,15 @@ class expert {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function expert() {
+    function __construct() {
 		global $db;
 		$this->table = $db->pre.'know_expert';
 		$this->db = &$db;
-		$this->fields = array('title','style','major','username','addtime','editor','edittime','introduce','content');
+		$this->fields = array('title','style','major','username','passport','addtime','editor','edittime','introduce','content');
+    }
+
+    function expert() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -27,11 +31,11 @@ class expert {
 		global $MOD, $DT_TIME, $_username, $_userid;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
-		check_name($post['ask']) or $post['ask'] = '';
-		$post['title'] = trim($post['title']);
-		$post['content'] = addslashes(save_remote(save_local(stripslashes($post['content']))));
+		$post['content'] = stripslashes($post['content']);
+		$post['content'] = save_local($post['content']);
+		if($MOD['save_remotepic']) $post['content'] = save_remote($post['content']);
 		$post['introduce'] = addslashes(get_intro($post['content'], 120));
-		clear_upload($post['content']);
+		$post['passport'] = addslashes(get_user($post['username'], 'username', 'passport'));
 		if($this->itemid) {
 			$post['editor'] = $_username;
 			$new = $post['content'];
@@ -42,8 +46,8 @@ class expert {
 		$content = $post['content'];
 		unset($post['content']);
 		$post = dhtmlspecialchars($post);
-		$post['content'] = dsafe($content);
-		$post['content'] = addslashes(save_remote(save_local(stripslashes($post['content']))));
+		$post['content'] = addslashes(dsafe($content));
+		clear_upload($post['content']);
 		return array_map("trim", $post);
 	}
 
@@ -59,7 +63,8 @@ class expert {
 			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
-		$pages = pages($items, $page, $pagesize);		
+		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -105,8 +110,7 @@ class expert {
 		} else {
 			$this->itemid = $itemid;
 			$r = $this->get_one();
-			$userid = get_user($r['username']);
-			if($r['content']) delete_local($r['content'], $userid);
+			if($r['content']) delete_local($r['content'], get_user($r['username']));
 			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}

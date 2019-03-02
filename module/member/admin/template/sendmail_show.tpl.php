@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -32,5 +32,5 @@ show_menu($menus);
 </tbody>
 </table>
 <div class="sbt"><input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
-<script type="text/javascript">Menuon(3);</script>
+<script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

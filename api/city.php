@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require '../common.inc.php';
@@ -18,7 +18,7 @@ if($action == 'go') {
 					if($r['domain']) {
 						dheader($r['domain']);
 					} else {
-						set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 365*86400);
+						set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 30*86400);
 					}
 					break;
 				}
@@ -30,7 +30,7 @@ if($action == 'go') {
 	if($areaid) {
 		$r = $db->get_one("SELECT areaid,name,domain,template FROM {$DT_PRE}city WHERE areaid=$areaid");
 		if($r) {
-			set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 365*86400);
+			set_cookie('city', $r['areaid'].'|'.$r['domain'], $DT_TIME + 30*86400);
 			$url = '';
 			if($forward) {
 				if(strpos($forward, DT_PATH) !== false) {
@@ -51,7 +51,7 @@ if($action == 'go') {
 			dheader($url ? $url : DT_PATH);
 		}
 	}
-	set_cookie('city', '0|', $DT_TIME + 365*86400);
+	set_cookie('city', '0|', $DT_TIME + 30*86400);
 	dheader(DT_PATH);
 }
 $lists = array();

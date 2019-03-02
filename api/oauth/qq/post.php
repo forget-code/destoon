@@ -5,25 +5,28 @@ $OAUTH[$site]['sync'] or exit;
 $_token = get_cookie('qq_token');
 $_openid = get_cookie('qq_openid');
 if($_token && $_openid) {
-	$_openid = decrypt($_openid);
+	$_openid = decrypt($_openid, DT_KEY.'QQID');
 	require '../post.inc.php';
 	$par = 'access_token='.$_token.'&oauth_consumer_key='.QQ_ID.'&openid='.$_openid;
 	$par .= '&format=xml&content='.$content;
 	$headers = array();
 	$pic = '';
 	if($thumb) {
-		if(strpos($thumb, DT_PATH) === false) {
-			$ext = file_ext($thumb);
-			in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp')) or $ext = 'jpg';
-			$pic = DT_ROOT.'/file/temp/'.date('YmdHis').mt_rand(10, 99).$_userid.'.'.$ext;
-			file_copy($thumb, $pic);
-			if(!@getimagesize($pic)) {
-				file_del($pic);
+		if(strpos($thumb, DT_PATH) === 0) {
+			$pic = str_replace(DT_PATH, DT_ROOT.'/', $thumb);
+		} else {
+			if($DT['remote_url'] && strpos($thumb, $DT['remote_url']) === 0) {
+				$pic = DT_ROOT.'/file/temp/'.date('YmdHis', $DT_TIME).mt_rand(10, 99).$_userid.'.'.$ext;
+				file_copy($thumb, $pic);
+			}
+		}
+		if($pic) {
+			if(@getimagesize($pic)) {
+				if(strpos($pic, '/file/') === false || strpos($pic, '..') !== false) $pic = '';
+			} else {
+				if(strpos($pic, 'file/temp') !== false) file_del($pic);
 				$pic = '';
 			}
-		} else {
-			$pic = str_replace(DT_PATH, DT_ROOT.'/', $thumb);
-			@getimagesize($pic) or $pic = '';
 		}
 		if($pic) {
 			$headers[] = 'Expect: ';
@@ -47,6 +50,7 @@ if($_token && $_openid) {
 	$rec = curl_exec($cur);
 	curl_close($cur);
 	if($pic && strpos($pic, 'file/temp') !== false) file_del($pic);
+	#log_write($rec, 'qq', 1);
 	if(strpos($rec, '<msg>ok</msg>') === false) {
 		//fail
 	} else {

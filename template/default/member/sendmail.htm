@@ -1,5 +1,5 @@
 {template 'header', $module}
-<form method="post" action="sendmail.php" id="dform" onsubmit="return check();">
+<form method="post" action="?" id="dform" onsubmit="return check();">
 <table cellspacing="1" cellpadding="6" class="tb">
 <tr>
 <td class="tl">发件人</td>
@@ -16,7 +16,7 @@
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件正文</td>
 <td class="tr"><textarea name="content" id="content" class="dsn">{$content}</textarea>
-{deditor($moduleid, 'content', 'Basic', '98%', 350)}<span id="dcontent" class="f_red"></span></td>
+{deditor($moduleid, 'content', 'Basic', '100%', 350)}<br/><span id="dcontent" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 验证码</td>
@@ -24,11 +24,11 @@
 </tr>
 <tr>
 <td class="tl"> </td>
-<td class="tr" height="30"><input type="submit" name="submit" value=" 发 送 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 预 览 " class="btn" onclick="mail_view();"/>&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
+<td class="tr" height="30"><input type="submit" name="submit" value=" 发 送 " class="btn_g"/>&nbsp;&nbsp;<input type="button" value=" 预 览 " class="btn" onclick="mail_view();"/>&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
 </tr>
 </table>
 </form>
-<form method="post" action="sendmail.php" name="pmail" id="pmail" target="_blank">
+<form method="post" action="?" name="pmail" id="pmail" target="_blank">
 <input type="hidden" name="preview" value="1"/> 
 <input type="hidden" name="title" id="ptitle"/> 
 <input type="hidden" name="content" id="pcontent"/> 

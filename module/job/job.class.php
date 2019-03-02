@@ -9,7 +9,7 @@ class job {
 	var $split;
 	var $errmsg = errmsg;
 
-    function job($moduleid) {
+    function __construct($moduleid) {
 		global $db, $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
@@ -17,6 +17,10 @@ class job {
 		$this->split = $MOD['split'];
 		$this->db = &$db;
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','department','total','minsalary','maxsalary','type','gender','marriage','education','minage','maxage','experience','status','hits','username','truename','telephone', 'mobile','address','email','msn','qq','ali','skype','sex','totime','editor','addtime','adddate','edittime','editdate','ip','template','linkurl','filepath','note','company');
+    }
+
+    function job($moduleid) {
+		$this->__construct($moduleid);
     }
 
 	function pass($post) {
@@ -34,11 +38,13 @@ class job {
 		if(!$post['truename']) return $this->_(lang('message->pass_truename'));
 		if(!$post['telephone']) return $this->_(lang('message->pass_telephone'));
 		if(!is_email(trim($post['email']))) return $this->_(lang('message->pass_email'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $TYPE, $_username, $_userid;
+		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['editor'] = $_username;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['adddate'] = timetodate($post['addtime'], 3);
@@ -47,7 +53,6 @@ class job {
 		$post['totime'] = $post['totime'] ? strtotime($post['totime'].' 23:59:59') : 0;
 		$post['fee'] = dround($post['fee']);
 		$post['total'] = intval($post['total']);
-		$post['email'] = trim($post['email']);
 		$post['minsalary'] = intval($post['minsalary']);
 		$post['maxsalary'] = intval($post['maxsalary']);
 		$post['type'] = intval($post['type']);
@@ -56,7 +61,6 @@ class job {
 		$post['experience'] = intval($post['experience']);
 		$post['minage'] = intval($post['minage']);
 		$post['maxage'] = intval($post['maxage']);
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($MOD['clear_link']) $post['content'] = clear_link($post['content']);
@@ -78,8 +82,15 @@ class job {
 	}
 
 	function get_one() {
-		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$content_table} c WHERE a.itemid=c.itemid and a.itemid=$this->itemid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
+			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'edittime DESC', $cache = '') {
@@ -91,13 +102,14 @@ class job {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
 			$r['userurl'] = userurl($r['username']);
-			$r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
+			if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
 			$r['parentid'] = $CATEGORY[$r['catid']]['parentid'] ? $CATEGORY[$r['catid']]['parentid'] : $r['catid'];
 			$lists[] = $r;
 		}
@@ -116,7 +128,7 @@ class job {
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("INSERT INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -136,7 +148,7 @@ class job {
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-	    $this->db->query("UPDATE {$content_table} SET content='$post[content]' WHERE itemid=$this->itemid");
+		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'], $this->itemid);
 		if($post['status'] > 2) $this->tohtml($this->itemid, $post['catid']);
@@ -252,7 +264,7 @@ class job {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}

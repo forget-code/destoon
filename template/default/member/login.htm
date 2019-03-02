@@ -19,8 +19,9 @@
 	<td width="20"> </td>
 	<td width="300" bgcolor="#FFFFFF" background="{DT_SKIN}image/login_b.gif">
 
-		<form method="post" action="{$DT[file_login]}"  onsubmit="return Dcheck();">
-		<input name="forward" type="hidden" id="forward" value="{$forward}">
+		<form method="post" action="{$DT[file_login]}" onsubmit="return Dcheck();">
+		<input name="forward" type="hidden" value="{$forward}"/>
+		<input name="auth" type="hidden" value="{$auth}"/>
 		<table width="290" cellpadding="3" cellspacing="3" align="right">
 		<tr>
 		<td colspan="3" class="f_gray">您尚未登录，或者访问了一个需要登录的页面..</td>
@@ -29,7 +30,7 @@
 		<td align="right">
 		<select name="option">
 			<option value="username">用户名</option>
-			{if $MOD[passport]}<option value="passport">通行证</option>{/if}
+			<option value="passport">昵称</option>
 			<option value="email">Email</option>
 			<option value="mobile">手机号</option>
 			<option value="company">公司名</option>
@@ -71,6 +72,7 @@
 		<td><input type="submit" name="submit" value=" 登 录 "/>&nbsp;&nbsp;<a href="send.php">忘记了密码？</a></td>
 		<td></td>
 		</tr>
+		<tr>
 		{if $oa}
 		<tr>
 		<td align="right">其他登录：</td>
@@ -130,6 +132,7 @@ function Dcheck() {
 		return false;
 	}
 {/if}
+	return true;
 }
 </script>
 {template 'footer'}

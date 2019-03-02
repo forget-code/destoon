@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 class admin {
 	var $userid;
 	var $username;
@@ -12,11 +12,15 @@ class admin {
 	var $pre;
 	var $errmsg = errmsg;
 
-	function admin() {
+	function __construct() {
 		global $db, $admin, $CFG;
 		$this->founderid = $CFG['founderid'];
 		$this->db = &$db;
 		$this->pre = $this->db->pre;
+	}
+
+	function admin() {
+		$this->__construct();
 	}
 
 	function is_member($username) {

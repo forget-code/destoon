@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -11,7 +11,7 @@ show_menu($menus);
 <input type="hidden" name="send" value="1"/>
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td class="tl">提示</td>
+<td class="tl"><span class="f_hid">*</span> 提示</td>
 <td>可以通过此功能将会员的未读站内信发送至其注册邮箱</td>
 </tr>
 <tr>

@@ -68,7 +68,7 @@
 									if(self.width > img_max_width) {
 										self.height = parseInt(self.height*img_max_width/self.width);
 										self.width = img_max_width;
-										self.onclick = function (e) {window.open(EXPath+'view.php?img='+self.src);}
+										self.onclick = function (e) {window.open(DTPath+'api/view.php?img='+self.src);}
 										self.title = L['click_open'];
 									}
 								}
@@ -76,7 +76,7 @@
 								if(self.width > img_max_width) {
 									self.height = parseInt(self.height*img_max_width/self.width);
 									self.width = img_max_width;
-									self.onclick = function (e) {window.open(EXPath+'view.php?img='+self.src);}
+									self.onclick = function (e) {window.open(DTPath+'api/view.php?img='+self.src);}
 									self.title = L['click_open'];
 								}
 							}

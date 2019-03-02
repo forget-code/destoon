@@ -7,11 +7,15 @@ class dlink {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function dlink() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'link';
 		$this->db = &$db;
 		$this->fields = array('typeid','areaid','level','title','style','thumb','introduce','addtime','editor','edittime','template', 'status', 'linkurl');
+    }
+
+    function dlink() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -26,9 +30,11 @@ class dlink {
 	function set($post) {
 		global $MOD, $DT_TIME, $_username, $_userid;
 		if(!$this->itemid) $post['addtime'] = $DT_TIME;
+		if($post['thumb'] && !is_url($post['thumb'])) $post['thumb'] = '';
 		$post['edittime'] = $DT_TIME;
 		$post['editor'] = $_username;
 		clear_upload($post['thumb']);
+		$post = dhtmlspecialchars($post);
 		return array_map("trim", $post);
 	}
 
@@ -45,6 +51,7 @@ class dlink {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -52,7 +59,7 @@ class dlink {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['typename'] = $TYPE[$r['typeid']]['typename'];
-			$r['typeurl'] = $MOD['link_url'].rewrite('index.php?typeid='.$r['typeid']);
+			$r['typeurl'] = $MOD['link_url'].list_url($r['typeid']);
 			$lists[] = $r;
 		}
 		return $lists;

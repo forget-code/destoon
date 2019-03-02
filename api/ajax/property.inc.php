@@ -16,9 +16,9 @@ foreach($options as $k=>$v) {
 	} else {
 		$star = $admin ? '<span class="f_hid">*</span> ' : '';
 	}
-	$table .=  '<tr><td class="tl">'.$star.$v['name'].'</td><td class="tr">'.property_html($values[$v['oid']], $v['oid'], $v['type'], $v['value'], $v['extend']).' <span class="f_red" id="dproduct-'.$v['oid'].'"></span></td></tr>';
+	$table .=  '<tr><td class="tl">'.$star.$v['name'].'</td><td class="tr">'.property_html($values[$v['oid']], $v['oid'], $v['type'], $v['value'], $v['extend']).'</td></tr>';
 	$select .= $v['required'] ? '<option value="'.$v['oid'].'">'.$v['name'].'</option>' : '';
 }
 $select .= '</select>';
-echo $table.$select;
+echo substr($table, 0, -10).$select.'</td></tr>';
 ?>

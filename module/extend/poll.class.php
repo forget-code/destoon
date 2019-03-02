@@ -9,13 +9,17 @@ class poll {
 	var $fields;
 	var $errmsg = errmsg;
 
-    function poll() {
+    function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'poll';
 		$this->table_item = $DT_PRE.'poll_item';
 		$this->table_record = $DT_PRE.'poll_record';
 		$this->db = &$db;
-		$this->fields = array('typeid','areaid', 'title','style','level','content','addtime','fromtime','totime','editor','edittime','template_poll','template', 'linkurl','poll_max','poll_page','poll_cols','poll_order','thumb_width','thumb_height','seo_title','seo_keywords','seo_description');
+		$this->fields = array('typeid','areaid', 'title','style','level','content','groupid','verify','addtime','fromtime','totime','editor','edittime','template_poll','template', 'linkurl','poll_max','poll_page','poll_cols','poll_order','thumb_width','thumb_height');
+    }
+
+    function poll() {
+		$this->__construct();
     }
 
 	function pass($post) {
@@ -41,6 +45,8 @@ class poll {
 		}
 		if($post['fromtime']) $post['fromtime'] = strtotime($post['fromtime'].' 0:0:0');
 		if($post['totime']) $post['totime'] = strtotime($post['totime'].' 23:59:59');
+		$post['groupid'] = implode(',', $post['groupid']);
+		$post['verify'] = intval($post['verify']);
 		$post['poll_max'] = intval($post['poll_max']);
 		$post['poll_page'] = intval($post['poll_page']);
 		$post['poll_page'] or $post['poll_page'] = 30;
@@ -66,6 +72,7 @@ class poll {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -76,7 +83,7 @@ class poll {
 			$r['fromdate'] = $r['fromtime'] ? timetodate($r['fromtime'], 3) : $L['timeless'];
 			$r['todate'] = $r['totime'] ? timetodate($r['totime'], 3) : $L['timeless'];
 			$r['typename'] = $TYPE[$r['typeid']]['typename'];
-			$r['typeurl'] = $MOD['poll_url'].rewrite('index.php?typeid='.$r['typeid']);
+			$r['typeurl'] = $MOD['poll_url'].list_url($r['typeid']);
 			$lists[] = $r;
 		}
 		return $lists;
@@ -91,6 +98,7 @@ class poll {
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table_record} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $this->db->fetch_array($result)) {
@@ -111,11 +119,8 @@ class poll {
         $sqlv = substr($sqlv, 1);
 		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		$this->itemid = $this->db->insert_id();
-		if(!$post['islink']) {
-			$linkurl = $this->linkurl($this->itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			tohtml('poll', $module, "itemid=$this->itemid");
-		}
+		$linkurl = $this->linkurl($this->itemid);
+		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
 		return $this->itemid;
 	}
 
@@ -128,27 +133,14 @@ class poll {
 		}
         $sql = substr($sql, 1);
 	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
-		if(!$post['islink']) {
-			$linkurl = $this->linkurl($this->itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
-			tohtml('poll', $module, "itemid=$this->itemid");
-		}
-		return true;
-	}
-
-	function update() {
-		$result = $this->db->query("SELECT * FROM {$this->table}");
-		while($r = $this->db->fetch_array($result)) {
-			$itemid = $r['itemid'];
-			$linkurl = $this->linkurl($itemid);
-			$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$itemid");
-		}
+		$linkurl = $this->linkurl($this->itemid);
+		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
 		return true;
 	}
 
 	function linkurl($itemid) {
 		global $MOD;
-		$linkurl = rewrite('index.php?itemid='.$itemid);
+		$linkurl = show_url($itemid);
 		return $MOD['poll_url'].$linkurl;
 	}
 

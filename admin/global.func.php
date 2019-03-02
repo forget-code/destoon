@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -114,13 +114,6 @@ function fetch_url($url) {
 	return $fetch;
 }
 
-function edition($k = -1) {
-	$E = array();
-	$E[0] = DT_DOMAIN;
-	$E[1] = '&#20010;&#20154;&#29256;';
-	return $k >= 0 ? $E[$k] : $E;
-}
-
 function admin_log($force = 0) {
 	global $DT, $db, $moduleid, $file, $action, $_username, $DT_QST, $DT_IP, $DT_TIME;
 	if($force) $DT['admin_log'] = 2;
@@ -130,9 +123,10 @@ function admin_log($force = 0) {
 		$fpos = strpos($DT_QST, '&forward');
 		if($fpos) $DT_QST = substr($DT_QST, 0, $fpos);
 		$logstring = get_cookie('logstring');
-		if($DT_QST == $logstring)  return false;
+		$md5string = md5($DT_QST);
+		if($md5string == $logstring)  return false;
 		$db->query("INSERT INTO {$db->pre}admin_log(qstring, username, ip, logtime) VALUES('$DT_QST','$_username','$DT_IP','$DT_TIME')");
-		set_cookie('logstring', $DT_QST);
+		set_cookie('logstring', $md5string);
 	}
 }
 
@@ -150,6 +144,7 @@ function admin_online() {
 
 function admin_check() {
 	global $CFG, $db, $_admin, $_userid, $moduleid, $file, $action, $catid, $_catids, $_childs;
+	if(!check_name($file)) return false;
 	if(in_array($file, array('logout', 'cloud', 'mymenu', 'search', 'ip', 'mobile'))) return true;//All user
 	if($moduleid == 1 && $file == 'index') return true;
 	if($CFG['founderid'] && $CFG['founderid'] == $_userid) return true;//Founder
@@ -177,6 +172,71 @@ function admin_check() {
 		if(in_array($file, array('admin', 'setting', 'module', 'area', 'database', 'template', 'skin', 'log', 'update', 'group', 'fields', 'loginlog'))) return false;//Founder || Common Admin Only
 	}
 	return true;
+}
+
+function admin_notice() {
+	global $DT, $MODULE, $db, $moduleid, $file, $itemid, $action, $reason, $msg, $eml, $sms, $wec;
+	if(!is_array($itemid)) return;
+	if(count($itemid) == 0) return;
+	$S = array(
+		'delete' => '已经被删除', 
+		'check' => '已经通过审核', 
+		'reject' => '没有通过审核',
+		'onsale' => '已经上架',
+		'unsale' => '已经下架',
+	);
+	$N = array(
+		'honor' => '荣誉资质', 
+		'news' => '公司新闻', 
+		'page' => '公司单页', 
+		'link' => '友情链接',
+	);
+	if(!isset($S[$action])) return;
+	if($moduleid > 4) {
+		$table = get_table($moduleid);
+		$name = $MODULE[$moduleid]['name'];
+		if($moduleid == 9) {
+			if($file == 'resume') {
+				$table = $db->pre.$file;
+				$name = '简历';
+			} else {
+				$name = '招聘';
+			}
+		} else if($moduleid == 16) {
+			$name = '商品';
+		}
+	} else if(isset($N[$file])) {
+		$table = $db->pre.$file;
+		$name = $N[$file];
+	} else {
+		return;
+	}
+	if($reason == '操作原因') $reason = '';
+	$msg = isset($msg) ? 1 : 0;
+	if(strlen($reason) > 2) $msg = 1;
+	$eml = isset($eml) ? 1 : 0;
+	if($msg == 0 && $eml == 0) return;
+	$sms = isset($sms) ? 1 : 0;
+	$wec = isset($wec) ? 1 : 0;
+	if($msg == 0) $sms = $wec = 0;
+	$result = $db->query("SELECT itemid,title,username,linkurl FROM {$table} WHERE itemid IN (".implode(',', $itemid).")");
+	while($r = $db->fetch_array($result)) {
+		$username = $r['username'];
+		if(!check_name($username)) continue;
+		$title = $r['title'];
+		$linkurl = strpos($r['linkurl'], '://') === false ? $MODULE[$moduleid]['linkurl'].$r['linkurl'] : $r['linkurl'];
+		$subject = '您发布的['.$name.']'.$title.'(ID:'.$r['itemid'].')'.$S[$action];
+		$body = '尊敬的会员：<br/>您发布的['.$name.']<a href="'.$linkurl.'" target="_blank">'.$title.'</a>(ID:'.$r['itemid'].')'.$S[$action].'！<br/>';
+		if($reason) $body .= '操作原因：<br/>'.$reason.'<br/>';
+		$body .= '如果您对此操作有异议，请及时与网站联系。';
+		if($msg) send_message($username, $subject, $body);
+		if($wec) send_weixin($username, $subject);
+		if($eml || $sms) {
+			$user = userinfo($username);
+			if($eml) send_mail($user['email'], $subject, $body);
+			if($sms) send_sms($user['mobile'], $subject.$DT['sms_sign']);
+		}
+	}
 }
 
 function item_check($itemid) {
@@ -215,7 +275,7 @@ function split_sell($part) {
 	global $db, $CFG, $MODULE;
 	$sql = file_get(DT_ROOT.'/file/setting/split_sell.sql');
 	$sql or dalert('请检查文件file/setting/split_sell.sql是否存在');
-	$sql = str_replace('destoon_sell', $db->pre.'sell_'.$part, $sql);
+	$sql = str_replace('destoon_sell', $db->pre.'sell_5_'.$part, $sql);
 	if($db->version() > '4.1' && $CFG['db_charset']) {
 		$sql .= " ENGINE=MyISAM DEFAULT CHARSET=".$CFG['db_charset'];
 	} else {
@@ -249,15 +309,24 @@ function seo_title($title, $show = '') {
 		}
 	} else {
 		foreach($SEO as $k=>$v) {
-			$title = str_replace($v, '$seo_'.$k, $title);
+			$title = str_replace('{'.$v.'}', '{$seo_'.$k.'}', $title);
 		}
 		return $title;
 	}
 }
 
 function seo_check($str) {
-	foreach(array('<', '>', '(', ')', ';', '?', '\\', '"', "'") as $v) {
+	foreach(array('<', '>', ';', '?', '"', '()') as $v) {
 		if(strpos($str, $v) !== false) return false;
+	}
+	if(preg_match_all("/\(([^\)]+)\)/i", $str, $matches)) {
+		foreach($matches[1] as $m) {
+			$m = trim($m);
+			if(strlen($m) < 2) return false;			
+			foreach(array('$', ',', "'") as $v) {
+				if(strpos($m, $v) !== false) return false;
+			}
+		}
 	}
 	return true;
 }
@@ -273,18 +342,24 @@ function install_file($file, $dir, $extend = 0) {
 }
 
 function list_dir($dir) {
-	$dirs = array();
+	include DT_ROOT.'/'.$dir.'/these.name.php';
+	$list = $dirs = array();
 	$files = glob(DT_ROOT.'/'.$dir.'/*');
-	if(is_array($files)) {
-		include DT_ROOT.'/'.$dir.'/these.name.php';	
-		foreach($files as $v) {
-			if(is_file($v)) continue;
-			$v = basename($v);
-			$n = isset($names[$v]) ? $names[$v] : $v;
-			$dirs[] = array('dir'=>$v, 'name'=>$n);
+	foreach($files as $v) {
+		if(is_file($v)) continue;
+		$v = basename($v);
+		$dirs[$v] = $v;
+	}
+	foreach($names as $k=>$v) {
+		if(isset($dirs[$k])) {
+			$list[] = array('dir'=>$k, 'name'=>$v);
+			unset($dirs[$k]);
 		}
 	}
-	return $dirs;
+	foreach($dirs as $v) {
+		$list[] = array('dir'=>$v, 'name'=>$v);
+	}
+	return $list;
 }
 
 function pass_encode($str) {
@@ -299,5 +374,12 @@ function pass_encode($str) {
 
 function pass_decode($new, $old) {
 	return $new == pass_encode($old) ? $old : $new;
+}
+
+function fix_domain($domain) {
+	if(strpos($domain, '.') === false) return '';
+	if(substr($domain, 0, 4) != 'http') $domain = 'http://'.$domain;
+	if(substr($domain, -1) != '/') $domain = $domain.'/';
+	return $domain;
 }
 ?>

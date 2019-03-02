@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -29,16 +29,14 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 级别</td>
 <td><input name="category[level]" type="text" size="2" value="1"/><?php tips('0 - 不在首页显示 1 - 正常显示 2 - 首页和上级分类并列显示');?></td>
 </tr>
-
 <tr>
 <td class="tl"><span class="f_hid">*</span> 分类模板</td>
 <td><?php echo tpl_select('list', $MODULE[$mid]['module'], 'category[template]', '默认模板');?></td>
 </tr>
-<tr>
+<tr style="display:<?php echo $mid == 18 ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 内容模板</td>
 <td><?php echo tpl_select('show', $MODULE[$mid]['module'], 'category[show_template]', '默认模板');?></td>
 </tr>
-
 <tr>
 <td class="tl"><span class="f_hid">*</span> Title(SEO标题)</td>
 <td><input name="category[seo_title]" type="text" size="61"></td>

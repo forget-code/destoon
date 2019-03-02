@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 load('profile.js');
@@ -25,8 +25,8 @@ load('profile.js');
 <td><input type="text" size="20" name="member[username]" id="username" onblur="validator('username');"/>&nbsp;<span id="dusername" class="f_red"></span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 通行证用户名</td>
-<td><input type="text" size="20" name="member[passport]" id="passport" onblur="validator('passport');"/>&nbsp;<span id="dpassport" class="f_red"></span></td>
+<td class="tl"><span class="f_hid">*</span> 昵称</td>
+<td><input type="text" size="20" name="member[passport]" id="passport" onblur="validator('passport');"/> <span class="f_gray">[支持中文]</span>&nbsp;<span id="dpassport" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 登录密码</td>
@@ -38,7 +38,7 @@ load('profile.js');
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> Email</td>
-<td><input type="text" size="30" name="member[email]" id="email" onblur="validator('email');"/>&nbsp;<span id="demail" class="f_red"></span> <span class="f_gray">[不公开]</span></td>
+<td><input type="text" size="30" name="member[email]" id="email" onblur="validator('email');"/> <span class="f_gray">[不公开]</span>&nbsp;<span id="demail" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 真实姓名</td>
@@ -171,8 +171,8 @@ load('profile.js');
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 公司介绍</td>
-<td><textarea name="member[introduce]" id="introduce" class="dsn"></textarea>
-<?php echo deditor($moduleid, 'introduce', $MOD['editor'], '95%', 300);?><br/><span id="dintroduce" class="f_red"></span></td>
+<td><textarea name="member[content]" id="content" class="dsn"></textarea>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 300);?><br/><span id="dcontent" class="f_red"></span></td>
 </tr>
 <?php echo $CFD ? fields_html('<td class="tl">', '<td>', array(), $CFD) : '';?>
 </table>
@@ -270,8 +270,8 @@ function Dcheck() {
 			Dmsg('请填写公司电话', 'telephone');
 			return false;
 		}
-		if(FCKLen('introduce') < 5) {
-			Dmsg('公司介绍不能少于5字，当前已经输入'+FCKLen('introduce')+'字', 'introduce');
+		if(FCKLen('content') < 10) {
+			Dmsg('公司介绍最少10字，当前已经输入'+FCKLen('content')+'字', 'content');
 			return false;
 		}
 	}

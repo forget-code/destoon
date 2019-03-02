@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -46,7 +46,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 <th>公司</th>
 <th>电话</th>
 <th>会员</th>
-<th width="120"><?php echo $timetype == 'add' ? '报价' : '更新';?>时间</th>
+<th width="130"><?php echo $timetype == 'add' ? '报价' : '更新';?>时间</th>
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>

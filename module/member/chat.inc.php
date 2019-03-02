@@ -1,60 +1,62 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
+login();
+$DT['im_web'] or dheader($MOD['linkurl']);
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
+require DT_ROOT.'/include/post.func.php';
 $chatid = (isset($chatid) && is_md5($chatid)) ? $chatid : '';
-$chatuser = $_username ? $_username : $DT_IP;
 $table = $DT_PRE.'chat';
-$MOD['chat_poll'] = intval($MOD['chat_poll']);
+$chat_poll = intval($MOD['chat_poll']);
 function get_chat_id($f, $t) {
-	global $DT_TIME;
-	if(!check_name($f)) {
-		$chat_browerid = get_cookie('chat_browerid');
-		if(!preg_match("/^[a-z0-9]{6}$/i", $chat_browerid)) {
-			$chat_browerid = random(6);
-			set_cookie('chat_browerid', $chat_browerid, $DT_TIME + 365*86400);
-		}
-		$f = md5($f.'|'.$chat_browerid.$_SERVER['HTTP_USER_AGENT']);
-	}
 	return md5(strcmp($f, $t) > 0 ? $f.'|'.$t : $t.'|'.$f);
 }
 function get_chat_file($chatid) {
 	return DT_ROOT.'/file/chat/'.substr($chatid, 0, 2).'/'.$chatid.'.php';
 }
 switch($action) {
-	case 'send':
-		$chatid or exit('0');
-		$word or exit('0');
-		if($MOD['chat_maxlen'] && strlen($word) > $MOD['chat_maxlen']*3) exit('0');
+	case 'send':		
+		$chatid or exit('ko');
+		trim($word) or exit('ko');
+		if($MOD['chat_maxlen'] && strlen($word) > $MOD['chat_maxlen']*3) exit('max');
 		$word = convert($word, 'UTF-8', DT_CHARSET);
-		$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
-		if($chat) {
-			if($chat['touser'] == $_username) {
-				$db->query("UPDATE {$table} SET fgettime=$DT_TIME WHERE chatid='$chatid'");
-			} else if($chat['fromuser'] == $chatuser) {
-				$db->query("UPDATE {$table} SET tgettime=$DT_TIME WHERE chatid='$chatid'");
-				if($chat['tgettime'] == 0) $db->query("UPDATE {$DT_PRE}member SET chat=chat+1 WHERE username='$chat[touser]'");
-			} else {
-				exit('0');
-			}
-		} else {
-			exit('0');
-		}
-		$filename = get_chat_file($chatid);
-		if(is_file($filename)) {
-			//控制记录体积为500K
-			if(filesize($filename) > 500*1024) file_put($filename, '<?php exit;?>');
-		} else {
-			file_put($filename, '<?php exit;?>');
-		}
 		$word = stripslashes(trim($word));
 		$word = strip_tags($word);
 		$word = dsafe($word);
 		$word = nl2br($word);
 		$word = strip_nr($word);
 		$word = str_replace('|', ' ', $word);
-		if($MOD['chat_file'] && $MG['upload']) {
-			require DT_ROOT.'/include/post.func.php';
-			clear_upload($word);
+		if($MOD['chat_file'] && $MG['upload']) clear_upload($word);
+		$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
+		if($chat) {
+			$lastmsg = addslashes(dsubstr($word, 50));
+			if($chat['touser'] == $_username) {
+				$sql = "fgettime=$DT_TIME,lasttime=$DT_TIME,lastmsg='$lastmsg'";
+				if($DT_TIME - $chat['freadtime'] > $chat_poll) {
+					$db->query("UPDATE {$DT_PRE}member SET chat=chat+1 WHERE username='$chat[fromuser]'");
+					$sql .= ",fnew=fnew+1";
+				}
+				$db->query("UPDATE {$table} SET {$sql} WHERE chatid='$chatid'");
+			} else if($chat['fromuser'] == $_username) {
+				$sql = "tgettime=$DT_TIME,lasttime=$DT_TIME,lastmsg='$lastmsg'";
+				if($DT_TIME - $chat['treadtime'] > $chat_poll) {
+					$db->query("UPDATE {$DT_PRE}member SET chat=chat+1 WHERE username='$chat[touser]'");
+					$sql .= ",tnew=tnew+1";
+				}
+				$db->query("UPDATE {$table} SET {$sql} WHERE chatid='$chatid'");
+			} else {
+				exit('ko');
+			}
+		} else {
+			exit('ko');
+		}
+		$filename = get_chat_file($chatid);
+		if(is_file($filename)) {
+			if(filesize($filename) > 500*1024) {
+				file_copy($filename, substr($filename, 0, -4).'-'.timetodate($DT_TIME, 'YmdHis').'.php');
+				file_put($filename, '<?php exit;?>');
+			}
+		} else {
+			file_put($filename, '<?php exit;?>');
 		}
 		$font_s = $font_s ? intval($font_s) : 0;
 		$font_c = $font_c ? intval($font_c) : 0;
@@ -69,55 +71,52 @@ switch($action) {
 		if($font_u) $css .= ' fu';
 		if($css) $word = '<span class="'.trim($css).'">'.$word.'</span>';
 		if($word && $fp = fopen($filename, 'a')) {
-			fwrite($fp, $DT_TIME.'|'.$chatuser.'|'.$word."\n");
+			fwrite($fp, $DT_TIME.'|'.$_username.'|'.$word."\n");
 			fclose($fp);
-			exit('1');
+			exit('ok');
 		}
-		exit('0');
+		exit('ko');
 	break;
 	case 'load':
 		$chatid or exit;
 		$filename = get_chat_file($chatid);
 		$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
 		if($chat) {
-			$chat['status'] = 3;
-			if($chat['touser'] == $_username) {//接收人
-				$db->query("UPDATE {$table} SET treadtime=$DT_TIME WHERE chatid='$chatid'");
-				if($DT_TIME - $chat['freadtime'] > $MOD['chat_poll']*3 && $DT_TIME - $chat['freadtime'] < $MOD['chat_poll']*6) $chat['status'] = 0;//发起人断开
-			} else if($chat['fromuser'] == $chatuser) {//发起人
-				$db->query("UPDATE {$table} SET freadtime=$DT_TIME WHERE chatid='$chatid'");
-				if($DT_TIME - $chat['treadtime'] > $MOD['chat_poll']*3 && $DT_TIME - $chat['treadtime'] < $MOD['chat_poll']*6) $chat['status'] = 0;//接收人断开
+			if($chat['touser'] == $_username) {
+				$db->query("UPDATE {$table} SET treadtime=$DT_TIME,tnew=0 WHERE chatid='$chatid'");
+			} else if($chat['fromuser'] == $_username) {
+				$db->query("UPDATE {$table} SET freadtime=$DT_TIME,fnew=0 WHERE chatid='$chatid'");
 			} else {
 				exit('0');
 			}
 		} else {
-			$chat['status'] = 0;
+			exit('0');
 		}
 		$chatlast = $_chatlast = intval($chatlast);
 		$first = isset($first) ? intval($first) : 0;
 		$i = $j = 0;
 		$chat_lastuser = '';
 		$chat_repeat = 0;
-		$josn = '';
+		$json = '';
 		if($chatlast < @filemtime($filename)) {
 			$data = file_get($filename);
 			if($data) {
 				$data = trim(substr($data, 13));
 				if($data) {
-					$date1 = '';
+					$time1 = 0;
 					$data = explode("\n", $data);
 					foreach($data as $d) {
 						list($time, $name, $word) = explode("|", $d);
-						if($chatuser == $name) { $chat_repeat++; } else {$chat_repeat = 0;}
+						if($_username == $name) { $chat_repeat++; } else {$chat_repeat = 0;}
 						$chat_lastuser = $name;
 						if($time > $chatlast && $word) {
 							$chatlast = $time;
-							$date2 = timetodate($time, 'Y-m-d');
-							$time = timetodate($time, 'H:i:s');
-							if($date2 == $date1 || !$first) {
+							$time2 = $time;
+							if($time2 - $time1 < 600) {
 								$date = '';
 							} else {
-								$date = $date1 = $date2;
+								$date = timetodate($time2, 5);
+								$time1 = $time2;
 							}
 							if($MOD['chat_url'] || $MOD['chat_img']) {
 								if(preg_match_all("/([http|https]+)\:\/\/([a-z0-9\/\-\_\.\,\?\&\#\=\%\+\;]{4,})/i", $word, $m)) {
@@ -137,14 +136,13 @@ switch($action) {
 								}
 							}
 							$word = str_replace('"', '\"', $word);
-							$self = $chatuser == $name ? 1 : 0;
+							$self = $_username == $name ? 1 : 0;
 							if($self) {
-								$name = '我';
+								//$name = 'Me';
 							} else {
-								check_name($name) or $name = '游客';
 								$j++;
 							}
-							$josn .= ($i ? ',' : '').'{time:"'.$time.'",date:"'.$date.'",name:"'.$name.'",word:"'.$word.'",self:"'.$self.'"}';
+							$json .= ($i ? ',' : '').'{time:"'.$time.'",date:"'.$date.'",name:"'.$name.'",word:"'.$word.'",self:"'.$self.'"}';
 							$i = 1;
 						}
 					}
@@ -152,22 +150,11 @@ switch($action) {
 				}
 			}
 		}
-		#if($chat_lastuser == $chatuser && $chat_repeat > 4) $chat['status'] = 1;
-		$josn = '{chat_status:"'.$chat['status'].'",chat_msg:['.$josn.'],chat_new:"'.$j.'",chat_last:"'.$chatlast.'"}';
-		exit($josn);
-	break;
-	case 'del':
-		login();
-		$chatid or exit;
-		$chat = $db->get_one("SELECT * FROM {$DT_PRE}chat WHERE chatid='$chatid'");
-		if($chat && ($chat['touser'] == $_username || ($chat['fromuser'] == $chatuser))) {
-			$db->query("DELETE FROM {$DT_PRE}chat WHERE chatid='$chatid'");
-		}
-		dmsg('删除成功', 'chat.php');
+		$json = '{chat_msg:['.$json.'],chat_new:"'.$j.'",chat_last:"'.$chatlast.'"}';
+		exit($json);
 	break;
 	case 'black':
-		login();
-		if(!is_ip($username) && !check_name($username)) message('未指定屏蔽对象');
+		if(!check_name($username)) message($L['chat_msg_black']);
 		$black = $db->get_one("SELECT black FROM {$DT_PRE}member WHERE userid=$_userid");
 		$black = $black['black'];
 		if($black) {
@@ -183,174 +170,95 @@ switch($action) {
 		$db->query("UPDATE {$DT_PRE}member SET black='$black' WHERE userid=$_userid");
 		$chatid = get_chat_id($_username, $username);
 		$db->query("DELETE FROM {$table} WHERE chatid='$chatid'");
-		dmsg('屏蔽成功', 'message.php?action=setting');
+		dmsg($L['chat_msg_black_success'], 'message.php?action=setting');
 	break;
 	case 'down':
-		if($data) {
+		if($data && check_name($username) && is_md5($chatid)) {
+			$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
+			if($chat['fromuser'] == $_username) {
+				$chat['touser'] == $username or exit;
+			} else {
+				$chat['fromuser'] == $username or exit;
+			}
 			$data = stripslashes(dsafe($data));
 			$css = file_get('image/chat.css');
-			$css = str_replace('#chat{width:auto;height:286px;overflow:auto;', '#chat{width:700px;margin:auto;', $css);
+			$css = str_replace('#chat{width:auto;height:266px;overflow:auto;', '#chat{width:600px;margin:auto;', $css);
 			$css = str_replace("url('", "url('".$MOD['linkurl']."image/", $css);
-			$data = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html;charset='.DT_CHARSET.'"/><title>聊天记录</title><style type="text/css">'.$css.'</style><base href="'.$MOD['linkurl'].'"/></head><body><div id="chat">'.$data.'</div></body></html>';
-			file_down('', 'chat_'.timetodate($DT_TIME, 'Y-m-d-H-i').'.html', $data);
+			$data = str_replace('o<em></em>n', 'on', $data);
+			$data = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html;charset='.DT_CHARSET.'"/><title>'.lang($L['chat_record'], array($username)).'</title><style type="text/css">'.$css.'</style><base href="'.$MOD['linkurl'].'"/></head><body><div id="chat">'.$data.'</div></body></html>';
+			file_down('', 'chat-'.$username.'-'.timetodate($DT_TIME, 'Y-m-d-H-i').'.html', $data);
 		}
 		exit;
 	break;
-	case 'contact':
-		check_name($touser) or dalert('不能与自己对话', 'goback');
-		$go = '?touser='.$touser.'&mid='.$mid.'&itemid='.$itemid.'&forward='.$forward;
-		if($_username) dheader($go);
-		$filename = get_chat_file(get_chat_id($chatuser, $touser));
-		if(is_file($filename)) dheader($go);
-		require DT_ROOT.'/include/post.func.php';
-		strlen($truename) > 2 or dalert('请填写联系人', 'goback');
-		is_telephone($telephone) or dalert('请填写联系电话', 'goback');
-		$truename = htmlspecialchars($truename);
-		$word = '您好，我是'.$truename.'，电话:'.$telephone;
-		if(is_email($email)) $word .= '，电子邮箱:'.$email;
-		if(is_qq($qq)) $word .= '，QQ:'.$qq;
-		file_put($filename, '<?php exit;?>');
-		if($fp = fopen($filename, 'a')) {
-			fwrite($fp, $DT_TIME.'|'.$chatuser.'|'.$word."\n");
-			fclose($fp);
+	case 'list':
+		$data = '';
+		$new = 0;
+		$result = $db->query("SELECT * FROM {$table} WHERE fromuser='$_username' OR touser='$_username' ORDER BY lasttime DESC LIMIT 100");
+		while($r = $db->fetch_array($result)) {
+			if($r['fromuser'] == $_username) {
+				$r['user'] = $r['touser'];
+				$r['new'] = $r['fnew'];
+			} else {					
+				$r['user'] = $r['fromuser'];
+				$r['new'] = $r['tnew'];
+			}
+			$new += $r['new'];
+			$r['last'] = timetodate($r['lasttime'], $r['lasttime'] > $today_endtime - 86400 ? 'H:i:s' : 'y-m-d');
+			$r['online'] = online($r['user'], 1);			
+			$data .= '<table cellpadding="0" cellspacing="0"><tr><td width="60">';
+			$data .= '<a href="?chatid='.$r['chatid'].'" target="chat_'.$r['chatid'].'"><img src="'.useravatar($r['user']).'" width="48"'.($r['online'] ? '' : ' class="chat_offline"').'/></a>';
+			$data .= '</td><td><ul>';
+			$data .= '<li><span>'.$r['last'].'</span><a href="?chatid='.$r['chatid'].'" target="chat_'.$r['chatid'].'">'.$r['user'].'</a></li>';
+			$data .= '<li>'.($r['new'] ? '<em>'.$r['new'].'</em>' : '').($r['online'] ? $L['chat_online'] : $L['chat_offline']).' '.$r['lastmsg'].'</li>';
+			$data .= '</ul></td></tr></table>';
 		}
-		$db->query("UPDATE {$DT_PRE}member SET chat=chat+1 WHERE username='$touser'");
-		dheader($go);
+		if($new != $_chat) {
+			$db->query("UPDATE {$DT_PRE}member SET chat=$new WHERE userid=$_userid");
+			$_chat = $new;
+		}
+		if(!$data) $data = '<table cellpadding="0" cellspacing="0"><tr><td style="padding:40px 0;text-align:center;">'.$L['chat_empty'].'</td></tr></table>';
+		exit($data);
 	break;
 	default:
 		if(isset($touser) && check_name($touser)) {
-			if($touser == $_username) dalert('不能与自己对话', 'chat.php');
-			if(!$MG['chat']) {
-				login();
-				dalert('您所在的会员组没有权限发起对话', 'grade.php');
-			}
+			if($touser == $_username) dalert($L['chat_msg_self'], '?action=index');
+			$MG['chat'] or dalert($L['chat_msg_no_rights'], 'grade.php');
 			$user = userinfo($touser);
-			$user or dalert('会员不存在', 'chat.php');
+			$user or dalert($L['chat_msg_user'], '?action=index');
 			if($user['black']) {
 				$black = explode(' ', $user['black']);
-				if(in_array($chatuser, $black)) dalert('对方拒绝与您对话', 'chat.php');
-				if(!$_username && in_array('Guest', $black)) dalert('对方拒绝与您对话', 'chat.php');
+				if(in_array($_username, $black)) dalert($L['chat_msg_refuse'], '?action=index');
 			}
-			$chat_fromuser = $chatuser;
-			$chat_touser = $touser;
-			$chat_id = $chatid = get_chat_id($chat_fromuser, $chat_touser);
 			$online = online($user['userid']);
-			$user['type'] = 'member';
-			$type = 1;
-			if(!$_userid && !is_file(get_chat_file($chatid))) $type = 4;
-			$head_title = '与【'.$user['company'].'】对话中';
+			$chatid = get_chat_id($_username, $touser);
+			$chat_id = $chatid;
+			$head_title = lang($L['chat_with'], array($user['username']));
+			$forward = is_url($forward) ? addslashes(dhtmlspecialchars($forward)) : '';
+			if(strpos($forward, $MOD['linkurl']) !== false) $forward = '';
 			$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
-			$chat_status = 3;
 			if($chat) {
-				//对话已经存在
-				if($chat['touser'] == $_username) {//当前为接收人
-					if($DT_TIME - $chat['freadtime'] > $MOD['chat_poll']*3) {//发起对话人已经断开
-						$db->query("UPDATE {$table} SET fromuser='$chat_fromuser',touser='$chat_touser',tgettime=0 WHERE chatid='$chatid'");
-					} else {//发起人在线
-						dheader('?chatid='.$chatid);
-					}
-					//
-				} else {//当前为发起人
-					if($DT_TIME - $chat['treadtime'] > $MOD['chat_poll']*3) {//接收人已经断开
-						$db->query("UPDATE {$table} SET tgettime=0 WHERE chatid='$chatid'");
-					} else {//接收人在线
-						//
-					}
-				}
+				$db->query("UPDATE {$table} SET forward='$forward' WHERE chatid='$chatid'");
 			} else {
-				$forward = addslashes(htmlspecialchars(strip_sql($forward)));
-				if(strpos($forward, $MOD['linkurl']) !== false) $forward = '';
-				//创建一个新对话
-				$db->query("INSERT INTO {$table} (chatid,fromuser,touser,tgettime,forward) VALUES ('$chat_id','$chat_fromuser','$chat_touser','0','$forward')");
+				$db->query("INSERT INTO {$table} (chatid,fromuser,touser,tgettime,forward) VALUES ('$chat_id','$_username','$touser','0','$forward')");
 			}
+			$type = 1;
 		} else if(isset($chatid) && is_md5($chatid)) {
 			$chat = $db->get_one("SELECT * FROM {$table} WHERE chatid='$chatid'");
-			if($chat && $chat['touser'] == $_username) {
-				$chat_id = $chatid;
-				$chat_status = 3;
-				if(check_name($chat['fromuser'])) {
-					if($DT_TIME - $chat['freadtime'] > $MOD['chat_poll']*3) {//发起对话人已经断开
-						$db->query("UPDATE {$table} SET tgettime=0 WHERE chatid='$chatid'");
-						dheader('chat.php?touser='.$chat['fromuser']);
-					}
+			if($chat && ($chat['touser'] == $_username || $chat['fromuser'] == $_username)) {
+				if($chat['touser'] == $_username) {
 					$user = userinfo($chat['fromuser']);
-					$online = online($user['userid']);
-					$user['type'] = 'member';
-				} else {
-					$user = array();
-					$user['type'] = 'guest';
-					$user['ip'] = $chat['fromuser'];
-					$user['area'] = ip2area($chat['fromuser']);
-					if($DT_TIME - $chat['freadtime'] > $MOD['chat_poll']*3) {//发起人是游客，并且已经断开，只能查看记录
-						$time = $DT_TIME - $MOD['chat_poll']*4;
-						$db->query("UPDATE {$table} SET freadtime='$time' WHERE chatid='$chatid'");
-					}
+				} else if($chat['fromuser'] == $_username) {
+					$user = userinfo($chat['touser']);
 				}
-				$head_title = '与'.($user['type'] == 'guest' ? '【游客】' : $chat['fromuser']).'对话中';
+				$online = online($user['userid']);
+				$chat_id = $chatid;
+				$head_title = lang($L['chat_with'], array($user['username']));
 			} else {
-				dheader('chat.php');
+				dheader('?action=index');
 			}
 			$type = 2;
 		} else {
-			$F = $T = array();
-			$tab = isset($tab) ? intval($tab) : -1;
-			if($_username) {
-				$chats = $i = 0;
-				//收到的对话
-				$result = $db->query("SELECT * FROM {$table} WHERE touser='$_username' ORDER BY tgettime DESC LIMIT 50");
-				while($r = $db->fetch_array($result)) {
-					if($i > 50) {
-						$db->query("DELETE FROM {$DT_PRE}chat WHERE chatid='$r[chatid]'");
-						continue;
-					}
-					if(check_name($r['fromuser'])) {
-						$m = userinfo($r['fromuser']);
-						$r['linkurl'] = $m['linkurl'];
-						$r['from'] = $m['company'];
-						$r['truename'] = $m['truename'];
-						$r['online'] = online($m['userid']);
-					} else {
-						$r['linkurl'] = '';
-						$r['from'] = ip2area($r['fromuser']);
-						$r['truename'] = '<span class="f_gray">游客</span>';
-						$r['online'] = 1;
-					}
-					$r['gettime'] = $r['tgettime'] ? timetodate($r['tgettime'], 5) : '--';
-					$r['new'] = 0;
-					if($r['tgettime'] > $r['treadtime']) {
-						$r['new'] = 1;
-						$chats++;
-					}
-					if($DT_TIME - $r['freadtime'] > $MOD['chat_poll']*3) {
-						$r['line'] = '<span class="f_gray"></span>';//等待中
-					} else {
-						$r['line'] = '<span class="f_blue">对话中</span>';
-					}
-					$i++;
-					$T[] = $r;
-				}
-				if($chats != $_chat) {
-					$_chat = $chats;
-					$db->query("UPDATE {$DT_PRE}member SET chat=$chats WHERE userid=$_userid");
-				}
-			}
-			//发起的对话
-			$result = $db->query("SELECT * FROM {$table} WHERE fromuser='$chatuser' ORDER BY fgettime DESC LIMIT 50");
-			while($r = $db->fetch_array($result)) {
-				if($DT_TIME - $r['treadtime'] > $MOD['chat_poll']*3) {
-					$r['line'] = '<span class="f_gray"></span>';//等待中
-				} else {
-					$r['line'] = '<span class="f_blue">对话中</span>';
-				}
-				$r['gettime'] = $r['fgettime'] ? timetodate($r['fgettime'], 5) : '';
-				$m = userinfo($r['touser']);
-				$r['linkurl'] = $m['linkurl'];
-				$r['online'] = online($m['userid']);
-				$r['from'] = $m['company'];
-				$r['truename'] = $m['truename'];
-				$F[] = $r;
-			}
-			$head_title = '在线对话';
+			$head_title = $L['chat_title'];
 			$type = 3;
 		}
 		if($type < 3) {
@@ -361,7 +269,6 @@ switch($action) {
 					$faces[$k] = basename($v, '.gif');
 				}
 			}
-			$chat_poll = $MOD['chat_poll']*1000;
 		}
 	break;
 }

@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 require MD_ROOT.'/company.class.php';
 $menus = array (
     array('添加'.VIP, '?moduleid='.$moduleid.'&file='.$file.'&action=add'),

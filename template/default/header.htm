@@ -10,8 +10,7 @@
 <meta name="description" content="{$head_description}"/>
 {/if}
 {if $head_mobile}
-<meta http-equiv="mobile-agent" content="format=xhtml; url={$head_mobile}"> 
-<meta http-equiv="mobile-agent" content="format=html5; url={$head_mobile}">
+<meta http-equiv="mobile-agent" content="format=html5;url={$head_mobile}">
 {/if}
 <meta name="generator" content="DESTOON B2B - www.destoon.com"/>
 <link rel="shortcut icon" type="image/x-icon" href="{DT_STATIC}favicon.ico"/>
@@ -46,7 +45,7 @@
 {/if}
 {php $searchid = ($moduleid > 3 && $MODULE[$moduleid]['ismenu'] && !$MODULE[$moduleid]['islink']) ? $moduleid : 5;}
 <script type="text/javascript">
-{if $head_mobile && $EXT[wap_goto]}
+{if $head_mobile && $EXT[mobile_goto]}
 GoMobile('{$head_mobile}');
 {/if}
 var searchid = {$searchid};
@@ -67,12 +66,14 @@ document.onselectstart=function(e){return false;};
 			<ul>
 			{if $DT[city]}<li class="h_city">[<span id="destoon_city">{$city_name}</span>] <a href="{DT_PATH}api/city.php" title="点击切换城市" rel="nofollow">切换</a></li>{/if}
 			<li class="h_fav"><script type="text/javascript">addFav('收藏本页');</script></li>
-			{if $EXT[wap_enable]}<li class="h_wap"><a href="{$EXT[wap_url]}mobile.php">手机版</a>&nbsp;</li>{/if}
-			{if $MODULE[16]}<li class="h_cart"><a href="{$MODULE[16][linkurl]}cart.php" rel="nofollow">购物车</a>(<span class="head_t" id="destoon_cart">0</span>)</li>{/if}
+			{if $EXT[mobile_enable]}<li class="h_mobile"><a href="{$EXT[mobile_url]}mobile.php">手机版</a>&nbsp;</li>{/if}
+			{if $head_mobile}<li class="h_qrcode"><a href="javascript:Dqrcode();">二维码</a>&nbsp;</li>{/if}
+			{if isset($MODULE[16])}<li class="h_cart"><a href="{$MODULE[16][linkurl]}cart.php" rel="nofollow">购物车</a>(<span class="head_t" id="destoon_cart">0</span>)</li>{/if}
 			</ul>
 		</div>
 	</div>
 </div>
+{if $head_mobile}<div id="destoon_qrcode" style="display:none;"></div>{/if}
 <div class="m head_s" id="destoon_space"></div>
 <div class="m"><div id="search_tips" style="display:none;"></div></div>
 <div class="m">

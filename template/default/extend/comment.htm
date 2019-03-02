@@ -15,16 +15,14 @@
 <script type="text/javascript" src="{DT_STATIC}file/script/jquery.js"></script>
 <script type="text/javascript" src="{DT_STATIC}file/script/common.js"></script>
 <script type="text/javascript" src="{DT_STATIC}file/script/page.js"></script>
+<script type="text/javascript">if(parent.location == window.location) Go('{$linkurl}');</script>
 </head>
-<!--<body oncontextmenu="return false">-->
-<body>
+<body oncontextmenu="return false">
+<div id="destoon_space" style="display:none;"></div>
+<iframe id="proxy_iframe" src="" style="display:none;"></iframe>
 <div id="destoon_comment">
 {if $template == 'close'}
 	<div class="comment_close">[该评论已关闭]</div>
-	<script style="text/javascript">
-	try{ parent.Dd('comment_div').style.display = 'none'; }
-	catch(e){}
-	</script>
 {else}
 	<a name="top"></a>
 	<div class="stat">
@@ -55,7 +53,7 @@
 	<tr>
 	<td class="comment_l" valign="top">
 	<div>
-	{if $v[uname]}<a href="{userurl($v[uname])}" target="_blank">{/if}<img src="{useravatar($v[uname])}" width="48" alt="" align="absmiddle"/>{if $v[uname]}</a>{/if}
+	{if $v[uname]}<a href="{userurl($v[uname])}" target="_blank">{/if}<img src="{useravatar($v[uname])}"  width="48" height="48" alt="" align="absmiddle"/>{if $v[uname]}</a>{/if}
 	</div>
 	</td>
 	<td valign="top">
@@ -66,13 +64,13 @@
 		<div class="comment_content" id="c_{$v[itemid]}">{if $v[quotation]}{$v[quotation]}{else}{$v[content]}{/if}</div>
 		{if $v[reply]}
 		<div class="comment_reply">
-		{if $v[editor]}<span style="color:red;">管理员</span>{else}<span style="color:blue;">{$v[replyer]}</span>{/if} <span style="font-size:11px;">{$v['replytime']}</span> 回复： {nl2br($v[reply])}
+		{if $v[editor]}<span style="color:red;">管理员</span>{else}<span style="color:blue;">{$v[replyer]}</span>{/if} <span style="font-size:11px;">{$v[replytime]}</span> 回复： {nl2br($v[reply])}
 		</div>
 		{/if}
 		<div class="comment_info">
 			<span class="comment_vote">
 			{if $could_del}
-			<a href="?mid={$mid}&itemid={$itemid}&page={$page}&action=delete&cid={$v[itemid]}" target="send" onclick="return confirm('确定要删除此评论吗？')">删除</a>&nbsp; | &nbsp;
+			<a href="?mid={$mid}&itemid={$itemid}&page={$page}&action=delete&cid={$v[itemid]}&proxy={$proxy}" target="send" onclick="return confirm('确定要删除此评论吗？')">删除</a>&nbsp; | &nbsp;
 			{/if}
 			{if $MOD[comment_vote]}
 			<a href="javascript:" onclick="R({$v[itemid]});">举报</a>&nbsp; | &nbsp;
@@ -92,7 +90,8 @@
 	{if $pages}<div class="pages">{$pages}</div>{/if}
 	<iframe src="" name="send" id="send" style="display:none;" scrolling="no" frameborder="0"></iframe>
 	<div class="comment_form">
-	<form method="post" action="{$MOD[linkurl]}comment.php" target="send" onsubmit="return C();">
+	<form method="post" action="{DT_PATH}api/comment.php" target="send" onsubmit="return C();">
+	<input type="hidden" name="proxy" value="{$proxy}"/>
 	<input type="hidden" name="mid" value="{$mid}"/>
 	<input type="hidden" name="itemid" value="{$itemid}"/>
 	<input type="hidden" name="items" value="{$items}"/>
@@ -115,7 +114,16 @@
 	</tr>
 	{if $need_captcha}
 	<tr id="tr_captcha" style="display:none;">
-	<td><div class="comment_input">&nbsp;<span>*</span> 验证码：&nbsp;{template 'captcha', 'chip'}</div></td>
+	<td>
+	<div class="comment_input">
+	<table cellpadding="0" cellspacing="0">
+	<tr>
+	<td>&nbsp;<span>*</span> 验证码：</td>
+	<td>&nbsp;{template 'captcha', 'chip'}</td>
+	</tr>
+	</table>
+	</div>	
+	</td>
 	</tr>
 	{/if}
 	<tr>
@@ -129,18 +137,13 @@
 	</tr>
 	</table>
 	</form>
-	</div>	
-	<form method="post" action="{$EXT[guestbook_url]}index.php" id="r_form" target="_blank">
-	<input type="hidden" name="action" value="report"/>
-	<input type="hidden" name="content" id="r_content" value=""/>
-	</form>
+	</div>
 {/if}
 </div>
 <script style="text/javascript">
 {if $template == 'comment'}
 function R(id) {
-	Dd('r_content').value = '评论举报，评论ID:'+id+'\n评论内容:\n'+Dd('c_'+id).innerHTML+'\n--------------------------\n举报理由:\n';
-	Dd('r_form').submit();
+	SendReport('评论举报，评论ID:'+id+'\n评论内容:\n'+Dd('c_'+id).innerHTML);
 }
 {if $MOD[comment_vote]}
 var v_id = 0;
@@ -226,10 +229,9 @@ function F() {
 try{parent.Dd('comment_count').innerHTML = {$items};}catch(e){}
 {/if}
 function H() {
-	try{parent.Dd('destoon_comment').style.height = Dd('destoon_comment').scrollHeight+'px';}
-	catch(e){}
+	Dd('proxy_iframe').src = '{if $proxy}{decrypt($proxy, DT_KEY.'PROXY')}{else}{$MODULE[$mid][linkurl]}{/if}ajax.php?action=proxy&itemid=1#'+Dd('destoon_comment').scrollHeight+'|{$items}';
 }
 H();
-</script>
+</script> 
 </body>
 </html>

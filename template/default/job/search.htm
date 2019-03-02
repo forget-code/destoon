@@ -1,15 +1,18 @@
 {template 'header'}
 <div class="m">
+	<div class="nav">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; <a href="{$MOD[linkurl]}search.php">搜索</a></div>
+</div>
+<div class="m">
 	<div class="left_box" style="border-top:none;">
 		<div class="type">
-		<a href="{$MOD[linkurl]}{rewrite('search.php?action=job')}" class="{if $action=='resume'}type_2{else}type_1{/if}" rel="nofollow">职位搜索</a>
-		<a href="{$MOD[linkurl]}{rewrite('search.php?action=resume')}" class="{if $action=='resume'}type_1{else}type_2{/if}" rel="nofollow">人才搜索</a>
+		<a href="{$MOD[linkurl]}search.php?action=job&kw={urlencode($kw)}" class="{if $action=='resume'}type_2{else}type_1{/if}">职位搜索</a>
+		<a href="{$MOD[linkurl]}search.php?action=resume&kw={urlencode($kw)}" class="{if $action=='resume'}type_1{else}type_2{/if}">人才搜索</a>
 		</div>
 		<div class="b10">&nbsp;</div>
 		{if $action == 'resume'}
 			<form action="{$MOD[linkurl]}search.php">
 			<input type="hidden" name="action" id="action" value="{if $action=='job'}job{else}resume{/if}"/>
-			<div style="padding:10px 0 10px 10px;border-bottom:#AACCEE 1px solid;">
+			<div style="padding:10px 0 10px 10px;border-bottom:#DDDDDD 1px solid;">
 			<table cellpadding="3" cellspacing="3">
 			<tr>
 			<td width="80" align="right">关 键 词：</td>
@@ -75,7 +78,7 @@
 			<td align="right"> </td>
 			<td colspan="3">
 			<input type="image" src="{DT_SKIN}image/resume_search.gif"/>
-			<a href="{$MOD[linkurl]}{rewrite('search.php?action=resume')}"><img src="{DT_SKIN}image/btn_reset_search.gif"/></a>
+			<a href="{$MOD[linkurl]}search.php?action=resume"><img src="{DT_SKIN}image/btn_reset_search.gif"/></a>
 			<a href="{$MODULE[2][linkurl]}{$DT[file_my]}?action=add&mid={$moduleid}&resume=1" id="add_link"><img src="{DT_SKIN}image/add_resume.gif" style="margin-left:150px;" id="add_img"/></a>
 			</td>
 			</tr>
@@ -116,7 +119,7 @@
 		{else}
 			<form action="{$MOD[linkurl]}search.php">
 			<input type="hidden" name="action" id="action" value="{if $action=='job'}job{else}resume{/if}"/>
-			<div style="padding:10px 0 10px 10px;border-bottom:#AACCEE 1px solid;">
+			<div style="padding:10px 0 10px 10px;border-bottom:#DDDDDD 1px solid;">
 			<table cellpadding="3" cellspacing="3">
 			<tr>
 			<td width="80" align="right">关 键 词：</td>
@@ -182,7 +185,7 @@
 			<td align="right"> </td>
 			<td colspan="3">
 			<input type="image" src="{DT_SKIN}image/job_search.gif"/>
-			<a href="{$MOD[linkurl]}{rewrite('search.php?action=job')}" rel="nofollow"><img src="{DT_SKIN}image/btn_reset_search.gif"/></a>
+			<a href="{$MOD[linkurl]}search.php?action=job" rel="nofollow"><img src="{DT_SKIN}image/btn_reset_search.gif"/></a>
 			<a href="{$MODULE[2][linkurl]}{$DT[file_my]}?action=add&mid={$moduleid}" id="add_link" rel="nofollow"><img src="{DT_SKIN}image/add_job.gif" style="margin-left:150px;" id="add_img"/></a>
 			</td>
 			</tr>

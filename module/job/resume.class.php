@@ -8,13 +8,17 @@ class resume {
 	var $table_data;
 	var $errmsg = errmsg;
 
-    function resume($moduleid) {
+    function __construct($moduleid) {
 		global $db, $DT_PRE, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $DT_PRE.'resume';
 		$this->table_data = $DT_PRE.'resume_data';
 		$this->db = &$db;
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','truename','gender','birthday','age','marriage','height', 'weight','education','school','major','skill','language','minsalary','maxsalary','situation','type','experience','mobile','telephone','address','email','msn','qq','ali','skype','thumb','username','addtime','editor','edittime','ip','template','status','hits','open','note');
+    }
+
+    function resume($moduleid) {
+		$this->__construct($moduleid);
     }
 
 	function pass($post) {
@@ -29,11 +33,13 @@ class resume {
 		if(strlen($post['mobile']) < 7) return $this->_(lang('message->pass_resume_mobile'));
 		if(!is_email(trim($post['email']))) return $this->_(lang('message->pass_email'));
 		if(!$post['content']) return $this->_(lang('message->pass_resume_content'));
+		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
 		global $MOD, $DT_TIME, $DT_IP, $TYPE, $_username, $_userid, $GENDER, $MARRIAGE, $EDUCATION;
+		is_url($post['thumb']) or $post['thumb'] = '';
 		$post['editor'] = $_username;
 		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['edittime'] = $DT_TIME;
@@ -50,10 +56,8 @@ class resume {
 		$post['education'] = intval($post['education']);
 		$post['experience'] = intval($post['experience']);
 		$post['situation'] = intval($post['situation']);
-		$post['email'] = trim($post['email']);
 		$post['status'] = intval($post['status']);
 		$post['open'] = intval($post['open']);
-		$post['title'] = trim($post['title']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($MOD['clear_link']) $post['content'] = clear_link($post['content']);
@@ -61,8 +65,10 @@ class resume {
 		if($MOD['introduce_length']) $post['introduce'] = addslashes(get_intro($post['content'], $MOD['introduce_length']));
 		if($this->itemid) {
 			$new = $post['content'];
+			if($post['thumb']) $new .= '<img src="'.$post['thumb'].'"/>';
 			$r = $this->get_one();
 			$old = $r['content'];
+			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 		} else {			
 			$post['ip'] = $DT_IP;
@@ -75,7 +81,14 @@ class resume {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} a,{$this->table_data} c WHERE a.itemid=c.itemid and a.itemid='$this->itemid'");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		if($r) {
+			$t = $this->db->get_one("SELECT content FROM {$this->table_data} WHERE itemid=$this->itemid");
+			$r['content'] = $t ? $t['content'] : '';
+			return $r;
+		} else {
+			return array();
+		}
 	}
 
 	function get_list($condition = 'status=3', $order = 'edittime DESC', $cache = '') {
@@ -87,12 +100,13 @@ class resume {
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
+		if($items < 1) return array();
 		$lists = array();
 		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
 		while($r = $this->db->fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
-			$r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
+			if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
 			$r['parentid'] = $CATEGORY[$r['catid']]['parentid'] ? $CATEGORY[$r['catid']]['parentid'] : $r['catid'];
 			$lists[] = $r;
 		}
@@ -224,7 +238,7 @@ class resume {
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition ");
+		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
 		while($r = $this->db->fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}

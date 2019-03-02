@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 ?>
 <form action="?">
@@ -28,7 +28,7 @@ include tpl('header');
 <?php foreach($lists as $k=>$v) { ?>
 <tr>
 <td>&nbsp;<a href="javascript:TopUseBack('<?php echo $v['copyfrom'];?>','<?php echo $v['fromurl'];?>');"><?php echo $v['copyfrom'];?></a></td>
-<td>&nbsp;<a href="<?php echo $EXT['linkurl'];?>redirect.php?url=<?php echo urlencode(fix_link($v['fromurl']));?>" target="_blank"><?php echo $v['fromurl'];?></a></td>
+<td>&nbsp;<a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode(fix_link($v['fromurl']));?>" target="_blank"><?php echo $v['fromurl'];?></a></td>
 <td align="center"><a href="javascript:TopUseBack('<?php echo $v['copyfrom'];?>','<?php echo $v['fromurl'];?>');" class="t">[选择]</a></td>
 </tr>
 <?php } ?>

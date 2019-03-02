@@ -29,7 +29,6 @@ $adddate = timetodate($addtime, 5);
 $editdate = timetodate($edittime, 5);
 $linkurl = $MOD['linkurl'].$linkurl;
 $maincat = get_maincat(0, $moduleid);
-$auth = encrypt("$itemid");
 $update = '';
 $fee = get_fee($item['fee'], $MOD['fee_view']);
 if(check_group($_groupid, $MOD['group_contact'])) {

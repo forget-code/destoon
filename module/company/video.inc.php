@@ -29,12 +29,15 @@ if($itemid) {
 	$video_p = $player;
 	if(in_array(file_ext($video), array('flv', 'mp4')) && strpos($video, '?') === false) $video_p = -1;
 	$video_a = $MOD['autostart'] ? 'true' : 'false';
+	$UA = strtolower($_SERVER['HTTP_USER_AGENT']);
+	$video_i = (strpos($UA, 'ipad') !== false || strpos($UA, 'ipod') !== false || strpos($UA, 'iphone') !== false || strpos($UA, 'android') !== false) ? 1 : 0;
 	$update = '';
 	include DT_ROOT.'/include/update.inc.php';
 	$head_canonical = $linkurl;
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $keyword;
 	$head_description = $introduce ? $introduce : $title;
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);;
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -65,6 +68,7 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
+	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 }
 include template('video', $template);
 ?>

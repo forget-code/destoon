@@ -12,7 +12,7 @@ a:hover {color:red;}
 .out {width:550px;border-top:#808080 1px solid;border-bottom:#404040 1px solid;border-left:#808080 1px solid;border-right:#404040 1px solid;}
 .in {background:#D4D0C8;border-bottom:#808080 1px solid;border-top:#FFFFFF 1px solid;border-left:#FFFFFF 1px solid;border-right:#808080 1px solid;}
 .head {background:#FFFFFF url('head.gif') repeat-x;border-bottom:#808080 1px solid;}
-.head div {height:66px;background:url('logo.gif') no-repeat 455px 38px;padding:3px 0 0 15px;line-height:36px;}
+.head div {height:66px;background:url('logo.gif') no-repeat 452px 38px;padding:3px 0 0 15px;line-height:32px;}
 .head strong {font-size:14px;color:#FFFFFF;font-family:Arial;}
 .body {height:250px;border-top:#FFFFFF 1px solid;border-bottom:#808080 1px solid;overflow:hidden;}
 .body div {padding:15px;}

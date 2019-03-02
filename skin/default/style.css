@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 /* global */
@@ -21,15 +21,16 @@ a.g:link,a.g:visited,a.g:active {color:#666666;text-decoration:none;}
 a.g:hover {color:#FF6600;}
 /* common */
 .m {margin:auto;width:980px;background:#FFFFFF;clear:both;}
-.head {background:#F1F1F1 url('image/head_bg.png') repeat-x;width:100%;height:31px;position:fixed;z-index:999999;left:0;}
+.head {background:#F1F1F1 url('image/head_bg.png') repeat-x;width:100%;height:31px;position:fixed;z-index:9;left:0;}
 .head_m {margin:auto;width:980px;padding:7px 0 0 0;color:#666666;}
 .head_s {height:31px;}
 .head_t strong{color:#FF0000;font-weight:normal;}
 .head_l li {float:left;margin:0 10px 0 0;}
 .h_city {background:url('image/ico_arrow_d.gif') no-repeat right center;padding:0 10px 0 0;}
 .h_fav {padding:0 6px 0 2px;}
-.h_wap {background:url('image/ico_wap.gif') no-repeat 0 center;padding:0 2px 0 15px;}
+.h_mobile {background:url('image/ico_mobile.gif') no-repeat 0 center;padding:0 2px 0 15px;}
 .h_cart {background:url('image/ico_cart.gif') no-repeat 0 center;padding:0 6px 0 18px;}
+.h_qrcode {background:url('image/ico_qrcode.gif') no-repeat 0 center;padding:0 6px 0 18px;}
 
 .logo {width:200px;height:70px;overflow:hidden;}
 .logo img {margin:5px 0 0 0;height:60px;}
@@ -90,7 +91,7 @@ a.g:hover {color:#FF6600;}
 .pages strong {background:#258CFF;padding:3px;border:#258CFF 1px solid;color:#FFFFFF;}
 .pages_inp {width:30px;border:#DDDDDD 1px solid;color:#666666;padding:2px;text-align:center;}
 .pages_btn {width:26px;border:#FF6600 1px solid;color:#FFFFFF;padding:1px;background:#FF6600;font-weight:bold;font-size:11px;}
-.pages label {background:#FFFFFF;border:#2E6AB1 1px solid;color:#004499;padding:1px 5px 1px 5px;}
+.pages label {background:#FFFFFF;border:#DDDDDD 1px solid;color:#666666;padding:3px 5px 3px 5px;}
 .pages label em {color:red;font-weight:bold;font-style:normal;}
 .pages label span {font-weight:bold;}
 .pages cite {font-style:normal;}

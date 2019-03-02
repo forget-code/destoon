@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('地区添加', '?file='.$file.'&action=add'),
     array('地区管理', '?file='.$file),
@@ -82,12 +82,16 @@ class area {
 	var $db;
 	var $table;
 
-	function area($areaid = 0)	{
+	function __construct($areaid = 0)	{
 		global $db, $DT_PRE, $AREA;
 		$this->areaid = $areaid;
 		$this->area = $AREA;
 		$this->table = $DT_PRE.'area';
 		$this->db = &$db;
+	}
+
+	function area($areaid = 0)	{
+		$this->__construct($areaid);
 	}
 
 	function add($area)	{

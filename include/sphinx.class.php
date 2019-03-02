@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -339,6 +339,9 @@ class SphinxClient
 	var $_arrayresult;	///< whether $result["matches"] should be a hash or an array
 	var $_timeout;		///< connect timeout
 
+	function __construct() {
+		$this->SphinxClient();
+	}
 
 	function SphinxClient ()
 	{

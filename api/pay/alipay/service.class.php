@@ -18,6 +18,9 @@ class alipay_service {
 	var $mysign;          //签名
 
 	//构造支付宝外部服务接口控制
+	function __construct($parameter,$security_code,$sign_type = "MD5",$transport= "https") {
+		$this->alipay_service($parameter,$security_code,$sign_type,$transport);
+	}
 	function alipay_service($parameter,$security_code,$sign_type = "MD5",$transport= "https") {
 		$this->parameter      = $this->para_filter($parameter);
 		$this->security_code  = $security_code;

@@ -16,22 +16,23 @@
 		[ <a href="javascript:SendFav();">加入收藏</a> ]&nbsp;
 		[ <a href="javascript:SendPage();">告诉好友</a> ]&nbsp;
 		[ <a href="javascript:Print();">打印本文</a> ]&nbsp;
+		[ <a href="javascript:SendReport();">违规举报</a> ]&nbsp;
 		[ <a href="javascript:window.close()">关闭窗口</a> ]
 		</center>
-		{template 'comment', 'chip'}
 		<br/>
+		{template 'comment', 'chip'}
 	</div>
 </div>
 <div class="m_n f_l">&nbsp;</div>
 	<div class="m_r f_l">
 		<div class="g_price">
-			<div>原价<br/><span>￥{$marketprice}</span></div>
+			<div>原价<br/><span>{$DT[money_sign]}{$marketprice}</span></div>
 			<div>折扣<br/>{$discount}折</div>
-			<div><strong>节省<br/>￥{$savemoney}</strong></div>
+			<div><strong>节省<br/>{$DT[money_sign]}{$savemoney}</strong></div>
 		</div>
 		<div class="b10 c_b">&nbsp;</div>
 		<div class="g_deal" onclick="Go('{$MOD[linkurl]}{rewrite('buy.php?itemid='.$itemid)}');">
-			<div>￥{$iprice}</div>
+			<div>{$DT[money_sign]}{$iprice}</div>
 		</div>
 		
 		{if $process == 2}

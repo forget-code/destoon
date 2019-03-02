@@ -1,68 +1,65 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-Dd('word').focus();var chat_link=chat_time=chat_new_msg=0;var chat_word='';var chat_interval;
+Dd('word').focus();var chat_time=chat_new_msg=0;var chat_word='';var chat_interval;
 function unixtime(){return Math.round(new Date().getTime()/1000);}
-function ec_set(i){if(i==1){Dd('ec1').className='ec';Dd('ec2').className='';Dd('chat_s').title=chat_lang.ec1;}else{Dd('ec1').className='';Dd('ec2').className='ec';Dd('chat_s').title=chat_lang.ec2;}chat_ec=i;set_cookie('chat_ec', i);Dh('ec');}
-var chat_ec=get_cookie('chat_ec');chat_ec=chat_ec==1?1:2;ec_set(chat_ec);
+function ec_set(i){if(i==1){Dd('ec1').className='ec';Dd('ec2').className='';Dd('chat_s').title=chat_lang.ec1;}else{Dd('ec1').className='';Dd('ec2').className='ec';Dd('chat_s').title=chat_lang.ec2;}chat_ec=i;set_local('chat_ec', i);Dh('ec');}
+var chat_ec=get_local('chat_ec');chat_ec=chat_ec==1?1:2;ec_set(chat_ec);
 function chat_send(){
-	if(chat_status!=3){
-		if(chat_status==0) chat_tip('对方已经离开了对话');
-		return;
-	}
 	var l=Dd('word').value.length;
 	if(Dd('word').value == chat_lang.tip || l<1){chat_tip('对话内容不能为空，请输入');Dd('word').focus();return;}
 	if(l>chat_maxlen){chat_tip('最多输入'+chat_maxlen+'字，当前已输入'+l+'字');Dd('word').focus();return;}
 	if(chat_mintime&&(unixtime()-chat_time<chat_mintime)){chat_tip('您的发言过快，请稍后再发');return;}
-	chat_time=unixtime();chat_word=Dd('word').value;Dd('word').value='';
-	var p='action=send';
-	p+='&chatid='+chat_id;
-	p+='&font_s='+Dd('font_s').value;
-	p+='&font_c='+Dd('font_c').value;
-	p+='&font_b='+(Dd('tool_font_b').className=='tool_a' ? 0 : 1);
-	p+='&font_i='+(Dd('tool_font_i').className=='tool_a' ? 0 : 1);
-	p+='&font_u='+(Dd('tool_font_u').className=='tool_a' ? 0 : 1);
-	p+='&word='+encodeURIComponent(chat_word);
-	chat_link=1;makeRequest(p, '?', '_chat_send');
-}
-function _chat_send(){
-	if(xmlHttp.readyState==4&&xmlHttp.status==200){
-		chat_link=0;
-		if(xmlHttp.responseText=='0'){
-			Dd('word').value=chat_word;
+	chat_time=unixtime();
+	Dd('font_s_id').value=Dd('font_s').value;
+	Dd('font_c_id').value=Dd('font_c').value;
+	Dd('font_b_id').value=Dd('tool_font_b').className=='tool_a' ? 0 : 1;
+	Dd('font_i_id').value=Dd('tool_font_i').className=='tool_a' ? 0 : 1;
+	Dd('font_u_id').value=Dd('tool_font_u').className=='tool_a' ? 0 : 1;
+	Dd('word_id').value=Dd('word').value;	
+	$.post('chat.php', $('#chat_send').serialize(), function(data) {
+		if(data == 'ok') {
+			$('#word').val('');
+			//chat_load();
+		} else if(data == 'max') {
+			chat_tip('发送内容过长');
+		} else {
 			chat_tip('发送失败，请重试');
-		}else{
-			Dd('word').value='';
-			chat_load();
 		}
-	}
+	});
 }
 function chat_load(d){
-	chat_link=1;
-	makeRequest('action=load&chatlast='+chat_last+'&chatid='+chat_id+'&first='+(d ? 1 : 0), '?', '_chat_load');
-}
-function _chat_load(){
-	if(xmlHttp.readyState==4&&xmlHttp.status==200){
-		chat_link=0;
-		if(xmlHttp.responseText){
-			eval("var chat_json="+xmlHttp.responseText);
+	$.post('chat.php', 'action=load&chatlast='+chat_last+'&chatid='+chat_id+'&first='+(d ? 1 : 0), function(data) {
+		if(data) {
+			eval("var chat_json="+data);
 			chat_last=chat_json.chat_last;
 			chat_msg=chat_json.chat_msg;
-			chat_status = chat_json.chat_status;
 			msglen=chat_msg.length;
 			for(var i=0;i<msglen;i++){
-				chat_into((chat_msg[i].date ? '<p class="dt"><span>'+chat_msg[i].date+'</span></p>' : '')+'<span class="u'+chat_msg[i].self+'">'+chat_msg[i].name+'</span><span class="t'+chat_msg[i].self+'">'+chat_msg[i].time+'</span><br/><p class="w'+chat_msg[i].self+'">'+chat_msg[i].word+'</p>');
-			}
-			chat_new(chat_json.chat_new);
-			if(chat_status==0){chat_sys('对方离开了对话');clearInterval(chat_interval);}
+				msghtm = '';
+				if(chat_msg[i].date) msghtm += '<div class="chat-date"><span>'+chat_msg[i].date+'</span></div>';
+				msghtm += '<table cellpadding="0" cellspacing="0" width="100%">';
+				msghtm += '<tr>';
+				if(chat_msg[i].self == 1) {
+					msghtm += '<td width="40"></td>';
+					msghtm += '<td valign="top"><div class="chat_msg1">'+chat_msg[i].word+'</div></td>';
+					msghtm += '<td class="chat_arr1"></td>';
+					msghtm += '<td width="60" valign="top" align="center"><a href="'+chat_home1+'" target="_blank"><img src="'+chat_head1+'" width="40" height="40"/></a></td>';
+				} else {
+					msghtm += '<td width="60" valign="top" align="center"><a href="'+chat_home0+'" target="_blank"><img src="'+chat_head0+'" width="40" height="40"/></a></td>';
+					msghtm += '<td class="chat_arr0"></td>';
+					msghtm += '<td valign="top"><div class="chat_msg0">'+chat_msg[i].word+'</div></td>';
+					msghtm += '<td width="40"></td>';
+				}
+				msghtm += '</tr>';
+				msghtm += '</table>';
+				$('#chat').append(msghtm);
+			}			
+			if(msglen) $('#chat').animate({scrollTop:$('#chat')[0].scrollHeight}, 500);
+			//if(msglen) Dd('chat').scrollTop=Dd('chat').scrollHeight;
 		}
-	}
-}
-function chat_into(msg){
-	var o=document.createElement("div");
-	o.innerHTML=msg;Dd('chat').appendChild(o);
-	Dd('chat').scrollTop=Dd('chat').scrollHeight;
+	});
 }
 function chat_log(){
 	Dd('chat').innerHTML='';
@@ -71,7 +68,7 @@ function chat_log(){
 }
 function chat_save(){
 	Dd('down_data').value=Dd('chat').innerHTML;
-	Dd('down').submit();
+	Dd('chat_down').submit();
 }
 function chat_off(){
 	if(confirm('确定要中断聊天吗？')){
@@ -105,9 +102,6 @@ function chat_tip(msg){
 	Dd('tip').innerHTML=msg;
 	Dd('sd').innerHTML=sound('chat_tip');
 	window.setTimeout("Dh('tip');",5000);
-}
-function chat_sys(msg){
-	chat_into('<span class="sys">[系统提示]'+msg+'</span>');
 }
 var chat_title_i=0;
 var title_interval;
@@ -177,17 +171,6 @@ function face_into(s){
 	Dd('word').value+=':'+s+')';
 	face_hide();
 	Dd('word').focus();
-}
-if(isGecko){
-	window.onbeforeunload=function(){
-		chat_link=1;
-		makeRequest('action=unload&chatid='+chat_id, '?');
-	}
-}else{
-	window.onunload=function(){
-		chat_link=1;
-		makeRequest('action=unload&chatid='+chat_id, '?');
-	}
 }
 chat_interval=setInterval('chat_load()',chat_poll);
 chat_log();

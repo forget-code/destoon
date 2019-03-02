@@ -1,5 +1,5 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -13,7 +13,7 @@ show_menu($menus);
 <table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 回答者</td>
-<td><a href="javascript:_user('<?php echo $username;?>');"><?php echo $username ? $username : 'Guest';?></a></td>
+<td><a href="javascript:_user('<?php echo $username;?>');"><?php echo $username ? $passport : 'Guest';?></a></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> IP</td>
@@ -22,7 +22,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 答案内容</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>

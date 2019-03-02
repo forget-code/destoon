@@ -6,6 +6,7 @@ $MG['address_limit'] > -1 or dalert(lang('message->without_permission_and_upgrad
 require DT_ROOT.'/include/post.func.php';
 require MD_ROOT.'/address.class.php';
 $do = new address();
+include load('message.lang');
 switch($action) {
 	case 'add':
 		if($MG['address_limit']) {
@@ -16,11 +17,14 @@ switch($action) {
 			if($do->pass($post)) {
 				$post['username'] = $_username;
 				$do->add($post);
-				dmsg($L['op_add_success'], $MOD['linkurl'].'address.php');
+				dmsg($L['op_add_success'], '?action=index');
 			} else {
 				message($do->errmsg);
 			}
 		} else {
+			foreach($do->fields as $v) {
+				$$v = '';
+			}
 			$head_title = $L['address_title_add'];
 		}
 	break;
@@ -44,23 +48,24 @@ switch($action) {
 	break;
 	case 'delete':
 		$itemid or message($L['address_msg_choose']);
-		$do->itemid = $itemid;
-		$r = $do->get_one();
-		if(!$r || $r['username'] != $_username) message();
-		$do->delete($itemid);
+		$itemids = is_array($itemid) ? $itemid : array($itemid);
+		foreach($itemids as $itemid) {
+			$do->itemid = $itemid;
+			$item = $do->get_one();
+			if(!$item || $item['username'] != $_username) message();
+			$do->delete($itemid);
+		}
 		dmsg($L['op_del_success'], $forward);
 	break;
 	default:
 		$condition = "username='$_username'";
 		if($keyword) $condition .= " AND address LIKE '%$keyword%'";
 		$lists = $do->get_list($condition);
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}address WHERE username='$_username'");
+		$limit_used = $r['num'];
+		$limit_free = $MG['address_limit'] && $MG['address_limit'] > $limit_used ? $MG['address_limit'] - $limit_used : 0;
 		$head_title = $L['address_title'];
 	break;
 }
-
-$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}address WHERE username='$_username'");
-$limit_used = $r['num'];
-
-$limit_free = $MG['address_limit'] && $MG['address_limit'] > $limit_used ? $MG['address_limit'] - $limit_used : 0;
 include template('address', $module);
 ?>

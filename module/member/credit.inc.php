@@ -20,7 +20,7 @@ switch($action) {
 					$r = $ex->get_one("SELECT `$fd` FROM `{$tb}` WHERE `uid`=$uid");
 					$num = intval($r[$fd]);
 				} else {
-					message($L['credit_msg_active'], '?');
+					message($L['credit_msg_active'], '?action=index');
 				}
 			} elseif($MOD['ex_type'] == 'DZX') {
 				$tb = $px.'common_member_count';
@@ -30,7 +30,7 @@ switch($action) {
 					$r = $ex->get_one("SELECT `$fd` FROM `{$tb}` WHERE `uid`=$uid");
 					$num = intval($r[$fd]);
 				} else {
-					message($L['credit_msg_active'], '?');
+					message($L['credit_msg_active'], '?action=index');
 				}
 			} else {
 				$tb = $px.'members';
@@ -39,7 +39,7 @@ switch($action) {
 					$uid = $r['uid'];
 					$num = intval($r[$fd]);
 				} else {
-					message($L['credit_msg_active'], '?');
+					message($L['credit_msg_active'], '?action=index');
 				}
 			}
 			if($submit) {
@@ -53,13 +53,13 @@ switch($action) {
 					$db->connect($CFG['db_host'], $CFG['db_user'], $CFG['db_pass'], $CFG['db_name'], $CFG['db_expires'], $CFG['db_charset'], $CFG['pconnect']);
 					credit_add($_username, $amount*$MOD['ex_rate']);
 					credit_record($_username, $amount*$MOD['ex_rate'], 'system', $L['credit_exchange_title'], $amount.$MOD['ex_name']);
-					dmsg($L['credit_msg_exchange'], '?');
+					dmsg($L['credit_msg_exchange'], '?action=index');
 				} else {
 					message($L['credit_pass_ex_max'].$num);
 				}
 			}
 		} else {
-			message($L['feature_close'], '?');
+			message($L['feature_close'], '?action=index');
 		}
 		$head_title = $L['credit_exchange_title'];
 	break;
@@ -73,7 +73,7 @@ switch($action) {
 				$amount = $P[$type];
 				$credit = $C[$type];
 				if($amount > 0) {
-					$_money >= $amount or message($L['money_not_enough'], $MOD['linkurl'].'charge.php?action=pay&amount='.($amount-$_money));
+					$_money >= $amount or message($L['money_not_enough'], 'charge.php?action=pay&reason=credit&amount='.($amount-$_money));
 					money_add($_username, -$amount);
 					money_record($_username, -$amount, $L['in_site'], 'system', $L['buy'].$DT['credit_name'], $credit.$DT['credit_unit']);
 					if($credit > 0) {
@@ -81,10 +81,12 @@ switch($action) {
 						credit_record($_username, $credit, 'system', $L['buy'].$DT['credit_name'], $amount.$DT['money_unit']);
 					}
 				}
-				dmsg($L['credit_msg_buy_success'], $MOD['linkurl'].'credit.php');
+				dmsg($L['credit_msg_buy_success'], $forward ? $forward : '?action=index');
+			} else {
+				$select = isset($C[$sum]) ? $sum : 0;
 			}
 		} else {
-			message($L['feature_close'], '?');
+			message($L['feature_close'], '?action=index');
 		}
 		$head_title = $L['credit_buy_title'];
 	break;
@@ -93,7 +95,7 @@ switch($action) {
 		$url = $MOD['linkurl'].'invite.php?user='.$_username;
 	break;
 	case 'less':
-		$_credit < 0 or dheader('credit.php');
+		$_credit < 0 or dheader('?action=index');
 		#$head_title = $L['invite_title'];
 	break;
 	default:

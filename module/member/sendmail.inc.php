@@ -23,7 +23,7 @@ if($submit) {
 	$content = ob_template('send', 'mail');
 	$DT['mail_name'] = $_company;
 	if(send_mail($email, $title, $content, '', false)) {//$_email
-		message(lang($L['sendmail_success'], array($email)), 'sendmail.php');
+		message(lang($L['sendmail_success'], array($email)), '?action=index');
 	} else {
 		message($L['sendmail_fail']);
 	}

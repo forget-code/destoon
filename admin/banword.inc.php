@@ -1,9 +1,9 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2013 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('IN_DESTOON') or exit('Access Denied');
+defined('DT_ADMIN') or exit('Access Denied');
 $menus = array(
     array('词语过滤', '?file='.$file),
 );
@@ -20,12 +20,16 @@ if($submit) {
 
 class banword {
 	var $db;
-	var $table;
+	var $table;	
 
-	function banword() {
+	function __construct() {
 		global $db, $DT_PRE;
 		$this->table = $DT_PRE.'banword';
 		$this->db = &$db;
+	}
+
+	function banword() {
+		$this->__construct();
 	}
 
 	function get_list($condition) {

@@ -87,7 +87,7 @@
 	{if $username}
 	<div class="box_head"><div><strong>[{$username}]的{$MOD[name]}</strong></div></div>
 	<div class="box_body">
-		<div class="t_c" style="padding:15px 0 15px 0;"><a href="{userurl($username)}" title="查看主页"><img src="{useravatar($username, 'large')}" alt=""/></a></div>
+		<div class="t_c" style="padding:15px 0 15px 0;"><a href="{userurl($username)}" title="查看主页"><img src="{useravatar($username, 'large')}" alt="" width="128" height="128"/></a></div>
 		{if $DT[im_web]}<div class="t_c">{im_web($username, 1)}</div>{/if}
 		<div class="b10">&nbsp;</div>
 	</div>

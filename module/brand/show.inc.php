@@ -4,6 +4,7 @@ $itemid or dheader($MOD['linkurl']);
 if(!check_group($_groupid, $MOD['group_show'])) include load('403.inc');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
+if($item['groupid'] == 2) include load('404.inc');
 if($item && $item['status'] > 2) {
 	if($MOD['show_html'] && is_file(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl'])) d301($MOD['linkurl'].$item['linkurl']);
 	extract($item);
@@ -39,10 +40,8 @@ if(check_group($_groupid, $MOD['group_contact'])) {
 		$member = $item['username'] ? userinfo($item['username']) : array();
 		if($item['totime'] && $item['totime'] < $DT_TIME && $item['status'] == 3) $update .= ",status=4";
 		if($member) {
-			foreach(array('groupid', 'vip','validated','company','areaid','truename','telephone','mobile','address','qq','msn','ali','skype') as $v) {
-				if($item[$v] != $member[$v]) $update .= ",$v='".addslashes($member[$v])."'";
-			}
-			if($item['email'] != $member['mail']) $update .= ",email='$member[mail]'";
+			$update_user = update_user($member, $item);
+			if($update_user) $db->query("UPDATE {$table} SET ".substr($update_user, 1)." WHERE username='$username'");
 		}
 	}
 } else {
@@ -55,7 +54,7 @@ if(check_group($_groupid, $MOD['group_contact'])) {
 include DT_ROOT.'/include/update.inc.php';
 $seo_file = 'show';
 include DT_ROOT.'/include/seo.inc.php';
-if($EXT['wap_enable']) $head_mobile = $EXT['wap_url'].'index.php?moduleid='.$moduleid.'&itemid='.$itemid.($page > 1 ? '&page='.$page : '');
+if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
 $template = 'show';
 if($MOD['template_show']) $template = $MOD['template_show'];
 if($CAT['show_template']) $template = $CAT['show_template'];

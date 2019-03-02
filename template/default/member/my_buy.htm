@@ -3,23 +3,19 @@
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
-<td class="tab" id="add"><a href="{$DT[file_my]}?mid={$mid}&action=add"><span>添加{$MOD[name]}</span></a></td>
+<td class="tab" id="add"><a href="?mid={$mid}&action=add"><span>添加{$MOD[name]}</span></a></td>
 {if $_userid}
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s3"><a href="{$DT[file_my]}?mid={$mid}"><span>已发布<span class="px10">({$nums[3]})</span></span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s2"><a href="{$DT[file_my]}?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s1"><a href="{$DT[file_my]}?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
-<td class="tab_nav">&nbsp;</td>
-<td class="tab" id="s4"><a href="{$DT[file_my]}?mid={$mid}&status=4"><span>已过期<span class="px10">({$nums[4]})</span></span></a></td>
+<td class="tab" id="s3"><a href="?mid={$mid}"><span>已发布<span class="px10">({$nums[3]})</span></span></a></td>
+<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
+<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
+<td class="tab" id="s4"><a href="?mid={$mid}&status=4"><span>已过期<span class="px10">({$nums[4]})</span></span></a></td>
 {/if}
 </tr>
 </table>
 </div>
 {if $action=='add' || $action=='edit'}
 <iframe src="" name="send" id="send" style="display:none;"></iframe>
-<form method="post" action="{$DT[file_my]}" id="dform" target="send" onsubmit="return check();">
+<form method="post" action="?" id="dform" target="send" onsubmit="return check();">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
@@ -60,7 +56,7 @@
 {/if}
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业分类</td>
-<td class="tr"><div id="catesch"></div>{ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"')}<br/>{if $DT[schcate_limit]}<input type="button" value="搜索分类" onclick="schcate({$moduleid});" class="btn"/> {/if}<span id="dcatid" class="f_red"></span></td>
+<td class="tr"><div id="catesch"></div>{ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, $DT_TOUCH ? '' : 'size="2" style="height:120px;width:180px;"')}{if !$DT_TOUCH}<br/>{/if}{if $DT[schcate_limit]}<input type="button" value="搜索分类" onclick="schcate({$moduleid});" class="btn"/> {/if}<span id="dcatid" class="f_red"></span></td>
 </tr>
 {if $CP}
 <script type="text/javascript">
@@ -69,7 +65,6 @@ var property_itemid = {$itemid};
 var property_admin = 0;
 </script>
 <script type="text/javascript" src="{DT_STATIC}file/script/property.js"></script>
-{if $itemid}<script type="text/javascript">setTimeout("load_property()", 1000);</script>{/if}
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -78,7 +73,7 @@ var property_admin = 0;
 <tr>
 <td class="tl">详细说明</td>
 <td class="tr f_gray"><textarea name="post[content]" id="content" class="dsn">{$content}</textarea>
-{deditor($moduleid, 'content', $group_editor, '98%', 350)}<span id="dcontent" class="f_red"></span>
+{deditor($moduleid, 'content', $group_editor, '100%', 350)}<br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -224,7 +219,7 @@ var property_admin = 0;
 {/if}
 <tr>
 <td class="tl">&nbsp;</td>
-<td class="tr" height="50"><input type="submit" name="submit" value=" 提 交 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
+<td class="tr" height="50"><input type="submit" name="submit" value=" 提 交 " class="btn_g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></td>
 </tr>
 </table>
 </form>
@@ -236,14 +231,14 @@ var property_admin = 0;
 {/if}
 {else}
 <div class="tt">
-<form action="{$DT[file_my]}">
+<form action="?">
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="status" value="{$status}"/>
 &nbsp;{category_select('catid', '行业分类', $catid, $moduleid)}&nbsp;
 {dselect($TYPE, 'typeid', '信息类型', $typeid)}&nbsp;
 <input type="text" size="50" name="kw" value="{$kw}" title="关键词"/>&nbsp;
 <input type="submit" value=" 搜 索 " class="btn"/>
-<input type="button" value=" 重 置 " class="btn" onclick="Go('{$DT[file_my]}?mid={$mid}&status={$status}');"/>
+<input type="button" value=" 重 置 " class="btn" onclick="Go('?mid={$mid}&status={$status}');"/>
 </form>
 </div>
 <div class="ls">
@@ -260,7 +255,7 @@ var property_admin = 0;
 {loop $lists $k $v}
 <tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="{$v[itemid]}"/></td>
-<td align="left" title="{$v[alt]}">&nbsp;{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="{$DT[file_my]}?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</td>
+<td align="left" title="{$v[alt]}">&nbsp;{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</td>
 <td><a href="{$v[caturl]}" target="_blank">{$v[catname]}</a></td>
 {if $timetype=='add'}
 <td class="f_gray px11" title="更新时间 {timetodate($v[edittime], 5)}">{timetodate($v[addtime], 5)}</td>
@@ -269,9 +264,9 @@ var property_admin = 0;
 {/if}
 <td class="f_gray px11">{$v[hits]}</td>
 <td>
-<a href="{$DT[file_my]}?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
-{if $MG[copy]}&nbsp;<a href="{$DT[file_my]}?mid={$mid}&action=add&itemid={$v[itemid]}&catid={$v[catid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/new.png" title="复制信息" alt=""/></a>{/if}
-{if $MG[delete]}&nbsp;<a href="{$DT[file_my]}?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
+<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
+{if $MG[copy]}&nbsp;<a href="?mid={$mid}&action=add&itemid={$v[itemid]}&catid={$v[catid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/new.png" title="复制信息" alt=""/></a>{/if}
+{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
 </td>
 </tr>
 {/loop}
@@ -353,6 +348,7 @@ function check() {
 	}
 {/if}
 	{if $FD}{fields_js()}{/if}
+	{if $CP}{property_js()}{/if}
 {if $need_password}
 	f = 'password';
 	l = Dd(f).value.length;
