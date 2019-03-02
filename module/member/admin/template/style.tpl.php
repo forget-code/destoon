@@ -3,25 +3,22 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="sbox">
 <form action="?">
-<div class="tt">模板搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td>
-&nbsp;<?php echo $fields_select;?>&nbsp;
-<input type="text" size="10" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo $fields_select;?>&nbsp;
+<input type="text" size="10" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
 <?php echo $type_select;?>&nbsp;
 <select name="groupid">
 <option value="0">会员组</option>
 <?php foreach($GROUP as $v) { if($v['groupid'] < 5) continue; ?>
 <option value="<?php echo $v['groupid'];?>"<?php echo $v['groupid'] == $groupid ? ' selected' : '';?>><?php echo $v['groupname'];?></option>
 <?php } ?>
-</select>
+</select>&nbsp;
 价格:<input type="text" size="3" name="minfee" value="<?php echo $minfee;?>"/>~
-<input type="text" size="3" name="maxfee" value="<?php echo $maxfee;?>" />&nbsp;
+<input type="text" size="3" name="maxfee" value="<?php echo $maxfee;?>"/>&nbsp;
 <select name="currency">
 <option value="">单位</option>
 <option value="money"<?php echo $currency == 'money' ? ' selected' : '';?>><?php echo $DT['money_name'];?></option>
@@ -29,18 +26,15 @@ show_menu($menus);
 <option value="free"<?php echo $currency == 'free' ? ' selected' : '';?>>免费</option>
 </select>&nbsp;
 <?php echo $order_select;?>&nbsp;
-<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>
+<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
 <input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
-</td>
-</tr>
-</table>
 </form>
+</div>
 <form method="post">
-<div class="tt">管理模板</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
-<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th width="50">排序</th>
 <th width="220">预览图</th>
 <th>风格目录</th>
@@ -50,7 +44,7 @@ show_menu($menus);
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><input name="listorder[<?php echo $v['itemid'];?>]" type="text" size="2" value="<?php echo $v['listorder'];?>"/></td>
 <td style="padding:5px 0 5px 0;" title="点击预览"><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&itemid=<?php echo $v['itemid'];?>" target="_blank"><img src="<?php echo $v['thumb'];?>" style="margin:0 0 5px 0;"/><br/>
@@ -77,11 +71,10 @@ show_menu($menus);
 <?php }?>
 </table>
 <div class="btns">
-<input type="submit" value=" 更新排序 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=order';"/>&nbsp;
-<input type="submit" value=" 删 除 " class="btn" onclick="if(confirm('确定要删除选中模板吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<input type="submit" value="更新排序" class="btn-g" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=order';"/>&nbsp;
+<input type="submit" value="删 除" class="btn-r" onclick="if(confirm('确定要删除选中模板吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
 </div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
-<br/>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

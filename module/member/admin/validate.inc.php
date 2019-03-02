@@ -105,7 +105,7 @@ switch($action) {
 				}
 				$content = '您的'.$V[$fd].'已经通过审核';
 				if($reason) $content .= ','.$reason;
-				if($sms) send_sms($t['mobile'], $content.$DT['sms_sign']);
+				if($sms) send_sms($user['mobile'], $content.$DT['sms_sign']);
 				if($wec) send_weixin($user['username'], $content);
 				$i++;
 			}
@@ -116,13 +116,15 @@ switch($action) {
 		$sfields = array('按条件', '会员名', '资料内容');
 		$dfields = array('username', 'username', 'content');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
@@ -219,15 +221,17 @@ switch($action) {
 		$sfields = array('按条件', '认证项', '会员名', '操作人');
 		$dfields = array('title', 'title', 'username', 'editor');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($type) or $type = '';
 		$status = isset($status) ? intval($status) : 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($action) $condition .= " AND type='$action'";
 		if($status) $condition .= " AND status=$status";
 		if($page > 1 && $sum) {

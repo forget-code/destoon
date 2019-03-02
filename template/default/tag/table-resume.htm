@@ -5,11 +5,11 @@
 		<td align="left">{$t[catname]}</td>
 		<td width="100" align="center">
 		{if $t[minsalary] && $t[maxsalary]}
-			{$t[minsalary]}-{$t[maxsalary]}{$DT[money_unit]}/月
+			{$t[minsalary]}-{$t[maxsalary]}元/月
 		{elseif $t[minsalary]}
-			{$t[minsalary]}{$DT[money_unit]}/月以上
+			{$t[minsalary]}元/月以上
 		{elseif $t[maxsalary]}
-			{$t[maxsalary]}{$DT[money_unit]}/月以内
+			{$t[maxsalary]}元/月以内
 		{else}
 			面议
 		{/if}

@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function guest_log(id) {
@@ -22,7 +22,7 @@ function safe_input(v) {
 	}
 	return false;
 }
-var guest_ids = ['company', 'truename', 'telephone', 'mobile', 'email', 'address', 'postcode', 'qq', 'ali', 'msn', 'skype', 'receive'];
+var guest_ids = ['company', 'truename', 'telephone', 'mobile', 'email', 'address', 'postcode', 'qq', 'wx', 'ali', 'skype', 'receive'];
 for(var i in guest_ids) {
 	guest_log(guest_ids[i]);
 }

@@ -3,7 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('模块设置'),
-    array('模板管理', 'javascript:Dwidget(\'?file=template&dir='.$module.'\', \'['.$MOD['name'].']模板管理\');'),
+    array('更新数据', '?moduleid=3&file=html'),
 );
 show_menu($menus);
 ?>
@@ -15,7 +15,7 @@ show_menu($menus);
 <input type="hidden" name="setting[weixin]" value="<?php echo $weixin;?>"/>
 <div id="Tabs0" style="display:">
 <div class="tt">通用设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">列表页地址规则</td>
 <td>
@@ -39,7 +39,7 @@ show_menu($menus);
 </table>
 <a name="mobile"></a>
 <div class="tt">手机版设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">手机版功能</td>
 <td>
@@ -83,22 +83,14 @@ show_menu($menus);
 </table>
 <a name="spread"></a>
 <div class="tt">排名推广</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr> 
 <td class="tl">排名推广绑定域名</td>
 <td><input name="setting[spread_domain]"  type="text" size="30" value="<?php echo $spread_domain;?>"/><?php tips('例如 http://spread.destoon.com/<br/>请将此域名绑定至网站spread目录');?></td>
 </tr>
 <tr> 
-<td class="tl">供应排名起价</td>
-<td><input name="setting[spread_sell_price]"  type="text" size="5" value="<?php echo $spread_sell_price;?>"/></td>
-</tr>
-<tr> 
-<td class="tl">求购排名起价</td>
-<td><input name="setting[spread_buy_price]"  type="text" size="5" value="<?php echo $spread_buy_price;?>"/></td>
-</tr>
-<tr>
-<td class="tl">公司排名起价</td>
-<td><input name="setting[spread_company_price]"  type="text" size="5" value="<?php echo $spread_company_price;?>"/></td>
+<td class="tl">排名默认起价</td>
+<td><input name="setting[spread_price]"  type="text" size="5" value="<?php echo $spread_price;?>"/></td>
 </tr>
 <tr>
 <td class="tl">加价幅度</td>
@@ -123,7 +115,7 @@ show_menu($menus);
 <td class="tl">历史排名列表</td>
 <td>
 <input type="radio" name="setting[spread_list]" value="1"  <?php if($spread_list) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[spread_list]" value="0"  <?php if(!$spread_list) echo 'checked';?>/> 关闭
+<input type="radio" name="setting[spread_list]" value="0"  <?php if(!$spread_list) echo 'checked';?>/> 关闭 <?php tips('如果选择关闭，只显示最新的第一页推广记录，并且不显示分页');?>
 </td>
 </tr>
 <tr>
@@ -137,7 +129,7 @@ show_menu($menus);
 
 <a name="ad"></a>
 <div class="tt">广告设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">广告功能</td>
 <td>
@@ -174,7 +166,7 @@ show_menu($menus);
 
 <a name="announce"></a>
 <div class="tt">公告设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">公告功能</td>
 <td>
@@ -190,7 +182,7 @@ show_menu($menus);
 
 <a name="link"></a>
 <div class="tt">友情链接</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">友情链接功能</td>
 <td>
@@ -218,7 +210,7 @@ show_menu($menus);
 
 <a name="comment"></a>
 <div class="tt">评论设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr> 
 <td class="tl">评论绑定域名</td>
 <td><input name="setting[comment_domain]"  type="text" size="30" value="<?php echo $comment_domain;?>"/><?php tips('例如 http://comment.destoon.com/<br/>请将此域名绑定至网站comment目录');?></td>
@@ -346,7 +338,7 @@ show_menu($menus);
 
 <a name="guestbook"></a>
 <div class="tt">留言设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">留言功能</td>
 <td>
@@ -373,13 +365,17 @@ show_menu($menus);
 
 <a name="gift"></a>
 <div class="tt">积分换礼设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">积分换礼功能</td>
 <td>
 <input type="radio" name="setting[gift_enable]" value="1"  <?php if($gift_enable) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[gift_enable]" value="0"  <?php if(!$gift_enable) echo 'checked';?>/> 关闭
 </td>
+</tr>
+<tr>
+<td class="tl">两次兑换时间间隔</td>
+<td><input type="text" size="5" name="setting[gift_time]" value="<?php echo $gift_time;?>"/> 秒</td>
 </tr>
 <tr> 
 <td class="tl">积分换礼绑定域名</td>
@@ -389,7 +385,7 @@ show_menu($menus);
 
 <a name="vote"></a>
 <div class="tt">投票设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">投票功能</td>
 <td>
@@ -405,7 +401,7 @@ show_menu($menus);
 
 <a name="poll"></a>
 <div class="tt">票选设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">票选功能</td>
 <td>
@@ -421,7 +417,7 @@ show_menu($menus);
 
 <a name="form"></a>
 <div class="tt">表单设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">表单功能</td>
 <td>
@@ -437,7 +433,7 @@ show_menu($menus);
 
 <a name="archiver"></a>
 <div class="tt">无图版设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">无图版功能</td>
 <td>
@@ -453,7 +449,7 @@ show_menu($menus);
 
 <a name="feed"></a>
 <div class="tt">RSS设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">RSS功能</td>
 <td>
@@ -474,7 +470,7 @@ show_menu($menus);
 
 <a name="sitemaps"></a>
 <div class="tt">Sitemaps</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">生成Sitemaps</td>
 <td>
@@ -549,7 +545,7 @@ show_menu($menus);
 
 <a name="baidunews"></a>
 <div class="tt">百度新闻(Baidu News) - 互联网新闻开放协议</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">生成百度新闻</td>
 <td>
@@ -584,26 +580,15 @@ show_menu($menus);
 </table>
 </div>
 <div class="sbt">
-<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
+<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 </form>
 <script type="text/javascript">
 var tab = <?php echo $tab;?>;
-var all = <?php echo $all;?>;
-function TabAll() {
-	var i = 0;
-	while(1) {
-		if(Dd('Tabs'+i) == null) break;
-		Dd('Tabs'+i).style.display = all ? (i == tab ? '' : 'none') : '';
-		i++;
-	}
-	Dd('ShowAll').value = all ? '展 开' : '合 并';
-	all = all ? 0 : 1;
-}
-window.onload=function() {
+var scr = '<?php echo $action;?>'
+$(function(){
 	if(tab) Tab(tab);
-	if(all) {all = 0; TabAll();}
-}
+	if(scr) $('html,body').animate({scrollTop:$("[name='"+scr+"']").offset().top}, 500);
+});
 </script>
 <?php include tpl('footer');?>

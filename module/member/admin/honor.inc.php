@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/honor.class.php';
+require DT_ROOT.'/module/'.$module.'/honor.class.php';
 $do = new honor();
 $menus = array (
     array('添加证书', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),

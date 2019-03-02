@@ -2,6 +2,7 @@
 require '../../common.inc.php';
 require DT_ROOT.'/api/weixin/init.inc.php';
 if($wx->signature()) {
+	isset($HTTP_RAW_POST_DATA) or $HTTP_RAW_POST_DATA = file_get_contents("php://input");
 	if($HTTP_RAW_POST_DATA) {
 		if(function_exists('libxml_disable_entity_loader')) libxml_disable_entity_loader(true);
 		$x = simplexml_load_string($HTTP_RAW_POST_DATA, 'SimpleXMLElement', LIBXML_NOCDATA);
@@ -30,7 +31,7 @@ if($wx->signature()) {
 							$tags['title'] = '会员中心';
 							$tags['description'] = $WX['bind'];
 							$tags['picurl'] = DT_PATH.'api/weixin/image/top_bind.jpg';
-							$tags['url'] = $EXT['mobile_url'].'weixin.php?action=member&auth='.encrypt("$FromUserName", DT_KEY.'WXID');
+							$tags['url'] = DT_MOB.'api/weixin.php?action=member&auth='.encrypt("$FromUserName", DT_KEY.'WXID');
 							$misc[] = $tags;						
 							$wx->response($FromUserName, $ToUserName, 'news', '', $misc);
 						break;
@@ -38,26 +39,26 @@ if($wx->signature()) {
 							if(substr($EventKey, 0, 5) == 'V_mid') {
 								$mid = intval(substr($EventKey, 5));
 								$mod = $MODULE[$mid]['module'];
-								if(in_array($mod, array('quote', 'exhibit', 'article', 'job', 'know', 'brand', 'group', 'video', 'photo'))) {
+								if(in_array($mod, array('article', 'brand', 'club', 'down', 'exhibit', 'group', 'job', 'know', 'photo', 'quote', 'special', 'video'))) {
 									$post['content'] = $EventKey;
 									$misc = array();
-									$result = $db->query("SELECT itemid,title,thumb,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level=2 ORDER BY addtime DESC LIMIT 1");
+									$result = $db->query("SELECT itemid,title,thumb,linkurl,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level=2 ORDER BY addtime DESC LIMIT 1");
 									while($r = $db->fetch_array($result)) {
 										$tags = array();
 										$tags['title'] = $r['title'];
 										$tags['description'] = '';
 										$tags['picurl'] = $r['thumb'];
-										$tags['url'] = $EXT['mobile_url'].'index.php?moduleid='.$mid.'&itemid='.$r['itemid'];
+										$tags['url'] = strpos($r['linkurl'], '://') === false ? $MODULE[$mid]['mobile'].$r['linkurl'] : $r['linkurl'];
 										$misc[] = $tags;
 									}
 									if($misc) {
-										$result = $db->query("SELECT itemid,title,thumb,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level=1 ORDER BY addtime DESC LIMIT 3");
+										$result = $db->query("SELECT itemid,title,thumb,linkurl,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level=1 ORDER BY addtime DESC LIMIT 3");
 										while($r = $db->fetch_array($result)) {
 											$tags = array();
 											$tags['title'] = $r['title'];
 											$tags['description'] = '';
 											$tags['picurl'] = $r['thumb'];
-											$tags['url'] = $EXT['mobile_url'].'index.php?moduleid='.$mid.'&itemid='.$r['itemid'];
+											$tags['url'] = strpos($r['linkurl'], '://') === false ? $MODULE[$mid]['mobile'].$r['linkurl'] : $r['linkurl'];
 											$misc[] = $tags;
 										}					
 										$wx->response($FromUserName, $ToUserName, 'news', '', $misc);
@@ -65,13 +66,13 @@ if($wx->signature()) {
 								} else if(in_array($mod, array('sell', 'buy', 'info', 'mall'))) {
 									$post['content'] = $EventKey;
 									$misc = array();
-									$result = $db->query("SELECT itemid,title,thumb,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level>0 ORDER BY addtime DESC LIMIT 4");
+									$result = $db->query("SELECT itemid,title,thumb,linkurl,level FROM ".get_table($mid)." WHERE status=3 AND thumb<>'' AND level>0 ORDER BY addtime DESC LIMIT 4");
 									while($r = $db->fetch_array($result)) {
 										$tags = array();
 										$tags['title'] = $r['title'];
 										$tags['description'] = '';
 										$tags['picurl'] = str_replace('.thumb.', '.middle.', $r['thumb']);
-										$tags['url'] = $EXT['mobile_url'].'index.php?moduleid='.$mid.'&itemid='.$r['itemid'];
+										$tags['url'] = strpos($r['linkurl'], '://') === false ? $MODULE[$mid]['mobile'].$r['linkurl'] : $r['linkurl'];
 										$misc[] = $tags;
 									}					
 									$wx->response($FromUserName, $ToUserName, 'news', '', $misc);
@@ -89,7 +90,9 @@ if($wx->signature()) {
 					}
 					$user = weixin_user($FromUserName);
 					$info = $wx->get_user($FromUserName);
-					$sql = "subscribe=1,addtime=".$info['subscribe_time'].",edittime=$DT_TIME,visittime=$DT_TIME";
+					$stime = intval($info['subscribe_time']);
+					$stime > 0 or $stime = $DT_TIME;
+					$sql = "subscribe=1,addtime=$stime,edittime=$DT_TIME,visittime=$DT_TIME";
 					foreach(array('nickname', 'sex', 'city', 'province', 'country', 'language', 'headimgurl') as $v) {
 						if(isset($info[$v])) $sql .= ",".$v."='".addslashes($info[$v])."'";
 					}
@@ -144,10 +147,19 @@ if($wx->signature()) {
 		} else {//消息
 			switch($MsgType) {
 				case 'text'://文本消息
-					$Content = convert("$x->Content", 'UTF-8', DT_CHARSET);
+					$Content = "$x->Content";
 					$post['content'] = $Content;
-					if($Content == '签到') $credit_add = 1;
-					//自动回复
+					if($Content == '签到') {
+						$credit_add = 1;
+					} else {
+						//自动回复
+						$t = $db->get_one("SELECT * FROM {$DT_PRE}weixin_auto WHERE keyword='$Content'");
+						if($t) {
+							$wx->response($FromUserName, $ToUserName, 'text', $t['reply']);
+						} else if($WX['auto']) {
+							$wx->response($FromUserName, $ToUserName, 'text', $WX['auto']);
+						}
+					}
 				break;
 				case 'image'://图片消息
 					$post['content'] = $x->PicUrl;
@@ -164,15 +176,15 @@ if($wx->signature()) {
 					$post['misc']['MediaId'] = "$x->MediaId";
 				break;
 				case 'location'://地理位置消息
-					$post['content'] = convert("$x->Label", 'UTF-8', DT_CHARSET);
+					$post['content'] = "$x->Label";
 					$post['misc']['Location_X'] = "$x->Location_X";
 					$post['misc']['Location_Y'] = "$x->Location_Y";
 					$post['misc']['Scale'] = "$x->Scale";
 				break;
 				case 'link'://链接消息
 					$post['content'] = $x->Url;
-					$post['misc']['Title'] = convert("$x->Title", 'UTF-8', DT_CHARSET);
-					$post['misc']['Description'] = convert("$x->Description", 'UTF-8', DT_CHARSET);
+					$post['misc']['Title'] = "$x->Title";
+					$post['misc']['Description'] = "$x->Description";
 				break;
 				default:
 				break;

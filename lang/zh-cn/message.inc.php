@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -38,7 +38,7 @@ $L['pass_telephone'] = '请填写电话号码';
 $L['pass_mobile'] = '请填写手机号码';
 $L['pass_email'] = '请填写电子邮件';
 $L['pass_qq'] = '请填写正确的QQ';
-$L['pass_msn'] = '请填写正确的MSN';
+$L['pass_wx'] = '请填写正确的微信';
 $L['pass_down_fileurl'] = '请上传文件或填写地址';
 $L['pass_down_badurl'] = '文件地址错误';
 $L['pass_down_filesize'] = '请填写文件大小';

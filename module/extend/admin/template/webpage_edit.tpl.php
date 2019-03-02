@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>单页</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 单页标题</td>
 <td><input name="post[title]" type="text" id="title" size="50" value="<?php echo $title;?>"/> <?php echo dstyle('post[style]', $style);?>&nbsp; <?php echo level_select('post[level]', '级别', $level);?> &nbsp;<input type="checkbox" name="post[islink]" value="1" id="islink" onclick="_islink();"  <?php if($islink) echo 'checked';?>/> 外部链接 <br/><span id="dtitle" class="f_red"></span></td>
@@ -66,7 +65,7 @@ show_menu($menus);
 <td><?php echo tpl_select('webpage', $module, 'post[template]', '默认模板', $template);?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

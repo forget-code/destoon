@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -19,13 +19,10 @@ if($submit) {
 }
 
 class banword {
-	var $db;
 	var $table;	
 
 	function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'banword';
-		$this->db = &$db;
+		$this->table = DT_PRE.'banword';
 	}
 
 	function banword() {
@@ -34,10 +31,10 @@ class banword {
 
 	function get_list($condition) {
 		global $pages, $page, $pagesize, $offset, $pagesize;
-		$pages = pages($this->db->count($this->table, $condition), $page, $pagesize);
+		$pages = pages(DB::count($this->table, $condition), $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY bid DESC LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY bid DESC LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -65,7 +62,7 @@ class banword {
 			$f = trim($f);
 			if($f) {
 				$t = isset($T[$k]) ? trim($T[$k]) : '';
-				if($f != $t) $this->db->query("INSERT INTO {$this->table} (replacefrom,replaceto,deny) VALUES('$f','$t','$post[deny]')");
+				if($f != $t) DB::query("INSERT INTO {$this->table} (replacefrom,replaceto,deny) VALUES('$f','$t','$post[deny]')");
 			}
 		}
 	}
@@ -74,12 +71,12 @@ class banword {
 		foreach($post as $k=>$v) {
 			if(!$v['replacefrom']) continue;
 			$v['deny'] = $v['deny'] ? 1 : 0;
-			if($v['replacefrom'] != $v['replaceto']) $this->db->query("UPDATE {$this->table} SET replacefrom='$v[replacefrom]',replaceto='$v[replaceto]',deny='$v[deny]' WHERE bid='$k'");
+			if($v['replacefrom'] != $v['replaceto']) DB::query("UPDATE {$this->table} SET replacefrom='$v[replacefrom]',replaceto='$v[replaceto]',deny='$v[deny]' WHERE bid='$k'");
 		}
 	}
 
 	function delete($bid) {
-		$this->db->query("DELETE FROM {$this->table} WHERE bid=$bid");
+		DB::query("DELETE FROM {$this->table} WHERE bid=$bid");
 	}
 }
 ?>

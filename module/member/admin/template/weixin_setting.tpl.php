@@ -3,12 +3,11 @@ defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">帐号设置</div>
 <form method="post">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">APPID</td>
 <td><input name="setting[appid]" type="text" size="30" value="<?php echo $appid;?>"/></td>
@@ -43,6 +42,11 @@ show_menu($menus);
 </td>
 </tr>
 <tr>
+<td class="tl">自动回复用户信息</td>
+<td><textarea name="setting[auto]" style="width:400px;height:50px;"><?php echo $auto;?></textarea>
+</td>
+</tr>
+<tr>
 <td class="tl">绑定会员描述信息</td>
 <td><textarea name="setting[bind]" style="width:400px;height:50px;"><?php echo $bind;?></textarea>
 </td>
@@ -53,9 +57,9 @@ show_menu($menus);
 </tr>
 </table>
 <div class="sbt">
-<input type="submit" name="submit" value=" 提 交 " class="btn"/>
+<input type="submit" name="submit" value="保 存" class="btn-g"/>
 </div>
 </form>
 <br/>
-<script type="text/javascript">Menuon(4);</script>
+<script type="text/javascript">Menuon(5);</script>
 <?php include tpl('footer');?>

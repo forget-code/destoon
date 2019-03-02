@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -10,13 +10,13 @@ function dmail($mail_to, $mail_subject, $mail_body, $mail_from = '', $mail_sign 
 	if($DT['mail_sign'] && $mail_sign) $mail_body .= $DT['mail_sign'];
 	if($DT['mail_type'] == 'sc') {
 		$url = 'http://sendcloud.sohu.com/webapi/mail.send.json';
-		$par = 'api_user='.$DT['smtp_user'].'&api_key='.$DT['smtp_pass'].'&from='.$DT['mail_sender'].'&fromname='.convert($DT['mail_name'], DT_CHARSET, 'UTF-8').'&to='.$mail_to.'&subject='.convert($mail_subject, DT_CHARSET, 'UTF-8').'&html='.convert($mail_body, DT_CHARSET, 'UTF-8');
+		$par = 'api_user='.$DT['smtp_user'].'&api_key='.$DT['smtp_pass'].'&from='.$DT['mail_sender'].'&fromname='.$DT['mail_name'].'&to='.$mail_to.'&subject='.$mail_subject.'&html='.$mail_body;
 		$rec = dcurl($url, $par);
 		$arr = json_decode($rec, true);
 		if($arr['message'] == 'success') return 'SUCCESS';		
 		$errmsg = '';
 		foreach($arr['errors'] as $v) {
-			$errmsg .= convert($v, 'UTF-8', DT_CHARSET)."\n";
+			$errmsg .= $v."\n";
 		}
 		$errmsg = trim($errmsg);
 		if(defined('TESTMAIL')) dalert('Error:'.$errmsg);

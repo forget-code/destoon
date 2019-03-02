@@ -18,8 +18,7 @@ show_menu($menusad);
 <input type="hidden" name="ad[pid]" value="<?php echo $p['pid'];?>"/>
 <input type="hidden" name="ad[typeid]" value="<?php echo $p['typeid'];?>"/>
 <input type="hidden" name="ad[key_moduleid]" value="<?php echo $p['moduleid'];?>"/>
-<div class="tt">添加广告</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 广告位</td>
 <td class="f_b">&nbsp;<?php echo $p['name'];?></td>
@@ -34,7 +33,7 @@ show_menu($menusad);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 广告介绍</td>
-<td><input name="ad[introduce]" type="text" size="60" /></td>
+<td><input name="ad[introduce]" type="text" size="50" /></td>
 </tr>
 <?php if($p['typeid'] == 1) { ?>
 <tr>
@@ -45,27 +44,27 @@ show_menu($menusad);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 上传文件</td>
-<td class="f_gray"><input type="text" size="60" id="upload"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('upload').value, 'upload');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('upload').value) window.open(Dd('upload').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('upload').value='';" class="jt">[删除]</span><?php tips('从这里上传文件后，把地址复制到代码里即可使用');?></td>
+<td class="f_gray"><input type="text" size="50" id="upload"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('upload').value, 'upload');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('upload').value) window.open(Dd('upload').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('upload').value='';" class="jt">[删除]</span><?php tips('从这里上传文件后，把地址复制到代码里即可使用');?></td>
 </tr>
 <?php } ?>
 <?php if($p['typeid'] == 2) { ?>
 <tr>
 <td class="tl"><span class="f_red">*</span> 链接文字</td>
-<td class="f_gray"><input type="text" size="60" name="ad[text_name]" id="text_name"/> <?php echo dstyle('ad[text_style]');?> [支持HTML语法] <span id="dtext_name" class="f_red"></span></td>
+<td class="f_gray"><input type="text" size="50" name="ad[text_name]" id="text_name"/> <?php echo dstyle('ad[text_style]');?> [支持HTML语法] <span id="dtext_name" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 链接地址</td>
-<td><input type="text" size="60" name="ad[text_url]" id="text_url"/> <span id="dtext_url" class="f_red"></span></td>
+<td><input type="text" size="50" name="ad[text_url]" id="text_url"/> <span id="dtext_url" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> Title提示</td>
-<td><input type="text" size="60" name="ad[text_title]"/></td>
+<td><input type="text" size="50" name="ad[text_title]"/></td>
 </tr>
 <?php } ?>
 <?php if($p['typeid'] == 3 || $p['typeid'] == 5) { ?>
 <tr>
 <td class="tl"><span class="f_red">*</span> 图片地址</td>
-<td class="f_gray"><input type="text" size="60" name="ad[image_src]" id="thumb"/>&nbsp;&nbsp;<span onclick="Dthumb(<?php echo $moduleid;?>,<?php echo $p['width'];?>,<?php echo $p['height'];?>, Dd('thumb').value);" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="_preview(Dd('thumb').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('thumb').value='';" class="jt">[删除]</span> <span id="dthumb" class="f_red"></span></td>
+<td class="f_gray"><input type="text" size="50" name="ad[image_src]" id="thumb"/>&nbsp;&nbsp;<span onclick="Dthumb(<?php echo $moduleid;?>,<?php echo $p['width'];?>,<?php echo $p['height'];?>, Dd('thumb').value);" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="_preview(Dd('thumb').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('thumb').value='';" class="jt">[删除]</span> <span id="dthumb" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 链接地址</td>
@@ -79,12 +78,12 @@ show_menu($menusad);
 <?php if($p['typeid'] == 4) { ?>
 <tr>
 <td class="tl"><span class="f_red">*</span> Flash地址</td>
-<td class="f_gray"><input type="text" size="60" name="ad[flash_src]" id="flash"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('flash').value, 'flash');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('flash').value) window.open(Dd('flash').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('flash').value='';" class="jt">[删除]</span> <span id="dflash" class="f_red"></span></td>
+<td class="f_gray"><input type="text" size="50" name="ad[flash_src]" id="flash"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('flash').value, 'flash');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('flash').value) window.open(Dd('flash').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('flash').value='';" class="jt">[删除]</span> <span id="dflash" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 循环播放</td>
 <td>
-<input type="radio" name="ad[flash_loop]" value="1" checked/> 是&nbsp;&nbsp;
+<input type="radio" name="ad[flash_loop]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="ad[flash_loop]" value="0"/> 否
 </td>
 </tr>
@@ -134,7 +133,7 @@ show_menu($menusad);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 上传文件</td>
-<td class="f_gray"><input type="text" size="60" id="upload"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('upload').value, 'upload');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('upload').value) window.open(Dd('upload').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('upload').value='';" class="jt">[删除]</span><?php tips('从这里上传文件后，把地址复制到代码里即可使用');?></td>
+<td class="f_gray"><input type="text" size="50" id="upload"/>&nbsp;&nbsp;<span onclick="Dfile(<?php echo $moduleid;?>, Dd('upload').value, 'upload');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('upload').value) window.open(Dd('upload').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('upload').value='';" class="jt">[删除]</span><?php tips('从这里上传文件后，把地址复制到代码里即可使用');?></td>
 </tr>
 <?php } ?>
 <tr>
@@ -165,24 +164,24 @@ show_menu($menusad);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 备注</td>
-<td><input name="ad[note]" type="text" size="60" /></td>
+<td><input name="ad[note]" type="text" size="50" /></td>
 </tr>
 <tr style="display:<?php if($p['typeid'] < 2 || $p['typeid'] > 6) echo 'none';?>">
 <td class="tl"><span class="f_hid">*</span> 点击统计</td>
 <td>
-<input type="radio" name="ad[stat]" value="1"/> 开启&nbsp;&nbsp;&nbsp;
+<input type="radio" name="ad[stat]" value="1"/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="ad[stat]" value="0" checked/> 关闭
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 广告状态</td>
 <td>
-<input type="radio" name="ad[status]" value="3" checked/> 已通过
+<input type="radio" name="ad[status]" value="3" checked/> 已通过&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="ad[status]" value="2"/> 审核中
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="添 加" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=list&pid=<?php echo $pid;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

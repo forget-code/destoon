@@ -3,16 +3,15 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">发送信件</div>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 发送类型</td>
 <td>
-<input type="radio" name="message[type]" value="1" onclick="Dd('group').style.display='';Dd('member').style.display='none';" checked id="type_1"/><label for="type_1"> 系统群发</label>
+<input type="radio" name="message[type]" value="1" onclick="Dd('group').style.display='';Dd('member').style.display='none';" checked id="type_1"/><label for="type_1"> 系统群发</label>&nbsp;&nbsp;
 <input type="radio" name="message[type]" value="0" onclick="Dd('group').style.display='none';Dd('member').style.display='';" id="type_0"/><label for="type_0"> 指定收件人</label>
 </td>
 </tr>
@@ -36,7 +35,7 @@ show_menu($menus);
 </tr>
 </tbody>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

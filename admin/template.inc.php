@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -15,8 +15,10 @@ $menus = array (
 isset($bakid) or $bakid = '';
 isset($fileid) or $fileid = '';
 $this_forward = '?file='.$file.'&dir='.$dir;
-$template_root = DT_ROOT.'/template/'.$CFG['template'].'/'.$dir;
-$template_path = 'template/'.$CFG['template'].'/'.$dir;
+$tpl = get_cookie('tpl');
+$tpl = check_name($tpl) ? $tpl : $CFG['template'];
+$template_root = DT_ROOT.'/template/'.$tpl.'/'.$dir;
+$template_path = 'template/'.$tpl.'/'.$dir;
 @include $template_root.'/these.name.php';
 
 function template_name($fileid = '', $name = '') {
@@ -36,10 +38,10 @@ function template_safe($content) {
 	if(preg_match_all("/script([^>]+)>/i", $content, $matches)) {
 		foreach($matches[1] as $m) {
 			$m = strtolower($m);
-			if(strpos($m, 'language') !== false || strpos($m, 'php') !== false) msg('模板内容包含不安全写法，禁止在线修改');
+			if(strpos($m, 'language') !== false || strpos($m, 'php') !== false) msg('模板内容包含不安全写法，禁止在线修改或预览');
 		}
 	}
-	if(preg_match("/(\<\?|\{php|file\(|eval|copy|file_put|file_get|fopen|fwrite|fread)/i", $content)) msg('模板内容包含不安全写法，禁止在线修改');
+	if(preg_match("/(\<\?|\{php|file\(|eval|copy|file_put|file_get|fopen|fwrite|fread)/i", $content)) msg('模板内容包含不安全写法，禁止在线修改或预览');
 	return $content;
 }
 
@@ -114,7 +116,6 @@ switch($action) {
 	case 'template_name':
 		$fileid or exit('0');
 		$name or exit('0');
-		$name = convert($name, 'UTF-8', DT_CHARSET);
 		template_name($fileid, $name);
 		exit('1');
 	break;
@@ -133,6 +134,14 @@ switch($action) {
 	case 'cache':
 		cache_clear('php', 'dir', 'tpl');
 		dmsg('更新成功', $this_forward);	
+	break;
+	case 'change':
+		$to = check_name($to) ? $to : '';
+		if($to && is_dir(DT_ROOT.'/template/'.$to.'/')) {
+			if($to == $CFG['template']) $to = '';
+			set_cookie('tpl', $to);
+		}
+		dmsg('切换成功', $this_forward);	
 	break;
 	default:
 		$dirs = $files = $templates = $baks = array();

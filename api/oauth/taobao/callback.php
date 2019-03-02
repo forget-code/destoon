@@ -12,7 +12,7 @@ if(strpos($rec, 'access_token') !== false) {
 	$arr = json_decode($rec, true);
 	$_SESSION['tb_access_token'] = $arr['access_token'];
 	$_SESSION['tb_openid'] = $arr['taobao_user_id'];
-	$_SESSION['tb_nickname'] = convert(urldecode($arr['taobao_user_nick']), 'UTF-8', DT_CHARSET);
+	$_SESSION['tb_nickname'] = urldecode($arr['taobao_user_nick']);
 	dheader('index.php?time='.$DT_TIME);
 } else {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);

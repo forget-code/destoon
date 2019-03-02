@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -23,7 +23,7 @@ switch($action) {
 			dmsg('更新成功', $forward);
 		} else {
 			if($areaid) {
-				@extract($do->get_one());
+				extract($do->get_one());
 			} else {
 				$areaid = $listorder = 0;
 				$name = $style = $letter = $domain = $iparea = $template = $seo_title = $seo_keywords = $seo_description = '';
@@ -37,7 +37,7 @@ switch($action) {
 			$letter = $do->letter($r['name']);
 			$db->query("UPDATE {$DT_PRE}city SET letter='$letter' WHERE areaid=$r[areaid]");
 		}
-		dmsg('更新成功', '?file='.$file);
+		dmsg('更新成功', $forward);
 	break;
 	case 'delete':
 		if($areaid) $areaids = $areaid;
@@ -61,13 +61,11 @@ switch($action) {
 
 class city {
 	var $areaid;
-	var $db;
 	var $table;
 
 	function __construct($areaid = 0)	{
-		global $db, $city;
-		$this->db = &$db;
-		$this->table = $this->db->pre.'city';
+		global $city;
+		$this->table = DT_PRE.'city';
 		$this->areaid = $areaid;
 	}
 
@@ -84,7 +82,7 @@ class city {
 			$sql2 .= $s."'".$v."'";
 			$s = ',';
 		}
-		$this->db->query("REPLACE INTO {$this->table} ($sql1) VALUES ($sql2)");		
+		DB::query("REPLACE INTO {$this->table} ($sql1) VALUES ($sql2)");		
 		return true;
 	}
 
@@ -100,12 +98,12 @@ class city {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE areaid=$areaid");	
+	    DB::query("UPDATE {$this->table} SET $sql WHERE areaid=$areaid");	
 		return true;
 	}
 	
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE areaid=$this->areaid");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE areaid=$this->areaid");
 	}
 
 	function get_list($condition) {
@@ -113,13 +111,13 @@ class city {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY letter,listorder LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY letter,listorder LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['linkurl'] = DT_PATH.'api/city.php?action=go&forward=&areaid='.$r['areaid'];
 			$lists[] = $r;
 		}
@@ -128,7 +126,7 @@ class city {
 
 	function delete($areaids) {
 		$areaids = is_array($areaids) ? implode(',', $areaids) : $areaids;
-		$this->db->query("DELETE FROM {$this->table} WHERE areaid IN ($areaids)");
+		DB::query("DELETE FROM {$this->table} WHERE areaid IN ($areaids)");
 		return true;
 	}
 

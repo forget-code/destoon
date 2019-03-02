@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -69,11 +69,10 @@ class remote {
     }
 
     function set_savename($savename) {
-		global $DT_TIME;
         if($savename) {
             $this->savename = $this->adduserid ? str_replace('.'.$this->ext, $this->userid.'.'.$this->ext, $savename) : $savename;
         } else {
-			$this->uptime = $DT_TIME;
+			$this->uptime = DT_TIME;
             $name = date('His', $this->uptime).rand(10, 99);
             $this->savename = $this->adduserid ? $name.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
         }

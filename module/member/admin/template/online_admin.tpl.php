@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">在线管理员</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th width="60">头像</th>
 <th>会员名</th>
@@ -15,7 +14,7 @@ show_menu($menus);
 <th>URL</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><img src="<?php echo useravatar($v['username']);?>" style="padding:5px;" width="48" height="48"/></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>')"><span<?php echo $sid == $v['sid'] ? ' style="color:red;" title="我"' : '';?>><?php echo $v['username'];?></span></a></td>
 <td><a href="<?php echo $MODULE[$v['moduleid']]['linkurl'];?>" target="_blank"><?php echo $MODULE[$v['moduleid']]['name'];?></a></td>
@@ -26,6 +25,5 @@ show_menu($menus);
 </tr>
 <?php }?>
 </table>
-<br/>
 <script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

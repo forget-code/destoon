@@ -8,11 +8,11 @@ $menus = array (
 );
 $P = $pid ? $db->get_one("SELECT * FROM {$table_product} WHERE itemid=$pid") : array();
 $M = ($P && $P['market']) ? explode('|', '所属市场|'.$P['market']) : array();
-require MD_ROOT.'/price.class.php';
+require DT_ROOT.'/module/'.$module.'/price.class.php';
 $do = new price;
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('公司', '会员', 'IP', '电话', 'QQ', '编辑', '备注');
-	$dfields = array('company', 'username', 'ip', 'telephone', 'qq', 'editor', 'note');
+	$sfields = array('公司', '会员', 'IP', '电话', 'QQ', '微信', '编辑', '备注');
+	$dfields = array('company', 'username', 'ip', 'telephone', 'qq', 'wx', 'editor', 'note');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '报价降序', '报价升序');
 	$dorder  = array('addtime DESC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'price DESC', 'price ASC');
 		

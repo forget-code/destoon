@@ -1,14 +1,14 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('form', 1);
-require MD_ROOT.'/form.class.php';
+require DT_ROOT.'/module/'.$module.'/form.class.php';
 $do = new form();
 $menus = array (
     array('添加表单', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('表单列表', '?moduleid='.$moduleid.'&file='.$file),
     array('更新地址', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
     array('表单分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'表单分类\');'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 $table = $DT_PRE.'form';
@@ -26,6 +26,7 @@ switch($action) {
 				isset($$v) or $$v = '';
 			}
 			$addtime = timetodate($DT_TIME);
+			$maxanswer = 1;
 			$typeid = 0;
 			$menuid = 0;
 			include tpl('form_edit', $module);
@@ -113,7 +114,6 @@ switch($action) {
 		$do->itemid = $fid;
 		$F = $do->get_one();
 		$F or msg('表单不存在');
-		isset($job) or $job = '';
 		$menus = array (
 			array('添加选项', '?moduleid='.$moduleid.'&file='.$file.'&action=question&fid='.$fid.'&job=add'),
 			array('选项管理', '?moduleid='.$moduleid.'&file='.$file.'&action=question&fid='.$fid),
@@ -252,7 +252,6 @@ switch($action) {
 		$do->itemid = $fid;
 		$F = $do->get_one();
 		$F or msg('表单不存在');
-		isset($job) or $job = '';
 		$menus = array (
 			array('添加选项', '?moduleid='.$moduleid.'&file='.$file.'&action=question&fid='.$fid.'&job=add'),
 			array('选项管理', '?moduleid='.$moduleid.'&file='.$file.'&action=question&fid='.$fid),

@@ -1,57 +1,55 @@
 {template 'header'}
-<script type="text/javascript">var sh = '{$MOD[linkurl]}search.php?catid={$catid}';</script>
-<div class="m">
-<div class="m_l_1 f_l">
-	<div class="left_box">		
-		<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; {cat_pos($CAT, ' &raquo; ')}</div>
-		{if $CP}
-		{loop $PPT $p}
-		<div class="ppt">
-			<table cellpadding="0" cellspacing="0" width="100%">
-			<tr>
-			<td class="ppt_l" valign="top">按{$p[name]}</td>
-			<td class="ppt_r" valign="top">
-			{loop $p[options] $o}
-			<a href="###" onclick="Go(sh+'&ppt_{$p[oid]}={urlencode($o)}');">{$o}</a>&nbsp;|&nbsp;
-			{/loop}
-			</td>
-			</tr>
-			</table>
+<div class="m">	
+	<div class="nav bd-b"><a href="{$MODULE[1][linkurl]}">首页</a> <i>&gt;</i> <a href="{$MOD[linkurl]}">{$MOD[name]}</a> <i>&gt;</i> {cat_pos($CAT, ' <i>&gt;</i> ')}</div>
+</div>
+<div class="m m2">
+	<div class="m2l">
+		<div class="sort">
+			<div class="sort-k">行业</div>
+			<div class="sort-v">
+				<ul>
+				{loop $maincat $k $v}
+				<li{if $v[catid]==$catid} class="on"{/if}><a href="{$MOD[linkurl]}{$v[linkurl]}">{set_style($v[catname],$v[style])}</a>{if !$cityid} <i>({$v[item]})</i>{/if}<li>
+				{/loop}
+				</ul>
+			</div>
+			<div class="c_b"></div>
 		</div>
-		{/loop}
-		{/if}
-		<div class="b10">&nbsp;</div>
+		<div class="sort">
+			<div class="sort-k">地区</div>
+			<div class="sort-v">
+				<ul>
+				{php $mainarea = get_mainarea(0)}
+				{loop $mainarea $k $v}
+				<li><a href="{$MOD[linkurl]}{rewrite('search.php?catid='.$catid.'&areaid='.$v['areaid'])}">{$v[areaname]}</a></li>
+				{/loop}
+				</ul>
+			</div>
+			<div class="c_b"></div>
+		</div>
+		<div class="sort">
+			<div class="sort-k">月份</div>
+			<div class="sort-v">
+				<ul>				
+				{php for($i=1;$i<13;$i++) { }
+				<li><a href="{$MOD[linkurl]}{rewrite('search.php?month='.$i.'&catid='.$catid)}">{$i}月</a></li>
+				{php } }
+				</ul>
+			</div>
+			<div class="c_b"></div>
+		</div>
+		{if $CP}{template 'property_list', 'chip'}{/if}
+		<div class="img_tip" id="img_tip" style="display:none;">&nbsp;</div>
+		{if $page == 1}{ad($moduleid,$catid,$kw,6)}{/if}
 		{if $tags}{template 'list-'.$module, 'tag'}{/if}
 	</div>
-</div>
-<div class="m_n f_l">&nbsp;</div>
-<div class="m_r_1 f_l">
-	<div class="box_head"><div><strong>按分类浏览</strong></div></div>
-	<div class="box_body">
-		<table width="100%" cellpadding="3">
-		{loop $maincat $k $v}
-		<tr>
-		<td{if $v[catid]==$catid} class="f_b"{/if}>{if !$cityid} <span class="f_r f_gray px10">({$v[item]})</span>{/if}<a href="{$MOD[linkurl]}{$v[linkurl]}">{set_style($v[catname],$v[style])}</a></td>
-		</tr>
-		{/loop}
-		</table>
-	</div>
-	<div class="b10 c_b"></div>
-	<div class="box_head"><div><strong>按月查看</strong></div></div>
-	<div class="box_body">
-		<div class="exh_month">
-		{php for($i=1;$i<13;$i++){ $j = $i<10 ? '0'.$i : $i;}
-		<div><a href="{$MOD[linkurl]}{rewrite('search.php?month='.$i.'&catid='.$catid)}" class="g" rel="nofollow">{$j}月</a></div>
-		{php } }
+	<div class="m2r">
+		<div class="sponsor">{ad($moduleid,$catid,$kw,7)}</div>
+		<div class="head-sub"><strong>搜索排行</strong></div>
+		<div class="list-rank">
+			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=$moduleid and status=3 and updatetime>$today_endtime-86400*30&pagesize=9&order=week_search desc&key=week_search&template=list-search_rank")}-->
 		</div>
 	</div>
-	<div class="b10 c_b"></div>
-	<div class="box_head"><div><strong>本月关注排行</strong></div></div>
-	<div class="box_body">
-		<div class="rank_list">
-			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=$moduleid and status>2 and updatetime>$today_endtime-86400*30&pagesize=10&order=month_search desc&key=month_search&template=list-search_rank")}-->
-		</div>		
-	</div>
-</div>
+	<div class="c_b"></div>
 </div>
 {template 'footer'}

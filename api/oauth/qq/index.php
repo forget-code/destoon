@@ -18,7 +18,7 @@ if($_SESSION['qq_access_token']) {
 		if(strpos($rec, 'nickname') !== false) {
 			$success = 1;
 			$arr = json_decode($rec, true);
-			$nickname = convert($arr['nickname'], 'UTF-8', DT_CHARSET);
+			$nickname = $arr['nickname'];
 			$avatar = $arr['figureurl_2'];
 			$url = '';
 			$DS = array('qq_access_token', 'qq_access_time', 'state');

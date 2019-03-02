@@ -1,24 +1,34 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-var _p = 0;
-function AutoTab() {
+var _p0 = _p1 = 0;
+function AutoTab0() {
+	Dd('ian').onmouseover = function() {_p0 = 1;} 
+	Dd('ian').onmouseout = function() {_p0 = 0;}
+	if(_p0) return;
 	var c;
-	Dd('trades').onmouseover = function() {_p = 1;} 
-	Dd('trades').onmouseout = function() {_p = 0;}
-	if(_p) return;
-	for(var i = 1; i < 4; i++) { if(Dd('trade_t_'+i).className == 'tab_2') {c = i;} }
+	for(var i = 1; i < 4; i++) { if(Dd('ian-h-'+i).className == 'on') {c = i;} }
 	c++; 
 	if(c > 3) c = 1;
-	Tb(c, 3, 'trade', 'tab');
+	Tb(Dd('ian-h-'+c));
 }
-if(Dd('trades') != null) window.setInterval('AutoTab()',5000);
-function ipad_tip_close() {
-	Dh('ipad_tips');
-	set_local('ipad_tips', 1);
+function AutoTab1() {
+	Dd('itrade').onmouseover = function() {_p1 = 1;} 
+	Dd('itrade').onmouseout = function() {_p1 = 0;}
+	if(_p1) return;
+	var c;
+	var a = new Array;
+	var i = 0;
+	$('#trade-h').children().each(function() {
+		if($(this).attr('class') == 'on') c = i;
+		a[i++] = $(this).attr('id');
+	});
+	a[i++] = a[0];
+	Tb(Dd(a[c+1]));
 }
-if(Dd('ipad_tips') != null && UA.match(/(iphone|ipad|ipod)/i) && get_local('ipad_tips') != 1) {
-	Ds('ipad_tips');
-	Dd('ipad_tips').innerHTML = '<div class="ipad_tips_logo"><img src="'+DTPath+'apple-touch-icon-precomposed.png" width="50" height="50" alt=""/></div><div class="ipad_tips_text"><strong>把本站添加至主屏幕</strong><br/>请点击工具栏上的<span class="ipad_tips_ico1"></span>或者<span class="ipad_tips_ico2"></span>并选择“添加书签”或者“添加至主屏幕”便于下次直接访问。</div><div class="ipad_tips_hide"><a href="javascript:ipad_tip_close();" class="ipad_tip_close" title="关闭并不再提示">&nbsp;</a></div><div class="c_b"></div>';
-}
+$(function(){
+	if(Dd('brands') != null) new dmarquee(220, 10, 3000, 'brands');
+	if(Dd('ian') != null) window.setInterval('AutoTab0()', 5000);
+	if(Dd('itrade') != null) window.setInterval('AutoTab1()', 8000);
+});

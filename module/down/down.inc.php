@@ -57,9 +57,8 @@ if(isset($mirror)) {
 			if(!in_array($ext, explode('|', $MOD['upload'])) || in_array($ext, array('php', 'sql')) || strpos($localfile, './') !== false) dheader($fileurl);//Safe
 			$title = file_vname($title);
 			$title or dheader($fileurl);
-			if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) $title = convert($title, DT_CHARSET, 'UTF-8');
 			if(strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== false) $title = str_replace(' ', '_', $title);
-			if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false) $title = convert($title, DT_CHARSET, 'GBK');
+			if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'rv:1') !== false) $title = convert($title, DT_CHARSET, 'GBK');
 			$title or dheader($fileurl);
 			file_down($localfile, $title.'.'.$ext);
 		} else {

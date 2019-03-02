@@ -4,7 +4,7 @@ include tpl('header');
 if(!isset($dialog)) show_menu($menus);
 ?>
 <div class="tt">会员资料</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td rowspan="9" align="center" width="160" class="f_gray">
 <img src="<?php echo useravatar($username, 'large');?>" width="128" height="128"/>
@@ -16,14 +16,13 @@ if(!isset($dialog)) show_menu($menus);
 <a href="?moduleid=<?php echo $moduleid;?>&action=move&groupids=2&userid=<?php echo $userid;?>" class="t"<?php if(isset($dialog)) {?> target="_blank"<?php } ?> onclick="return confirm('确定要禁止此会员访问吗？');">禁止访问</a> | 
 <a href="?moduleid=<?php echo $moduleid;?>&action=delete&userid=<?php echo $userid;?>&forward=<?php echo urlencode('?moduleid='.$moduleid);?>" class="t"<?php if(isset($dialog)) {?> target="_blank"<?php } ?> onclick="return confirm('确定要删除此会员吗？系统将删除选中用户所有信息，此操作将不可撤销');">删除会员</a><br/>
 </div>
-
 <?php if($DT['im_web']) { ?><?php echo im_web($username);?> <?php } ?>
 <a href="javascript:Dwidget('?moduleid=2&file=sendmail&email=<?php echo $email;?>', '发送邮件');"><img width="16" height="16" src="<?php echo DT_SKIN;?>image/email.gif" title="发送邮件 <?php echo $email;?>" align="absmiddle"/></a> 
 <?php if($mobile) { ?><a href="javascript:Dwidget('?moduleid=2&file=sendsms&mobile=<?php echo $mobile;?>', '发送短信');"><img src="<?php echo DT_SKIN;?>image/mobile.gif" title="发送短信" align="absmiddle"/></a> <?php } ?>
 <a href="javascript:Dwidget('?moduleid=2&file=message&action=send&touser=<?php echo $username;?>', '发送消息');"><img width="16" height="16" src="<?php echo DT_SKIN;?>image/msg.gif" title="发送消息" align="absmiddle"/></a>
 <?php echo im_qq($qq);?>
+<?php echo im_wx($wx, $username);?>
 <?php echo im_ali($ali);?>
-<?php echo im_msn($msn);?>
 <?php echo im_skype($skype);?>
 </td>
 <td class="tl">会员名</td>
@@ -87,7 +86,7 @@ if(!isset($dialog)) show_menu($menus);
 </tr>
 </table>
 <div class="tt">备注信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <?php
 	if($note) {
 		echo '<tr><th>时间</th><th>内容</th><th width="150">管理员</th></tr>';
@@ -108,7 +107,7 @@ if(!isset($dialog)) show_menu($menus);
 <td class="tl">追加备注</td>
 <td align="center">
 <textarea name="note" style="width:99%;height:20px;overflow:visible;padding:0;"></textarea></td>
-<td align="center" width="130"><input type="submit" name="submit" value="追加" class="btn"/><?php if($_admin == 1) {?>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:$('#edit_note').toggle();" class="t">修改</a><?php } ?></td>
+<td align="center" width="130"><input type="submit" name="submit" value="追加" class="btn-g"/><?php if($_admin == 1) {?>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:$('#edit_note').toggle();" class="t">修改</a><?php } ?></td>
 </tr>
 </form>
 <form method="post" action="?">
@@ -120,26 +119,25 @@ if(!isset($dialog)) show_menu($menus);
 <td class="tl">修改备注</td>
 <td align="center" class="f_gray">
 <textarea name="note" style="width:99%;height:100px;overflow:visible;padding:0;"><?php echo $note;?></textarea><br/>请只修改备注文字，不要改动 | 和 - 符号以及时间和管理员</td>
-<td align="center"><input type="submit" name="submit" value="修改" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&action=note_edit&userid=<?php echo $userid;?>&note=" class="t" onclick="return confirm('确定要清空此会员的备注信息吗？此操作将不可撤销');">清空</a></td>
+<td align="center"><input type="submit" name="submit" value="修改" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&action=note_edit&userid=<?php echo $userid;?>&note=" class="t" onclick="return confirm('确定要清空此会员的备注信息吗？此操作将不可撤销');">清空</a></td>
 </tr>
 </form>
 </table>
 <div class="tt">公司资料</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
+<tr>
+<td class="tl">公司名称</td>
+<td colspan="3">&nbsp;<?php echo $company;?>&nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo DT_PATH;?>api/company.php?wd=<?php echo urlencode($company);?>" target="_blank" class="t">查询</a></td>
+</tr>
 <tr>
 <td class="tl">公司主页</td>
 <td colspan="3">&nbsp;<a href="<?php echo $linkurl;?>" target="_blank" class="t"><?php echo $linkurl;?></a></td>
 </tr>
 <tr>
-<td class="tl">公司名</td>
-<td>&nbsp;<?php echo $company;?></td>
 <td class="tl">公司类型</td>
 <td>&nbsp;<?php echo $type;?></td>
-</tr>
 <td class="tl">经营模式</td>
 <td>&nbsp;<?php echo $mode;?></td>
-<td class="tl">主营范围</td>
-<td>&nbsp;<?php echo $business;?></td>
 </tr>
 <tr>
 <td class="tl">注册资本</td>
@@ -159,26 +157,26 @@ if(!isset($dialog)) show_menu($menus);
 <td class="tl">采购的产品 (需要的服务)</td>
 <td>&nbsp;<?php echo $buy;?></td>
 </tr>
+<tr>
+<td class="tl">主营范围：</td>
+<td colspan="3">&nbsp;<?php echo $business;?></td>
+</tr>
 <?php if($catid) { ?>
 <?php $MOD['linkurl'] = $MODULE[4]['linkurl'];?>
 <tr>
 <td class="tl">主营行业：</td>
 <td colspan="3">
 	<?php $catids = explode(',', substr($catid, 1, -1));?>
-	<table cellpadding="2" cellspacing="2" width="100%">
 	<?php foreach($catids as $i=>$c) { ?>
-	<?php if($i%3==0) echo '<tr>';?>
-	<td width="33%"><?php echo cat_pos(get_cat($c), ' / ', '_blank');?></td>
-	<?php if($i%3==2) echo '</tr>';?>
+	<?php echo cat_pos(get_cat($c), ' / ', '_blank');?>&nbsp;&nbsp;&nbsp;&nbsp;
 	<?php } ?>
-	</table>
 </td>
 </tr>
 <?php } ?>
 </table>
 
 <div class="tt">联系方式</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">姓 名</td>
 <td>&nbsp;<?php echo $truename;?></td>
@@ -210,8 +208,8 @@ if(!isset($dialog)) show_menu($menus);
 <td>&nbsp;<?php echo im_ali($ali);?> <?php echo $ali;?></td>
 </tr>
 <tr>
-<td class="tl">MSN</td>
-<td>&nbsp;<?php echo im_msn($msn);?> <?php echo $msn;?></td>
+<td class="tl">微信</td>
+<td>&nbsp;<?php echo im_wx($wx, $username);?> <?php echo $wx;?></td>
 <td class="tl">Skype</td>
 <td>&nbsp;<?php echo im_skype($skype);?> <?php echo $skype;?></td>
 </tr>
@@ -228,7 +226,7 @@ if(!isset($dialog)) show_menu($menus);
 </table>
 
 <div class="tt">财务信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">开户银行</td>
 <td>&nbsp;<?php echo $bank;?></td>
@@ -256,7 +254,7 @@ if(!isset($dialog)) show_menu($menus);
 </table>
 
 <div class="tt">其他信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">推荐注册人</td>
 <td>&nbsp;<a href="?moduleid=<?php echo $moduleid;?>&action=show&username=<?php echo $inviter;?>" target="_blank"><?php echo $inviter;?></a></td>

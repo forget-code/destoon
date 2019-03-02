@@ -3,11 +3,11 @@ defined('DT_ADMIN') or exit('Access Denied');
 $MCFG = array();
 $MCFG['module'] = 'know';
 $MCFG['name'] = '知道';
-$MCFG['author'] = 'DESTOON.COM';
+$MCFG['author'] = 'DESTOON';
 $MCFG['homepage'] = 'www.destoon.com';
-$MCFG['copy'] = false;
+$MCFG['copy'] = true;
 $MCFG['uninstall'] = true;
-$MCFG['moduleid'] = 10;
+$MCFG['moduleid'] = 0;
 
 $RT = array();
 $RT['file']['index'] = '知道管理';

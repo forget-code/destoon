@@ -3,15 +3,14 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">记录搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td>&nbsp;
 <?php echo $fields_select;?>&nbsp;
-<input type="text" size="10" name="kw" value="<?php echo $kw;?>"/>&nbsp;
+<input type="text" size="10" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词"/>&nbsp;
 <select name="bank">
 <option value="">开户银行</option>
 <?php
@@ -33,7 +32,7 @@ foreach($BANKS as $k=>$v) {
 <option value="addtime" <?php if($timetype == 'addtime') echo 'selected';?>>申请时间</option>
 <option value="edittime" <?php if($timetype == 'edittime') echo 'selected';?>>受理时间</option>
 </select>&nbsp;
-<?php echo dcalendar('fromtime', $fromtime);?> 至 <?php echo dcalendar('totime', $totime);?>&nbsp;
+<?php echo dcalendar('fromdate', $fromdate);?> 至 <?php echo dcalendar('todate', $todate);?>&nbsp;
 <select name="mtype">
 <option value="amount" <?php if($mtype == 'amount') echo 'selected';?>>实付</option>
 <option value="fee" <?php if($mtype == 'fee') echo 'selected';?>>手续费</option>
@@ -47,10 +46,9 @@ foreach($BANKS as $k=>$v) {
 </table>
 </form>
 <form method="post">
-<div class="tt">提现记录</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
-<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>流水号</th>
 <th>实付金额</th>
 <th>手续费</th>
@@ -63,7 +61,7 @@ foreach($BANKS as $k=>$v) {
 <th>管理</th>
 </tr>
 <?php foreach($cashs as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center" title="<?php echo $v['note'];?>">
+<tr align="center" title="<?php echo $v['note'];?>">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><?php echo $v['itemid'];?></td>
 <td class="f_red"><?php echo $v['amount'];?></td>
@@ -92,10 +90,10 @@ foreach($BANKS as $k=>$v) {
 </tr>
 </table>
 <div class="btns">
-<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中记录吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<input type="submit" value=" 批量删除 " class="btn-r" onclick="if(confirm('确定要删除选中记录吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
 </div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Menuon(0);</script>
 <br/>
 <?php include tpl('footer');?>

@@ -22,6 +22,7 @@ if($openid) {
 		array('消息记录', '?moduleid='.$moduleid.'&file='.$file),
 		array('事件记录', '?moduleid='.$moduleid.'&file='.$file.'&action=event'),
 		array('用户管理', '?moduleid='.$moduleid.'&file='.$file.'&action=user'),
+		array('自动回复', '?moduleid='.$moduleid.'&file='.$file.'&action=auto'),
 		array('菜单管理', '?moduleid='.$moduleid.'&file='.$file.'&action=menu'),
 		array('帐号设置', '?moduleid='.$moduleid.'&file='.$file.'&action=setting'),
 		array('公众平台', DT_PATH.'api/redirect.php?url=http://mp.weixin.qq.com/', 'target="_blank"'),
@@ -39,6 +40,24 @@ switch($action) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
 		$db->query("DELETE FROM {$DT_PRE}weixin_chat WHERE itemid IN ($itemids)");
 		dmsg('删除成功', $forward);
+	break;
+	case 'edit':
+		$itemid or msg('请选择记录');
+		$user = $db->get_one("SELECT * FROM {$DT_PRE}weixin_user WHERE itemid=$itemid");
+		$user or msg('记录不存在');
+		if($submit) {
+			if(check_name($name)) {
+				$name != $user['username'] or msg('会员名'.$name.'未修改');
+				$u = userinfo($name);
+				$u or msg('会员'.$name.'不存在');
+				$u['groupid'] > 4 or msg('会员'.$name.'所在组不可修改');
+				$db->query("UPDATE {$DT_PRE}weixin_user SET username='' WHERE username='$name'");
+			}
+			$db->query("UPDATE {$DT_PRE}weixin_user SET username='$name' WHERE itemid=$itemid");
+			dmsg('修改成功', $forward);
+		} else {
+			include tpl('weixin_edit', $module);
+		}		
 	break;
 	case 'setting':
 		if($submit) {		
@@ -218,8 +237,8 @@ switch($action) {
 		$SUBSCRIBE = array('<span style="color:red;">已取消</span>', '<span style="color:green;">关注中</span>', '<span style="color:#666666;">未关注</span>');
 		$sfields = array('按条件', '会员名', '昵称', '城市', '省份', '国籍', '语言');
 		$dfields = array('username', 'username', 'nickname', 'city', 'province', 'country', 'language');
-		$sorder  = array('结果排序方式', '关注时间降序', '关注时间升序', '更新时间降序', '更新时间升序');
-		$dorder  = array('itemid DESC', 'addtime DESC', 'addtime ASC', 'logintime DESC', 'logintime ASC');
+		$sorder  = array('结果排序方式', '关注时间降序', '关注时间升序', '访问时间降序', '访问时间升序');
+		$dorder  = array('itemid DESC', 'addtime DESC', 'addtime ASC', 'visittime DESC', 'visittime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($site) or $site = '';
 		isset($order) && isset($dorder[$order]) or $order = 0;
@@ -245,13 +264,56 @@ switch($action) {
 		$result = $db->query("SELECT * FROM {$DT_PRE}weixin_user WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
-			$r['editdate'] = timetodate($r['edittime'], 5);
+			$r['visitdate'] = timetodate($r['visittime'], 5);
 			$r['gender'] = $SEX[$r['sex']];
 			$r['status'] = $SUBSCRIBE[$r['subscribe']];
 			$r['headimgurl'] or $r['headimgurl'] = 'api/weixin/image/headimg.jpg';
 			$lists[] = $r;
 		}
 		include tpl('weixin_user', $module);
+	break;
+	case 'auto':
+		if($submit) {		
+			foreach($post as $k=>$v) {
+				$k = intval($k);
+				if($k == 0) {
+					if($v['keyword'] && $v['reply']) {
+						$K = explode("\n", trim(strip_tags($v['keyword'])));
+						$R = explode("\n", trim(strip_tags($v['reply'])));
+						foreach($K as $i=>$W) {
+							$keyword = trim($W);
+							$reply = trim($R[$i]);							
+							if($keyword && $reply) $db->query("INSERT INTO {$DT_PRE}weixin_auto SET keyword='$keyword',reply='$reply'");
+						}
+					}
+				} else {
+					if(isset($v['delete'])) {
+						$db->query("DELETE FROM {$DT_PRE}weixin_auto WHERE itemid=$k");
+					} else {
+						$keyword = trim(strip_tags($v['keyword']));
+						$reply = trim(strip_tags($v['reply']));
+						if($keyword && $reply) $db->query("UPDATE {$DT_PRE}weixin_auto SET keyword='$keyword',reply='$reply' WHERE itemid=$k");
+					}
+				}
+			}
+			dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&action='.$action);
+		} else {
+			$condition = "1";
+			if($kw) $condition .= " AND (keyword LIKE '%$keyword%' OR reply LIKE '%$keyword%')";
+			if($page > 1 && $sum) {
+				$items = $sum;
+			} else {
+				$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}weixin_auto WHERE $condition");
+				$items = $r['num'];
+			}
+			$pages = pages($items, $page, $pagesize);
+			$lists = array();
+			$result = $db->query("SELECT * FROM {$DT_PRE}weixin_auto WHERE $condition ORDER BY itemid LIMIT $offset,$pagesize");
+			while($r = $db->fetch_array($result)) {
+				$lists[] = $r;
+			}
+			include tpl('weixin_auto', $module);
+		}
 	break;
 	case 'menu':
 		if($submit) {
@@ -265,14 +327,20 @@ switch($action) {
 			}
 			for($i = 0; $i < 3; $i++) {
 				if($post[$i][0]['name']) {
-					$menu[$i]['name'] = urlencode(convert($post[$i][0]['name'], DT_CHARSET, 'UTF-8'));
+					$menu[$i]['name'] = urlencode($post[$i][0]['name']);
 					if($sub[$i]) {
 						for($j = 1; $j < 6; $j++) {
 							if($post[$i][$j]['name'] && $post[$i][$j]['key']) {
-									$menu[$i]['sub_button'][$j-1]['name'] = urlencode(convert($post[$i][$j]['name'], DT_CHARSET, 'UTF-8'));
+								$menu[$i]['sub_button'][$j-1]['name'] = urlencode($post[$i][$j]['name']);
 								if(substr($post[$i][$j]['key'], 0, 4) == 'http') {
 									$menu[$i]['sub_button'][$j-1]['type'] = 'view';
 									$menu[$i]['sub_button'][$j-1]['url'] = $post[$i][$j]['key'];
+								} else if(strpos($post[$i][$j]['key'], '|') !== false) {
+									$tmp = explode('|', $post[$i][$j]['key']);
+									$menu[$i]['sub_button'][$j-1]['type'] = 'miniprogram';
+									$menu[$i]['sub_button'][$j-1]['url'] = isset($tmp[2]) ? $tmp[2] : $EXT['mobile_url'];
+									$menu[$i]['sub_button'][$j-1]['appid'] = $tmp[0];
+									$menu[$i]['sub_button'][$j-1]['pagepath'] = $tmp[1];
 								} else {
 									$menu[$i]['sub_button'][$j-1]['type'] = 'click';
 									$menu[$i]['sub_button'][$j-1]['key'] = $post[$i][$j]['key'];
@@ -286,6 +354,12 @@ switch($action) {
 							if(substr($post[$i][0]['key'], 0, 4) == 'http') {
 								$menu[$i]['type'] = 'view';
 								$menu[$i]['url'] = $post[$i][0]['key'];
+							} else if(strpos($post[$i][0]['key'], '|') !== false) {
+								$tmp = explode('|', $post[$i][0]['key']);
+								$menu[$i]['type'] = 'miniprogram';
+								$menu[$i]['url'] = isset($tmp[2]) ? $tmp[2] : $EXT['mobile_url'];
+								$menu[$i]['appid'] = $tmp[0];
+								$menu[$i]['pagepath'] = $tmp[1];
 							} else {
 								$menu[$i]['type'] = 'click';
 								$menu[$i]['key'] = $post[$i][0]['key'];
@@ -363,7 +437,7 @@ switch($action) {
 		}
 		$pages = pages($items, $page, $pagesize);
 		$lists = array();
-		$result = $db->query("SELECT u.username,u.nickname,u.sex,u.city,u.province,u.country,u.language,u.headimgurl,c.* FROM {$DT_PRE}weixin_chat c,{$DT_PRE}weixin_user u WHERE $condition ORDER BY c.addtime DESC LIMIT $offset,$pagesize");
+		$result = $db->query("SELECT u.username,u.nickname,u.sex,u.city,u.province,u.country,u.language,u.headimgurl,c.* FROM {$DT_PRE}weixin_chat c,{$DT_PRE}weixin_user u WHERE $condition ORDER BY c.itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['headimgurl'] or $r['headimgurl'] = 'api/weixin/image/headimg.jpg';

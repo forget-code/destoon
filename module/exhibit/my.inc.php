@@ -1,12 +1,14 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-$MG['exhibit_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+$mod_limit = intval($MOD['limit_'.$_groupid]);
+$mod_free_limit = intval($MOD['free_limit_'.$_groupid]);
+$mod_limit > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/include/post.func.php';
 include load($module.'.lang');
 include load('my.lang');
-require MD_ROOT.'/exhibit.class.php';
-$do = new exhibit($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -20,25 +22,30 @@ $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $f
 if(in_array($action, array('', 'add'))) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND status>1");
 	$limit_used = $r['num'];
-	$limit_free = $MG['exhibit_limit'] > $limit_used ? $MG['exhibit_limit'] - $limit_used : 0;
+	$limit_free = $mod_limit > $limit_used ? $mod_limit - $limit_used : 0;
 }
 switch($action) {
 	case 'add':
-		if($MG['exhibit_limit'] && $limit_used >= $MG['exhibit_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
+		if($mod_limit && $limit_used >= $mod_limit) dalert(lang($L['info_limit'], array($mod_limit, $limit_used)), $_userid ? '?mid='.$mid : '?action=index');
+		if($MG['hour_limit']) {
+			$today = $DT_TIME - 3600;
+			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
+			if($r && $r['num'] >= $MG['hour_limit']) dalert(lang($L['hour_limit'], array($MG['hour_limit'])), $_userid ? '?mid='.$mid : '?action=index');
+		}
 		if($MG['day_limit']) {
 			$today = $today_endtime - 86400;
 			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
-			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
+			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? '?mid='.$mid : '?action=index');
 		}
 
-		if($MG['exhibit_free_limit'] >= 0) {
-			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $MG['exhibit_free_limit'] && $_userid) ? dround($MOD['fee_add']) : 0;
+		if($mod_free_limit >= 0) {
+			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $mod_free_limit && $_userid) ? dround($MOD['fee_add']) : 0;
 		} else {
 			$fee_add = 0;
 		}
 		$fee_currency = $MOD['fee_currency'];
 		$fee_unit = $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
-		$need_password = $fee_add && $fee_currency == 'money';
+		$need_password = $fee_add && $fee_currency == 'money' && $fee_add > $DT['quick_pay'];
 		$need_captcha = $MOD['captcha_add'] == 2 ? $MG['captcha'] : $MOD['captcha_add'];
 		$need_question = $MOD['question_add'] == 2 ? $MG['question'] : $MOD['question_add'];
 		$could_color = check_group($_groupid, $MOD['group_color']) && $MOD['credit_color'] && $_userid;
@@ -88,13 +95,12 @@ switch($action) {
 				$msg = $post['status'] == 2 ? $L['success_check'] : $L['success_add'];
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
-				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
-					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
+					$forward = '?mid='.$mid.'&status='.$post['status'];
 					$msg = '';
 				} else {
-					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&action=add';
+					$forward = '?mid='.$mid.'&action=add';
 				}
 				$js .= 'window.onload=function(){parent.window.location="'.$forward.'";}';
 				dalert($msg, '', $js);
@@ -113,6 +119,7 @@ switch($action) {
 				$fromtime = timetodate($fromtime, 3);
 				$totime = timetodate($totime, 3);
 			} else {
+				$_catid = $catid;
 				foreach($do->fields as $v) {
 					$$v = '';
 				}
@@ -126,14 +133,14 @@ switch($action) {
 					$telephone = $user['telephone'];
 					$fax = $user['fax'];
 					$addr = $user['address'];
-					$msn = $user['msn'];
 					$qq = $user['qq'];
+					$wx = $user['wx'];
 					$areaid = $user['areaid'];
 				} else {
 					$areaid = $cityid;
 				}
 				$content = '';
-				$catid = 0;
+				$catid = $_catid;
 			}
 			$item = array();
 		}
@@ -192,22 +199,24 @@ switch($action) {
 	case 'sign':
 		$id = isset($id) && $id ? intval($id) : '';
 		$sfields = $L['exhibit_sign_fields'];
-		$dfields = array('title', 'title', 'username', 'company', 'truename', 'address', 'postcode', 'mobile', 'email', 'qq', 'content');
+		$dfields = array('title', 'title', 'username', 'company', 'truename', 'address', 'postcode', 'mobile', 'email', 'qq', 'wx', 'content');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$itemid or $itemid = '';
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = "user='$_username'";
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($id) $condition .= " AND id=$id";
-		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_order} WHERE $condition");
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_sign} WHERE $condition");
 		$items = $r['num'];
 		$pages = pages($items, $page, $pagesize);	
 		$lists = array();
-		$result = $db->query("SELECT * FROM {$table_order} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
+		$result = $db->query("SELECT * FROM {$table_sign} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['linkurl'] = DT_PATH.'api/redirect.php?mid='.$moduleid.'&itemid='.$r['id'];
 			$r['addtime'] = timetodate($r['addtime'], 5);
@@ -231,9 +240,26 @@ if($_userid) {
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE username='$_username' AND status=$i");
 		$nums[$i] = $r['num'];
 	}
-	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_order} WHERE user='$_username'");
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_sign} WHERE user='$_username'");
 	$nums[5] = $r['num'];
 }
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?mid='.$mid;
+	} else {
+		$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'edittime';
+		foreach($lists as $k=>$v) {
+			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
+			$lists[$k]['date'] = timetodate($v[$time], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$foot = '';
+		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&status='.$status : '?action=index';
+	}
+}
 $head_title = lang($L['module_manage'], array($MOD['name']));
-include template('my_'.$module, 'member');
+include template($MOD['template_my'] ? $MOD['template_my'] : 'my_'.$module, 'member');
 ?>

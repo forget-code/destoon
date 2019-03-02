@@ -2,9 +2,12 @@
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $MOD['ad_enable'] or dheader(DT_PATH);
+$ext = 'ad';
+$url = $EXT[$ext.'_url'];
+$mob = $EXT[$ext.'_mob'];
 $TYPE = $L['ad_type'];
-require MD_ROOT.'/ad.class.php';
-$do = new ad();
+require DT_ROOT.'/module/'.$module.'/'.$ext.'.class.php';
+$do = new $ext();
 $currency = $MOD['ad_currency'];
 $unit = $currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
 if($itemid) $pid = $itemid;
@@ -36,18 +39,32 @@ if($pid || $aid) {
 			$ad_kw = $a['key_word'];
 		}
 	}
-	include template('ad_view', $module);
+	$action = 'view';
 } else {
 	$destoon_task = "moduleid=$moduleid&html=ad";
 	$head_title = $L['ad_title'];
 	if($catid) $typeid = $catid;
 	$condition = 'open=1';
+	if($keyword) $condition .= " AND name LIKE '%$keyword%'";
 	if($typeid) {
 		isset($TYPE[$typeid]) or dheader($EXT['ad_url']);
 		$condition .= " AND typeid=$typeid";
 		$head_title = $TYPE[$typeid].$DT['seo_delimiter'].$head_title;
 	}
-	$ads = $do->get_list_place($condition, 'listorder DESC,pid DESC');
-	include template('ad', $module);
+	$lists = $do->get_list_place($condition, 'listorder DESC,pid DESC');	
 }
+$template = $ext;
+if($DT_PC) {
+	$destoon_task = "moduleid=$moduleid&html=$ext";
+	if($EXT['mobile_enable']) $head_mobile = str_replace($url, $mob, $DT_URL);
+} else {
+	$foot = '';
+	if($itemid) {
+		$back_link = $mob;
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1 || $typeid) ? $mob : DT_MOB.'more.php';
+	}
+}
+include template($template, $module);
 ?>

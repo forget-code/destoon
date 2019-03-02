@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -73,7 +73,7 @@ class tree {
 				}
 				$spacer = $adds ? $adds.$j : '';
 				$selected = $id == $sid ? 'selected' : '';
-				@extract($a);
+				extract($a);
 				eval("\$nstr = \"$str\";");
 				$this->ret .= $nstr;
 				$this->get_tree($id, $str, $sid, $adds.$k.'&nbsp;');

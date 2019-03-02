@@ -1,11 +1,11 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class dsession {
-    function dsession() {
+	function __construct() {
 		if(DT_DOMAIN) @ini_set('session.cookie_domain', '.'.DT_DOMAIN);
 		@ini_set('session.gc_maxlifetime', 1800);
     	if(is_dir(DT_ROOT.'/file/session/')) {
@@ -19,6 +19,10 @@ class dsession {
 		session_cache_limiter('private, must-revalidate');
 		@session_start();
 		header("cache-control: private");
+    }
+
+    function dsession() {
+		$this->__construct();
     }
 }
 ?>

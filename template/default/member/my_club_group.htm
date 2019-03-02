@@ -1,11 +1,12 @@
+{template 'header', 'member'}
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td width="110" id="submenu"></td>
 <td class="tab" id="add"><a href="?mid={$mid}&job={$job}&action=add"><span>创建商圈</span></a></td>
-<td class="tab" id="s3"><a href="?mid={$mid}&job={$job}"><span>已开通<span class="px10">({$nums[3]})</span></span></a></td>
-<td class="tab" id="s2"><a href="?mid={$mid}&job={$job}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
-<td class="tab" id="s1"><a href="?mid={$mid}&job={$job}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
+<td class="tab" id="s3"><a href="?mid={$mid}&job={$job}"><span>已开通({$nums[3]})</span></a></td>
+<td class="tab" id="s2"><a href="?mid={$mid}&job={$job}&status=2"><span>审核中({$nums[2]})</span></a></td>
+<td class="tab" id="s1"><a href="?mid={$mid}&job={$job}&status=1"><span>未通过({$nums[1]})</span></a></td>
 </tr>
 </table>
 </div>
@@ -17,7 +18,7 @@
 <input type="hidden" name="job" value="{$job}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
 <input type="hidden" name="forward" value="{$forward}"/>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 {if $status==1 && $action=='edit' && $note}
 <tr>
 <td class="tl">未通过原因</td>
@@ -85,12 +86,12 @@
 <input type="hidden" name="status" value="{$status}"/>
 &nbsp;{category_select('catid', '所有分类', $catid, $moduleid)}&nbsp;
 <input type="text" size="50" name="kw" value="{$kw}" title="关键词"/>&nbsp;
-<input type="submit" value=" 搜 索 " class="btn"/>
+<input type="submit" value=" 搜 索 " class="btn"/>&nbsp;
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?mid={$mid}&job={$job}&status={$status}');"/>
 </form>
 </div>
 <div class="ls">
-<table cellpadding="0" cellspacing="0" class="tb">
+<table cellpadding="10" cellspacing="0" class="tb">
 <tr>
 <th width="100">图标</th>
 <th>名称</th>
@@ -101,23 +102,23 @@
 <th width="40">管理</th>
 </tr>
 {loop $lists $k $v}
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><a href="javascript:_preview('{$v[thumb]}');"><img src="{$v[thumb]}" width="80" class="thumb"/></a></td>
-<td><a href="{$v[linkurl]}" target="_blank" class="t">{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</td>
+<td><a href="{$v[linkurl]}" target="_blank" class="t">{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="image/why.gif" title="未通过原因"/></a>{/if}</td>
 <td>&nbsp;&nbsp;<a href="{$v[caturl]}" target="_blank">{$v[catname]}</a>&nbsp;&nbsp;</td>
-<td class="f_gray px11">{$v[adddate]}</td>
-<td><a href="javascript:Dwidget('?mid={$mid}&job=manage&action=post&gid={$v[itemid]}', '[{$v[title]}]帖子管理');"><span class="f_gray px11">{$v[post]}</span></a></td>
-<td><a href="?mid={$mid}&job=fans&gid={$v[itemid]}"><span class="f_gray px11">{$v[fans]}</span></a></td>
+<td class="f_gray">{$v[adddate]}</td>
+<td><a href="javascript:Dwidget('?mid={$mid}&job=manage&action=post&gid={$v[itemid]}', '[{$v[title]}]帖子管理');"><span class="f_gray">{$v[post]}</span></a></td>
+<td><a href="?mid={$mid}&job=fans&gid={$v[itemid]}"><span class="f_gray">{$v[fans]}</span></a></td>
 <td>
-<a href="?mid={$mid}&job={$job}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
+<a href="?mid={$mid}&job={$job}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="image/edit.png" title="修改" alt=""/></a>
 </td>
 </tr>
 {/loop}
 </table>
 </div>
-{if $MG[club_group_limit]}
+{if $group_limit}
 <div class="limit">
-总共可建 <span class="f_b f_red">{$MG[club_group_limit]}</span> 个&nbsp;&nbsp;&nbsp;
+总共可建 <span class="f_b f_red">{$group_limit}</span> 个&nbsp;&nbsp;&nbsp;
 当前已建 <span class="f_b">{$limit_used}</span> 个&nbsp;&nbsp;&nbsp;
 还可以建 <span class="f_b f_blue">{$limit_free}</span> 个&nbsp;&nbsp;&nbsp;
 </div>
@@ -171,25 +172,15 @@ function check() {
 {/if}
 {if $need_question}
 	f = 'answer';
-	l = Dd(f).value.length;
-	if(l < 1) {
-		Dmsg('请填写验证问题', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
+		Dmsg('请填写正确的验证问题', f);
 		return false;
 	}
 {/if}
 {if $need_captcha}
 	f = 'captcha';
-	l = Dd(f).value;
-	if(!is_captcha(l)) {
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
 		Dmsg('请填写正确的验证码', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
 		return false;
 	}
 {/if}
@@ -197,3 +188,5 @@ function check() {
 }
 </script>
 {/if}
+{template 'club_js', 'chip'}
+{template 'footer', 'member'}

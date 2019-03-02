@@ -17,15 +17,14 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<div class="tt">基本设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">网站名称</td>
 <td><input name="setting[sitename]" type="text" value="<?php echo $sitename;?>" size="40"/></td>
 </tr>
 <tr>
 <td class="tl">网站地址</td>
-<td><input name="config[url]" type="text" value="<?php echo $url;?>" size="40"/><?php tips('请添写完整URL地址,例如http://www.destoon.com/<br/>注意以 / 结尾');?></td>
+<td><input name="config[url]" type="text" value="<?php echo $url;?>" size="40"/><?php tips('请添写完整URL地址,例如https://www.destoon.com/<br/>注意以 / 结尾');?></td>
 </tr>
 <tr>
 <td class="tl">网站LOGO</td>
@@ -110,10 +109,28 @@ tips('位于./skin/目录,一个目录即为一套风格');
 $select = '';
 $dirs = list_dir('template');
 foreach($dirs as $v) {
+	if(is_dir(DT_ROOT.'/template/'.$v['dir'].'/mobile/')) continue;
 	$selected = ($CFG['template'] && $v['dir'] == $CFG['template']) ? 'selected' : '';
 	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
 }
 $select = '<select name="config[template]">'.$select.'</select>';
+echo $select;
+tips('位于./template/目录,一个目录即为一套模板');
+?>
+</td> 
+</tr>
+<tr>
+<td class="tl">手机默认模板</td>
+<td>
+<?php
+$select = '';
+$dirs = list_dir('template');
+foreach($dirs as $v) {
+	if(!is_dir(DT_ROOT.'/template/'.$v['dir'].'/mobile/')) continue;
+	$selected = ($CFG['template_mobile'] && $v['dir'] == $CFG['template_mobile']) ? 'selected' : '';
+	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
+}
+$select = '<select name="config[template_mobile]">'.$select.'</select>';
 echo $select;
 tips('位于./template/目录,一个目录即为一套模板');
 ?>
@@ -160,6 +177,14 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td><input name="setting[credit_unit]" type="text" value="<?php echo $credit_unit;?>" size="10"/></td>
 </tr>
 <tr>
+<td class="tl">小额免密支付</td>
+<td><input name="setting[quick_pay]" type="text" value="<?php echo $quick_pay;?>" size="10"/><?php tips('请填写数字，小于此额度的支付无需用户输入支付密码');?></td>
+</tr>
+<tr>
+<td class="tl">购物车最大容量</td>
+<td><input name="setting[max_cart]" type="text" value="<?php echo $max_cart;?>" size="10"/><?php tips('请填写数字，如果未启用商城功能，请设置为0');?></td>
+</tr>
+<tr>
 <td class="tl">后台左侧栏宽度</td>
 <td><input name="setting[admin_left]" type="text" value="<?php echo $admin_left;?>" size="5"/> px</td>
 </tr>
@@ -178,17 +203,17 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </td>
 </tr>
 <tr>
+<td class="tl">即时通讯微信</td>
+<td>
+<input type="radio" name="setting[im_wx]" value="1"  <?php if($im_wx){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[im_wx]" value="0"  <?php if(!$im_wx){ ?>checked <?php } ?>/> 关闭
+</td>
+</tr>
+<tr>
 <td class="tl">即时通讯阿里旺旺</td>
 <td>
 <input type="radio" name="setting[im_ali]" value="1"  <?php if($im_ali){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
 <input type="radio" name="setting[im_ali]" value="0"  <?php if(!$im_ali){ ?>checked <?php } ?>/> 关闭
-</td>
-</tr>
-<tr>
-<td class="tl">即时通讯MSN</td>
-<td>
-<input type="radio" name="setting[im_msn]" value="1"  <?php if($im_msn){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[im_msn]" value="0"  <?php if(!$im_msn){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
 <tr>
@@ -198,13 +223,11 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[im_skype]" value="0"  <?php if(!$im_skype){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
-<?php include DT_ROOT.'/api/trade/setting.inc.php';?>
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<div class="tt">SEO优化</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">标题分隔符</td>
 <td><input name="setting[seo_delimiter]" type="text" value="<?php echo $seo_delimiter;?>" size="10"/></td>
@@ -275,13 +298,26 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </td>
 </tr>
 <tr>
-<td class="tl">会员顶级域名Rewrite</td>
+<td class="tl">公司二级域名https</td>
 <td>
-<input type="radio" name="config[com_rewrite]" value="1"  <?php if($com_rewrite){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="config[com_rewrite]" value="0"  <?php if(!$com_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('部分服务器可能无法开启会员绑定的顶级域名Rewrite，如果无法开启，可在此关闭，以免出现打不开页面的情况，此项仅针对会员顶级域名，不影响其他页面Rewrite');?>
+<input type="radio" name="setting[com_https]" value="1"  <?php if($com_https){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[com_https]" value="0"  <?php if(!$com_https){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
-
+<tr>
+<td class="tl">会员顶级域名伪静态</td>
+<td>
+<input type="radio" name="config[com_rewrite]" value="1"  <?php if($com_rewrite){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="config[com_rewrite]" value="0"  <?php if(!$com_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('部分服务器可能无法开启会员绑定的顶级域名伪静态，如果无法开启，可在此关闭，以免出现打不开页面的情况，此项仅针对会员顶级域名，不影响其他页面伪静态');?>
+</td>
+</tr>
+<tr>
+<td class="tl">搜索页伪静态</td>
+<td>
+<input type="radio" name="setting[search_rewrite]" value="1"  <?php if($search_rewrite){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[search_rewrite]" value="0"  <?php if(!$search_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('搜索结果地址伪静态，此项会增加服务器负载');?>
+</td>
+</tr>
 <tr>
 <td class="tl">服务器中文路径编码</td>
 <td>
@@ -290,7 +326,6 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[pcharset]" value="utf-8"  <?php if($pcharset == 'utf-8'){ ?>checked <?php } ?>/> UTF-8 <?php tips('当生成包含中文文件名的文件出现乱码或者下载带有中文名文件提示找不到文件时，可尝试设置此项');?>
 </td>
 </tr>
-
 <tr>
 <td class="tl">404错误日志</td>
 <td>
@@ -304,8 +339,7 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </div>
 
 <div id="Tabs2" style="display:none">
-<div class="tt">服务器优化</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">首页自动更新频率</td>
 <td>
@@ -323,10 +357,6 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td>
 <input name="setting[task_item]" type="text" value="<?php echo $task_item;?>" size="5"/> 秒 <?php tips('仅对生成的静态网页有效');?>
 </td>
-</tr>
-<tr>
-<td class="tl">TAG(标签)缓存更新周期</td>
-<td><input type="text" name="config[tag_expires]" value="<?php echo $tag_expires;?>" size="5"/> 秒<?php tips('此项可明显减轻标签数据调用对服务器的压力');?></td>
 </tr>
 <tr>
 <td class="tl">SQL查询缓存更新周期</td>
@@ -353,8 +383,8 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <option value="shmop"<?php echo $cache == 'shmop' ? ' selected' : '';?>>shmop (<?php echo (function_exists('shmop_open') && function_exists('ftok')) ? '支持' : '不支持'?>)</option>
 <option value="apc"<?php echo $cache == 'apc' ? ' selected' : '';?>>apc (<?php echo function_exists('apc_fetch') ? '支持' : '不支持'?>)</option>
 </select>
-<?php tips('除了文件缓存，其他缓存方式需要服务器端支持，具体请查看phpinfo信息。<br/>请在确认服务器环境支持的情况下开启，否则可能导致未知的错误<br/>如果需要开启Memcache缓存，请先配置file/config/memcache.inc.php连接参数');?>&nbsp;&nbsp;
-<a href="?action=cacheclear" target="_blank" class="t">[清空缓存]</a>&nbsp;&nbsp;
+<?php tips('除了文件缓存，其他缓存方式需要服务器端支持，具体请查看phpinfo信息。<br/>请在确认服务器环境支持的情况下开启，否则可能导致未知的错误');?>&nbsp;&nbsp;
+<a href="javascript:Dwidget('?file=html&action=cacheclear', '清空缓存');" class="t">[清空缓存]</a>&nbsp;&nbsp;
 <a href="javascript:Diframe('?file=<?php echo $file;?>&action=cache', 0, 0 , 1);" class="t">[缓存测试]</a>
 </td>
 </tr>
@@ -429,7 +459,7 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td><input type="text" size="3" name="setting[min_kw]" value="<?php echo $min_kw;?>"/>
 至
 <input type="text" size="3" name="setting[max_kw]" value="<?php echo $max_kw;?>"/>
-字符<?php tips('一个汉字的长度为2个字符，建议设置为3-30个字符之间');?></td>
+字符<?php tips('一个汉字的长度为3个字符，建议设置为3-30个字符之间');?></td>
 </tr>
 <tr>
 <td class="tl">两次搜索时间间隔</td>
@@ -456,7 +486,7 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </tr>
 <tr>
 <td class="tl">信息内容长度限制</td>
-<td><input type="text" size="5" name="setting[max_len]" value="<?php echo $max_len;?>"/> 字符<?php tips('GBK一个汉字为2个字符，UTF-8一个汉字为3个字符<br/>填0为不限，建议设置，以免内容过长');?></td>
+<td><input type="text" size="5" name="setting[max_len]" value="<?php echo $max_len;?>"/> 字符<?php tips('一个汉字占3个字符，填0为不限，建议设置，以免内容过长');?></td>
 </tr>
 <tr>
 <td class="tl">静态文件分离部署地址</td>
@@ -514,11 +544,11 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </tr>
 <tr> 
 <td class="tl">远程存储目录</td>
-<td><input name="setting[ftp_path]" id="ftp_path" type="text" size="60" value="<?php echo $ftp_path;?>"/><?php tips('例如 /wwwroot/img/ 或者 /httpdocs/img/<br/>具体以实际情况为准');?></td>
+<td><input name="setting[ftp_path]" id="ftp_path" type="text" size="30" value="<?php echo $ftp_path;?>"/><?php tips('例如 / 或者 /www/<br/>具体以实际情况为准');?></td>
 </tr>
 <tr>
 <td class="tl">远程访问URL</td>
-<td><input name="setting[remote_url]" type="text" value="<?php echo $remote_url;?>" size="60"/><?php tips('例如 http://static.destoon.com/，注意以 / 结尾');?></td>
+<td><input name="setting[remote_url]" id="ftp_remote_url" type="text" value="<?php echo $remote_url;?>" size="60"/><?php tips('例如 http://static.destoon.com/，注意以 / 结尾，建议设置为域名根目录且不能包含file/upload');?></td>
 </tr>
 <tr> 
 <td class="tl">测试FTP连接</td>
@@ -531,7 +561,12 @@ function TestFTP() {
 		Dalert('FTP主机不能为空');
 		Dd('ftp_host').focus();
 		return false;
-	}	
+	}
+	if(Dd('ftp_remote_url').value.indexOf('file/upload') != -1) {
+		Dalert('远程访问URL不能包含file/upload');
+		Dd('ftp_remote_url').focus();
+		return false;
+	}
 	var fssl = Dd('ftp_ssl').checked ? 1 : 0;
 	var fpasv = Dd('ftp_pasv').checked ? 1 : 0;
 	var url = '?file=setting&action=ftp&ftp_host='+Dd('ftp_host').value+'&ftp_port='+Dd('ftp_port').value+'&ftp_user='+Dd('ftp_user').value+'&ftp_pass='+Dd('ftp_pass').value+'&ftp_path='+Dd('ftp_path').value+'&ftp_ssl='+fssl+'&ftp_pasv='+fpasv;
@@ -540,8 +575,7 @@ function TestFTP() {
 </script>
 </div>
 <div id="Tabs3" style="display:none">
-<div class="tt">安全中心</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">允许登录后台的地区</td>
 <td><input name="setting[admin_area]" type="text" value="<?php echo $admin_area;?>" size="60"/><?php tips('设置工作人员常用的登录地区，多个地区用|分隔<br/>例如“北京|上海|广州”，非常用地区的IP将无法登录后台');?></td>
@@ -694,6 +728,16 @@ function TestFTP() {
 </td>
 </tr>
 <tr>
+<td class="tl">CDN加速</td>
+<td>
+<select name="config[cdn]">
+<option value="0"<?php echo $cdn == 0 ? ' selected' : '';?>>未使用</option>
+<option value="1"<?php echo $cdn == 1 ? ' selected' : '';?>>已使用</option>
+</select>&nbsp;
+<?php tips('如果域名解析开启过CND加速，需要选择已使用，否则可能会导致IP获取错误，具体请在系统体检里检查');?>
+</td>
+</tr>
+<tr>
 <td class="tl">Cookie作用域</td>
 <td><input name="config[cookie_domain]" type="text" value="<?php echo $cookie_domain;?>" size="20"/><?php tips('例如要保证顶级域名destoon.com所有二级域名均可正常登录注销，则填写.destoon.com(注意顶级域名前加.)');?></td>
 </tr>
@@ -713,43 +757,7 @@ function TestFTP() {
 </div>
 
 <div id="Tabs4" style="display:none">
-<div class="tt">图片水印</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td class="tl">水印图片</td>
-<td><input name="setting[water_mark]" type="text" value="<?php echo $water_mark;?>" size="40"/><br/>
-<img src="file/image/<?php echo $water_mark;?>"/></td>
-</tr>
-<tr>
-<td class="tl">水印透明度</td>
-<td><input name="setting[water_transition]" type="text" value="<?php echo $water_transition;?>" size="5"><?php tips('如果水印图为gif格式，请设置范围为 1~100 的整数,数值越小水印图片越透明。PNG 类型水印本身具有真彩透明效果，无须此设置');?></td>
-</tr>
-<tr>
-<td class="tl">JPEG 水印质量</td>
-<td><input name="setting[water_jpeg_quality]" type="text" value="<?php echo $water_jpeg_quality;?>" size="5"><?php tips('范围为 0~100 的整数,数值越大结果图片效果越好,但尺寸也越大');?></td>
-</tr>
-</table>
-<div class="tt">文字水印</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td class="tl">水印文字</td>
-<td><input name="setting[water_text]" type="text" id="water_text" value="<?php echo $water_text;?>" size="30" style="color:<?php echo $water_fontcolor;?>;font-size:<?php echo $water_fontsize;?>px;"></td>
-</tr>
-<tr>
-<td class="tl">中文字体</td>
-<td><input name="setting[water_font]" type="text" value="<?php echo $water_font;?>" size="30"> <?php if($water_font && !is_file(DT_ROOT."/file/font/".$water_font)){ ?><span class="f_red">字体不存在,请上传字体到./file/font/目录</span><?php } ?></td>
-</tr>
-<tr>
-<td class="tl">文字大小</td>
-<td><input name="setting[water_fontsize]" type="text" value="<?php echo $water_fontsize;?>" size="8" style="font-size:<?php echo $water_fontsize;?>px;" onblur="this.style.fontSize=this.value+'px';Dd('water_text').style.fontSize=this.value+'px';"> px</td>
-</tr>
-<tr>
-<td class="tl">文字颜色</td>
-<td><input name="setting[water_fontcolor]" type="text" value="<?php echo $water_fontcolor;?>" size="8" style="color:<?php echo $water_fontcolor;?>" onblur="this.style.color=this.value;Dd('water_text').style.color=this.value;"></td>
-</tr>
-</table>
-<div class="tt">图片处理</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">水印类型</td>
 <td>
@@ -772,26 +780,26 @@ function TestFTP() {
 <tr>
 <td class="tl">水印位置</td>
 <td>
-	<table cellspacing="1" cellpadding="5" width="150" bgcolor="#DDDDDD">
-	<tr align="center" bgcolor="#F1F2F3">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="1" <?php if($water_pos==1){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="2" <?php if($water_pos==2){ ?>checked <?php } ?>/></td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="3" <?php if($water_pos==3){ ?>checked <?php } ?>/> </td>
+	<table cellspacing="1" cellpadding="5" width="150" bgcolor="#DDDDDD" class="ctb">
+	<tr align="center" bgcolor="#FFFFFF">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="1" <?php if($water_pos==1){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="2" <?php if($water_pos==2){ ?>checked <?php } ?>/></td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="3" <?php if($water_pos==3){ ?>checked <?php } ?>/> </td>
 	</tr>
 
-	<tr align="center"  bgcolor="#F1F2F3">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="4" <?php if($water_pos==4){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="5" <?php if($water_pos==5){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="6" <?php if($water_pos==6){ ?>checked <?php } ?>/> </td>
+	<tr align="center" bgcolor="#FFFFFF">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="4" <?php if($water_pos==4){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="5" <?php if($water_pos==5){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="6" <?php if($water_pos==6){ ?>checked <?php } ?>/> </td>
 	</tr>
 
-	<tr align="center" bgcolor="#F1F2F3">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="7" <?php if($water_pos==7){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="8" <?php if($water_pos==8){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="9" <?php if($water_pos==9){ ?>checked <?php } ?>/> </td>
+	<tr align="center" bgcolor="#FFFFFF">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="7" <?php if($water_pos==7){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="8" <?php if($water_pos==8){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="9" <?php if($water_pos==9){ ?>checked <?php } ?>/> </td>
 	</tr>
-	<tr align="center" bgcolor="#F1F2F3">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'" colspan="3">随机 <input type="radio" name="setting[water_pos]" value="0" <?php if($water_pos==0){ ?>checked <?php } ?>/></td>
+	<tr align="center" bgcolor="#FFFFFF">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'" colspan="3">随机 <input type="radio" name="setting[water_pos]" value="0" <?php if($water_pos==0){ ?>checked <?php } ?>/></td>
 	</tr>
 	</table>
 </tr>
@@ -851,12 +859,40 @@ function TestFTP() {
 <?php tips('由于显示器宽度有限，超过此宽度的图片将被等比调整为此宽度以节省存储空间');?>
 </td>
 </tr>
+<tr>
+<td class="tl">水印图片</td>
+<td><input name="setting[water_mark]" type="text" value="<?php echo $water_mark;?>" size="40"/><br/>
+<img src="file/image/<?php echo $water_mark;?>"/></td>
+</tr>
+<tr>
+<td class="tl">水印透明度</td>
+<td><input name="setting[water_transition]" type="text" value="<?php echo $water_transition;?>" size="5"><?php tips('如果水印图为gif格式，请设置范围为 1~100 的整数,数值越小水印图片越透明。PNG 类型水印本身具有真彩透明效果，无须此设置');?></td>
+</tr>
+<tr>
+<td class="tl">JPEG 水印质量</td>
+<td><input name="setting[water_jpeg_quality]" type="text" value="<?php echo $water_jpeg_quality;?>" size="5"><?php tips('范围为 0~100 的整数,数值越大结果图片效果越好,但尺寸也越大');?></td>
+</tr>
+<tr>
+<td class="tl">水印文字</td>
+<td><input name="setting[water_text]" type="text" id="water_text" value="<?php echo $water_text;?>" size="30" style="color:<?php echo $water_fontcolor;?>;font-size:<?php echo $water_fontsize;?>px;"></td>
+</tr>
+<tr>
+<td class="tl">中文字体</td>
+<td><input name="setting[water_font]" type="text" value="<?php echo $water_font;?>" size="30"> <?php if($water_font && !is_file(DT_ROOT."/file/font/".$water_font)){ ?><span class="f_red">字体不存在,请上传字体到./file/font/目录</span><?php } ?></td>
+</tr>
+<tr>
+<td class="tl">文字大小</td>
+<td><input name="setting[water_fontsize]" type="text" value="<?php echo $water_fontsize;?>" size="8" style="font-size:<?php echo $water_fontsize;?>px;" onblur="this.style.fontSize=this.value+'px';Dd('water_text').style.fontSize=this.value+'px';"> px</td>
+</tr>
+<tr>
+<td class="tl">文字颜色</td>
+<td><input name="setting[water_fontcolor]" type="text" value="<?php echo $water_fontcolor;?>" size="8" style="color:<?php echo $water_fontcolor;?>" onblur="this.style.color=this.value;Dd('water_text').style.color=this.value;"></td>
+</tr>
 </table>
 </div>
 
 <div id="Tabs5" style="display:none">
-<div class="tt">邮件发送</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">发送方式</td>
 <td>
@@ -965,121 +1001,71 @@ foreach($NAME as $k=>$v) {
 </div>
 
 <div id="Tabs6" style="display:none">
-<div class="tt">页面细节</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
-<td class="tl">行业分类大类</td>
-<td><input type="text" name="setting[page_bigcat]" value="<?php echo $page_bigcat;?>" size="60"/><?php tips('例如填写工业品|消费品|原材料|商业服务，然后把供应的一级分类级别设置为1即可归入工业品，设置为2归入消费品，设置为3归入原材料，设置为4归入商业服务，依次类推');?></td>
-</tr>
-<tr>
-<td class="tl">首页显示行业类别</td>
-<td><input type="radio" name="setting[page_catalog]" value="1"  <?php if($page_catalog){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[page_catalog]" value="0"  <?php if(!$page_catalog){ ?>checked <?php } ?>/> 否</td>
-</tr>
-
-<tr>
-<td class="tl">首页供求信息数量</td>
-<td><input type="text" name="setting[page_trade]" value="<?php echo $page_trade;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页企业展示数量</td>
-<td><input type="text" name="setting[page_com]" value="<?php echo $page_com;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页推荐产品数量</td>
-<td><input type="text" name="setting[page_sell]" value="<?php echo $page_sell;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页商城热卖数量</td>
+<td class="tl">首页推荐商品数量</td>
 <td><input type="text" name="setting[page_mall]" value="<?php echo $page_mall;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页行情资讯数量</td>
-<td><input type="text" name="setting[page_quote]" value="<?php echo $page_quote;?>" size="5"/></td>
+<td class="tl">首页推荐供应数量</td>
+<td><input type="text" name="setting[page_sell]" value="<?php echo $page_sell;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页产品报价数量</td>
-<td><input type="text" name="setting[page_price]" value="<?php echo $page_price;?>" size="5"/></td>
+<td class="tl">首页推荐招商数量</td>
+<td><input type="text" name="setting[page_info]" value="<?php echo $page_info;?>" size="5"/></td>
 </tr>
-
 <tr>
 <td class="tl">首页推荐团购数量</td>
 <td><input type="text" name="setting[page_group]" value="<?php echo $page_group;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页资讯排行数量</td>
-<td><input type="text" name="setting[page_rank]" value="<?php echo $page_rank;?>" size="5"/></td>
+<td class="tl">首页图片资讯数量</td>
+<td><input type="text" name="setting[page_newst]" value="<?php echo $page_newst;?>" size="5"/></td>
 </tr>
-
-<tr>
-<td class="tl">首页推荐专题数量</td>
-<td><input type="text" name="setting[page_special]" value="<?php echo $page_special;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页企业新闻数量</td>
-<td><input type="text" name="setting[page_comnews]" value="<?php echo $page_comnews;?>" size="5"/></td>
-</tr>
-
 <tr>
 <td class="tl">首页显示头条资讯</td>
 <td><input type="radio" name="setting[page_newsh]" value="1"  <?php if($page_newsh){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[page_newsh]" value="0"  <?php if(!$page_newsh){ ?>checked <?php } ?>/> 否</td>
 </tr>
-
 <tr>
-<td class="tl">首页最新资讯数量</td>
-<td><input type="text" name="setting[page_news]" value="<?php echo $page_news;?>" size="5"/></td>
+<td class="tl">首页推荐资讯数量</td>
+<td><input type="text" name="setting[page_news]" value="<?php echo $page_news;?>" size="5"/> X 2</td>
 </tr>
-
 <tr>
-<td class="tl">首页图片中心数量</td>
-<td><input type="text" name="setting[page_photo]" value="<?php echo $page_photo;?>" size="5"/></td>
+<td class="tl">首页推荐专题数量</td>
+<td><input type="text" name="setting[page_special]" value="<?php echo $page_special;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页视频推荐数量</td>
+<td class="tl">首页推荐视频数量</td>
 <td><input type="text" name="setting[page_video]" value="<?php echo $page_video;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页商圈帖子数量</td>
-<td><input type="text" name="setting[page_post]" value="<?php echo $page_post;?>" size="5"/></td>
+<td class="tl">首页推荐图库数量</td>
+<td><input type="text" name="setting[page_photo]" value="<?php echo $page_photo;?>" size="5"/></td>
 </tr>
-
-<tr>
-<td class="tl">首页推荐商圈数量</td>
-<td><input type="text" name="setting[page_club]" value="<?php echo $page_club;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页行业知道数量</td>
-<td><input type="text" name="setting[page_know]" value="<?php echo $page_know;?>" size="5"/></td>
-</tr>
-
-<tr>
-<td class="tl">首页行业展会数量</td>
-<td><input type="text" name="setting[page_exhibit]" value="<?php echo $page_exhibit;?>" size="5"/></td>
-</tr>
-
 <tr>
 <td class="tl">首页品牌展示数量</td>
 <td><input type="text" name="setting[page_brand]" value="<?php echo $page_brand;?>" size="5"/></td>
 </tr>
-
 <tr>
-<td class="tl">首页招聘求职数量</td>
+<td class="tl">首页行业展会数量</td>
+<td><input type="text" name="setting[page_exhibit]" value="<?php echo $page_exhibit;?>" size="5"/></td>
+</tr>
+<tr>
+<td class="tl">首页推荐招聘数量</td>
 <td><input type="text" name="setting[page_job]" value="<?php echo $page_job;?>" size="5"/></td>
+</tr>
+<tr>
+<td class="tl">首页行业知道数量</td>
+<td><input type="text" name="setting[page_know]" value="<?php echo $page_know;?>" size="5"/></td>
 </tr>
 <tr>
 <td class="tl">首页资料下载数量</td>
 <td><input type="text" name="setting[page_down]" value="<?php echo $page_down;?>" size="5"/></td>
+</tr>
+<tr>
+<td class="tl">首页推荐商圈数量</td>
+<td><input type="text" name="setting[page_club]" value="<?php echo $page_club;?>" size="5"/></td>
 </tr>
 <tr>
 <td class="tl">首页图片链接数量</td>
@@ -1093,8 +1079,7 @@ foreach($NAME as $k=>$v) {
 </div>
 
 <div id="Tabs7" style="display:none">
-<div class="tt">云服务</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">服务帐号</td>
 <td><input name="config[cloud_uid]" type="text" id="cloud_uid" value="<?php echo $cloud_uid;?>" size="30"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="?file=cloud&action=key" target="_blank" class="t">[申请帐号]</a></td> 
@@ -1103,13 +1088,14 @@ foreach($NAME as $k=>$v) {
 <td class="tl">服务密钥</td>
 <td><input name="config[cloud_key]" type="text" id="cloud_key" value="<?php echo $cloud_key;?>" size="30" onfocus="if(this.value.indexOf('**')!=-1)this.value='';"/></td>
 </tr>
-</table>
-<div class="tt">手机短信</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">提示信息</td>
+<td class="f_red">以下云服务需要先填写正确的帐号和密钥方可开启成功</td>
+</tr>
 <tr>
 <td class="tl">手机短信</td>
 <td>
-<input type="radio" name="setting[sms]" value="1"  <?php if($sms){ ?>checked <?php } ?> onclick="Ds('dsms');"/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[sms]" value="1"  <?php if($sms){ ?>checked <?php } ?> onclick="Ds('dsms');"/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[sms]" value="0"  <?php if(!$sms){ ?>checked <?php } ?> onclick="Dh('dsms');"/> 关闭
 </td>
 </tr>
@@ -1117,7 +1103,7 @@ foreach($NAME as $k=>$v) {
 <?php if($sms && DT_CLOUD_UID && DT_CLOUD_KEY) { ?>
 <tr>
 <td class="tl">短信余额</td>
-<td><span class="f_red" id="sms_balance"></span> 条&nbsp;&nbsp;<a href="?file=cloud&action=sms" target="_blank" class="t">[在线充值]</a></td> 
+<td><span class="f_red" id="sms_balance"></span> 条&nbsp;&nbsp;&nbsp;&nbsp;<a href="?file=cloud&action=smsbuy" target="_blank" class="t">[在线购买]</a></td> 
 </tr>
 <?php } ?>
 <tr>
@@ -1141,13 +1127,10 @@ foreach($NAME as $k=>$v) {
 <td><input name="setting[sms_sign]" type="text" value="<?php echo $sms_sign;?>" size="30"/> <?php tips('将显示在短信内容结尾，以便会员识别，请尽量简短，正确的格式为【签名】，例如 【某某网】。包含签名的短信会被运营商认为是更正规的短信，从而进入更快的发送通道');?></td> 
 </tr>
 </tbody>
-</table>
-<div class="tt">快递追踪</div>
-<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">快递追踪</td>
 <td>
-<input type="radio" name="setting[cloud_express]" value="1"  <?php if($cloud_express){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[cloud_express]" value="1"  <?php if($cloud_express){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[cloud_express]" value="0"  <?php if(!$cloud_express){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
@@ -1180,7 +1163,7 @@ function TestMail() {
 }
 </script>
 <div class="sbt">
-<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -1197,10 +1180,13 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-window.onload=function() {
+$(function(){
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-}
+	if(window.screen.width < 1280) {
+		$('.menu div').hide();
+	}
+});
 </script>
-<script type="text/javascript" src="http://www.destoon.com/sms.php?action=get&uid=<?php echo DT_CLOUD_UID;?>&key=<?php echo md5(DT_CLOUD_KEY.'|'.DT_CLOUD_UID);?>"></script>
+<script type="text/javascript" src="https://www.destoon.com/sms.php?action=get&uid=<?php echo DT_CLOUD_UID;?>&key=<?php echo md5(DT_CLOUD_KEY.'|'.DT_CLOUD_UID);?>"></script>
 <?php include tpl('footer');?>

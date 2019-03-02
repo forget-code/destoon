@@ -8,8 +8,7 @@ $menus = array (
     array('号码列表', '?moduleid='.$moduleid.'&file='.$file.'&action=list'),
 );
 function _userinfo($mobile) {
-	global $db;
-	return $db->get_one("SELECT * FROM {$db->pre}member m,{$db->pre}company c WHERE m.userid=c.userid AND m.mobile='$mobile'");
+	return DB::get_one("SELECT * FROM ".DT_PRE."member m,".DT_PRE."company c WHERE m.userid=c.userid AND m.mobile='$mobile'");
 }
 function _safecheck($content) {
 	if(strpos($content, '{$user[') === false) return false;
@@ -114,16 +113,18 @@ switch($action) {
 		dmsg('清理成功', $forward);
 	break;
 	case 'record':
-		$sfields = array('按条件', '短信内容', '发送结果', '手机号', '操作人');
+		$sfields = array('按条件', '短信内容', '发送结果', '手机号', 'IP', '操作人');
 		$dfields = array('message', 'message', 'code', 'mobile', 'editor');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= $fields < 3 ? " AND $dfields[$fields] LIKE '%$keyword%'" : " AND $dfields[$fields]='$keyword'";
-		if($fromtime) $condition .= " AND sendtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND sendtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND sendtime>=$fromtime";
+		if($totime) $condition .= " AND sendtime<=$totime";
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {

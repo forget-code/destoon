@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -83,14 +83,11 @@ switch($action) {
 
 class cron {
 	var $itemid;
-	var $db;
 	var $table;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'cron';
-		$this->db = &$db;
+		$this->table = DT_PRE.'cron';
     }
 
     function cron() {
@@ -98,7 +95,6 @@ class cron {
     }
 
 	function pass($post) {
-		global $DT_TIME;
 		if(!is_array($post)) return false;
 		if(!$post['title']) return $this->_('请填写任务名称');
 		if(!check_name($post['name']) || !is_file(DT_ROOT.'/api/cron/'.$post['name'].'.inc.php')) return $this->_('请选择脚本文件');
@@ -126,7 +122,7 @@ class cron {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = '', $order = 'itemid ASC') {
@@ -134,13 +130,13 @@ class cron {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);	
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['lasttime'] = $r['lasttime'] ? timetodate($r['lasttime'], 5) : 'N/A';
 			$r['nexttime'] = $r['nexttime'] ? timetodate($r['nexttime'], 5) : 'N/A';
 			$r['text'] = $this->time2text($r['schedule']);
@@ -157,7 +153,7 @@ class cron {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		return $this->itemid;
 	}
 
@@ -168,12 +164,12 @@ class cron {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
 	function delete() {
-		$this->db->query("DELETE FROM {$this->table} WHERE itemid=$this->itemid");
+		DB::query("DELETE FROM {$this->table} WHERE itemid=$this->itemid");
 	}
 
 	function nexttime($schedule, $time) {

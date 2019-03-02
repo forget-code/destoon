@@ -1,60 +1,50 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-function player(u, w, h, p, a) {
-	var w = w ? w : 480;
-	var h = h ? h : 400;
-	var e = t = c = m = x = '';
-	var UA = navigator.userAgent.toLowerCase();
-	if(UA.indexOf('mac os')!=-1) m = 'Mac';
-	if(UA.indexOf('ipad')!=-1) m = 'iPad';
-	if(UA.indexOf('iphone')!=-1) m = 'iPhone';
-	if(UA.indexOf('ipod')!=-1) m = 'iPod';
-	if(UA.indexOf('android')!=-1) m = 'Android';
+function player(u, w, h, a) {
+	var w = w ? w : 600;
+	var h = h ? h : 500;
+	var e = t = c = m = x = d = u5 = p1 = p2 = '';
+	var ua = navigator.userAgent.toLowerCase();
+	if(ua.indexOf('mac os')!=-1) m = 'Mac';
+	if(ua.indexOf('ipad')!=-1) m = 'iPad';
+	if(ua.indexOf('iphone')!=-1) m = 'iPhone';
+	if(ua.indexOf('ipod')!=-1) m = 'iPod';
+	if(ua.indexOf('android')!=-1) m = 'Android';
 	x = ext_url(u);
+	d = cutstr(u, '://', '/');
+	switch(d) {
+		case 'player.youku.com':
+		case 'v.qq.com':
+		case 'm.iqiyi.com':
+			return html_frame(u, w, h);
+		break;
+		default:
+		break;
+	}
 	if(m) {
-		u5 = '';
 		if(x == 'mp4') {
 			u5 = u;
-		} else if(u.indexOf('.youku.com')!=-1) {
-			u5 = youku_url5(u);
-			if(u5) return html_url5(u5, w, h);
-		} else if(u.indexOf('.tudou.com')!=-1) {
-			u5 = tudou_url5(u);
-			if(u5) return html_url5(u5, w, h);
-		} else if(u.indexOf('static.video.qq.com')!=-1||u.indexOf('imgcache.qq.com')!=-1) {
-			u5 = vqq_url5(u);
-			if(u5) return html_url5(u5, w, h);
-		} else if(u.indexOf('.56.com')!=-1) {
-			u5 = v56_url5(u);
-			if(u5) return html_url5(u5, w, h);
-		} else if(u.indexOf('.ku6.com')!=-1) {
-			u5 = ku6_url5(u);
-		} else if(u.indexOf('.youtube.com')!=-1) {
-			u5 = youtube_url5(u);
-			if(u5) return html_url5(u5, w, h);
+		} else if(d.indexOf('.youtube.com')!=-1) {
+			u5 = url2video5(u);
+			if(u5) return html_frame(u5, w, h);
+		} else if(u.indexOf('.huya.com')!=-1) {
+			u5 = url2video5(u);
+			if(u5) return html_play(u5);
+		} else if(d.indexOf('.douyucdn.cn')!=-1) {
+			u5 = url2video5(u);
+			if(u5) return html_play(u5);
 		}
-		var h2 = parseInt(h/2)-21;
-		var w2 = parseInt(w/2)-21;
-		if(u5) {
-			return m == 'Android' ? '<div style="width:'+w+'px;height:'+h+'px;text-align:center;background:#141516;margin:auto;"><a href="'+u5+'" target="_blank"><img src="'+DTPath+'/file/image/play.png" style="padding:'+h2+'px '+w2+'px '+h2+'px '+w2+'px;"/></a></div>' : '<video src="'+u5+'" width="'+w+'" height="'+h+'"'+(a ? ' autoplay="autoplay"' : '')+' controls="controls"></video>';
-		} else {
-			return '<div style="width:'+w+'px;height:'+h+'px;text-align:center;background:#000000;color:#FFFFFF;margin:auto;"><div style="padding-top:'+h2+'px;">'+m+L['iso_tips_video']+'</div></div>';
-		}
+		return u5 ? '<video src="'+u5+'" width="'+w+'" height="'+h+'"'+(a ? ' autoplay="autoplay"' : '')+' controls="controls">'+html_play(u5)+'</video>' : html_play(u);
 	}
-	if(p == 0) {
-		e = 'swf';
-	} else if(p == 1) {
-		e = 'wma';
-	} else if(p == 2) {
-		e = 'rm';
-	} else {
-		e = x;
-	}
-	if(e == 'rm' || e == 'rmvb' || e == 'ram') {
+	if(d.indexOf('.huya.com')!=-1) {
+		return html_frame(u, w, h);
+	} else if(d.indexOf('.douyucdn.cn')!=-1) {
+		return '<embed src="'+u+'" width="'+w+'" height="'+h+'" allownetworking="all" allowscriptaccess="always" quality="high" bgcolor="#000" wmode="window" allowfullscreen="true" allowFullScreenInteractive="true" type="application/x-shockwave-flash"></embed>';
+	} else if(x == 'rm' || x == 'rmvb' || x == 'ram') {
 		t = 'audio/x-pn-realaudio-extend';
-	} else if(e == 'wma' || e == 'wmv') {
+	} else if(x == 'wma' || x == 'wmv') {
 		t = 'application/x-mplayer2';
 		c = 'controls="imagewindow,controlpanel,statusbar"';
 	} else {
@@ -65,52 +55,24 @@ function player(u, w, h, p, a) {
 	return '<embed src="'+u+'" width="'+w+'" height="'+h+'" type="'+t+'" autostart="'+(a ? 'true' : 'false')+'" '+c+'></embed>';
 }
 function ext_url(v) {return v.substring(v.lastIndexOf('.')+1, v.length).toLowerCase();}
-function html_url5(u, w, h) {return '<iframe src="'+u5+'" width="'+w+'" height="'+h+'" frameborder="0" scrolling="no" allowfullscreen="true" allowtransparency="true"></iframe>';}
-function youku_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('/sid/') == -1 || u.indexOf('/v.sw') == -1) return '';
-	t1 = u.split('/sid/');
-	t2 = t1[1].split('/v.sw');
-	t3 = t2[0];
-	return t3 ? 'http://player.youku.com/embed/'+t3 : '';
-}
-function tudou_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('/v/') == -1) return '';
-	t1 = u.split('/v/');
-	t2 = t1[1].split('/');
-	t3 = t2[0];	
-	return t3 ? 'http://www.tudou.com/programs/view/html5embed.action?code='+t3 : '';
-}
-function vqq_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('vid=') == -1) return '';
-	t1 = u.split('vid=');
-	t2 = t1[1].split('&');
-	t3 = t2[0];
-	return t3 ? 'http://v.qq.com/iframe/player.html?vid='+t3+'&tiny=0&auto=0' : '';
-	//return t3 ? 'http://vxml.56.com/m3u8/'+t3+'/' : '';
-}
-function v56_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('/v_') == -1 || u.indexOf('.sw') == -1) return '';
-	t1 = u.split('/v_');
-	t2 = t1[1].split('.sw');
-	t3 = t2[0];
-	return t3 ? 'http://www.56.com/iframe/'+t3 : '';
-}
-function ku6_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('refer/') == -1 || u.indexOf('v.sw') == -1) return '';
-	t1 = u.split('refer/');
-	t2 = t1[1].split('/v.sw');
-	t3 = t2[0];
-	return t3 ? 'http://v.ku6.com/fetchwebm/'+t3+'.m3u8' : '';
-}
-function youtube_url5(u) {
-	var t1,t2,t3;
-	if(u.indexOf('youtube.com/v/') == -1) return '';
-	t1 = u.split('/v/');
-	t3 = t1[1];
-	return t3 ? 'http://www.youtube.com/embed/'+t3 : '';
+function html_frame(u, w, h) {return '<iframe src="'+u+'" width="'+w+'" height="'+h+'" frameborder="0" scrolling="no" allowfullscreen="true" allowtransparency="true"></iframe>';}
+function html_play(u) {return '<a href="'+u+'" target="_blank" rel="external"><div style="width:100%;height:200px;background:#000000 url('+DTPath+'/file/image/play.png) no-repeat center center;background-size:48px 48px;"></div></a>';}
+function url2video5(u) {
+	var p = '';
+	var d = cutstr(u, '://', '/');
+	switch(d) {
+		case 'www.youtube.com':
+			p = cutstr(u, '/v/', '&');
+			if(p) return 'http://www.youtube.com/embed/'+p;
+		break;
+		case 'liveshare.huya.com':
+			p = cutstr(u, '/iframe/', '/');
+			if(p) return 'http://m.huya.com/'+p;
+		break;
+		case 'staticlive.douyucdn.cn':
+			p = cutstr(u, 'room_id=', '&');
+			if(p) return 'https://m.douyu.com/'+p;
+		break;
+	}
+	return u;
 }

@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $qid = isset($qid) ? intval($qid) : 0;
-require MD_ROOT.'/answer.class.php';
+require DT_ROOT.'/module/'.$module.'/answer.class.php';
 $do = new answer();
 $menus = array (
     array('答案列表', '?moduleid='.$moduleid.'&file='.$file.'&qid='.$qid),
@@ -33,6 +33,14 @@ switch($action) {
 		$itemid or msg();
 		$do->itemid = $itemid;
 		if($submit) {
+			$content = stripslashes(trim($post['content']));
+			if(!$content) msg('请填写答案');
+			$content = save_local($content);
+			if($MOD['clear_alink']) $content = clear_link($content);
+			if($MOD['save_remotepic']) $content = save_remote($content);
+			$content = dsafe($content);
+			$post['content'] = addslashes($content);
+			clear_upload($content, $itemid, $table_answer);
 			if($do->pass($post)) {
 				$do->edit($post);
 				dmsg('修改成功', $forward);

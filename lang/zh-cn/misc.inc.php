@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -37,10 +37,10 @@ $L['content_truename'] = '联系人：';
 $L['content_email'] = '电子邮件：';
 $L['content_company'] = '公司名：';
 $L['content_telephone'] = '联系电话：';
-$L['content_qq'] = '联系QQ：';
-$L['content_msn'] = '联系MSN：';
+$L['content_qq'] = 'QQ：';
+$L['content_wx'] = '微信：';
 $L['content_ali'] = '阿里旺旺：';
-$L['content_skype'] = '联系Skype：';
+$L['content_skype'] = 'Skype：';
 $L['content_type'] = '我想了解的产品信息有：';
 $L['content_from'] = '(信息来自公司主页)';
 $L['content_date'] = '我希望在 {V0} 之前回复';

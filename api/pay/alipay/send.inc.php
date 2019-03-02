@@ -11,18 +11,18 @@ $parameter = array(
 	'subject' => $DT['sitename'].'会员充值',	//商品名称，必填
 	'body' => $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')',      //商品描述，必填
 
-	"out_trade_no"   => $orderid,     //商品外部交易号，必填（保证唯一性）
-	"price"          => $charge,           //商品单价，必填（价格不能为0）
-	"payment_type"   => "1",              //默认为1,不需要修改
-	"quantity"       => "1",              //商品数量，必填
+	'out_trade_no'   => $orderid,     //商品外部交易号，必填（保证唯一性）
+	'price'          => $charge,           //商品单价，必填（价格不能为0）
+	'payment_type'   => '1',              //默认为1,不需要修改
+	'quantity'       => '1',              //商品数量，必填
 		
-	"logistics_fee"      =>'0.00',        //物流配送费用
-	"logistics_payment"  =>'SELLER_PAY',   //物流费用付款方式：SELLER_PAY(卖家支付)、BUYER_PAY(买家支付)、BUYER_PAY_AFTER_RECEIVE(货到付款)
-	"logistics_type"     =>'EXPRESS',     //物流配送方式：POST(平邮)、EMS(EMS)、EXPRESS(其他快递)
+	'logistics_fee'      =>'0.00',        //物流配送费用
+	'logistics_payment'  =>'SELLER_PAY',   //物流费用付款方式：SELLER_PAY(卖家支付)、BUYER_PAY(买家支付)、BUYER_PAY_AFTER_RECEIVE(货到付款)
+	'logistics_type'     =>'EXPRESS',     //物流配送方式：POST(平邮)、EMS(EMS)、EXPRESS(其他快递)
 
-	"show_url"       => $show_url,        //商品相关网站
-	"seller_email"   => $seller_email,     //卖家邮箱，必填
-	"buyer_email"    =>  $_email,
+	'show_url'       => $show_url,        //商品相关网站
+	'seller_email'   => $seller_email,     //卖家邮箱，必填 
+	'buyer_email'    => $_email,	//买家邮箱 
 );
 
 //对URL组合

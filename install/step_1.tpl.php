@@ -10,17 +10,17 @@ include IN_ROOT.'/header.tpl.php';
 	</div>
 </div>
 <div class="body">
-<div>
-<textarea style="width:100%;height:190px;margin:0 0 10px 0;">
+<div style="padding:24px;">
+<textarea style="width:760px;height:224px;border:#CCCCCC 1px solid;margin-bottom:16px;padding:10px;">
 <?php echo $license;?>
 </textarea>
-<strong style="color:red;">注意</strong>：本软件仅限个人免费使用，非个人用户(公司、协会等组织机构)必须购买授权后正式建站
+<span style="color:red;">&nbsp;&nbsp;注意：本软件仅限个人免费使用，非个人用户(公司、协会等组织机构)必须购买授权后正式建站</span>
 </div>
 </div>
 <div class="foot">
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td width="215">
+<td width="220">
 <div class="progress">
 <div id="progress"></div>
 </div>

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -19,13 +19,10 @@ if($submit) {
 }
 
 class question {
-	var $db;
 	var $table;
 
 	function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'question';
-		$this->db = &$db;
+		$this->table = DT_PRE.'question';
 	}
 
 	function question() {
@@ -34,10 +31,10 @@ class question {
 
 	function get_list($condition) {
 		global $pages, $page, $pagesize, $offset, $pagesize;
-		$pages = pages($this->db->count($this->table, $condition), $page, $pagesize);
+		$pages = pages(DB::count($this->table, $condition), $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY qid DESC LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY qid DESC LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -64,7 +61,7 @@ class question {
 			$q = trim($q);
 			if($q) {
 				$a = isset($A[$k]) ? trim($A[$k]) : '';
-				if($q && $a) $this->db->query("INSERT INTO {$this->table} (question,answer) VALUES('$q','$a')");
+				if($q && $a) DB::query("INSERT INTO {$this->table} (question,answer) VALUES('$q','$a')");
 			}
 		}
 	}
@@ -72,12 +69,12 @@ class question {
 	function edit($post) {
 		foreach($post as $k=>$v) {
 			if(!$v['question'] || !$v['answer']) continue;
-			$this->db->query("UPDATE {$this->table} SET question='$v[question]',answer='$v[answer]' WHERE qid='$k'");
+			DB::query("UPDATE {$this->table} SET question='$v[question]',answer='$v[answer]' WHERE qid='$k'");
 		}
 	}
 
 	function delete($qid) {
-		$this->db->query("DELETE FROM {$this->table} WHERE qid=$qid");
+		DB::query("DELETE FROM {$this->table} WHERE qid=$qid");
 	}
 }
 ?>

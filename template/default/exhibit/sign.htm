@@ -1,7 +1,7 @@
 {template 'header'}
 <div class="m">
 	<div class="nav">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; <a href="{$linkurl}">{$item[title]}</a> &raquo; 在线报名</div>
-	<form method="post" action="{$MOD[linkurl]}sign.php" id="dform" onsubmit="return check();">
+	<form method="post" action="sign.php" id="sign_form" onsubmit="return sign_check();">
 	<input type="hidden" name="forward" value="{$forward}"/>
 	<input type="hidden" name="itemid" value="{$itemid}"/>
 	<table width="100%" cellpadding="8" cellspacing="1" bgcolor="#DDDDDD">	
@@ -19,7 +19,7 @@
 	</tr>
 	<tr>
 	<td bgcolor="#F3F3F3" align="right">公司名称</td>
-	<td bgcolor="#FFFFFF"><input type="text" name="company" size="30" id="company" value="{$company}"/></td>
+	<td bgcolor="#FFFFFF"><input type="text" name="company" size="30" id="company" value="{$company}"/> <span class="f_red" id="dcompany"></span></td>
 	</tr>
 	<tr>
 	<td bgcolor="#F3F3F3" align="right">通讯地址</td>
@@ -37,6 +37,12 @@
 	<tr>
 	<td bgcolor="#F3F3F3" align="right">QQ</td>
 	<td bgcolor="#FFFFFF"><input type="text" size="30" name="qq" id="qq" value="{$qq}"/></td>
+	</tr>
+	{/if}
+	{if $DT[im_wx]}
+	<tr>
+	<td bgcolor="#F3F3F3" align="right">微信</td>
+	<td bgcolor="#FFFFFF"><input type="text" size="30" name="wx" id="wx" value="{$wx}"/></td>
 	</tr>
 	{/if}
 	<tr>
@@ -62,7 +68,7 @@
 </div>
 {if !$_userid}<script type="text/javascript" src="{DT_STATIC}file/script/guest.js"></script>{/if}
 <script type="text/javascript">
-function check() {
+function sign_check() {
 	var l;
 	var f;
 	f = 'amount';
@@ -86,13 +92,8 @@ function check() {
 	}
 	{if $need_captcha}
 	f = 'captcha';
-	l = Dd(f).value;
-	if(!is_captcha(l)) {
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
 		Dmsg('请填写正确的验证码', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
 		return false;
 	}
 	{/if}

@@ -7,8 +7,7 @@ $menus = array (
     array('记录清理', '?moduleid='.$moduleid.'&file='.$file.'&action=clear', 'onclick="if(!confirm(\'为了系统安全,系统仅删除90天之前的记录\n此操作不可撤销，请谨慎操作\')) return false"'),
 );
 function _userinfo($mobile) {
-	global $db;
-	return $db->get_one("SELECT * FROM {$db->pre}member m,{$db->pre}company c WHERE m.userid=c.userid AND m.mobile='$mobile'");
+	return DB::get_one("SELECT * FROM ".DT_PRE."member m,".DT_PRE."company c WHERE m.userid=c.userid AND m.mobile='$mobile'");
 }
 $table = $DT_PRE.'finance_sms';
 switch($action) {
@@ -45,7 +44,7 @@ switch($action) {
 				sms_add($username, $amount);
 				sms_record($username, $amount, $_username, $reason, $note);
 			}
-			if($error) message('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
+			if($error) msg('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
 			dmsg('操作成功', '?moduleid='.$moduleid.'&file='.$file.'&action=record');
 		} else {
 			if(isset($userid)) {
@@ -72,18 +71,19 @@ switch($action) {
 		$sorder  = array('排序方式', '数量降序', '数量升序', '时间降序', '时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'addtime DESC', 'addtime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		(isset($username) && check_name($username)) or $username = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($type) or $type = 0;
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$order_select = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($type) $condition .= $type == 1 ? " AND amount>0" : " AND amount<0";
 		if($username) $condition .= " AND username='$username'";
 		if($page > 1 && $sum) {

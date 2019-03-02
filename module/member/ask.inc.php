@@ -27,7 +27,6 @@ switch($action) {
 				'title' => $title,
 				);
 			$fields = dhtmlspecialchars($fields);
-			clear_upload($content);
 			$content = dsafe(addslashes(save_remote(save_local(stripslashes($content)))));
 			$fields['content'] = $content;
 			$fields['qid'] = $a ? $a['itemid'] : 0;
@@ -39,6 +38,8 @@ switch($action) {
 			}
 			$sqlk = substr($sqlk, 1); $sqlv = substr($sqlv, 1);
 			$db->query("INSERT INTO {$DT_PRE}ask ($sqlk) VALUES ($sqlv)");
+			$itemid = $db->insert_id();
+			clear_upload($content, $itemid, 'ask');
 			dmsg($L['ask_add_success'], '?action=index');
 		} else {
 			$typeid = isset($typeid) ? intval($typeid) : 0;
@@ -64,7 +65,6 @@ switch($action) {
 			if(!$typeid || !isset($TYPE[$typeid])) message($L['pass_typeid']);		
 			if(empty($title)) message($L['pass_title']);
 			if(empty($content)) message($L['pass_content']);
-			clear_upload($content);
 			$content = dsafe(addslashes(save_remote(save_local(stripslashes($content)))));
 			$fields = array(
 				'typeid' => $typeid,
@@ -78,6 +78,7 @@ switch($action) {
 			}
 			$sql = substr($sql, 1);
 			$db->query("UPDATE {$DT_PRE}ask SET $sql WHERE itemid=$itemid");
+			clear_upload($content, $itemid, 'ask');
 			dmsg($L['op_edit_success'], $forward);
 		} else {			
 			extract($r);
@@ -116,6 +117,12 @@ switch($action) {
 		$db->query("DELETE FROM {$DT_PRE}ask WHERE itemid=$itemid");
 		dmsg($L['op_del_success'], $forward);
 	break;
+	case 'support':
+		$support or message($L['support_error_1']);
+		$user = userinfo($support);
+		$user or message($L['support_error_2']);
+		$head_title = $L['support_title'];
+	break;
 	default:
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
@@ -124,8 +131,9 @@ switch($action) {
 		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
 		if($typeid > -1) $condition .= " AND typeid=$typeid";
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}ask WHERE $condition");
-		$pages = pages($r['num'], $page, $pagesize);		
-		$asks = array();
+		$items = $r['num'];
+		$pages = pages($items, $page, $pagesize);		
+		$lists = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}ask WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
@@ -133,10 +141,25 @@ switch($action) {
 			$r['dstatus'] = $dstatus[$r['status']];
 			$r['dstar'] = $L['ask_star_type'][$r['star']];
 			$r['type'] = $r['typeid'] && isset($TYPE[$r['typeid']]) ? set_style($TYPE[$r['typeid']]['typename'], $TYPE[$r['typeid']]['style']) : $L['default_type'];
-			$asks[] = $r;
+			$lists[] = $r;
 		}
 		$head_title = $L['ask_title'];
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit' || $action == 'show' || $action == 'support') {
+		$back_link = '?action=index';
+	} else {
+		$time = 'addtime';
+		foreach($lists as $k=>$v) {
+			$lists[$k]['date'] = timetodate($v[$time], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1) ? '?action=index' : 'index.php';
+	}
 }
 include template('ask', $module);
 ?>

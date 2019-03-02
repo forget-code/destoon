@@ -1,27 +1,28 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-$MG['club_reply_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
-require MD_ROOT.'/reply.class.php';
+$reply_limit = intval($MOD['reply_limit_'.$_groupid]);
+$reply_limit > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+require DT_ROOT.'/module/'.$module.'/reply.class.php';
 $do = new reply();
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 $today = $today_endtime - 86400;
-if(in_array($action, array('', 'add')) && $MG['club_reply_limit']) {
-	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table}_reply WHERE $sql AND status>1 AND addtime>$today");
+if(in_array($action, array('', 'add')) && $reply_limit) {
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_reply} WHERE $sql AND status>1 AND addtime>$today");
 	$limit_used = $r['num'];
-	$limit_free = $MG['club_reply_limit'] > $limit_used ? $MG['club_reply_limit'] - $limit_used : 0;
+	$limit_free = $reply_limit > $limit_used ? $reply_limit - $limit_used : 0;
 }
 switch($action) {
 	case 'add':
 		check_group($_groupid, $MOD['group_reply']) or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 		$tid = isset($tid) ? intval($tid) : 0;
-		$tid or dalert($L['my_choose_post'], $MOD['linkurl']);
+		$tid or dalert($L['my_choose_post'], $DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
 		$T = $db->get_one("SELECT * FROM {$table} WHERE itemid=$tid");
 		($T && $T['status'] == 3) or dalert($L['my_not_post']);
 		$gid = $T['gid'];
 		$GRP = get_group($gid);
 		($GRP && $GRP['status'] == 3) or dalert($L['my_not_group']);
-		if($MG['club_reply_limit'] && $limit_used >= $MG['club_reply_limit']) dalert(lang($L['day_limit'], array($MG['club_reply_limit'], $limit_used)), $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job);
+		if($reply_limit && $limit_used >= $reply_limit) dalert(lang($L['day_limit'], array($reply_limit, $limit_used)), $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job);
 		if($GRP['reply_type'] && !is_fans($GRP)) {
 			$action = 'reply';
 			$head_title = lang('message->without_permission');
@@ -30,7 +31,7 @@ switch($action) {
 		$rid = isset($rid) ? intval($rid) : 0;
 		$R = array();
 		if($rid) {
-			$R = $db->get_one("SELECT * FROM {$table}_reply WHERE itemid=$rid");
+			$R = $db->get_one("SELECT * FROM {$table_reply} WHERE itemid=$rid");
 			($R && $R['status'] == 3 && $R['tid'] == $tid) or dalert($L['my_not_reply']);
 			$str = $R['content'];
 			if(strpos($str, '<hr class="club_break" />') !== false) {
@@ -61,15 +62,15 @@ switch($action) {
 				$do->add($post);
 				$js = '';
 				if($post['status'] == 3) {
-					$forward = $MOD['linkurl'].'goto.php?itemid='.$do->itemid;
+					$forward = ($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).'goto.php?itemid='.$do->itemid;
 					$msg = '';
 				} else {
 					if($_userid) {
 						set_cookie('dmsg', $msg);
-						$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job.'&status='.$post['status'];
+						$forward = '?mid='.$mid.'&job='.$job.'&status='.$post['status'];
 						$msg = '';
 					} else {
-						$forward = $MOD['linkurl'].$T['linkurl'];
+						$forward = ($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$T['linkurl'];
 						$msg = $L['success_check'];
 					}
 				}
@@ -119,7 +120,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $db->get_one("SELECT username FROM {$table}_reply WHERE itemid=$itemid");
+			$item = $db->get_one("SELECT username FROM {$table_reply} WHERE itemid=$itemid");
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -138,9 +139,26 @@ switch($action) {
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 4; $i++) {
-		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE username='$_username' AND status=$i");
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_reply} WHERE username='$_username' AND status=$i");
 		$nums[$i] = $r['num'];
 	}
 }
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?mid='.$mid.'&job='.$job;
+	} else {
+		foreach($lists as $k=>$v) {
+			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
+			$lists[$k]['date'] = timetodate($v['addtime'], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$foot = '';
+		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&job='.$job.'&status='.$status : '?mid='.$mid.'&job='.$job;
+	}
+}
 $head_title = $L['my_reply_title'];
+include template($MOD['template_my_reply'] ? $MOD['template_my_reply'] : 'my_club_reply', 'member');
 ?>

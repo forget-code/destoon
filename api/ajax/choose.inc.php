@@ -7,7 +7,7 @@ if($job == 'item') {
 	isset($username) or $username = '';
 	$condition = $mid == 4 ? 'groupid>5' : 'status=3';
 	if($keyword) $condition .= " AND keyword LIKE '%$keyword%'";
-	if($from == 'relate' && $mid == 16) {
+	if($from == 'relate' && $MODULE[$mid]['module'] == 'mall') {
 		check_name($username) or exit;
 		$condition .= " AND username='$username'";
 	} else {
@@ -100,5 +100,5 @@ if($job == 'item') {
 	}
 	$head_title = '选择图片';
 }
-include template('select', 'member');
+include template('choose', 'member');
 ?>

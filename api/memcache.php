@@ -1,7 +1,8 @@
 <?php
 define('DT_ADMIN', true);
 require '../common.inc.php';
-($_userid > 0 && $_groupid == 1 && $_userid == $CFG['founderid']) or exit('Access Denied');
+require DT_ROOT.'/include/post.func.php';
+($_userid > 0 && $_groupid == 1 && is_founder($_userid)) or exit('Access Denied');
 /*
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |

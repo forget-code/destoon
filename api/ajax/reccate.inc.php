@@ -2,7 +2,6 @@
 defined('IN_DESTOON') or exit('Access Denied');
 isset($name) or $name = '';
 if(!$name || strlen($name) < 2 || strlen($name) > 30) exit;
-$name = convert($name, 'UTF-8', DT_CHARSET);
 $limit = $DT['schcate_limit'] ? intval($DT['schcate_limit']) : 10;
 $table = get_table($moduleid);
 $html = '';

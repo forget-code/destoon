@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -20,7 +20,6 @@ class upload {
     var $errmsg = errmsg;
 	var $userid;
 	var $image;
-	var $uptime = 0;
 	var $adduserid = true;
 
     function __construct($_file, $savepath, $savename = '', $fileformat = '') {
@@ -31,6 +30,7 @@ class upload {
 			$this->file_size = $file['size'];
 			$this->file_type = $file['type'];
 			$this->file_error = $file['error'];
+			break;
 		}
 		$this->userid = $_userid;
 		$this->ext = file_ext($this->file_name);
@@ -63,6 +63,11 @@ class upload {
 		if(!$this->fileformat) return false;
 		if(!preg_match("/^(".$this->fileformat.")$/i", $this->ext)) return false;
 		if(preg_match("/^(php|phtml|php3|php4|jsp|exe|dll|cer|shtml|shtm|asp|asa|aspx|asax|ashx|cgi|fcgi|pl)$/i", $this->ext)) return false;
+		if($this->savename) {
+			$ext = file_ext($this->savename);
+			if(!preg_match("/^(".$this->fileformat.")$/i", $ext)) return false;
+			if(preg_match("/^(php|phtml|php3|php4|jsp|exe|dll|cer|shtml|shtm|asp|asa|aspx|asax|ashx|cgi|fcgi|pl)$/i", $ext)) return false;
+		}
 		return true;
     }
 
@@ -77,12 +82,10 @@ class upload {
     }
 
     function set_savename($savename) {
-		global $DT_TIME;
         if($savename) {
             $this->savename = $this->adduserid ? str_replace('.'.$this->ext, $this->userid.'.'.$this->ext, $savename) : $savename;
         } else {
-			$this->uptime = $DT_TIME;
-            $name = date('His', $this->uptime).mt_rand(10, 99);
+            $name = date('His', DT_TIME).mt_rand(10, 99);
             $this->savename = $this->adduserid ? $name.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
         }
 		$this->saveto = $this->savepath.$this->savename;		

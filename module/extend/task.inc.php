@@ -6,7 +6,7 @@ if($html == 'webpage') {
 	$r = $db->get_one("SELECT linkurl,islink FROM {$DT_PRE}webpage WHERE itemid=$itemid");
 	$r or exit;
 	$r['islink'] and exit;
-	$db->query("UPDATE {$DT_PRE}webpage SET hits=hits+1 WHERE itemid=$itemid");
+	if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$DT_PRE}webpage SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');
 	if($DT_TIME - @filemtime(DT_ROOT.'/'.$r['linkurl']) > $task_item) tohtml('webpage', $module);
 } else if($html == 'spread') {
 	$r = $db->get_one("SELECT * FROM {$DT_PRE}spread ORDER BY rand()");

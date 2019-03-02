@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -36,12 +36,11 @@ function strip_sql($string, $type = 1) {
 		return array_map('strip_sql', $string);
 	} else {
 		if($type) {
-			global $DT_PRE;
 			$string = preg_replace("/\/\*([\s\S]*?)\*\//", "", $string);
 			$string = preg_replace("/0x([a-f0-9]{2,})/i", '0&#120;\\1', $string);
-			$string = preg_replace_callback("/(select|update|replace|delete|drop)([\s\S]*?)({$DT_PRE}|from)/i", 'strip_wd', $string);
+			$string = preg_replace_callback("/(select|update|replace|delete|drop)([\s\S]*?)(".DT_PRE."|from)/i", 'strip_wd', $string);
 			$string = preg_replace_callback("/(load_file|substring|substr|reverse|trim|space|left|right|mid|lpad|concat|concat_ws|make_set|ascii|bin|oct|hex|ord|char|conv)([^a-z]?)\(/i", 'strip_wd', $string);
-			$string = preg_replace_callback("/(union|where|having|outfile|dumpfile|{$DT_PRE})/i", 'strip_wd', $string);
+			$string = preg_replace_callback("/(union|where|having|outfile|dumpfile|".DT_PRE.")/i", 'strip_wd', $string);
 			return $string;
 		} else {
 			return str_replace(array('&#95;','&#100;','&#101;','&#103;','&#105;','&#109;','&#110;','&#112;','&#114;','&#115;','&#116;','&#118;','&#120;'), array('_','d','e','g','i','m','n','p','r','s','t','v','x'), $string);
@@ -67,7 +66,7 @@ function strip_uri($uri) {
 	}
 	if(strpos($uri, '<') !== false || strpos($uri, "'") !== false || strpos($uri, '"') !== false || strpos($uri, '0x') !== false) {
 		dhttp(403, 0);
-		dalert('HTTP 403 Forbidden', DT_PATH);
+		dalert('HTTP 403 Forbidden - Bad URL', DT_PATH);
 	}
 }
 
@@ -92,7 +91,7 @@ function strip_key($array) {
 	}
 }
 
-function strip_str($string, $level = 0) {
+function strip_str($string) {
 	return str_replace(array('\\','"', "'"), array('', '', ''), $string);
 }
 ?>

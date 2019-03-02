@@ -8,8 +8,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="tb" value="<?php echo $tb;?>"/>
 <input type="hidden" name="post[tb]" value="<?php echo $tb;?>"/>
-<div class="tt">添加字段</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 字段</td>
 <td><input name="post[name]" type="text" id="name" size="20"/>
@@ -52,6 +51,7 @@ show_menu($menus);
 <option value="checkbox">多选框(checkbox)</option>
 <option value="hidden">隐藏域(hidden)</option>
 <option value="date">日期选择</option>
+<option value="time">时间选择</option>
 <option value="thumb">缩略图上传</option>
 <option value="file">文件上传</option>
 <option value="editor">网页编辑器</option>
@@ -92,6 +92,7 @@ show_menu($menus);
 <option value="nl">限数字和字母</option>
 <option value="email">限E-mail地址</option>
 <option value="date">限日期格式</option>
+<option value="time">限时间格式</option>
 </select><br/>
 直接填数字表示限制最小长度,如果要限制长度范围例如6到20之间,则填写 6-20<br/>
 可以直接书写兼容js和php的正则表达式<br/>
@@ -108,19 +109,19 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 直接显示</td>
 <td>
-<input type="radio" name="post[display]" value="1" checked/> 是
+<input type="radio" name="post[display]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[display]" value="0"/> 否 <?php tips('如果选择否，可以手动将本字段加入到对应的模板文件里，系统将不直接显示');?>
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 前台显示</td>
 <td>
-<input type="radio" name="post[front]" value="1" checked/> 是
+<input type="radio" name="post[front]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[front]" value="0"/> 否 <?php tips('如果选择是，则会在前台显示，会员可以修改');?>
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="添 加" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&tb=<?php echo $tb;?>');"/></div>
 </form>
 <script type="text/javascript">
 function dhtml(id) {
@@ -176,6 +177,8 @@ function dlimit(id) {
 		Dd('input_limit').value = 'is_email';
 	} else if(id == 'date') {
 		Dd('input_limit').value = 'is_date';
+	} else if(id == 'time') {
+		Dd('input_limit').value = 'is_time';
 	} else {
 		Dd('input_limit').value = '';
 	}

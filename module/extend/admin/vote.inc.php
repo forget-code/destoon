@@ -1,15 +1,14 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('vote', 1);
-require MD_ROOT.'/vote.class.php';
+require DT_ROOT.'/module/'.$module.'/vote.class.php';
 $do = new vote();
 $menus = array (
     array('添加投票', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('投票列表', '?moduleid='.$moduleid.'&file='.$file),
     array('更新投票', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
     array('投票分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'投票分类\');'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 switch($action) {

@@ -8,7 +8,7 @@ $menus = array (
   array('支付接口'),
   array($DT['credit_name'].'规则'),
   array('会员整合'),
-  array('定义字段', 'javascript:Dwidget(\'?file=fields&tb='.$table.'\', \'['.$MOD['name'].']定义字段\');'),
+  array('一键登录'),
 );
 show_menu($menus);
 ?>
@@ -17,8 +17,7 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<div class="tt">基本设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">新用户注册</td>
 <td>
@@ -36,24 +35,33 @@ show_menu($menus);
 </td>
 </tr>
 <tr>
-<td class="tl">用户密码长度</td>
-<td>
-<input type="text" size="3" name="setting[minpassword]" value="<?php echo $minpassword;?>"/>
-至
-<input type="text" size="3" name="setting[maxpassword]" value="<?php echo $maxpassword;?>"/>
-字符<?php tips('过短的密码不利于用户的帐户安全<br/>建议设置为6-20个字符之间，不要超过31位');?>
-</td>
-</tr>
-<tr>
 <td class="tl">用户名保留关键字</td>
 <td><textarea name="setting[banusername]" style="width:96%;height:30px;overflow:visible;"><?php echo $banusername;?></textarea><?php tips('含有保留的关键字的用户名将被禁止注册<br/>多个保留关键字请用|隔开');?>
 </td>
 </tr>
 <tr>
-<td class="tl">用户名保留关键字匹配模式</td>
+<td class="tl">保留关键字匹配模式</td>
 <td>
 <input type="radio" name="setting[banmodeu]" value="1" <?php if($banmodeu) echo 'checked';?>/> 相同&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[banmodeu]" value="0" <?php if(!$banmodeu) echo 'checked';?>/> 包含<?php tips('选择包含时，当用户名中含有关键字时即禁止注册<br/>选择相同时，当用户名和关键字相同时才禁止注册');?>
+</td>
+</tr>
+<tr>
+<td class="tl">用户密码长度</td>
+<td>
+<input type="text" size="3" name="setting[minpassword]" value="<?php echo $minpassword;?>"/>
+至
+<input type="text" size="3" name="setting[maxpassword]" value="<?php echo $maxpassword;?>"/>
+字符<?php tips('过短的密码不利于用户的帐户安全<br/>建议设置为6-20个字符之间，不要超过30位');?>
+</td>
+</tr>
+<tr>
+<td class="tl">用户密码强度</td>
+<td>
+<input type="checkbox" name="setting[mixpassword][]" value="1"<?php echo strpos(','.$mixpassword.',', ',1,') !== false ? ' checked' : '';?>/> 数字&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="checkbox" name="setting[mixpassword][]" value="2"<?php echo strpos(','.$mixpassword.',', ',2,') !== false ? ' checked' : '';?>/> 小写字母&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="checkbox" name="setting[mixpassword][]" value="3"<?php echo strpos(','.$mixpassword.',', ',3,') !== false ? ' checked' : '';?>/> 大写字母&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="checkbox" name="setting[mixpassword][]" value="4"<?php echo strpos(','.$mixpassword.',', ',4,') !== false ? ' checked' : '';?>/> 标点符号&nbsp;&nbsp;&nbsp;&nbsp;
 </td>
 </tr>
 <tr>
@@ -62,7 +70,7 @@ show_menu($menus);
 </td>
 </tr>
 <tr>
-<td class="tl">公司名保留关键字匹配模式</td>
+<td class="tl">保留关键字匹配模式</td>
 <td>
 <input type="radio" name="setting[banmodec]" value="1" <?php if($banmodec) echo 'checked';?>/> 相同&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[banmodec]" value="0" <?php if(!$banmodec) echo 'checked';?>/> 包含<?php tips('选择包含时，当公司名中含有关键字时即禁止注册<br/>选择相同时，当公司名和关键字相同时才禁止注册');?>
@@ -76,10 +84,11 @@ show_menu($menus);
 <tr>
 <td class="tl">新用户注册验证</td>
 <td>
-<input type="radio" name="setting[checkuser]" value="0" <?php if(!$checkuser) echo 'checked';?>> 不验证
-&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[checkuser]" value="0" <?php if(!$checkuser) echo 'checked';?>> 不验证&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[checkuser]" value="1" <?php if($checkuser==1) echo 'checked';?>> 人工审核&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[checkuser]" value="2" <?php if($checkuser==2) echo 'checked';?>> 邮件验证
+<input type="radio" name="setting[checkuser]" value="2" <?php if($checkuser==2) echo 'checked';?>> 邮件验证&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[checkuser]" value="3" <?php if($checkuser==3) echo 'checked';?>> 短信验证&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[checkuser]" value="4" <?php if($checkuser==4) echo 'checked';?>> 邮件或短信验证
 </td>
 </tr>
 
@@ -104,24 +113,6 @@ show_menu($menus);
 <td>
 <input type="radio" name="setting[welcome_sms]" value="1" <?php if($welcome_sms) echo 'checked';?>/> 开启&nbsp;&nbsp;
 <input type="radio" name="setting[welcome_sms]" value="0" <?php if(!$welcome_sms) echo 'checked';?>/> 关闭<?php tips('短信费用由网站支付，建议开启邮件验证码注册后，再开启此功能，以过滤恶意注册');?>
-</td>
-</tr>
-
-
-<tr>
-<td class="tl">注册邮件验证码</td>
-<td>
-<input type="radio" name="setting[emailcode_register]" value="1" <?php if($emailcode_register) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[emailcode_register]" value="0" <?php if(!$emailcode_register) echo 'checked';?>/> 关闭
-</td>
-</tr>
-
-
-<tr>
-<td class="tl">注册手机验证码</td>
-<td>
-<input type="radio" name="setting[mobilecode_register]" value="1" <?php if($mobilecode_register) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[mobilecode_register]" value="0" <?php if(!$mobilecode_register) echo 'checked';?>/> 关闭
 </td>
 </tr>
 
@@ -194,12 +185,44 @@ $ECK = array(
 	'capital' => '注册资本',
 	'address' => '公司地址',
 	'telephone' => '联系电话',
+	'gzh' => '微信公众号',
+	'gzhqr' => '公众号二维码',
 	'content' => '公司介绍',
 );
 foreach($ECK as $k=>$v) {
 	echo '<input type="checkbox" name="setting[edit_check][]" value="'.$k.'" id="check_'.$k.'" '.(strpos(','.$edit_check.',', ','.$k.',') !== false ? ' checked' : '').'/><label for="check_'.$k.'"> '.$v.' </label>';
 }
 ?>
+</td>
+</tr>
+<tr>
+<td class="tl">登录失败次数限制</td>
+<td><input type="text" size="3" name="setting[login_times]" value="<?php echo $login_times;?>"/> 次登录失败后锁定登录 <input type="text" size="3" name="setting[lock_hour]" value="<?php echo $lock_hour;?>"/> 小时
+</td>
+</tr>
+<tr>
+<td class="tl">用户登录启用验证码</td>
+<td>
+<input type="radio" name="setting[captcha_login]" value="1" <?php if($captcha_login) echo 'checked';?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[captcha_login]" value="0" <?php if(!$captcha_login) echo 'checked';?>/> 关闭
+</td>
+</tr>
+<tr>
+<td class="tl">用户登录有效期</td>
+<td><input type="text" size="6" name="setting[login_time]" value="<?php echo $login_time;?>"/> 秒 <?php tips('0代表关闭浏览器自动退出登录（安全），大于0的数字代表记忆登录的时间，如果设置，最小值为86400（24小时）');?></td>
+</tr>
+<tr>
+<td class="tl">手机验证码登录</td>
+<td>
+<input type="radio" name="setting[login_sms]" value="1" <?php if($login_sms) echo 'checked';?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[login_sms]" value="0" <?php if(!$login_sms) echo 'checked';?>/> 关闭
+</td>
+</tr>
+<tr>
+<td class="tl">微信扫码登录</td>
+<td>
+<input type="radio" name="setting[login_scan]" value="1" <?php if($login_scan) echo 'checked';?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[login_scan]" value="0" <?php if(!$login_scan) echo 'checked';?>/> 关闭 <?php tips('请确保微信登录已经开启，否则请勿开启');?>
 </td>
 </tr>
 <tr>
@@ -217,8 +240,19 @@ foreach($ECK as $k=>$v) {
 </td>
 </tr>
 <tr>
-<td class="tl">登录失败次数限制</td>
-<td><input type="text" size="3" name="setting[login_times]" value="<?php echo $login_times;?>"/> 次登录失败后锁定登录 <input type="text" size="3" name="setting[lock_hour]" value="<?php echo $lock_hour;?>"/> 小时
+<td class="tl">修改资料启用验证码</td>
+<td>
+<input type="radio" name="setting[captcha_edit]" value="2" <?php if($captcha_edit == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[captcha_edit]" value="1" <?php if($captcha_edit == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[captcha_edit]" value="0" <?php if($captcha_edit == 0) echo 'checked';?>> 全部关闭
+</td>
+</tr>
+<tr>
+<td class="tl">修改商铺设置启用验证码</td>
+<td>
+<input type="radio" name="setting[captcha_home]" value="2" <?php if($captcha_home == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[captcha_home]" value="1" <?php if($captcha_home == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[captcha_home]" value="0" <?php if($captcha_home == 0) echo 'checked';?>> 全部关闭
 </td>
 </tr>
 <tr>
@@ -264,10 +298,6 @@ foreach($ECK as $k=>$v) {
 <input type="radio" name="setting[chat_file]" value="1" <?php if($chat_file) echo 'checked';?>/> 开启&nbsp;&nbsp;
 <input type="radio" name="setting[chat_file]" value="0" <?php if(!$chat_file) echo 'checked';?>/> 关闭
 </td>
-</tr>
-<tr>
-<td class="tl">在线交谈发送文件类型</td>
-<td><input type="text" size="50" name="setting[chat_ext]" value="<?php echo $chat_ext;?>"/></td>
 </tr>
 <tr>
 <td class="tl">在线交谈自动解析网址</td>
@@ -344,40 +374,11 @@ foreach($ECK as $k=>$v) {
 </select>
 </td>
 </tr>
-<tr>
-<td class="tl">商务中心显示所有菜单</td>
-<td>
-<input type="radio" name="setting[show_menu]" value="1" <?php if($show_menu) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[show_menu]" value="0" <?php if(!$show_menu) echo 'checked';?>/> 关闭<?php tips('选择关闭 则隐藏无权限访问的菜单');?>
-</td>
-</tr>
-<tr>
-<td class="tl">用户登录启用验证码</td>
-<td>
-<input type="radio" name="setting[captcha_login]" value="1" <?php if($captcha_login) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[captcha_login]" value="0" <?php if(!$captcha_login) echo 'checked';?>/> 关闭
-</td>
-</tr>
-<tr>
-<td class="tl">用户登录默认记住会员</td>
-<td>
-<input type="radio" name="setting[login_remember]" value="1" <?php if($login_remember) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[login_remember]" value="0" <?php if(!$login_remember) echo 'checked';?>/> 关闭
-</td>
-</tr>
-<tr>
-<td class="tl">用户登录默认进入商务室</td>
-<td>
-<input type="radio" name="setting[login_goto]" value="1" <?php if($login_goto) echo 'checked';?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[login_goto]" value="0" <?php if(!$login_goto) echo 'checked';?>/> 关闭
-</td>
-</tr>
 </table>
 </div>
 
 <div id="Tabs1" style="display:none;">
-<div class="tt">公司相关</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">公司类型</td>
 <td><input type="text" name="setting[com_type]" style="width:98%;" value="<?php echo $com_type;?>"/></td>
@@ -445,7 +446,15 @@ X
 <input type="radio" name="setting[news_check]" value="2" <?php if($news_check == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[news_check]" value="1" <?php if($news_check == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[news_check]" value="0" <?php if($news_check == 0) echo 'checked';?>> 全部关闭
+</td>
+</tr>
 
+<tr>
+<td class="tl">默认缩略图[宽X高]</td>
+<td>
+<input type="text" size="3" name="setting[news_thumb_width]" value="<?php echo $news_thumb_width;?>"/>
+X
+<input type="text" size="3" name="setting[news_thumb_height]" value="<?php echo $news_thumb_height;?>"/> px
 </td>
 </tr>
 
@@ -528,8 +537,7 @@ X
 </table>
 </div>
 <div id="Tabs2" style="display:none">
-<div class="tt">财务相关</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">会员在线充值</td>
 <td>
@@ -538,11 +546,24 @@ X
 </td>
 </tr>
 <tr>
-<td class="tl">最小充值额度</td>
-<td><input type="text" size="20" name="setting[mincharge]" value="<?php echo $mincharge;?>"/> 0表示不限，填数字表示最小额度，填多个数字用|分隔表示选择额度</td>
+<td class="tl">充值卡充值</td>
+<td>
+<input type="radio" name="setting[pay_card]" value="1" <?php if($pay_card) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[pay_card]" value="0" <?php if(!$pay_card) echo 'checked';?>/> 关闭
+</td>
 </tr>
 <tr>
-<td class="tl">线下付款方式网页地址</td>
+<td class="tl">最小充值额度</td>
+<td><input type="text" size="5" name="setting[mincharge]" value="<?php echo $mincharge;?>"/> 0表示不限，填数字表示最小额度</td>
+</tr>
+<tr>
+<td class="tl">打赏快捷额度</td>
+<td>
+<input type="text" size="50" name="setting[awards]" value="<?php echo $awards;?>"/><?php tips('多个金额用|分割');?>
+</td>
+</tr>
+<tr>
+<td class="tl">线下付款网址</td>
 <td><input type="text" size="60" name="setting[pay_url]" value="<?php echo $pay_url;?>"/><?php tips('如果未启用会员在线充值，则系统自动调转至此地址查看普通付款方式。建议用扩展功能的单网页建立');?></td>
 </tr>
 <tr>
@@ -588,12 +609,6 @@ X
 <td class="tl">买家确认收货时间限制</td>
 <td><input type="text" size="2" name="setting[trade_day]" value="<?php echo $trade_day;?>"/> 天<?php tips('买家在此时间内未确认收货或申请仲裁，则系统自动付款给卖家，交易成功');?></td>
 </tr>
-<!--
-<tr>
-<td class="tl">卖家确认发货时间限制</td>
-<td><input type="text" size="2" name="setting[trade_send]" value="<?php echo $trade_send;?>"/> 天<?php tips('买家付款后，卖家在此时间内未发货，则系统自动退款给买家');?></td>
-</tr>
--->
 <tr>
 <td class="tl">常用支付方式</td>
 <td><input type="text" name="setting[pay_banks]" style="width:95%;" value="<?php echo $pay_banks;?>"/><?php tips('手动添加'.$DT['money_name'].'流水时需选择');?></td>
@@ -605,12 +620,10 @@ X
 </table>
 </div>
 <div id="Tabs3" style="display:none">
-<div class="tt">支付接口</div>
 <?php include DT_ROOT.'/api/pay/setting.inc.php';?>
 </div>
 <div id="Tabs4" style="display:none;">
-<div class="tt"><?php echo $DT['credit_name'];?>规则</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><?php echo $DT['credit_name'];?>为负禁发信息</td>
 <td>
@@ -694,7 +707,7 @@ X
 </tr>
 </table>
 <div class="tt"><?php echo $DT['credit_name'];?>购买</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><?php echo $DT['credit_name'];?>购买额度</td>
 <td>
@@ -710,7 +723,7 @@ X
 </tr>
 </table>
 <div class="tt"><?php echo $DT['credit_name'];?>兑换</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">会员积分兑换</td>
 <td>
@@ -765,8 +778,7 @@ X
 </table>
 </div>
 <div id="Tabs5" style="display:none">
-<div class="tt">会员整合</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">启用会员整合</td>
 <td>
@@ -820,7 +832,7 @@ X
 </tr>
 <tr id="u_c_m" style="display:<?php echo $uc_mysql ? '' : 'none';?>">
 <td colspan="2" style="padding:10px;">
-	<table cellpadding="2" cellspacing="1" class="tb">
+	<table cellspacing="0" class="tb">
 	<tr>
 	<td class="tl">数据库主机名</td>
 	<td><input name="setting[uc_dbhost]" type="text" size="30" value="<?php echo $uc_dbhost;?>" id="uc_dbhost"/></td>
@@ -872,11 +884,12 @@ X
 </tr>
 </tbody>
 </table>
-<div class="tt">一键登录</div>
+</div>
+<div id="Tabs6" style="display:none">
 <?php include DT_ROOT.'/api/oauth/setting.inc.php';?>
 </div>
 <div class="sbt">
-<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -920,9 +933,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-window.onload=function() {
+$(function(){
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-}
+});
 </script>
 <?php include tpl('footer');?>

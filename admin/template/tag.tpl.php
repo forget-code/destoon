@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">标签创建向导</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所属模块</td>
 <td><input type="text" name="setting[moduleid]" size="20" id="moduleid" value="<?php echo $mid;?>"/>
@@ -90,7 +89,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 包含子分类</td>
 <td>
-<input type="radio" name="setting[child]" value="1" checked/> 是&nbsp;&nbsp;
+<input type="radio" name="setting[child]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[child]" value="0" id="child"/> 否
 </td>
 <td>child</td>
@@ -106,7 +105,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 包含子地区</td>
 <td>
-<input type="radio" name="setting[areachild]" value="1" checked/> 是&nbsp;&nbsp;
+<input type="radio" name="setting[areachild]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[areachild]" value="0" id="areachild"/> 否
 </td>
 <td>areachild</td>
@@ -116,8 +115,7 @@ show_menu($menus);
 <td><input type="text" name="setting[expires]" size="10" id="expires"/>
 <select onchange="Dd('expires').value=this.value">
 <option value="">默认缓存</option>
-<option value="-1">不缓存</option>
-<option value="-2">SQL缓存</option>
+<option value="0">不缓存</option>
 <option value="600">自定义时间(秒)</option>
 </select>
 </td>
@@ -135,8 +133,8 @@ show_menu($menus);
 
 </td>
 <td>
-<input type="button" value="生成标签" class="btn" onclick="mk_tag();"/>&nbsp;&nbsp;
-<input type="button" value="重新设置" class="btn" onclick="Go('?file=<?php echo $file;?>');"/>
+<input type="button" value="生成标签" class="btn-b" onclick="mk_tag();"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" value="调用手册" class="btn" onclick="window.open('https://www.destoon.com/doc/develop/22.html');"/>
 </td>
 <td> </td>
 </table>
@@ -145,13 +143,13 @@ show_menu($menus);
 <input type="hidden" name="action" value="preview"/>
 <input type="hidden" id="tag_expires" name="tag_expires"/>
 <div class="tt">标签代码</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
+<table cellspacing="0" class="tb">
+<tr class="dsn">
 <td class="tl"><span class="f_hid">*</span> 自定义CSS</td>
 <td><textarea name="tag_css" id="tag_css"  style="width:98%;height:40px;font-family:Fixedsys,verdana;overflow:visible;color:green;"></textarea> 
 </td>
 </tr>
-<tr>
+<tr class="dsn">
 <td class="tl"><span class="f_hid">*</span> HTML开始标签</td>
 <td><input type="text" name="tag_html_s" id="tag_html_s" size="30" value="" style="font-family:Fixedsys,verdana;"/></td>
 </tr>
@@ -160,30 +158,19 @@ show_menu($menus);
 <td><textarea name="tag_code" id="tag_code"  style="width:98%;height:40px;font-family:Fixedsys,verdana;overflow:visible;color:blue;"></textarea> 
 </td>
 </tr>
-<tr>
+<tr class="dsn">
 <td class="tl"><span class="f_hid">*</span> HTML结束标签</td>
 <td><input type="text" name="tag_html_e" id="tag_html_e" size="10" value="" style="font-family:Fixedsys,verdana;"/></td>
 </tr>
 <tr>
 <td class="tl"></td>
 <td>
-<input type="submit" name="submit" value="预览标签" class="btn"/>
-<input type="button" value="复制标签" class="btn" onclick="copy_tag();"/>
-<input type="button" value="清空标签" class="btn" onclick="Dd('tag_code').value='';Dd('tag_js').value='';"/>
-<input type="button" value="清空CSS" class="btn" onclick="Dd('tag_css').value='';"/>
-<input type="button" value="清空HTML" class="btn" onclick="Dd('tag_html_s').value='';Dd('tag_html_e').value='';"/>
+<input type="submit" name="submit" value="预览标签" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" value="重新生成" class="btn" onclick="Go('?file=<?php echo $file;?>');"/>&nbsp;&nbsp;
 </td>
 </tr>
 </table>
 </form>
-<div class="tt">调用手册</div>
-<table cellpadding="2" cellspacing="1" class="tb" style="line-height:200%;">
-<tr>
-<td class="tl"><span class="f_hid">*</span> 参阅</td>
-<td><a href="http://help.destoon.com/faq/tag.php?tc=client" target="_blank" class="t">http://help.destoon.com/faq/tag.php</a><br/>
-</td>
-</table>
-</div>
 <script type="text/javascript">
 function mk_tag() {
 	if(Dd('moduleid').value == '' && Dd('table').value == '') {
@@ -273,7 +260,7 @@ function Dict() {
 		alert('所属模块 或 数据表 必须指定一项');
 		return false;
 	}
-	mkDialog('', '<iframe src="?file=tag&action=find&mid='+Dd('moduleid').value+'&tb='+Dd('table').value+'" width="600" height=300" border="0" vspace="0" hspace="0" marginwidth="0" marginheight="0" framespacing="0" frameborder="0" scrolling="yes"></iframe>', '数据字典', 620, 0, 0);
+	Dwidget('?file=tag&action=find&mid='+Dd('moduleid').value+'&tb='+Dd('table').value, '数据字典');
 }
 </script>
 <script type="text/javascript">Menuon(3);</script>

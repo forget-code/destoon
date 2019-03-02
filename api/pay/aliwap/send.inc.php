@@ -1,11 +1,9 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-if(DT_CHARSET == 'GBK') @header("Content-Type:text/html;charset=UTF-8");
 require DT_ROOT.'/api/pay/'.$bank.'/config.inc.php';
 require DT_ROOT.'/api/pay/'.$bank.'/submit.class.php';
 $out_trade_no = $orderid;
 $subject = $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')';
-$subject = convert($subject, DT_CHARSET, 'UTF-8');
 $total_fee = $charge;
 $show_url = $EXT['mobile_url'];
 $body = '';

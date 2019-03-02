@@ -1,12 +1,13 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
     array('添加模块', '?file='.$file.'&action=add'),
     array('模块管理', '?file='.$file),
+    array('系统模型', '?file='.$file.'&action=sys'),
     array('更新缓存', '?file='.$file.'&action=cache'),
 );
 require DT_ROOT.'/include/sql.func.php';
@@ -52,6 +53,7 @@ switch($action) {
 				if(!file_put(DT_ROOT.'/'.$dir.'/config.inc.php', "DESTOON")) msg('目录'.$dir.'无法写入，请设置此目录可写权限');
 			}
 			if($post['domain']) $post['domain'] = fix_domain($post['domain']);
+			if($post['mobile']) $post['mobile'] = fix_domain($post['mobile']);
 			$post['linkurl'] = $post['islink'] ? $post['linkurl'] : ($post['domain'] ? $post['domain'] : linkurl($post['moduledir']."/"));
 			if($post['islink']) $post['module'] = 'destoon';
 			$post['installtime'] = $DT_TIME;
@@ -77,7 +79,7 @@ switch($action) {
 				@include DT_ROOT.'/module/'.$module.'/admin/install.inc.php';
 			}
 			cache_module();
-			dmsg('模块安装成功', $this_forward);
+			dmsg('模块添加成功', $this_forward);
 		} else {
 			$imodules = array();
 			$result = $db->query("SELECT module FROM {$DT_PRE}module");
@@ -107,6 +109,7 @@ switch($action) {
 			if($islink) {
 				if(!$post['linkurl']) msg('请填写链接地址');
 			} else {
+				if($modid == 4) $post['moduledir'] = 'company';
 				if(!$post['moduledir']) msg('请填写安装目录');
 				if(!preg_match("/^[0-9a-z_-]+$/i", $post['moduledir'])) msg('目录名不合法,请更换一个再试');
 				$sysdirs = array('ad', 'admin', 'announce', 'api', 'archiver', 'comment', 'feed', 'file', 'gift', 'guestbook', 'include', 'install', 'lang', 'link', 'module', 'poll', 'sitemap', 'skin', 'spread', 'template', 'upgrade', 'vote', 'mobile', 'form');
@@ -114,6 +117,7 @@ switch($action) {
 				$r = $db->get_one("SELECT moduleid FROM {$DT_PRE}module WHERE moduledir='$post[moduledir]' AND moduleid!=$modid");
 				if($r) msg('此目录名已经被其他模块使用,请更换一个再试');
 				if($post['domain']) $post['domain'] = fix_domain($post['domain']);
+				if($post['mobile']) $post['mobile'] = fix_domain($post['mobile']);
 				$post['linkurl'] = $post['domain'] ? $post['domain'] : linkurl($post['moduledir']."/");
 			}			
 			$sql = $s = "";
@@ -124,6 +128,7 @@ switch($action) {
 			$db->query("UPDATE {$DT_PRE}module SET $sql WHERE moduleid=$modid");
 			if(!$islink && $moduledir != $post['moduledir']) {
 				rename(DT_ROOT.'/'.$moduledir, DT_ROOT.'/'.$post['moduledir']) or msg('无法重命名目录'.$moduledir.'为'.$post['moduledir'].',请手动修改');
+				rename(DT_ROOT.'/mobile/'.$moduledir, DT_ROOT.'/mobile/'.$post['moduledir']);
 			}
 			cache_module();
 			dmsg('模块修改成功', $this_forward);
@@ -160,6 +165,7 @@ switch($action) {
 			$tb = str_replace($DT_PRE, '', get_table($moduleid));
 			$db->query("DELETE FROM `".$DT_PRE."fields` WHERE tb='$tb'");
 			dir_delete(DT_ROOT.'/'.$dir);
+			dir_delete(DT_ROOT.'/mobile/'.$dir);
 		}
 		$db->query("DELETE FROM {$DT_PRE}module WHERE moduleid='$modid'");
 		cache_module();
@@ -174,8 +180,10 @@ switch($action) {
 			$module = $r['module'];
 			$dir = $r['moduledir'];
 			if(!dir_create(DT_ROOT.'/'.$dir)) msg('无法创建'.$dir.'目录，请检查PHP是否有创建权限或手动创建');
-			if(!file_put(DT_ROOT.'/'.$dir.'/config.inc.php', "DesToon Test")) msg('目录'.$dir.'无法写入，如果是Linux/Unix服务器，请设置此目录可写权限');
-			file_put(DT_ROOT.'/'.$dir.'/config.inc.php', "<?php\n\$moduleid = ".$moduleid.";\n?>");
+			if(!file_put(DT_ROOT.'/'.$dir.'/ajax.php', "DESTOON TEST")) msg('目录'.$dir.'无法写入，如果是Linux/Unix服务器，请设置此目录可写权限');
+			file_del(DT_ROOT.'/'.$dir.'/config.inc.php');
+			file_copy(DT_ROOT.'/api/ajax.php', DT_ROOT.'/'.$dir.'/ajax.php');
+			file_copy(DT_ROOT.'/api/ajax.php', DT_ROOT.'/mobile/'.$dir.'/ajax.php');
 			include $remkdir;			
 			cache_module();
 			dmsg('目录重建成功', '?file='.$file);
@@ -202,13 +210,17 @@ switch($action) {
 	break;
 	case 'cache':
 		cache_module();
-		dmsg('更新成功', '?file='.$file);
+		dmsg('更新成功', $forward);
 	break;
 	case 'ckdir':
 		if(!preg_match("/^[0-9a-z_-]+$/i", $moduledir)) dialog('不是一个合法的目录名,请更换一个再试');
 		$r = $db->get_one("SELECT moduleid FROM {$DT_PRE}module WHERE moduledir='$moduledir'");
 		if($r || is_dir(DT_ROOT.'/'.$moduledir.'/')) dialog('该目录名已经被使用,请更换一个再试');
 		dialog('目录名可以使用');
+	break;
+	case 'sys':
+		$sysmodules = get_modules();
+		include tpl('module_sys');
 	break;
 	default:
 		$sysmodules = get_modules();
@@ -217,7 +229,7 @@ switch($action) {
 		while($r = $db->fetch_array($result)) {
 			if($r['moduleid'] == 1) continue;
 			$r['installdate'] = timetodate($r['installtime'], 3);
-			$r['modulename'] = isset($sysmodules[$r['module']]) ? $sysmodules[$r['module']]['name'] : '外链';
+			$r['modulename'] = isset($sysmodules[$r['module']]) ? $sysmodules[$r['module']]['name'] : '<span class="f_red">外链</span>';
 			if($r['disabled']) {
 				$_modules[] = $r;
 			} else {

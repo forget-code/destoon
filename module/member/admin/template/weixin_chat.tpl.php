@@ -3,14 +3,13 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">在线交谈</div>
 <style type="text/css">
-#chat{width:auto;height:286px;overflow:auto;}
+#chat{width:auto;height:246px;overflow:auto;}
 #chat div {margin:5px 5px 5px 10px;line-height:20px;}
 #chat img {cursor:pointer;}
 #chat a:link,#chat a:visited,#chat a:active {color:#0072C1;text-decoration:underline;}
 #chat a:hover {color:#FF0000;}
-.dt {display:block;height:20px;line-height:20px;background:url('<?php echo DT_STATIC.$MODULE[2]['moduledir'];?>/image/chat_dt.gif') no-repeat 80px center;margin:0;}
+.dt {display:block;height:20px;line-height:20px;margin:0;}
 .dt span{color:#FF6600;}
 .u1 {color:#008040;}
 .u0 {color:#0000FF;}
@@ -36,7 +35,7 @@ show_menu($menus);
 .fb {font-weight:bold;}
 .fi {font-style:italic;}
 .fu {text-decoration:underline;}
-#word {width:98%;height:40px;border:#CDE1EF 1px solid;}
+#word {width:98%;height:40px;border:none;}
 </style>
 <iframe src="" name="send" id="send" style="display:none;"></iframe>
 <div id="sd"></div>
@@ -45,7 +44,7 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="send"/>
 <input type="hidden" name="openid" value="<?php echo $openid;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td bgcolor="#DEEAF2">
 <a href="<?php echo $U['headimgurl'];?>" target="_blank"><img src="<?php echo $U['headimgurl'];?>" width="46" style="margin:5px 10px 5px 5px;float:left;"/></a>
@@ -56,15 +55,13 @@ show_menu($menus);
 <td><div id="chat"></div></td>
 </tr>
 <tr>
-<td><textarea id="word" name="word" onkeydown="return chat_key(event);" title="按Ctrl+Enter发送"></textarea></td>
-</tr>
-<tr>
-<td style="padding:5px 10px 5px 5px;">
-<span class="f_r"><input type="submit" value="发 送" class="btn" id="btn"/></span>
-<img src="api/weixin/image/media_upload.gif" onclick="Dfile(<?php echo $moduleid;?>, '', 'chat', 'jpg|amr|mp3|mp4');" class="c_p" title="上传多媒体文件文件(有效期3天)&#10;- 图片，支持jpg格式，最大128K&#10;- 语音，支持amr、mp3格式，最大256K&#10;- 视频，支持mp4格式，最大1M"/>
-</td>
+<td><textarea id="word" name="word" onkeydown="return chat_key(event);" title="按Ctrl+Enter发送" placeholder="请输入聊天内容"></textarea></td>
 </tr>
 </table>
+<div style="padding:16px 10px;background:#F1F2F3;">
+<span class="f_r"><input type="submit" value="发 送" class="btn-g" id="btn"/></span>
+<img src="api/weixin/image/media_upload.gif" onclick="Dfile(<?php echo $moduleid;?>, '', 'chat', 'jpg|amr|mp3|mp4');" class="c_p" title="上传多媒体文件文件(有效期3天)&#10;- 图片，支持jpg格式，最大128K&#10;- 语音，支持amr、mp3格式，最大256K&#10;- 视频，支持mp4格式，最大1M"/>
+</div>
 </form>
 <script type="text/javascript">
 var chat_last = 0;
@@ -72,26 +69,20 @@ var chat_link = 0;
 function chat_load(){
 	if(chat_link) return;
 	chat_link=1;
-	makeRequest('moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&openid=<?php echo $openid;?>&action=load&chatlast='+chat_last, '?', '_chat_load');
-}
-function _chat_load(){
-	if(xmlHttp.readyState==4&&xmlHttp.status==200){
-		if(xmlHttp.responseText){
-			eval("var chat_json="+xmlHttp.responseText);
-			chat_last=chat_json.chat_last;
-			chat_msg=chat_json.chat_msg;
-			msglen=chat_msg.length;
-			for(var i=0;i<msglen;i++){
-				chat_into((chat_msg[i].date ? '<p class="dt"><span>'+chat_msg[i].date+'</span></p>' : '')+'<span class="u'+chat_msg[i].self+'">'+chat_msg[i].name+'</span><span class="t'+chat_msg[i].self+'">'+chat_msg[i].time+'</span><br/><p class="w'+chat_msg[i].self+'">'+chat_msg[i].word+'</p>');
-			}
-			if(chat_json.chat_new > 0) {
-				Dd('sd').innerHTML=sound('chat_msg');
-				if(Dd('word').disabled == true) chat_show(1);
-			}
-			chat_link=0;
-			//Dd('debug').value = chat_json.chat_bug;//TMP
+	$.get('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&openid=<?php echo $openid;?>&action=load&chatlast='+chat_last, function(data) {
+		eval("var chat_json="+data);
+		chat_last=chat_json.chat_last;
+		chat_msg=chat_json.chat_msg;
+		msglen=chat_msg.length;
+		for(var i=0;i<msglen;i++){
+			chat_into((chat_msg[i].date ? '<p class="dt"><span>'+chat_msg[i].date+'</span></p>' : '')+'<span class="u'+chat_msg[i].self+'">'+chat_msg[i].name+'</span><span class="t'+chat_msg[i].self+'">'+chat_msg[i].time+'</span><br/><p class="w'+chat_msg[i].self+'">'+chat_msg[i].word+'</p>');
 		}
-	}
+		if(chat_json.chat_new > 0) {
+			Dd('sd').innerHTML=sound('chat_msg');
+			if(Dd('word').disabled == true) chat_show(1);
+		}
+		chat_link=0;
+	});
 }
 function chat_into(msg){
 	var o=document.createElement("div");
@@ -135,6 +126,6 @@ function check() {
 	chat_hide();
 	return true;
 }
+Menuon(2);
 </script>
-<script type="text/javascript">Menuon(2);</script>
 <?php include tpl('footer');?>

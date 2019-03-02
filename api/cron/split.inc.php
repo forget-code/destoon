@@ -12,8 +12,9 @@ if($files) {
 		$fd = $mid == 4 ? 'userid' : 'itemid';
 		$r = $db->get_one("SELECT MAX($fd) AS maxid FROM ".get_table($mid));
 		$part = split_id($r['maxid']);
-		split_content($mid, $part);
-		split_content($mid, $part+1);
+		split_content($mid, $part++);
+		split_content($mid, $part++);
+		split_content($mid, $part++);
 	}
 }
 ?>

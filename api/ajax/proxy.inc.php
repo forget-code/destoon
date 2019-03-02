@@ -51,7 +51,7 @@ function H() {
 	}
 }
 <?php } else { ?>
-	alert(window.location.hash);
+	//alert(window.location.hash);
 function H() {
 	if(!window.location.hash) return;
 	var H2 = window.location.hash.split('#')[1]+'px';

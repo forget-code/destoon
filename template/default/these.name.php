@@ -22,7 +22,6 @@ $names = array (
   'mall' => '商城模板',
   'member' => '商务中心',
   'message' => '提示信息',
-  'mobile' => '手机版',
   'photo' => '图库模板',
   'quote' => '行情模板',
   'sell' => '供应模板',

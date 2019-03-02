@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/link.class.php';
+require DT_ROOT.'/module/'.$module.'/link.class.php';
 $do = new dlink();
 $menus = array (
     array('添加链接', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),

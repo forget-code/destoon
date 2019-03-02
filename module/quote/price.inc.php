@@ -1,11 +1,11 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-$itemid or dheader($MOD['linkurl'].'product.php');
+$itemid or dheader('product.php');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 if(!check_group($_groupid, $MOD['group_show_price'])) include load('403.inc');
 require DT_ROOT.'/include/post.func.php';
 $P = $db->get_one("SELECT * FROM {$table_product} WHERE itemid=$itemid");
-$P or dheader($MOD['linkurl'].'product.php');
+$P or dheader('product.php');
 $could_add = check_group($_groupid, $MOD['group_add_price']);
 $MARKET = $P['market'] ? explode('|', $L['price_market'].'|'.$P['market']) : array();
 if($could_add) {
@@ -38,9 +38,9 @@ if($could_add) {
 isset($ms) or $ms = array();
 $market = isset($market) ? intval($market) : 0;
 $areaid = isset($areaid) ? intval($areaid) : 0;
-$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 $fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-$todate = isset($todate) && is_date($todate) ? $todate : '';
+(isset($todate) && is_date($todate)) or $todate = '';
 $totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 $items = 0;
 $tags = array();
@@ -53,16 +53,16 @@ if($market) $condition .= " AND market=$market";
 if($fromtime) $condition .= " AND edittime>=$fromtime";
 if($totime) $condition .= " AND edittime<=$totime";
 $items = $db->count($table_price, $condition, $DT['cache_search']);
-$pages = pages($items, $page, $pagesize);
+$pages = $DT_PC ? pages($items, $page, $pagesize) : mobile_pages($items, $page, $pagesize);
 $tags = array();
 $result = $db->query("SELECT * FROM {$table_price} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
 while($r = $db->fetch_array($result)) {
 	$tags[] = $r;
 }
-if($page == 1) {
+if(!$DT_BOT && $page == 1) {
 	$update = 'hits=hits+1';
 	if($_condition == $condition && $items != $P['item']) $update .= ",item=$items";
-	$db->query("UPDATE {$table_product} SET $update WHERE itemid=$itemid");
+	$db->query("UPDATE LOW_PRIORITY {$table_product} SET $update WHERE itemid=$itemid", 'UNBUFFERED');
 }
 if($pages) {
 	$t = explode('&nbsp;<input', $pages);
@@ -128,5 +128,11 @@ if($P['seo_title']) {
 $head_title = $head_title.$DT['seo_delimiter'].$MOD['name'];
 $head_keywords = $P['seo_keywords'];
 $head_description = $P['seo_description'];
-include template('price', $module);
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MOD['linkurl'], $MOD['mobile'], $DT_URL);
+} else {
+	$back_link = ($kw || $page > 1) ? rewrite('price.php?itemid='.$itemid) : rewrite('product.php?page=1');
+	$EXT['mobile_ajax'] = 0;
+}
+include template($MOD['template_price'] ? $MOD['template_price'] : 'price', $module);
 ?>

@@ -11,8 +11,7 @@ show_menu($menus);
 <input type="hidden" name="fid" value="<?php echo $fid;?>"/>
 <input type="hidden" name="qid" value="<?php echo $qid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $job=='add' ? '添加' : '修改';?>选项</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 选项名称</td>
 <td><input name="post[name]" type="text"  size="30" id="name" value="<?php echo $name;?>"/> <span id="dname" class="f_red"></span></td>
@@ -23,7 +22,7 @@ show_menu($menus);
 <?php
 foreach($TYPE as $k=>$v) { 
 ?>
-<input type="radio" name="post[type]" value="<?php echo $k;?>" id="t_<?php echo $k;?>" onclick="c(<?php echo $k;?>)" <?php echo $k == $type ? 'checked' : '';?>/><label for="t_<?php echo $k;?>"> <?php echo $v;?></label>
+<input type="radio" name="post[type]" value="<?php echo $k;?>" id="t_<?php echo $k;?>" onclick="c(<?php echo $k;?>)" <?php echo $k == $type ? 'checked' : '';?>/><label for="t_<?php echo $k;?>"> <?php echo $v;?></label>&nbsp;&nbsp;&nbsp;&nbsp;
 <?php }?>
 </td>
 </tr>
@@ -44,8 +43,7 @@ foreach($TYPE as $k=>$v) {
 <td><textarea name="post[extend]" style="width:98%;height:30px;overflow:visible;"><?php echo $extend;?></textarea></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value=" 关 闭 " class="btn" onclick="window.parent.location.reload();"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=question&fid=<?php echo $fid;?>');"/></div>
 </form>
 <script type="text/javascript">
 function c(id) {

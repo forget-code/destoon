@@ -5,7 +5,7 @@ require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $MG['friend_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/include/post.func.php';
 $TYPE = get_type('friend-'.$_userid);
-require MD_ROOT.'/friend.class.php';
+require DT_ROOT.'/module/'.$module.'/friend.class.php';
 $do = new friend();
 switch($action) {
 	case 'add':
@@ -25,7 +25,7 @@ switch($action) {
 			}
 		} else {
 			$username = isset($username) ? trim($username) : '';
-			$truename = $homepage = $company = $career = $telephone = $msn = $qq = $ali = $skype = '';
+			$truename = $style = $note = $listorder = $mobile = $email = $homepage = $company = $career = $telephone = $qq = $wx = $ali = $skype = '';
 			if($username) {
 				$r = userinfo($username);
 				if($r) {
@@ -34,8 +34,8 @@ switch($action) {
 					$company = $r['company'];
 					$telephone = $r['telephone'];
 					$career = $r['career'];
-					$msn = $r['msn'];
 					$qq = $r['qq'];
+					$wx = $r['wx'];
 					$ali = $r['ali'];
 					$skype = $r['skype'];
 				}
@@ -63,12 +63,23 @@ switch($action) {
 			$head_title = $L['friend_title_edit'];
 		}
 	break;
-	case 'delete':
-		$itemid or message($L['friend_msg_choose']);
+	case 'show':
+		$itemid or message();
 		$do->itemid = $itemid;
 		$r = $do->get_one();
 		if(!$r || $r['userid'] != $_userid) message();
-		$do->delete($itemid);
+		extract($r);
+		$head_title = $L['friend_title_show'];
+	break;
+	case 'delete':
+		$itemid or message($L['friend_msg_choose']);	
+		$itemids = is_array($itemid) ? $itemid : array($itemid);
+		foreach($itemids as $itemid) {
+			$do->itemid = $itemid;
+			$item = $do->get_one();
+			if(!$item || $item['userid'] != $_userid) message();
+			$do->delete($itemid);
+		}
 		dmsg($L['op_del_success'], $forward);
 	break;
 	case 'my':
@@ -81,7 +92,7 @@ switch($action) {
 		}
 
 		$sfields = $L['friend_sfields'];
-		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'qq', 'ali', 'msn', 'skype', 'username', 'note');
+		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'qq', 'wx', 'ali', 'skype', 'username', 'note');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
@@ -94,10 +105,12 @@ switch($action) {
 			$lists[] = $r;
 		}
 		$head_title = $L['friend_title'];
+		include template('friend_my', $module);
+		exit;
 	break;
 	default:
 		$sfields = $L['friend_sfields'];
-		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'qq', 'ali', 'msn', 'skype', 'username', 'note');
+		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'qq', 'ali', 'skype', 'username', 'note');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
@@ -106,13 +119,23 @@ switch($action) {
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($typeid > -1) $condition .= " AND typeid=$typeid";		
 		$lists = $do->get_list($condition);
-		if(count($lists)%2 == 1) $lists[] = array();//Fix Cells
 		if($MG['friend_limit']) {
 			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}friend WHERE userid=$_userid");
 			$limit_used = $r['num'];
 			$limit_free = $MG['friend_limit'] > $limit_used ? $MG['friend_limit'] - $limit_used : 0;
 		}
 		$head_title = $L['friend_title'];
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit' || $action == 'show') {
+		$back_link = '?action=index';
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1) ? '?action=index' : 'index.php';
+	}
 }
 include template('friend', $module);
 ?>

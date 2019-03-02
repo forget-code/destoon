@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -54,14 +54,11 @@ switch($action) {
 }
 class keylink {
 	var $item;
-	var $db;
 	var $table;
 	var $errmsg = errmsg;
 
 	function __construct() {
-		global $db;
-		$this->db = &$db;
-		$this->table = $this->db->pre.'keylink';
+		$this->table = DT_PRE.'keylink';
 	}
 
 	function keylink() {
@@ -73,13 +70,13 @@ class keylink {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE item='$this->item'$condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE item='$this->item'$condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE item='$this->item'$condition ORDER BY listorder DESC,itemid DESC LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE item='$this->item'$condition ORDER BY listorder DESC,itemid DESC LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -102,7 +99,7 @@ class keylink {
 	function add($post) {
 		if(strlen($post['title']) < 2 || strlen($post['url']) < 12) return false;
 		$post['listorder'] = strlen($post['title']);
-		$this->db->query("INSERT INTO {$this->table} (listorder,title,url,item) VALUES('$post[listorder]','$post[title]','$post[url]','$this->item')");
+		DB::query("INSERT INTO {$this->table} (listorder,title,url,item) VALUES('$post[listorder]','$post[title]','$post[url]','$this->item')");
 		return true;
 	}
 
@@ -110,12 +107,12 @@ class keylink {
 		foreach($post as $k=>$v) {
 			if(strlen($v['title']) < 2 || strlen($v['url']) < 12) return false;
 			$v['listorder'] = strlen($v['title']);
-			$this->db->query("UPDATE {$this->table} SET listorder='$v[listorder]',title='$v[title]',url='$v[url]' WHERE itemid='$k' AND item='$this->item'");
+			DB::query("UPDATE {$this->table} SET listorder='$v[listorder]',title='$v[title]',url='$v[url]' WHERE itemid='$k' AND item='$this->item'");
 		}
 	}
 
 	function delete($itemid) {
-		$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid AND item='$this->item'");
+		DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid AND item='$this->item'");
 		cache_keylink($this->item);
 	}
 

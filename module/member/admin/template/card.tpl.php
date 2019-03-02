@@ -4,7 +4,7 @@ include tpl('header');
 show_menu($menus);
 ?>
 <?php if($print) { ?>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>卡号</th>
 <th>密码</th>
@@ -12,7 +12,7 @@ show_menu($menus);
 <th>有效期至</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><?php echo $v['number'];?></td>
 <td><?php echo $v['password'];?></td>
 <td class="f_blue"><?php echo $v['amount'];?></td>
@@ -20,18 +20,17 @@ show_menu($menus);
 </tr>
 <?php }?>
 </table>
-<div class="pages"><?php echo $pages;?></div>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Dh('destoon_menu');</script>
 <?php exit; } ?>
-<div class="tt">充值卡搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td>&nbsp;
 <?php echo $fields_select;?>&nbsp;
-<input type="text" size="20" name="kw" value="<?php echo $kw;?>"/>&nbsp;
+<input type="text" size="20" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词"/>&nbsp;
 <select name="status">
 <option value="0">状态</option>
 <option value="1" <?php if($status == 1) echo 'selected';?>>已使用</option>
@@ -50,7 +49,7 @@ show_menu($menus);
 <option value="totime" <?php if($timetype == 'totime') echo 'selected';?>>到期时间</option>
 <option value="addtime" <?php if($timetype == 'addtime') echo 'selected';?>>制卡时间</option>
 </select>&nbsp;
-<?php echo dcalendar('fromtime', $fromtime);?> 至 <?php echo dcalendar('totime', $totime);?>&nbsp;
+<?php echo dcalendar('fromdate', $fromdate);?> 至 <?php echo dcalendar('todate', $todate);?>&nbsp;
 面额：
 <input type="text" name="minamount" value="<?php echo $minamount;?>" size="5"/> 至 
 <input type="text" name="maxamount" value="<?php echo $maxamount;?>" size="5"/>&nbsp;
@@ -60,11 +59,10 @@ show_menu($menus);
 </tr>
 </table>
 </form>
-<div class="tt">充值卡管理</div>
 <form method="post">
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
-<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>卡号</th>
 <th>密码</th>
 <th>面额</th>
@@ -75,7 +73,7 @@ show_menu($menus);
 <th>制卡时间</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><?php echo $v['number'];?></td>
 <td><?php echo $v['password'];?></td>
@@ -89,11 +87,11 @@ show_menu($menus);
 <?php }?>
 </table>
 <div class="btns">
-<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中充值卡吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 批量删除 " class="btn-r" onclick="if(confirm('确定要删除选中充值卡吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
 <input type="button" value=" 打印卡号 " class="btn" onclick="window.open('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&print=1');"/>
 </div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Menuon(1);</script>
 <br/>
 <?php include tpl('footer');?>

@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/webpage.class.php';
+require DT_ROOT.'/module/'.$module.'/webpage.class.php';
 isset($item) or $item = 1;
 $do = new webpage();
 $do->item = $item;
@@ -9,7 +9,7 @@ $menus = array (
     array('单页列表', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item),
     array('全部单页', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&itemid=1'),
     array('创建新组', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&action=group'),
-    array('生成网页', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&action=html'),
+    array('更新数据', '?moduleid='.$moduleid.'&file='.$file.'&item='.$item.'&action=html'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 $this_forward = '?moduleid='.$moduleid.'&file='.$file.'&item='.$item;

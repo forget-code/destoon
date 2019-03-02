@@ -50,7 +50,7 @@ if(isset($month) && isset($M[$month])) {
 	if($num) {
 		$result = $db->query("SELECT title,linkurl,addtime FROM {$table} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
-			$r['adddate'] = timetodate($r['addtime'], 6);
+			$r['adddate'] = timetodate($r['addtime'], 5);
 			if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MODULE[$mid]['linkurl'].$r['linkurl'];
 			$T[] = $r;
 		}

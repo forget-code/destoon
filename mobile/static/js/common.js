@@ -1,30 +1,46 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function Dd(i) {return document.getElementById(i);}
 function Ds(i) {Dd(i).style.display = '';}
 function Dh(i) {Dd(i).style.display = 'none';}
+function _delete() {return confirm('确定要删除吗？此操作将不可撤销');}
 function Go(u) {window.location = u;}
+function Inner(i,s) {try {Dd(i).innerHTML = s;}catch(e){}}
+function showmsg(m, t) {
+	Dtoast(m);
+}
+function Dmsg(str, i, s, t) {
+	try{
+		if(s || i == 'content'){$("html, body").animate({scrollTop:$('#d'+i).offset().top-h}, 100);}
+		$('#d'+i).html(str);
+		Dd(i).focus();
+		window.setTimeout(function(){$('#d'+i).html('');}, 5000);
+	}catch(e){}
+	Dtoast(str);
+}
+function FCKLen() {return $('#editor').text().length;}
 function Dback(u, r, e) {
 	var m = e ? '/'+e+'/' : '';
 	if(r && m && r.match(eval(m))) {
-		Go(u ? u : 'index.php');
+		Go(u ? u : DTMob);
 	} else if(r) {
-		window.history.back();
+		window.history.back(-1);
 	} else if(document.referrer) {
-		window.history.back();
+		window.history.back(-1);
 	} else {
-		Go(u ? u : 'index.php');
+		Go(u ? u : DTMob);
 	}
 }
+function checked_count(id) {return $('#'+id+' :checked').length;}
 function GoPage(max, url) {
 	if(max < 2) return;
 	var page = parseInt(prompt('Go to page of (1-'+max+')', ''));
 	if(page >= 1 && page <= max) Go(url.replace(/\{destoon_page\}/, page));
 }
 function DTrim(s) {
-	s = s.trim();
+	s = $.trim(s);
 	var t = encodeURIComponent(s);
 	if(t.indexOf('%E2%80%86') != -1) s = decodeURIComponent(t.replace(/%E2%80%86/g, ''));
 	return s;
@@ -52,7 +68,7 @@ function Dsheet(action, cancel, msg) {
 		if(msg) htm += '<em>'+msg+'</em>';
 		htm += '<ul>';
 		for(var i=0;i<arr.length;i++) {
-			if(i > 4) break;
+			if(i > 7) break;
 			htm += '<li'+(i==0&&!msg ? ' style="border:none;"' : '')+'>'+arr[i]+'</li>';
 		}
 		htm += '</ul></div>';
@@ -69,7 +85,7 @@ function Dsheet(action, cancel, msg) {
 			var _htm = $('.ui-sheet div').html();
 			setTimeout(function(){
 				if(_htm == $('.ui-sheet div').html()) Dsheet(0);
-			}, 1000);}
+			}, 100);}
 		);
 	} else {
 		$('.ui-mask').fadeOut('fast');
@@ -91,10 +107,10 @@ $(document).on('pageinit', function(event) {
 	$('.ui-icon-loading').on('click', function(event) {
 		window.location.reload();
 	});
-	$('.list-txt li,.list-set li,.list-img').on('tap', function(event) {
+	$('.list-txt li,.list-set li,.list-pay li,.list-img').on('tap', function(event) {
 		$(this).css('background-color', '#F6F6F6');
 	});
-	$('.list-txt li,.list-set li,.list-img').on('mouseout', function(event) {
+	$('.list-txt li,.list-set li,.list-pay li').on('mouseout', function(event) {
 		$(this).css('background-color', '#FFFFFF');
 	});
 });

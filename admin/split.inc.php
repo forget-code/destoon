@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -89,7 +89,9 @@ if($action == 'merge') {
 			$itemid = $fid + $num;
 		}
 	} else {
-		//$db->query("TRUNCATE TABLE `{$table_data}`");
+		$table_back = 'zzz_'.substr($table_data, strlen($DT_PRE));
+		$db->query("RENAME TABLE `{$table_data}` TO `{$table_back}`");
+		#$db->query("TRUNCATE TABLE `{$table_data}`");
 		msg($MODULE[$mid]['name'].'内容拆分成功');
 	}
 	msg('ID从'.$fid.'至'.($itemid-1).'拆分成功'.progress($sid, $fid, $tid), "?mid=$mid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num");

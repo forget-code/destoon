@@ -10,13 +10,11 @@ show_menu($menus);
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="post[mycatid]" value="<?php echo $mycatid;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>商品</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 商品分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
-<br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?>
+ <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
 </tr>
 
 <tr>
@@ -26,8 +24,8 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 商品价格</td>
 <td>
-<table cellpadding="4" cellspacing="1" bgcolor="#FFFFFF">
-<tr bgcolor="#EFF5FB" align="center">
+<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
+<tr bgcolor="#F5F5F5" align="center">
 <td width="90">数量</td>
 <td width="90">价格</td>
 <td width="90"></td>
@@ -56,7 +54,7 @@ show_menu($menus);
 <td id="p_p_3"></td>
 </tr>
 </table>
-<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=100;Dd('p2').value=900;Dd('a3').value=500;Dd('p3').value=800;Dstep();">阶梯价格</span> / <span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=Dd('p2').value=Dd('a3').value=Dd('p3').value='';Dstep();">非阶梯价格</span></span>
+<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=100;Dd('p2').value=900;Dd('a3').value=500;Dd('p3').value=800;Dstep();">阶梯价格</span> / <span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=Dd('p2').value=Dd('a3').value=Dd('p3').value='';Dstep();">非阶梯价格</span></span> <span id="dprice" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -85,7 +83,7 @@ var property_admin = 1;
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
 	<input type="hidden" name="post[thumb1]" id="thumb1" value="<?php echo $thumb1;?>"/>
 	<input type="hidden" name="post[thumb2]" id="thumb2" value="<?php echo $thumb2;?>"/>
-	<table width="360">
+	<table width="360" class="ctb">
 	<tr align="center" height="120" class="c_p">
 	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb').value, true);}"/></td>
 	<td width="120"><img src="<?php echo $thumb1 ? $thumb1 : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb1" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb1').src, 1);}else{Dalbum(1,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb1').value, true);}"/></td>
@@ -115,8 +113,8 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <tr>
 <td class="tl"><span class="f_hid">*</span> 可选属性</td>
 <td>
-<table cellpadding="4" cellspacing="1" bgcolor="#FFFFFF">
-<tr bgcolor="#EFF5FB" align="center">
+<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
+<tr bgcolor="#F5F5F5" align="center">
 <td>属性名称</td>
 <td>属性值</td>
 </tr>
@@ -137,13 +135,14 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <td class="f_gray">例如：红色|蓝色|黑色|白色 多个属性用|分隔</td>
 </tr>
 </table>
+<span id="dnv" class="f_red"></span>
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 运费设置</td>
 <td>
-<table cellpadding="4" cellspacing="1" bgcolor="#FFFFFF">
-<tr bgcolor="#EFF5FB" align="center">
+<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
+<tr bgcolor="#F5F5F5" align="center">
 <td>快递</td>
 <td>默认运费</td>
 <td>增加一件商品增加</td>
@@ -192,7 +191,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </td>
 </tr>
 </table>
-<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Nexpress('0.00', '包邮');">包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');">满500包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('10.00', '快递');">快递10元</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');Dd('express_name_2').value = '快递';Dd('fee_start_2').value = '10.00';">快递10元，满500包邮</span></span>
+<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Nexpress('0.00', '包邮');">包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');">满500包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('10.00', '快递');">快递10元</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');Dd('express_name_2').value = '快递';Dd('fee_start_2').value = '10.00';">快递10元，满500包邮</span></span> <span id="dexpress" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -233,7 +232,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
@@ -255,7 +254,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php if($action == 'add') { ?>
@@ -264,7 +263,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
 <td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
@@ -318,62 +317,62 @@ function check() {
 	}
 	if(Dd('v1').value) {
 		if(!Dd('n1').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称', 'nv');
 			Dd('n1').focus();
 			return false;
 		}
 		if(Dd('v1').value.indexOf('|') == -1) {
-			alert(Dd('n1').value+'至少需要两个属性');
+			Dmsg(Dd('n1').value+'至少需要两个属性', 'nv');
 			Dd('v1').focus();
 			return false;
 		}
 	}
 	if(Dd('v2').value) {
 		if(!Dd('n2').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称');
 			Dd('n2').focus();
 			return false;
 		}
 		if(Dd('v2').value.indexOf('|') == -1) {
-			alert(Dd('n2').value+'至少需要两个属性');
+			Dmsg(Dd('n2').value+'至少需要两个属性', 'nv');
 			Dd('v2').focus();
 			return false;
 		}
 	}
 	if(Dd('v3').value) {
 		if(!Dd('n3').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称', 'nv');
 			Dd('n3').focus();
 			return false;
 		}
 		if(Dd('v3').value.indexOf('|') == -1) {
-			alert(Dd('n3').value+'至少需要两个属性');
+			Dmsg(Dd('n3').value+'至少需要两个属性', 'nv');
 			Dd('v3').focus();
 			return false;
 		}
 	}
 	if(Dd('n1').value && (Dd('n1').value == Dd('n2').value || Dd('n1').value == Dd('n3').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('n2').value && (Dd('n2').value == Dd('n1').value || Dd('n2').value == Dd('n3').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('n3').value && (Dd('n3').value == Dd('n1').value || Dd('n3').value == Dd('n2').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('express_name_1').value && (Dd('express_name_1').value == Dd('express_name_2').value || Dd('express_name_1').value == Dd('express_name_3').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}
 	if(Dd('express_name_2').value && (Dd('express_name_2').value == Dd('express_name_1').value || Dd('express_name_2').value == Dd('express_name_3').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}
 	if(Dd('express_name_3').value && (Dd('express_name_3').value == Dd('express_name_1').value || Dd('express_name_3').value == Dd('express_name_2').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}	
 	<?php echo $FD ? fields_js() : '';?>
@@ -421,13 +420,13 @@ function Dstep() {
 	if(u.length < 1) Dd('unit').value = u = '件';
 	var m = '<?php echo $DT['money_unit'];?>';
 	if(!a1 || a1 < 1) {
-		alert('起订量必须大于0');
+		Dmsg('起订量必须大于0', 'price');
 		Dd('a1').value = '1';
 		Dd('a1').focus();
 		return false;
 	}
 	if(!p1 || p1 < 0.1) {
-		alert('请填写商品价格');
+		Dmsg('请填写商品价格', 'price');
 		Dd('p1').value = '';
 		Dd('p1').focus();
 		return false;
@@ -436,13 +435,13 @@ function Dstep() {
 	Dd('p_p_1').innerHTML = p1+m+'/'+u;
 	if(a2 > 1 && p2 > 0.01) {
 		if(a2 <= a1) {
-			alert('数量必须大于'+a1);
+			Dmsg('数量必须大于'+a1, 'price');
 			Dd('a2').value = '';
 			Dd('a2').focus();
 			return false;
 		}
 		if(p2 >= p1) {
-			alert('价格必须小于'+p1);
+			Dmsg('价格必须小于'+p1, 'price');
 			Dd('p2').value = '';
 			Dd('p2').focus();
 			return false;
@@ -454,13 +453,13 @@ function Dstep() {
 	}
 	if(a3 > 1 && p3 > 0.01) {
 		if(a3 <= a2) {
-			alert('数量必须大于'+a2);
+			Dmsg('数量必须大于'+a2, 'price');
 			Dd('a3').value = '';
 			Dd('a3').focus();
 			return false;
 		}
 		if(p3 >= p2) {
-			alert('价格必须小于'+p2);
+			Dmsg('价格必须小于'+p2, 'price');
 			Dd('p3').value = '';
 			Dd('p3').focus();
 			return false;

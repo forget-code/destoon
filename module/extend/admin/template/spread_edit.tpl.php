@@ -9,14 +9,18 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>排名</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 排名模块</td>
 <td>
-<input type="radio" name="post[mid]" value="5" id="m_5"<?php if($mid == 5) echo ' checked';?>/><label for="m_5"> 供应</label>
-<input type="radio" name="post[mid]" value="6" id="m_6"<?php if($mid == 6) echo ' checked';?>/><label for="m_6"> 求购</label>
-<input type="radio" name="post[mid]" value="4" id="m_4"<?php if($mid == 4) echo ' checked';?>/><label for="m_4"> 公司</label>
+<select name="post[mid]">
+<?php 
+foreach($MODULE as $v) {
+	if(($v['moduleid'] > 0 && $v['moduleid'] < 4) || $v['islink']) continue;
+	echo '<option value="'.$v['moduleid'].'"'.($mid == $v['moduleid'] ? ' selected' : '').'>'.$v['name'].'</option>';
+} 
+?>
+</select>
 </td>
 </tr>
 <tr>
@@ -30,13 +34,13 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 单位</td>
 <td>
-<input type="radio" name="post[currency]" value="money" <?php if($currency == 'money') echo 'checked';?>/> <?php echo $DT['money_name'];?>&nbsp;
+<input type="radio" name="post[currency]" value="money" <?php if($currency == 'money') echo 'checked';?>/> <?php echo $DT['money_name'];?>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[currency]" value="credit" <?php if($currency == 'credit') echo 'checked';?>/> <?php echo $DT['credit_name'];?>
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息ID</td>
-<td><input type="text" size="10" name="post[tid]" id="key_id" value="<?php echo $tid;?>" onfocus="Sid();"/> <img src="<?php echo $MODULE[2]['linkurl'];?>image/img_select.gif" width="12" height="12" title="选择信息ID" class="c_p" onclick="Sid();"/> <span id="dkey_id" class="f_red"></span></td>
+<td><input type="text" size="10" name="post[tid]" id="key_id" value="<?php echo $tid;?>" onfocus="Sid();"/> <span id="dkey_id" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 投放时段</td>
@@ -44,12 +48,12 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员名称</td>
-<td><input type="text" size="20" name="post[username]" id="username" value="<?php echo $username;?>"/> <span id="dusername" class="f_red"></span></td>
+<td><input type="text" size="20" name="post[username]" id="username" value="<?php echo $username;?>"/>&nbsp;&nbsp;<a href="javascript:_user(Dd('username').value);" class="t">[资料]</a> <span id="dusername" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 排名状态</td>
 <td>
-<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 通过&nbsp;
+<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 通过&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[status]" value="2" <?php if($status == 2) echo 'checked';?>/> 待审
 </td>
 </tr>
@@ -57,9 +61,8 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 备注事项</td>
 <td><input type="text" size="60" name="post[note]" value="<?php echo $note;?>"/></td>
 </tr>
-</tbody>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">
@@ -70,6 +73,8 @@ function Sid() {
 		select_item('5&itemid='+Dd('key_id').value);
 	} else if(Dd('m_6').checked) {
 		select_item('6&itemid='+Dd('key_id').value);
+	} else if(Dd('m_16').checked) {
+		select_item('16&itemid='+Dd('key_id').value);
 	}
 }
 function check() {

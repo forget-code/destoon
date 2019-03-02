@@ -20,10 +20,8 @@ if($html == 'show') {
 					if(check_pay($mid, $itemid)) {
 						$user_status = 3;
 					} else {
-						$user_status = 2;						
-						$linkurl = $MOD['linkurl'].$linkurl;
-						$fee_back = $currency == 'money' ? dround($fee*intval($MOD['fee_back'])/100) : ceil($fee*intval($MOD['fee_back'])/100);
-						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid.'&username='.$username.'&fee_back='.$fee_back.'&fee='.$fee.'&currency='.$currency.'&sign='.crypt_sign($_username.$mid.$itemid.$username.$fee.$fee_back.$currency.$linkurl.$title).'&title='.rawurlencode($title).'&forward='.urlencode($linkurl);
+						$user_status = 2;
+						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid;
 					}
 				} else {
 					$user_status = 0;
@@ -39,7 +37,7 @@ if($html == 'show') {
 	if($user_status == 3 && $item['username']) $member = userinfo($item['username']);
 	$contact = strip_nr(ob_template('contact', 'chip'), true);
 	echo 'Inner("contact", \''.$contact.'\');';
-	echo 'Inner("hits", \''.$item['hits'].'\');';
+	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
 	$update = '';
 	if($item['totime'] && $item['totime'] < $DT_TIME && $item['status'] == 3) {
 		$update .= ",status=4";
@@ -47,9 +45,9 @@ if($html == 'show') {
 	}
 	if($member) {
 		$update_user = update_user($member, $item);
-		if($update_user) $db->query("UPDATE {$table} SET ".substr($update_user, 1)." WHERE username='$username'");
+		if($update_user) $db->query("UPDATE LOW_PRIORITY {$table} SET ".substr($update_user, 1)." WHERE username='$username'", 'UNBUFFERED');
 	}
-	include DT_ROOT.'/include/update.inc.php';
+	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
@@ -65,7 +63,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits']) {
+	if($DT['cache_hits'] && $MOD['hits']) {
 		$file = DT_CACHE.'/hits-'.$moduleid;
 		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
 	}

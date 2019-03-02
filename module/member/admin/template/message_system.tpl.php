@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">系统信件管理</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th width="40">ID</th>
 <th>标题</th>
@@ -13,7 +12,7 @@ show_menu($menus);
 <th width="50">操作</th>
 </tr>
 <?php foreach($messages as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><?php echo $v['itemid'];?></td>
 <td align="left"><a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>">&nbsp;<?php echo $v['title'];?></a></td>
 <td><?php echo $v['group'];?></td>

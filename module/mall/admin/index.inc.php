@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/mall.class.php';
-$do = new mall($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加商品', '?moduleid='.$moduleid.'&action=add'),
     array('商品列表', '?moduleid='.$moduleid),
@@ -24,9 +24,9 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊',  '商品名称', '商品品牌',  '简介', '计量单位', '关联名称', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', '编辑', 'IP', '属性名1', '属性名2', '属性名3', '属性值1', '属性值2', '属性值3', '快递1', '快递2', '快递3', '文件路径', '内容模板');
-	$dfields = array('keyword', 'title', 'brand', 'introduce', 'unit', 'relate_name', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'express_name_1', 'express_name_2', 'express_name_3', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '商品单价降序', '商品单价升序', '订单数量降序', '订单数量升序', '销售数量降序', '销售数量升序', '库存总量降序', '库存总量升序', '评论次数降序', '评论次数升序', '浏览人气降序', '浏览人气升序', '信息ID降序', '信息ID升序');
+	$sfields = array('模糊',  '商品名称', '商品品牌',  '简介', '计量单位', '关联名称', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', '编辑', 'IP', '属性名1', '属性名2', '属性名3', '属性值1', '属性值2', '属性值3', '快递1', '快递2', '快递3', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'brand', 'introduce', 'unit', 'relate_name', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'express_name_1', 'express_name_2', 'express_name_3', 'filepath', 'template');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '商品单价降序', '商品单价升序', '订单数量降序', '订单数量升序', '销售数量降序', '销售数量升序', '库存总量降序', '库存总量升序', '评论数量降序', '评论数量升序', '浏览人气降序', '浏览人气升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'vip DESC', 'vip ASC', 'price DESC', 'price DESC', 'orders DESC', 'orders ASC', 'sales DESC', 'sales ASC', 'amount DESC', 'amount ASC', 'comments DESC', 'comments ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
 
 	$level = isset($level) ? intval($level) : 0;
@@ -39,9 +39,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$price = isset($price) ? intval($price) : 0;
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime')) or $datetype = 'edittime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 	
 	$minprice = isset($minprice) ? dround($minprice) : '';
@@ -138,7 +138,7 @@ switch($action) {
 				if($tmp) extract($tmp);
 			}
 			$EXP = array();
-			$result = $db->query("SELECT * FROM {$DT_PRE}mall_express WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
+			$result = $db->query("SELECT * FROM {$table_express} WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
 			while($r = $db->fetch_array($result)) {
 				$EXP[] = $r;
 			}
@@ -177,7 +177,7 @@ switch($action) {
 			$unit or $unit = '件';
 			$addtime = timetodate($addtime);
 			$EXP = array();
-			$result = $db->query("SELECT * FROM {$DT_PRE}mall_express WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
+			$result = $db->query("SELECT * FROM {$table_express} WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
 			while($r = $db->fetch_array($result)) {
 				$EXP[] = $r;
 			}

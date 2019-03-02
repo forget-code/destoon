@@ -3,14 +3,13 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">站内信件修改</div>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="message[type]" value="1"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员组</td>
 <td><?php echo group_checkbox('message[groupids][]', $groupids, '2,3,4');?></td>
@@ -26,9 +25,8 @@ show_menu($menus);
 <?php echo deditor($moduleid, 'content', 'Message', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
-</tbody>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=system');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

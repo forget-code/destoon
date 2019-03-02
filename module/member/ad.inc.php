@@ -1,12 +1,14 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 login();
+$MG['biz'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+$MG['ad'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
-$MG['ad'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 include load('extend.lang');
 $adurl = $EXT['ad_url'];
 $TYPE = $L['ad_type'];
+$menu_id = 2;
 if($action == 'add') {
 	$pid = isset($pid) ? intval($pid) : 0;
 	if($pid) {
@@ -27,10 +29,10 @@ if($action == 'add') {
 			$amount = $price*$month;
 			if($amount) {
 				if($currency == 'money') {
-					if($amount > $_money) message($L['money_not_enough'], $MODULE[2]['linkurl'].'charge.php?action=pay&amount='.($amount-$_money));
+					if($amount > $_money) message($L['money_not_enough']);
 					is_payword($_username, $password) or message($L['error_payword']);
 				} else {
-					if($amount > $_credit) message($L['credit_not_enough'], $MODULE[2]['linkurl'].'credit.php?action=buy&amount='.($amount-$_credit));
+					if($amount > $_credit) message($L['credit_not_enough']);
 				}
 			}
 			$ad = array();
@@ -94,17 +96,37 @@ if($action == 'add') {
 			$sqlv = substr($sqlv, 1);
 			$db->query("INSERT INTO {$DT_PRE}ad ($sqlk) VALUES ($sqlv)");
 			$db->query("UPDATE {$DT_PRE}ad_place SET ads=ads+1 WHERE pid=$pid");
-			message($L['ad_buy_success'], '?status=2');
+			dmsg($L['ad_buy_success'], '?status=2');
 		}
 	} else {
-		dheader($adurl);
+		dheader('?action=list');
+	}
+} else if($action == 'list') {
+	$currency = $EXT['ad_currency'];
+	$unit = $currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
+	$condition = "open=1";
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}ad_place WHERE $condition");
+	$items = $r['num'];
+	$pages = pages($items, $page, $pagesize);
+	$lists = array();
+	$result = $db->query("SELECT * FROM {$DT_PRE}ad_place WHERE $condition ORDER BY listorder DESC,pid DESC LIMIT $offset,$pagesize");
+	while($r = $db->fetch_array($result)) {
+		$r['alt'] = $r['name'];
+		$r['name'] = set_style($r['name'], $r['style']);
+		$r['adddate'] = timetodate($r['addtime'], 5);
+		$r['editdate'] = timetodate($r['edittime'], 5);
+		$r['width'] or $r['width'] = '--';
+		$r['height'] or $r['height'] = '--';
+		$r['typename'] = $TYPE[$r['typeid']];
+		$lists[] = $r;
 	}
 } else {
 	$status = isset($status) ? intval($status) : 3;
 	in_array($status, array(2, 3)) or $status = 3;
 	$condition = "username='$_username' AND status=$status";
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}ad WHERE $condition");
-	$pages = pages($r['num'], $page, $pagesize);
+	$items = $r['num'];
+	$pages = pages($items, $page, $pagesize);
 	$lists = array();
 	$result = $db->query("SELECT * FROM {$DT_PRE}ad WHERE $condition ORDER BY aid DESC LIMIT $offset,$pagesize");
 	while($r = $db->fetch_array($result)) {
@@ -124,6 +146,20 @@ $nums = array();
 for($i = 2; $i < 4; $i++) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}ad WHERE username='$_username' AND status=$i");
 	$nums[$i] = $r['num'];
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'list') {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = '?action=index';
+	} else if ($action == 'add') {
+		$back_link = '?action=list';
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1) ? '?action=index' : 'biz.php';
+	}
 }
 include template('ad', $module);
 ?>

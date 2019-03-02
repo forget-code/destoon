@@ -1,20 +1,21 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 login();
-$MG['club_group_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
-require MD_ROOT.'/group.class.php';
+$group_limit = intval($MOD['group_limit_'.$_groupid]);
+$group_limit > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+require DT_ROOT.'/module/'.$module.'/group.class.php';
 $do = new group($moduleid);
 $sql = "username='$_username'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
-if(in_array($action, array('', 'add')) && $MG['club_group_limit']) {
-	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table}_group WHERE $sql AND status>1");
+if(in_array($action, array('', 'add')) && $group_limit) {
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_group} WHERE $sql AND status>1");
 	$limit_used = $r['num'];
-	$limit_free = $MG['club_group_limit'] > $limit_used ? $MG['club_group_limit'] - $limit_used : 0;
+	$limit_free = $group_limit > $limit_used ? $group_limit - $limit_used : 0;
 }
 
 switch($action) {
 	case 'add':
-		if($MG['club_group_limit'] && $limit_used >= $MG['club_group_limit']) dalert(lang($L['info_limit'], array($MG['club_group_limit'], $limit_used)), $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job);
+		if($group_limit && $limit_used >= $group_limit) dalert(lang($L['info_limit'], array($group_limit, $limit_used)), $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job);
 
 		$need_captcha = $MOD['captcha_group'] == 2 ? $MG['captcha'] : $MOD['captcha_group'];
 		$need_question = $MOD['question_group'] == 2 ? $MG['question'] : $MOD['question_group'];
@@ -39,7 +40,7 @@ switch($action) {
 				$msg = $post['status'] == 2 ? $L['success_check'] : $L['success_add'];
 				$js = '';
 				set_cookie('dmsg', $msg);
-				$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&job='.$job.'&status='.$post['status'];
+				$forward = '?mid='.$mid.'&job='.$job.'&status='.$post['status'];
 				$msg = '';
 				$js .= 'window.onload=function(){parent.window.location="'.$forward.'";}';
 				dalert($msg, '', $js);
@@ -47,11 +48,12 @@ switch($action) {
 				dalert($do->errmsg, '', ($need_captcha ? reload_captcha() : '').($need_question ? reload_question() : ''));
 			}
 		} else {
+			$_catid = $catid;
 			foreach($do->fields as $v) {
 				$$v = '';
 			}
 			$content = '';
-			$catid = intval($catid);
+			$catid = $_catid;
 			$areaid = $cityid;
 			$item = array();
 		}
@@ -97,9 +99,27 @@ switch($action) {
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 4; $i++) {
-		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table}_group WHERE username='$_username' AND status=$i");
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_group} WHERE username='$_username' AND status=$i");
 		$nums[$i] = $r['num'];
 	}
 }
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?mid='.$mid.'&job='.$job;
+	} else {
+		$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'edittime';
+		foreach($lists as $k=>$v) {
+			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
+			$lists[$k]['date'] = timetodate($v[$time], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$foot = '';
+		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&job='.$job.'&status='.$status : '?mid='.$mid.'&job='.$job;
+	}
+}
 $head_title = $L['my_group_title'];
+include template($MOD['template_my_group'] ? $MOD['template_my_group'] : 'my_club_group', 'member');
 ?>

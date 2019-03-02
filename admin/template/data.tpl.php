@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">配置列表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>配置名称</th>
 <th>配置说明</th>
@@ -18,12 +17,12 @@ show_menu($menus);
 <td><a href="?file=<?php echo $file;?>&action=config&name=<?php echo $v['name'];?>"><?php echo $v['name'];?></a></td>
 <td align="left">&nbsp;<?php echo $v['title'];?></td>
 <td><?php echo $v['database'];?></td>
-<td class="px11"><?php echo $v['edittime'];?></td>
-<td class="px11"><?php echo $v['lasttime'];?></td>
+<td class="px12"><?php echo $v['edittime'];?></td>
+<td class="px12"><?php echo $v['lasttime'];?></td>
 <td>
+<a href="?file=<?php echo $file;?>&action=config&name=<?php echo $v['name'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;
 <a href="?file=<?php echo $file;?>&action=import&name=<?php echo $v['name'];?>" onclick="return confirm('确定要导入此配置文件吗？\n\n此操作不可恢复，请在导入前备份相关的数据表');"><img src="admin/image/import.png" width="16" height="16" title="导入本系列配置文件" alt=""/></a>&nbsp;
 <a href="?file=<?php echo $file;?>&action=view&name=<?php echo $v['name'];?>"><img src="admin/image/view.png" width="16" height="16" title="效果预览" alt=""/></a>&nbsp;
-<a href="?file=<?php echo $file;?>&action=config&name=<?php echo $v['name'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;
 <a href="?file=<?php echo $file;?>&action=download&name=<?php echo $v['name'];?>"><img src="admin/image/save.png" width="16" height="16" title="下载" alt=""/></a>&nbsp;
 <a href="?file=<?php echo $file;?>&action=delete&name=<?php echo $v['name'];?>" onclick="return _delete();"><img src="admin/image/delete.png" width="16" height="16" title="删除" alt=""/></a></td>
 </tr>
@@ -33,9 +32,9 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="config"/>
 <div class="tt">新建配置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
-<td class="tl"><span class="f_hid">*</span> 导入类型</td>
+<td class="tl"><span class="f_red">*</span> 导入类型</td>
 <td>
 <input type="radio" name="type" value="0" id="t_0" onclick="Ds('p_0');Dh('p_2');" checked/><label for="t_0"/> 模块</label>&nbsp;&nbsp;&nbsp;
 <input type="radio" name="type" value="1" id="t_1" onclick="Dh('p_0');Dh('p_2');"/><label for="t_1"/> 会员</label>&nbsp;&nbsp;&nbsp;
@@ -43,7 +42,7 @@ show_menu($menus);
 </td>
 </tr>
 <tr id="p_0" style="display:">
-<td class="tl"><span class="f_hid">*</span> 选择模块</td>
+<td class="tl"><span class="f_red">*</span> 选择模块</td>
 <td>
 <select name="mid" id="mid">
 <option value="0">请选择</option>
@@ -59,7 +58,7 @@ foreach($MODULE as $m) {
 </td>
 </tr>
 <tr id="p_2" style="display:none">
-<td class="tl"><span class="f_hid">*</span> 选择表</td>
+<td class="tl"><span class="f_red">*</span> 选择表</td>
 <td>
 <select name="tb" id="tb">
 <option value="">请选择</option>
@@ -74,7 +73,7 @@ foreach($tables as $t) {
 </tr>
 <tr>
 <td class="tl"> </td>
-<td height="30"><input type="submit" value="下一步" class="btn"/></td>
+<td height="30"><input type="submit" value="下一步" class="btn-g"/></td>
 </tr>
 </table>
 </form>

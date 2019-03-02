@@ -5,7 +5,15 @@ $EXT['weixin'] or dheader('./');
 $WX = cache_read('weixin.php');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
-$W = $db->get_one("SELECT * FROM {$DT_PRE}weixin_user WHERE username='$_username'");
+$i = 0;
+$result = $db->query("SELECT * FROM {$DT_PRE}weixin_user WHERE username='$_username' ORDER BY logintime DESC");
+while($r = $db->fetch_array($result)) {
+	if($i++) {
+		$db->query("UPDATE {$DT_PRE}weixin_user SET username='' WHERE itemid=$r[itemid]");
+	} else {
+		$W = $r;
+	}
+}
 switch($action) {
 	case 'push':
 		$W or message();
@@ -22,6 +30,12 @@ switch($action) {
 		$auth = encrypt($_username.md5(DT_IP.$_SERVER['HTTP_USER_AGENT']), DT_KEY.'WXQR');
 		$head_title = $L['weixin_title'];	
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	$back_link = 'index.php';
 }
 include template('weixin', $module);
 ?>

@@ -1,13 +1,13 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/sell.class.php';
-$do = new sell($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加'.$MOD['name'], '?moduleid='.$moduleid.'&action=add'),
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('审核'.$MOD['name'], '?moduleid='.$moduleid.'&action=check'),
-    array('过期'.$MOD['name'], '?moduleid='.$moduleid.'&action=expire'),
-    array('未通过'.$MOD['name'], '?moduleid='.$moduleid.'&action=reject'),
+    array('已过期', '?moduleid='.$moduleid.'&action=expire'),
+    array('未通过', '?moduleid='.$moduleid.'&action=reject'),
     array('回收站', '?moduleid='.$moduleid.'&action=recycle'),
     array('移动分类', '?moduleid='.$moduleid.'&action=move'),
 );
@@ -24,10 +24,10 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '产品品牌', '计量单位', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', '编辑', 'IP', '参数名1', '参数名2', '参数名3', '参数值1', '参数值2', '参数值3', '文件路径', '内容模板');
-	$dfields = array('keyword', 'title', 'brand', 'unit', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '产品单价降序', '产品单价升序', '供货总量降序', '供货总量升序', '最小起订降序', '最小起订升序', '浏览次数降序', '浏览次数升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'vip DESC', 'vip ASC', 'price DESC', 'price ASC', 'amount DESC', 'amount ASC', 'minamount DESC', 'minamount ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊', '标题', '产品品牌', '计量单位', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', '编辑', 'IP', '参数名1', '参数名2', '参数名3', '参数值1', '参数值2', '参数值3', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'brand', 'unit', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'filepath', 'template');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '产品单价降序', '产品单价升序', '供货总量降序', '供货总量升序', '最小起订降序', '最小起订升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'vip DESC', 'vip ASC', 'price DESC', 'price ASC', 'amount DESC', 'amount ASC', 'minamount DESC', 'minamount ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'itemid DESC', 'itemid ASC');
 
 	$level = isset($level) ? intval($level) : 0;
 	$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
@@ -40,9 +40,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$price = isset($price) ? intval($price) : 0;
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime')) or $datetype = 'edittime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 	
 	$minprice = isset($minprice) ? dround($minprice) : '';
@@ -148,7 +148,7 @@ switch($action) {
 			$item = $do->get_one();
 			extract($item);
 			$addtime = timetodate($addtime);
-			$totime = $totime ? timetodate($totime, 3) : '';
+			$totime = $totime ? timetodate($totime, 6) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
 			include tpl($action, $module);

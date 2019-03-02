@@ -1,8 +1,14 @@
 <?php
 require '../../../common.inc.php';
+$bank = 'weixin';
+$PAY = cache_read('pay.php');
+$PAY[$bank]['enable'] or dheader($MODULE[2]['linkurl'].'charge.php?action=record');
 $charge_title = '';
 if($action == 'ajax') {
 	$itemid or exit('ko');
+	$r = $db->get_one("SELECT * FROM {$DT_PRE}finance_charge WHERE itemid=$itemid");
+	if($r && $_username == $r['username'] && $r['status'] > 0) exit('ok');
+	exit('ko');
 } else {
 	$auth = isset($auth) ? decrypt($auth, DT_KEY.'QRPAY') : '';
 	$auth or dheader($MODULE[2]['linkurl'].'charge.php?action=record');
@@ -10,16 +16,9 @@ if($action == 'ajax') {
 	$itemid = $orderid = intval($t[0]);
 	($itemid && $t[2] == $DT_IP) or dheader($MODULE[2]['linkurl'].'charge.php?action=record');
 	$charge_title = $t[1];
+	$r = $db->get_one("SELECT * FROM {$DT_PRE}finance_charge WHERE itemid=$itemid");
 }
-$r = $db->get_one("SELECT * FROM {$DT_PRE}finance_charge WHERE itemid=$itemid");
-if($action == 'ajax') {
-	if($r && $r['status'] == 3) exit('ok');
-	exit('ko');
-}
-if(!$r || !$_username || $r['username'] != $_username || $r['status'] != 0 || $r['bank'] != 'weixin') dheader($MODULE[2]['linkurl'].'charge.php?action=record');
-$bank = 'weixin';
-$PAY = cache_read('pay.php');
-$PAY[$bank]['enable'] or dheader($MODULE[2]['linkurl'].'charge.php?action=record');
+if(!$r || !$_username || $r['username'] != $_username || $r['status'] > 0 || $r['bank'] != $bank) dheader($MODULE[2]['linkurl'].'charge.php?action=record');
 function make_sign($arr, $key) {
 	ksort($arr);
 	$str = '';
@@ -48,7 +47,6 @@ $post['appid'] = $PAY[$bank]['appid'];
 $post['mch_id'] = $PAY[$bank]['partnerid'];
 $post['nonce_str'] = md5(md5($itemid.$PAY[$bank]['keycode'].$total_fee));
 $post['body'] = $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')';
-$post['body'] = convert($post['body'], DT_CHARSET, 'UTF-8');
 $post['out_trade_no'] = $itemid;
 $post['total_fee'] = $total_fee;
 $post['spbill_create_ip'] = $DT_IP;
@@ -64,7 +62,7 @@ if(strpos($rec, 'code_url') !== false) {
 	if(strpos($rec, 'return_msg') !== false) {
 		if(function_exists('libxml_disable_entity_loader')) libxml_disable_entity_loader(true);
 		$x = simplexml_load_string($rec, 'SimpleXMLElement', LIBXML_NOCDATA);
-		dalert(convert($x->return_msg, 'UTF-8', DT_CHARSET), $MODULE[2]['linkurl'].'charge.php?action=record');
+		dalert($x->err_code_des ? $x->err_code_des : $x->return_msg, $MODULE[2]['linkurl'].'charge.php?action=record');
 	} else {
 		dalert('Can Not Connect weixin', $MODULE[2]['linkurl'].'charge.php?action=record');
 	}
@@ -75,7 +73,7 @@ if(strpos($rec, 'code_url') !== false) {
     <meta http-equiv="content-type" content="text/html;charset=<?php echo DT_CHARSET;?>"/>
     <meta name="viewport" content="width=device-width, initial-scale=1" /> 
     <title>微信支付<?php echo $DT['seo_delimiter'];?><?php echo $DT['sitename'];?></title>
-	<style>
+	<style type="text/css">
 	* {word-break:break-all;font-family:"Segoe UI","Lucida Grande",Helvetica,Arial,Verdana,"Microsoft YaHei";}
 	body {margin:0;font-size:14px;color:#333333;background:#EFEFF4;-webkit-user-select:none;}
 	</style>
@@ -87,7 +85,7 @@ if(strpos($rec, 'code_url') !== false) {
 		<img src="<?php echo DT_PATH;?>api/qrcode.png.php?auth=<?php echo encrypt($x->code_url, DT_KEY.'QRCODE');?>" style="width:180px;height:180px;margin:10px 0;"/>
 		<div style="padding:0 16px;font-size:16px;color:#555555;line-height:32px;">		
 		<?php
-		if($DT_TOUCH) {
+		if(DT_TOUCH) {
 			echo $DT_MOB['browser'] == 'weixin' ? '请长按上面的二维码<br/>选择识别图中二维码' : '请使用微信扫描二维码完成支付<br/><a href="http://app.destoon.com/scan/" rel="external" style="color:#2E7DC6;text-decoration:none;">如何扫描？</a>';
 		} else {
 			echo '请打开手机微信<br/>扫一扫上面的二维码';
@@ -100,7 +98,12 @@ if(strpos($rec, 'code_url') !== false) {
 		<a href="<?php echo $MODULE[2]['linkurl'];?>charge.php?action=record" style="color:#2E7DC6;text-decoration:none;">取消支付</a>
 		</div>
 	</div>
-	<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery.js"></script>
+	<!--[if lte IE 9]><!-->
+	<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-1.5.2.min.js"></script>
+	<!--<![endif]-->
+	<!--[if (gte IE 10)|!(IE)]><!-->
+	<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-2.1.1.min.js"></script>
+	<!--<![endif]-->
 	<script type="text/javascript">
 	var interval = window.setInterval(
 		function() {

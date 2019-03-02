@@ -7,7 +7,7 @@ preg_match("/^[0-9\.\,]{13,17}$/", $map) or $map = $map_mid;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo DT_CHARSET;?>" />
 <title>灵图 - 双击标注位置</title>
 <style type="text/css">

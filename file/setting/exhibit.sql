@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_exhibit`;
-CREATE TABLE `destoon_exhibit` (
+DROP TABLE IF EXISTS `destoon_exhibit_8`;
+CREATE TABLE `destoon_exhibit_8` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -11,6 +11,7 @@ CREATE TABLE `destoon_exhibit` (
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
+  `comments` int(10) unsigned NOT NULL default '0',
   `orders` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
@@ -31,7 +32,7 @@ CREATE TABLE `destoon_exhibit` (
   `fax` varchar(20) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
-  `msn` varchar(50) NOT NULL default '',
+  `wx` varchar(50) NOT NULL default '',
   `remark` mediumtext NOT NULL,
   `sign` tinyint(1) unsigned NOT NULL default '0',
   `editor` varchar(30) NOT NULL default '',
@@ -48,15 +49,15 @@ CREATE TABLE `destoon_exhibit` (
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='展会';
 
-DROP TABLE IF EXISTS `destoon_exhibit_data`;
-CREATE TABLE `destoon_exhibit_data` (
+DROP TABLE IF EXISTS `destoon_exhibit_data_8`;
+CREATE TABLE `destoon_exhibit_data_8` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` mediumtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='展会内容';
 
-DROP TABLE IF EXISTS `destoon_exhibit_order`;
-CREATE TABLE `destoon_exhibit_order` (
+DROP TABLE IF EXISTS `destoon_exhibit_sign_8`;
+CREATE TABLE `destoon_exhibit_sign_8` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `id` bigint(20) unsigned NOT NULL default '0',
   `user` varchar(30) NOT NULL,
@@ -70,6 +71,7 @@ CREATE TABLE `destoon_exhibit_order` (
   `postcode` varchar(10) NOT NULL,
   `email` varchar(50) NOT NULL,
   `qq` varchar(20) NOT NULL,
+  `wx` varchar(50) NOT NULL,
   `content` text NOT NULL,
   `username` varchar(30) NOT NULL,
   `addtime` int(10) unsigned NOT NULL default '0',

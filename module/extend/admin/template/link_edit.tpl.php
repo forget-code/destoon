@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>链接</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 网站分类</td>
 <td><span id="type_box"><?php echo type_select('link', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='link',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $file;?>', '链接分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
@@ -35,7 +34,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 链接状态</td>
 <td>
-<input type="radio" name="post[status]" value="3" <?php if($status==3) echo 'checked';?>/> 通过
+<input type="radio" name="post[status]" value="3" <?php if($status==3) echo 'checked';?>/> 通过&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[status]" value="2" <?php if($status==2) echo 'checked';?>/> 待审
 </td>
 </tr>
@@ -46,7 +45,7 @@ show_menu($menus);
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?><?php echo $status == 2 ? '&action=check' : '';?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

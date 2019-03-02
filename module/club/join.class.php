@@ -2,15 +2,13 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class djoin {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'club_fans';
-		$this->db = &$db;
+		global $table_fans;
+		$this->table = $table_fans;
 		$this->fields = array('gid','reason','username','passport','addtime','status');
     }
 
@@ -22,17 +20,17 @@ class djoin {
 		global $GRP, $L;
 		if(!is_array($post)) return false;
 		if($GRP['join_type'] && !$post['reason']) return $this->_($L['join_pass_reason']);
-		if(strlen($post['reason']) > DT_CHARLEN*500) return $this->_($L['join_pass_max_reason']);
+		if(strlen($post['reason']) > 3*500) return $this->_($L['join_pass_max_reason']);
 		return true;
 	}
 
 	function set($post) {
-		global $DT_TIME, $_username, $_passport;
+		global $_username, $_passport;
 		$post['status'] = $post['status'] == 3 ? 3 : 2;
 		if($this->itemid) {
 			//
 		} else {
-			$post['addtime'] = $DT_TIME;
+			$post['addtime'] = DT_TIME;
 			$post['username'] = $_username;
 			$post['passport'] = $_passport;
 		}
@@ -41,29 +39,29 @@ class djoin {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'itemid DESC') {
-		global $MOD, $table, $pages, $page, $pagesize, $offset, $items, $sum;
+		global $MOD, $table, $table_group, $pages, $page, $pagesize, $offset, $items, $sum;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();	
 		$lists = $gids = $GRPS = array();
-		$result = $this->db->query("SELECT itemid,gid,addtime FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT itemid,gid,addtime FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$gids[$r['gid']] = $r['gid'];
 			$lists[] = $r;
 		}
 		if($gids) {
-			$result = $this->db->query("SELECT * FROM {$table}_group WHERE itemid IN (".implode(',', $gids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT * FROM {$table_group} WHERE itemid IN (".implode(',', $gids).")");
+			while($r = DB::fetch_array($result)) {
 				$GRPS[$r['itemid']] = $r;
 			}
 			if($GRPS) {
@@ -87,8 +85,8 @@ class djoin {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		return $this->itemid;
 	}
 
@@ -99,7 +97,7 @@ class djoin {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -109,7 +107,7 @@ class djoin {
 				$this->delete($v); 
 			}
 		} else {
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 

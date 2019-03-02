@@ -3,7 +3,6 @@ defined('IN_DESTOON') or exit('Access Denied');
 class photo {
 	var $moduleid;
 	var $itemid;
-	var $db;
 	var $table;
 	var $table_data;
 	var $table_item;
@@ -12,13 +11,12 @@ class photo {
 	var $errmsg = errmsg;
 
     function __construct($moduleid) {
-		global $db, $table, $table_data, $table_item, $MOD;
+		global $table, $table_data, $table_item, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
 		$this->table_data = $table_data;
 		$this->table_item = $table_item;
 		$this->split = $MOD['split'];
-		$this->db = &$db;
 		$this->fields = array('catid','areaid','level','title','style','fee','introduce','thumb','banner','status','hits','open','password','question','answer','username','addtime', 'editor','edittime','ip','template', 'linkurl','filepath','domain','note');
     }
 
@@ -34,15 +32,15 @@ class photo {
 		if(!$post['password'] && $post['open'] == 2) return $this->_(lang('photo->pass_password'));
 		if(!$post['question'] && $post['open'] == 1) return $this->_(lang('photo->pass_question'));
 		if(!$post['answer'] && $post['open'] == 1) return $this->_(lang('photo->pass_answer'));
-		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
+		if(DT_MAX_LEN && strlen(clear_img($post['content'])) > DT_MAX_LEN) $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		global $MOD, $_username, $_userid;
 		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['content'] = stripslashes($post['content']);
 		$post['fee'] = dround($post['fee']);
 		$post['content'] = save_local($post['content']);
@@ -59,7 +57,7 @@ class photo {
 			delete_diff($new, $old);
 		} else {
 			$post['username'] = $post['editor'] = $_username;
-			$post['ip'] = $DT_IP;
+			$post['ip'] = DT_IP;
 		}
 		$content = $post['content'];
 		unset($post['content']);
@@ -69,10 +67,10 @@ class photo {
 	}
 
 	function get_one() {
-		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		$r = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
 		if($r) {
 			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$t = DB::get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
 			$r['content'] = $t ? $t['content'] : '';
 			return $r;
 		} else {
@@ -85,14 +83,14 @@ class photo {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['alt'] = $r['title'];
@@ -102,8 +100,8 @@ class photo {
 			$lists[] = $r;
 		}
 		if($catids) {
-			$result = $this->db->query("SELECT catid,catname,linkurl FROM {$this->db->pre}category WHERE catid IN (".implode(',', $catids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT catid,catname,linkurl FROM ".DT_PRE."category WHERE catid IN (".implode(',', $catids).")");
+			while($r = DB::fetch_array($result)) {
 				$CATS[$r['catid']] = $r;
 			}
 			if($CATS) {
@@ -125,10 +123,10 @@ class photo {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		DB::query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -146,9 +144,9 @@ class photo {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		DB::query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'], $this->itemid);
 		if($post['status'] == 3) $this->tohtml($this->itemid, $post['catid']);
@@ -161,7 +159,7 @@ class photo {
 	}
 
 	function update($itemid) {
-		$item = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
+		$item = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
 		$update = '';
 		$keyword = $item['title'].','.strip_tags(cat_pos(get_cat($item['catid']), ','));
 		if($keyword != $item['keyword']) {
@@ -177,14 +175,14 @@ class photo {
 		}
 		$linkurl = itemurl($item);
 		if($linkurl != $item['linkurl']) $update .= ",linkurl='$linkurl'";
-		if($update) $this->db->query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
+		if($update) DB::query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
 	}
 
 	function recycle($itemid) {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->recycle($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
 			$this->delete($itemid, false);
 			return true;
 		}		
@@ -195,7 +193,7 @@ class photo {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->restore($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
 			if($MOD['show_html']) tohtml('show', $module, "itemid=$itemid");
 			return true;
 		}		
@@ -218,15 +216,15 @@ class photo {
 				$userid = get_user($r['username']);
 				if($r['thumb']) delete_upload($r['thumb'], $userid);
 				if($r['content']) delete_local($r['content'], $userid);
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 				$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-				$this->db->query("DELETE FROM {$content_table} WHERE itemid=$itemid");
-				if($MOD['cat_property']) $this->db->query("DELETE FROM {$this->db->pre}category_value WHERE moduleid=$this->moduleid AND itemid=$itemid");
-				$result = $this->db->query("SELECT * FROM {$this->table_item} WHERE item=$itemid");
-				while($rr = $this->db->fetch_array($result)) {
+				DB::query("DELETE FROM {$content_table} WHERE itemid=$itemid");
+				if($MOD['cat_property']) DB::query("DELETE FROM ".DT_PRE."category_value WHERE moduleid=$this->moduleid AND itemid=$itemid");
+				$result = DB::query("SELECT * FROM {$this->table_item} WHERE item=$itemid");
+				while($rr = DB::fetch_array($result)) {
 					delete_upload($rr['thumb'], $userid);
 				}
-				$this->db->query("DELETE FROM {$this->table_item} WHERE item=$itemid");
+				DB::query("DELETE FROM {$this->table_item} WHERE item=$itemid");
 				if($r['username'] && $MOD['credit_del']) {
 					credit_add($r['username'], -$MOD['credit_del']);
 					credit_record($r['username'], -$MOD['credit_del'], 'system', lang('my->credit_record_del', array($MOD['name'])), 'ID:'.$this->itemid);
@@ -236,7 +234,7 @@ class photo {
 	}
 
 	function check($itemid) {
-		global $_username, $DT_TIME, $MOD;
+		global $_username, $MOD;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->check($v); }
 		} else {
@@ -246,32 +244,32 @@ class photo {
 				credit_add($item['username'], $MOD['credit_add']);
 				credit_record($item['username'], $MOD['credit_add'], 'system', lang('my->credit_record_add', array($MOD['name'])), 'ID:'.$this->itemid);
 			}
-			$this->db->query("UPDATE {$this->table} SET status=3,hits=hits+1,editor='$_username',edittime=$DT_TIME WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3,editor='$_username',edittime=".DT_TIME." WHERE itemid=$itemid");
 			$this->tohtml($itemid);
 			return true;
 		}
 	}
 
 	function reject($itemid) {
-		global $_username, $DT_TIME;
+		global $_username;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->reject($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
 			return true;
 		}
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT itemid FROM {$this->table} WHERE $condition");
+		while($r = DB::fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
 	}
 
 	function level($itemid, $level) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
+		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function item_list($condition = 'status=3', $order = 'listorder ASC,itemid ASC', $cache = '') {
@@ -279,13 +277,13 @@ class photo {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table_item} WHERE $condition", $cache);
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table_item} WHERE $condition", $cache);
 			$items = $r['num'];
 		}
 		$pages =  pages($items, $page, $pagesize);
 		$lists = $catids = $CATS = array();
-		$result = $this->db->query("SELECT * FROM {$this->table_item} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table_item} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
+		while($r = DB::fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -297,15 +295,17 @@ class photo {
 		foreach($post as $v) {
 			$thumb .= $v['thumb'];
 		}
-		if($thumb) clear_upload($thumb, $this->itemid);
-		if($post[0]['thumb']) {
-			$thumb = $post[0]['thumb'];
-			$listorder = intval($post[0]['listorder']);
-			$introduce = $post[0]['introduce'];
-			if($introduce == $L['photo_intro']) $introduce = '';
-			$this->db->query("INSERT INTO {$this->table_item} (item,thumb,introduce,listorder) VALUES ('$this->itemid', '$thumb','$introduce','$listorder')");
+		if($thumb) clear_upload($thumb, $this->itemid, $this->table_item);
+		if(isset($post[0])) {
+			if(is_url($post[0]['thumb'])) {
+				$thumb = $post[0]['thumb'];
+				$listorder = intval($post[0]['listorder']);
+				$introduce = $post[0]['introduce'];
+				if($introduce == $L['photo_intro']) $introduce = '';
+				DB::query("INSERT INTO {$this->table_item} (item,thumb,introduce,listorder) VALUES ('$this->itemid', '$thumb','$introduce','$listorder')");
+			}
+			unset($post[0]);
 		}
-		unset($post[0]);
 		foreach($post as $k=>$v) {
 			if(isset($v['delete'])) {
 				$this->item_delete($k);
@@ -316,7 +316,7 @@ class photo {
 				$listorder = intval($v['listorder']);
 				$introduce = $v['introduce'];
 				if($introduce == $L['photo_intro']) $introduce = '';
-				$this->db->query("UPDATE {$this->table_item} SET thumb='$thumb',introduce='$introduce',listorder='$listorder' WHERE itemid=$k");
+				DB::query("UPDATE {$this->table_item} SET thumb='$thumb',introduce='$introduce',listorder='$listorder' WHERE itemid=$k");
 			} else {
 				$this->item_delete($k);
 			}
@@ -326,17 +326,17 @@ class photo {
 	function item_delete($itemid = 0) {
 		global $_userid;
 		if($itemid) {
-			$r = $this->db->get_one("SELECT thumb FROM {$this->table_item} WHERE itemid=$itemid");
+			$r = DB::get_one("SELECT thumb FROM {$this->table_item} WHERE itemid=$itemid");
 			if($r) {
 				delete_upload($r['thumb'], $_userid);
-				$this->db->query("DELETE FROM {$this->table_item} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$this->table_item} WHERE itemid=$itemid");
 			}
 		} else {
-			$result = $this->db->query("SELECT thumb FROM {$this->table_item} WHERE item=$this->itemid");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT thumb FROM {$this->table_item} WHERE item=$this->itemid");
+			while($r = DB::fetch_array($result)) {
 				delete_upload($r['thumb'], $_userid);
 			}
-			$this->db->query("DELETE FROM {$this->table_item} WHERE item=$this->itemid");
+			DB::query("DELETE FROM {$this->table_item} WHERE item=$this->itemid");
 		}
 	}
 

@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">IP库更新</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>库文件</th>
 <th>更新时间</th>
@@ -15,7 +14,7 @@ show_menu($menus);
 <th>手动下载<?php echo tips('提示：无法在线更新，请手动下载wry.rar，解压其中的wry.dat，覆盖上传至file/ipdata/目录');?></th>
 <?php } ?>
 </tr>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td>file/ipdata/wry.dat</td>
 <td><?php echo $now?></td>
 <td><?php echo $new;?></td>

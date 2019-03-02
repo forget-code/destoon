@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_mall`;
-CREATE TABLE `destoon_mall` (
+DROP TABLE IF EXISTS `destoon_mall_16`;
+CREATE TABLE `destoon_mall_16` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `mycatid` bigint(20) unsigned NOT NULL default '0',
@@ -25,6 +25,7 @@ CREATE TABLE `destoon_mall` (
   `thumb` varchar(255) NOT NULL default '',
   `thumb1` varchar(255) NOT NULL default '',
   `thumb2` varchar(255) NOT NULL default '',
+  `thumbs` text NOT NULL,
   `relate_name` varchar(100) NOT NULL,
   `relate_id` varchar(255) NOT NULL,
   `relate_title` varchar(100) NOT NULL,
@@ -57,8 +58,8 @@ CREATE TABLE `destoon_mall` (
   `mobile` varchar(50) NOT NULL default '',
   `address` varchar(255) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
-  `msn` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
+  `wx` varchar(50) NOT NULL default '',
   `ali` varchar(30) NOT NULL default '',
   `skype` varchar(30) NOT NULL default '',
   `editor` varchar(30) NOT NULL default '',
@@ -79,16 +80,8 @@ CREATE TABLE `destoon_mall` (
   KEY `areaid` (`areaid`)
 ) TYPE=MyISAM COMMENT='商城';
 
-DROP TABLE IF EXISTS `destoon_mall_cart`;
-CREATE TABLE `destoon_mall_cart` (
-  `userid` bigint(20) unsigned NOT NULL default '0',
-  `data` text NOT NULL,
-  `edittime` int(10) unsigned NOT NULL default '0',
-  UNIQUE KEY `userid` (`userid`)
-) TYPE=MyISAM COMMENT='购物车';
-
-DROP TABLE IF EXISTS `destoon_mall_comment`;
-CREATE TABLE `destoon_mall_comment` (
+DROP TABLE IF EXISTS `destoon_mall_comment_16`;
+CREATE TABLE `destoon_mall_comment_16` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `mallid` bigint(20) unsigned NOT NULL default '0',
   `buyer` varchar(30) NOT NULL default '',
@@ -108,15 +101,15 @@ CREATE TABLE `destoon_mall_comment` (
   KEY `seller` (`seller`)
 ) TYPE=MyISAM COMMENT='订单评论';
 
-DROP TABLE IF EXISTS `destoon_mall_data`;
-CREATE TABLE `destoon_mall_data` (
+DROP TABLE IF EXISTS `destoon_mall_data_16`;
+CREATE TABLE `destoon_mall_data_16` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` mediumtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='商城内容';
 
-DROP TABLE IF EXISTS `destoon_mall_express`;
-CREATE TABLE `destoon_mall_express` (
+DROP TABLE IF EXISTS `destoon_mall_express_16`;
+CREATE TABLE `destoon_mall_express_16` (
   `itemid` int(10) unsigned NOT NULL auto_increment,
   `parentid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -132,49 +125,8 @@ CREATE TABLE `destoon_mall_express` (
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='运费模板';
 
-DROP TABLE IF EXISTS `destoon_mall_order`;
-CREATE TABLE `destoon_mall_order` (
-  `itemid` bigint(20) unsigned NOT NULL auto_increment,
-  `mid` smallint(6) unsigned NOT NULL default '16',
-  `mallid` bigint(20) unsigned NOT NULL default '0',
-  `buyer` varchar(30) NOT NULL default '',
-  `seller` varchar(30) NOT NULL default '',
-  `title` varchar(100) NOT NULL default '',
-  `thumb` varchar(255) NOT NULL default '',
-  `price` decimal(10,2) unsigned NOT NULL default '0.00',
-  `number` int(10) unsigned NOT NULL default '0',
-  `amount` decimal(10,2) unsigned NOT NULL default '0.00',
-  `fee` decimal(10,2) NOT NULL default '0.00',
-  `fee_name` varchar(30) NOT NULL default '',
-  `buyer_name` varchar(30) NOT NULL default '',
-  `buyer_address` varchar(255) NOT NULL default '',
-  `buyer_postcode` varchar(10) NOT NULL default '',
-  `buyer_phone` varchar(30) NOT NULL default '',
-  `buyer_mobile` varchar(30) NOT NULL default '',
-  `buyer_star` tinyint(1) unsigned NOT NULL default '0',
-  `seller_star` tinyint(1) unsigned NOT NULL default '0',
-  `send_type` varchar(50) NOT NULL default '',
-  `send_no` varchar(50) NOT NULL default '',
-  `send_status` tinyint(1) unsigned NOT NULL default '0',
-  `send_time` varchar(20) NOT NULL default '',
-  `send_days` int(10) unsigned NOT NULL default '0',
-  `cod` tinyint(1) unsigned NOT NULL default '0',
-  `trade_no` varchar(50) NOT NULL default '',
-  `add_time` smallint(6) NOT NULL default '0',
-  `addtime` int(10) unsigned NOT NULL default '0',
-  `updatetime` int(10) unsigned NOT NULL default '0',
-  `editor` varchar(30) NOT NULL default '',
-  `buyer_reason` mediumtext NOT NULL,
-  `refund_reason` mediumtext NOT NULL,
-  `note` varchar(255) NOT NULL default '',
-  `status` tinyint(1) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`itemid`),
-  KEY `buyer` (`buyer`),
-  KEY `seller` (`seller`)
-) TYPE=MyISAM COMMENT='商城订单';
-
-DROP TABLE IF EXISTS `destoon_mall_stat`;
-CREATE TABLE `destoon_mall_stat` (
+DROP TABLE IF EXISTS `destoon_mall_stat_16`;
+CREATE TABLE `destoon_mall_stat_16` (
   `mallid` bigint(20) unsigned NOT NULL default '0',
   `seller` varchar(30) NOT NULL default '',
   `scomment` int(10) unsigned NOT NULL default '0',
@@ -188,3 +140,15 @@ CREATE TABLE `destoon_mall_stat` (
   `b3` int(10) unsigned NOT NULL default '0',
   UNIQUE KEY `mallid` (`mallid`)
 ) TYPE=MyISAM COMMENT='评分统计';
+
+DROP TABLE IF EXISTS `destoon_mall_view_16`;
+CREATE TABLE `destoon_mall_view_16` (
+  `uid` varchar(50) NOT NULL,
+  `itemid` bigint(20) unsigned NOT NULL default '0',
+  `username` varchar(30) NOT NULL default '',
+  `seller` varchar(30) NOT NULL,
+  `lasttime` int(10) unsigned NOT NULL default '0',
+  UNIQUE KEY `uid` (`uid`),
+  KEY `username` (`username`),
+  KEY `lasttime` (`lasttime`)
+) TYPE=MyISAM COMMENT='浏览历史';

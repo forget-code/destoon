@@ -1,9 +1,7 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-var Abody = document.documentElement || document.body;
-if(isGecko) Abody = document.body;
 var mid_div = Dd('mid_div');
 var mid_pic = Dd('mid_pic');
 var big_div = Dd('big_div');
@@ -31,7 +29,7 @@ function MAlbum(e) {
 		ll = parseInt((AL - eX + ZW/2) * pl);
 	}
 	if(big_pic.clientWidth < big_div.clientWidth) ll = 0;
-	eY = e.clientY + Abody.scrollTop;
+	eY = e.clientY + $(document).scrollTop();
     var pt = (big_pic.clientHeight - big_div.clientHeight)/(PH - ZH);
 	if(eY <= AT + ZH/2) {
 		t = AT;
@@ -55,13 +53,13 @@ function Album(id, s) {
 }
 function SAlbum() {
 	s = Dd('mid_pic').src;
-	if(s.indexOf('nopic240.gif') != -1) return;
+	if(s.indexOf('nopic320.gif') != -1) return;
 	if(s.indexOf('.middle.') != -1) s = s.substring(0, s.length-8-ext(s).length);
 	Dd('big_pic').src = s;
 	Ds('big_div');
 	Ds('zoomer');
 }
 function HAlbum() {Dh('zoomer');Dh('big_div');}
-function PAlbum(o) {if(o.src.indexOf('nopic240.gif')==-1) View(o.src);}
+function PAlbum(o) {if(o.src.indexOf('nopic320.gif')==-1) View(o.src);}
 Dh('zoomer');
 mid_div.onmousemove = MAlbum;

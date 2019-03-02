@@ -11,7 +11,7 @@ $_status = $L['group_status'];
 $dstatus = $L['group_dstatus'];
 $_send_status = $L['send_status'];
 $dsend_status = $L['send_dstatus'];
-$table = $DT_PRE.'group_order';
+$table = $table_order;
 if($action == 'refund' || $action == 'show') {
 	$itemid or msg('未指定记录');
 	$td = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
@@ -77,7 +77,7 @@ switch($action) {
 			isset($status) or msg('请指定受理结果');
 			strlen($content) > 5 or msg('请填写操作理由');
 			$content .= '[网站]';
-			clear_upload($content);
+			clear_upload($content, $itemid, $table);
 			$content = dsafe(addslashes(save_remote(save_local(stripslashes($content)))));
 			if($status == 5) {//已退款，买家胜 退款
 				money_add($td['buyer'], $td['money']);
@@ -199,10 +199,10 @@ switch($action) {
 		isset($seller) or $seller = '';
 		isset($buyer) or $buyer = '';
 		isset($amounts) or $amounts = '';
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($timetype) or $timetype = 'addtime';
 		isset($mtype) or $mtype = 'money';
 		isset($minamount) or $minamount = '';
@@ -214,8 +214,8 @@ switch($action) {
 		$order_select = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND $timetype>=$fromtime";
+		if($totime) $condition .= " AND $timetype<=$totime";
 		if($status !== '') $condition .= " AND status='$status'";
 		if($seller) $condition .= " AND seller='$seller'";
 		if($buyer) $condition .= " AND buyer='$buyer'";

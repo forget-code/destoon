@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require 'common.inc.php';
@@ -18,6 +18,10 @@ if($DT['log_404'] && strpos($DT_URL, '/404.php') === false) {
 }
 if($DT_BOT) dhttp(404, $DT_BOT);
 $head_title = '404 Not Found';
-if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'404.php';
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = DT_MOB.'404.php';
+} else {
+	//
+}
 include template('404', 'message');
 ?>

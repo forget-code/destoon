@@ -15,5 +15,5 @@ document.write('.bd-l {border-left:#A7A7AA 0.5px solid;}');
 }
 document.write('</style>');
 if(_os == 'ios' && _bs != 'screen' && navigator.standalone) {/*IOS 主屏打开*/
-document.write('<script type="text/javascript" src="mobile.php?action=screen"></sc'+'ript>');
+document.write('<script type="text/javascript" src="'+AJPath+'?action=screen"></sc'+'ript>');
 }

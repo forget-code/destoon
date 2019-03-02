@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require 'common.inc.php';
@@ -63,11 +63,12 @@ if($username) {
 		if(is_file($html_file)) exit(include($html_file));
 	}
 	$AREA or $AREA = cache_read('area.php');
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'];
+	if($EXT['mobile_enable']) $head_mobile = DT_MOB;
 	$index = 1;
 	$seo_title = $DT['seo_title'];
 	$head_keywords = $DT['seo_keywords'];
 	$head_description = $DT['seo_description'];
+	$CSS = array('index');
 	if($city_template) {
 		include template($city_template, 'city');
 	} else {		

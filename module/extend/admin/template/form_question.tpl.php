@@ -10,8 +10,7 @@ show_menu($menus);
 <input type="hidden" name="job" value="order"/>
 <input type="hidden" name="fid" value="<?php echo $fid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">选项列表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th width="40">排序</th>
 <th>ID</th>
@@ -23,7 +22,7 @@ show_menu($menus);
 <th width="70" colspan="2">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) { ?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="text" size="2" name="listorder[<?php echo $v['qid'];?>]" value="<?php echo $v['listorder'];?>"/></td>
 <td><?php echo $v['qid'];?></td>
 <td><?php echo $v['name'];?></td>
@@ -43,11 +42,13 @@ show_menu($menus);
 </tr>
 <?php } ?>
 </table>
-<div class="btns">
-<input type="submit" value=" 更新排序 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value=" 关 闭 " class="btn" onclick="window.parent.location.reload();"/>
-</div>
+<div class="btns"><input type="submit" value="更新排序" class="btn-g"/></div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
-<script type="text/javascript">Menuon(1);</script>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
+<script type="text/javascript">
+Menuon(1);
+$(function(){
+	if($('body').width()<900) $('body').width(900);
+});
+</script>
 <?php include tpl('footer');?>

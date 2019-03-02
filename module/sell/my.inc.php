@@ -1,13 +1,15 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-$MG['sell_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+$mod_limit = intval($MOD['limit_'.$_groupid]);
+$mod_free_limit = intval($MOD['free_limit_'.$_groupid]);
+$mod_limit > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 $MTYPE = get_type('product-'.$_userid);
 require DT_ROOT.'/include/post.func.php';
 include load($module.'.lang');
 include load('my.lang');
-require MD_ROOT.'/sell.class.php';
-$do = new sell($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -21,26 +23,31 @@ $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $f
 if(in_array($action, array('', 'add'))) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND status>1");
 	$limit_used = $r['num'];
-	$limit_free = $MG['sell_limit'] > $limit_used ? $MG['sell_limit'] - $limit_used : 0;
+	$limit_free = $mod_limit > $limit_used ? $mod_limit - $limit_used : 0;
 }
 if(check_group($_groupid, $MOD['group_refresh'])) $MOD['credit_refresh'] = 0;
 switch($action) {
 	case 'add':
-		if($MG['sell_limit'] && $limit_used >= $MG['sell_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
+		if($mod_limit && $limit_used >= $mod_limit) dalert(lang($L['info_limit'], array($mod_limit, $limit_used)), $_userid ? '?mid='.$mid : '?action=index');
+		if($MG['hour_limit']) {
+			$today = $DT_TIME - 3600;
+			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
+			if($r && $r['num'] >= $MG['hour_limit']) dalert(lang($L['hour_limit'], array($MG['hour_limit'])), $_userid ? '?mid='.$mid : '?action=index');
+		}
 		if($MG['day_limit']) {
 			$today = $today_endtime - 86400;
 			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
-			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
+			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? '?mid='.$mid : '?action=index');
 		}
 
-		if($MG['sell_free_limit'] >= 0) {
-			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $MG['sell_free_limit'] && $_userid) ? dround($MOD['fee_add']) : 0;
+		if($mod_free_limit >= 0) {
+			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $mod_free_limit && $_userid) ? dround($MOD['fee_add']) : 0;
 		} else {
 			$fee_add = 0;
 		}
 		$fee_currency = $MOD['fee_currency'];
 		$fee_unit = $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
-		$need_password = $fee_add && $fee_currency == 'money';
+		$need_password = $fee_add && $fee_currency == 'money' && $fee_add > $DT['quick_pay'];
 		$need_captcha = $MOD['captcha_add'] == 2 ? $MG['captcha'] : $MOD['captcha_add'];
 		$need_question = $MOD['question_add'] == 2 ? $MG['question'] : $MOD['question_add'];
 		$could_elite = check_group($_groupid, $MOD['group_elite']) && $MOD['credit_elite'] && $_userid;
@@ -109,13 +116,12 @@ switch($action) {
 				$msg = $post['status'] == 2 ? $L['success_check'] : $L['success_add'];
 				$js = '';
 				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
-				if(isset($post['sync_qq']) && $post['sync_qq']) $js .= sync_weibo('qq', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
-					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
+					$forward = '?mid='.$mid.'&status='.$post['status'];
 					$msg = '';
 				} else {
-					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&action=add';
+					$forward = '?mid='.$mid.'&action=add';
 				}
 				$js .= 'window.onload=function(){parent.window.location="'.$forward.'";}';
 				dalert($msg, '', $js);
@@ -130,13 +136,14 @@ switch($action) {
 				if(!$item || $item['username'] != $_username) message();
 				extract($item);
 				$thumb = $thumb1 = $thumb2 = '';
-				$totime = $totime > $DT_TIME ? timetodate($totime, 3) : '';
+				$totime = $totime > $DT_TIME ? timetodate($totime, 6) : '';
 			} else {
+				$_catid = $catid;
 				foreach($do->fields as $v) {
 					$$v = '';
 				}
 				$content = '';
-				$catid = 0;
+				$catid = $_catid;
 				$days = 3;
 				$totime = '';
 				$typeid = 0;
@@ -186,7 +193,7 @@ switch($action) {
 			}
 		} else {
 			extract($item);
-			$totime = $totime ? timetodate($totime, 3) : '';
+			$totime = $totime ? timetodate($totime, 6) : '';
 			$mycatid_select = type_select('product-'.$_userid, 0, 'post[mycatid]', $L['type_default'], $mycatid);
 		}
 	break;
@@ -205,6 +212,7 @@ switch($action) {
 	case 'refresh':
 		$MG['refresh_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 		$itemid or message($L['select_info']);
+		if($MOD['credit_refresh'] && $_credit < $MOD['credit_refresh']) message($L['credit_lack']);
 		$itemids = $itemid;
 		$s = $f = 0;
 		foreach($itemids as $itemid) {
@@ -212,7 +220,7 @@ switch($action) {
 			$item = $db->get_one("SELECT username,edittime FROM {$table} WHERE itemid=$itemid");
 			$could_refresh = $item && $item['username'] == $_username;
 			if($could_refresh && $MG['refresh_limit'] && $DT_TIME - $item['edittime'] < $MG['refresh_limit']) $could_refresh = false;
-			if($could_refresh && $MOD['credit_refresh'] && $MOD['credit_refresh'] > $_credit) $could_refresh = false;
+			if($could_refresh && $MOD['credit_refresh'] && ($MOD['credit_refresh'] > $_credit || $_credit < 0)) $could_refresh = false;
 			if($could_refresh) {
 				$do->refresh($itemid);
 				$s++;
@@ -257,6 +265,23 @@ if($_userid) {
 		$nums[$i] = $r['num'];
 	}
 	$nums[0] = count($MTYPE);
+}
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?mid='.$mid;
+	} else {
+		$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'edittime';
+		foreach($lists as $k=>$v) {
+			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
+			$lists[$k]['date'] = timetodate($v[$time], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$foot = '';
+		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&status='.$status : '?action=index';
+	}
 }
 $head_title = lang($L['module_manage'], array($MOD['name']));
 include template($MOD['template_my'] ? $MOD['template_my'] : 'my_'.$module, 'member');

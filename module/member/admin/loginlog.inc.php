@@ -21,7 +21,7 @@ switch($action) {
 		isset($admin) or $admin = -1;
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$ip = isset($ip) ? $ip : '';
-		$username = isset($username) ? $username : '';
+		(isset($username) && check_name($username)) or $username = '';
 		$fromdate = isset($fromdate) ? $fromdate : '';
 		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
 		$todate = isset($todate) ? $todate : '';
@@ -29,8 +29,8 @@ switch($action) {
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND logintime>$fromtime";
-		if($totime) $condition .= " AND logintime<$totime";
+		if($fromtime) $condition .= " AND logintime>=$fromtime";
+		if($totime) $condition .= " AND logintime<=$totime";
 		if($ip) $condition .= " AND loginip='$ip'";
 		if($username) $condition .= " AND username='$username'";
 		if($admin > -1) $condition .= " AND admin='$admin'";

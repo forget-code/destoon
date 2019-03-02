@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">修改留言 </div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 留言人</td>
 <td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $username : 'Guest';?></a>&nbsp; IP:<?php echo $ip;?> 来自 <?php echo ip2area($ip);?> <input type="checkbox" name="post[hidden]" value="1" <?php if($hidden) echo 'checked';?>/> 匿名留言</td>
@@ -40,12 +39,12 @@ show_menu($menus);
 <td><?php echo $qq ? im_qq($qq).' '.$qq : '';?></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
-<td><?php echo $ali ? im_ali($ali).' '.$ali : '';?></td>
+<td class="tl"><span class="f_hid">*</span> 微信</td>
+<td><?php echo $wx ? im_wx($wx, $username).' '.$wx : '';?></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> MSN</td>
-<td><?php echo $msn ? im_msn($msn).' '.$msn : '';?></td>
+<td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
+<td><?php echo $ali ? im_ali($ali).' '.$ali : '';?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> Skype</td>
@@ -69,7 +68,7 @@ show_menu($menus);
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

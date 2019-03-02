@@ -3,9 +3,8 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">回复详情</div>
 <a name="q<?php echo $k;?>"></a>
-<table cellpadding="5" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">回复会员</td>
 <td><a href="javascript:_user('<?php echo $R['username'];?>');" class="t"><?php echo $R['username'] ? $R['username'] : 'Guest';?></a>&nbsp; IP:<?php echo $R['ip'];?> 来自 <?php echo ip2area($R['ip']);?></td>
@@ -25,7 +24,7 @@ show_menu($menus);
 <?php } ?>
 <tr>
 <td class="tl"></td>
-<td><input type="button" value=" 返 回 " class="btn" onclick="window.history.back(-1);"/></td>
+<td><input type="button" value="返 回" class="btn-g" onclick="window.history.back(-1);"/></td>
 </tr>
 </table>
 <script type="text/javascript">Menuon(3);</script>

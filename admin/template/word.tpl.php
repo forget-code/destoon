@@ -5,7 +5,7 @@ show_menu($menus);
 ?>
 <?php if($submit) { ?>
 <div class="tt">保存成功</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> HTML代码</td>
 <td><textarea name="content" id="content" style="width:600px;height:150px;margin:3px;font-family:Fixedsys,verdana;"><?php echo $content;?></textarea>
@@ -34,9 +34,9 @@ function CopyCode() {
 </script>
 <?php } else { ?>
 <div class="tt">什么是编辑助手？</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
-<td style="padding:3px 10px 3px 10px;line-height:22px;">
+<td style="line-height:32px;">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当您使用word制作了一篇图文并茂的文档，通过后台发布时，发现文档内容里的图片并不能直接粘贴到编辑器里。由于word的加密方式不公开，在不安装插件的情况下，常规的方法目前无法有效的解决此问题。于是一张一张的上传占用了您大量的宝贵时间……<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑助手可以通过以下三步帮您快速解决此问题：<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1、复制一份您的word文件，然后修改新的文件名为英文和数字格式(注意：中文的文件名可能无法被助手识别)，例如“word.doc”；<br/>
@@ -51,12 +51,12 @@ function CopyCode() {
 <form method="post" action="?" enctype="multipart/form-data" target="send" onsubmit="return Upcheck();" id="up">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="upload"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 选择文件</td>
 <td>
 &nbsp;<input name="uploadfile" id="uploadfile" type="file" size="25" onchange="Upcheck();Dd('up').submit();"/>&nbsp;&nbsp;
-<input type="submit" value=" 上 传 " class="btn" id="upbtn"/>
+<input type="submit" value=" 上 传 " class="btn-g" id="upbtn"/>
 </td>
 </tr>
 </table>
@@ -66,14 +66,14 @@ function CopyCode() {
 <form method="post" action="?" onsubmit="return WdCheck();">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="word" id="word" value=""/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 读取文件</td>
 <td>
 &nbsp;
 <select name="wd_charset" id="wd_charset">
-<option value="gbk">GBK编码</option>
 <option value="utf-8">UTF-8编码</option>
+<option value="gbk">GBK编码</option>
 </select>&nbsp;
 <input name="wd_nr" id="wd_nr" type="checkbox" value="1" checked/> <label for="wd_nr">过滤空行</label>&nbsp;
 <input name="wd_note" id="wd_note" type="checkbox" value="1" checked/> <label for="wd_note">过滤注释</label>&nbsp;
@@ -90,7 +90,7 @@ function CopyCode() {
 </tr>
 <tr>
 <td></td>
-<td><input type="checkbox" name="water" value="1" checked/> 图片添加水印&nbsp;&nbsp;<input type="submit" name="submit" value="保 存" class="btn" id="save"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="预 览" class="btn" onclick="RunCode();"/></td>
+<td><input type="checkbox" name="water" value="1" checked/> 图片添加水印&nbsp;&nbsp;<input type="submit" name="submit" value="保 存" class="btn-g" id="save"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="预 览" class="btn" onclick="RunCode();"/></td>
 </tr>
 </table>
 </form>
@@ -118,22 +118,19 @@ function Upsuccess(s) {
 	ReadWord();
 }
 function ReadWord() {
-	var p = 'file=<?php echo $file;?>&action=read&word='+Dd('word').value+'&charset='+Dd('wd_charset').value;
+	var p = '?file=<?php echo $file;?>&action=read&word='+Dd('word').value+'&charset='+Dd('wd_charset').value;
 	p += '&wd_nr='+(Dd('wd_nr').checked ? 1 : 0);
 	p += '&wd_note='+(Dd('wd_note').checked ? 1 : 0);
 	p += '&wd_span='+(Dd('wd_span').checked ? 1 : 0);
 	p += '&wd_style='+(Dd('wd_style').checked ? 1 : 0);
 	p += '&wd_class='+(Dd('wd_class').checked ? 1 : 0);
-	makeRequest(p, '?', '_ReadWord');
-}
-function _ReadWord() {    
-	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
-		if(xmlHttp.responseText) {
-			Dd('content').value = xmlHttp.responseText;
+	$.get(p, function(data) {
+		if(data) {
+			Dd('content').value = data;
 		} else {
-			alert('抱歉，读取失败，请检查压缩包内的htm文件');
+			alert('读取失败，请检查压缩包内的htm文件');
 		}
-	}
+	});
 }
 function RunCode() {
 	if(Dd('content').value == '') {

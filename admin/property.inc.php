@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -45,6 +45,7 @@ switch($action) {
 		}
 	break;
 	case 'copy':
+		$_id = $mid ? $mid : $CAT['moduleid'];
 		if($submit) {
 			if($type) {
 				$fromid = intval($fromid);
@@ -68,15 +69,9 @@ switch($action) {
 			include tpl('property_copy');
 		}
 	break;
-	case 'order':
-		$do->order($listorder, $pid);
-		dmsg('排序成功', $forward);
-	break;
-	case 'delete':
-		$oid or msg();
-		$do->oid = $oid;
-		$do->delete($pid);
-		dmsg('删除成功', '?file='.$file.'&catid='.$catid);
+	case 'update':
+		$do->update($post);
+		dmsg('更新成功', $forward);
 	break;
 	default:
 		$lists = $do->get_list();
@@ -84,16 +79,13 @@ switch($action) {
 	break;
 }
 class property {
-	var $db;
 	var $oid;
 	var $catid;
 	var $table;
 	var $errmsg = errmsg;
 
 	function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'category_option';
-		$this->db = &$db;
+		$this->table = DT_PRE.'category_option';
 	}
 
 	function property() {
@@ -102,7 +94,6 @@ class property {
 
 	function pass($post) {
 		if(!is_array($post)) return false;
-		//if(!$post['pid']) return $this->_(lang('message->pass_property_op_pid'));
 		if(!$post['name']) return $this->_('请填写属性名称');
 		if($post['type'] == 3) {
 			if(!$post['value']) return $this->_('请填写备选值');
@@ -125,7 +116,7 @@ class property {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		return true;
 	}
 
@@ -136,18 +127,18 @@ class property {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE oid=$this->oid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE oid=$this->oid");
 		return true;
 	}
 
 	function copy($id, $type, $name) {
 		$i = 0;
 		$condition = $type ? "catid=$id" : "oid=$id";
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE {$condition}");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE {$condition}");
+		while($r = DB::fetch_array($result)) {
 			if($name) {
 				$n = daddslashes($r['name']);
-				$t = $this->db->get_one("SELECT * FROM {$this->table} WHERE catid=$this->catid AND name='$n'");
+				$t = DB::get_one("SELECT * FROM {$this->table} WHERE catid=$this->catid AND name='$n'");
 				if($t) {
 					if($type) continue;
 					return $this->_('属性名称 ['.$r['name'].'] 已存在');
@@ -162,7 +153,7 @@ class property {
 			}
 			$sqlk = substr($sqlk, 1);
 			$sqlv = substr($sqlv, 1);
-			$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+			DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 			$i++;
 		}
 		if($i) return true;
@@ -170,19 +161,21 @@ class property {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE oid=$this->oid");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE oid=$this->oid");
 	}
 
-	function delete($pid) {
-		$this->db->query("DELETE FROM {$this->table} WHERE oid=$this->oid");
-	}
-
-	function order($listorder) {
-		if(!is_array($listorder)) return false;
-		foreach($listorder as $k=>$v) {
+	function update($post) {
+		foreach($post as $k=>$v) {
 			$k = intval($k);
-			$v = intval($v);
-			$this->db->query("UPDATE {$this->table} SET listorder=$v WHERE oid=$k");
+			if(isset($v['delete']) && $v['delete']) {
+				DB::query("DELETE FROM {$this->table} WHERE oid=$k");
+			} else {
+				$listorder = intval($v['listorder']);
+				$value = $v['value'];
+				$name = $v['name'];
+				$required = $v['required'] ? 1 : 0;
+				DB::query("UPDATE {$this->table} SET listorder=$listorder,required=$required,value='$value',name='$name' WHERE oid=$k");
+			}
 		}
 		return true;
 	}
@@ -193,14 +186,14 @@ class property {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {			
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
-		if($items != $CAT['property']) $this->db->query("UPDATE {$this->db->pre}category SET property=$r[num] WHERE catid=$this->catid");
+		if($items != $CAT['property']) DB::query("UPDATE ".DT_PRE."category SET property=$r[num] WHERE catid=$this->catid");
 		$pages = pages($items, $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY listorder ASC,oid ASC LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY listorder ASC,oid ASC LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;

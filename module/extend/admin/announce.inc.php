@@ -1,15 +1,14 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('announce', 1);
-require MD_ROOT.'/announce.class.php';
+require DT_ROOT.'/module/'.$module.'/announce.class.php';
 $do = new announce();
 $menus = array (
     array('添加公告', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('公告列表', '?moduleid='.$moduleid.'&file='.$file),
     array('更新地址', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
     array('公告分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'公告分类\');'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 switch($action) {

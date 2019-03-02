@@ -2,15 +2,13 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class group {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db;
-		$this->table = $db->pre.'club_group';
-		$this->db = &$db;
+		global $table_group;
+		$this->table = $table_group;
 		$this->fields = array('catid','areaid','title','level','style','thumb','filepath','content','template','show_template','join_type','list_type','show_type','post_type','reply_type','status','manager','reason','username','addtime','editor','edittime');
     }
 
@@ -29,9 +27,9 @@ class group {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		global $MOD, $_username, $_userid;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		$post['edittime'] = DT_TIME;
 		if($this->itemid) {
 			$post['editor'] = $_username;
 			$new = '';
@@ -41,7 +39,7 @@ class group {
 			if($r['thumb']) $old .= '<img src="'.$r['thumb'].'"/>';
 			delete_diff($new, $old);
 		} else {
-			$post['ip'] = $DT_IP;
+			$post['ip'] = DT_IP;
 		}
 		$post['join_type'] = $post['join_type'] ? 1 : 0;
 		$post['list_type'] = $post['list_type'] ? 1 : 0;
@@ -56,22 +54,22 @@ class group {
 	}
 
 	function get_one($condition = '') {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
 	}
 
 	function get_list($condition = '1', $order = 'addtime DESC') {
-		global $MOD, $pages, $page, $pagesize, $offset, $sum;
+		global $MOD, $pages, $page, $pagesize, $offset, $items, $sum;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['alt'] = $r['title'];
@@ -81,8 +79,8 @@ class group {
 			$lists[] = $r;
 		}
 		if($catids) {
-			$result = $this->db->query("SELECT catid,catname,linkurl FROM {$this->db->pre}category WHERE catid IN (".implode(',', $catids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT catid,catname,linkurl FROM ".DT_PRE."category WHERE catid IN (".implode(',', $catids).")");
+			while($r = DB::fetch_array($result)) {
 				$CATS[$r['catid']] = $r;
 			}
 			if($CATS) {
@@ -104,20 +102,20 @@ class group {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		$t = get_cat($this->itemid);
 		if($t) {
-			$t = $this->db->get_one("SELECT MAX(catid) AS id FROM {$this->db->pre}category");
+			$t = DB::get_one("SELECT MAX(catid) AS id FROM ".DT_PRE."category");
 			$itemid = intval($t['id'] + 1);
-			$this->db->query("UPDATE {$this->table} SET itemid=$itemid WHERE itemid=$this->itemid");
+			DB::query("UPDATE {$this->table} SET itemid=$itemid WHERE itemid=$this->itemid");
 			$maxid = $itemid + 100;
-			$this->db->query("INSERT {$this->db->pre}category (catid) VALUES ($maxid)");
-			$this->db->query("DELETE FROM {$this->db->pre}category WHERE catid=$maxid");
+			DB::query("INSERT ".DT_PRE."category (catid) VALUES ($maxid)");
+			DB::query("DELETE FROM ".DT_PRE."category WHERE catid=$maxid");
 			$this->itemid = $itemid;
 		}
 		$this->update($this->itemid);
-		clear_upload($post['thumb']);
+		clear_upload($post['thumb'], $this->itemid, $this->table);
 		return $this->itemid;
 	}
 
@@ -129,9 +127,9 @@ class group {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$this->update($this->itemid);
-		clear_upload($post['thumb']);
+		clear_upload($post['thumb'], $this->itemid, $this->table);
 		return true;
 	}
 
@@ -142,7 +140,7 @@ class group {
 
 	function update($itemid) {
 		global $DT;
-		$item = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
+		$item = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
 		$update = '';
 		if(!$item['filepath']) {
 			$item['filepath'] = $itemid;
@@ -155,7 +153,7 @@ class group {
 		$linkurl = listurl(array('catid' => $item['itemid'], 'catdir' => $item['filepath'], 'catname' => $item['title']));
 		if($DT['index']) $linkurl = str_replace($DT['index'].'.'.$DT['file_ext'], '', $linkurl);
 		if($linkurl != $item['linkurl']) $update .= ",linkurl='$linkurl'";
-		if($update) $this->db->query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
+		if($update) DB::query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
 		$this->tohtml($itemid);
 	}
 
@@ -163,7 +161,7 @@ class group {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->recycle($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
 			$this->delete($itemid, false);
 			return true;
 		}		
@@ -174,14 +172,14 @@ class group {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->restore($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
 			$this->tohtml($itemid);
 			return true;
 		}		
 	}
 
 	function delete($itemid, $all = true) {
-		global $MOD, $table;
+		global $MOD, $table, $table_fans;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->delete($v, $all); }
 		} else {
@@ -203,44 +201,44 @@ class group {
 			if($all) {
 				$userid = get_user($r['username']);
 				if($r['thumb']) delete_upload($r['thumb'], $userid);
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
-				$this->db->query("DELETE FROM {$table}_fans WHERE gid=$itemid");
-				$this->db->query("UPDATE {$table} SET status=0 WHERE gid=$itemid");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$table_fans} WHERE gid=$itemid");
+				DB::query("UPDATE {$table} SET status=0 WHERE gid=$itemid");
 			}
 		}
 	}
 
 	function check($itemid) {
-		global $_username, $DT_TIME;
+		global $_username;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->check($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=3,editor='$_username',edittime=$DT_TIME WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3,editor='$_username',edittime=".DT_TIME." WHERE itemid=$itemid");
 			$this->tohtml($itemid);
 			return true;
 		}
 	}
 
 	function reject($itemid) {
-		global $_username, $DT_TIME;
+		global $_username;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->reject($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
 			return true;
 		}
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT itemid FROM {$this->table} WHERE $condition");
+		while($r = DB::fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
 	}
 
 	function level($itemid, $level) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
+		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function _($e) {

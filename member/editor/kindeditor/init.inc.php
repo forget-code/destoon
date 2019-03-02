@@ -16,24 +16,18 @@ $editor .= 'var EDW = "'.$_width.'";';
 $editor .= 'var EDH = "'.$_height.'";';
 $editor .= 'var EDD = "'.($draft ? 1 : 0).'";';
 $editor .= 'var EID = "'.$textareaid.'";';
-$editor .= 'var FCKID = "'.$textareaid.'";';
 $editor .= '$(\'#'.$textareaid.'\').css({width:\''.$_width.'\',height:\''.$_height.'\',display:\'\'});';
 $editor .= 'KindEditor.ready(function(K) { ';
 $editor .= 'window.editor = K.create(\'#'.$textareaid.'\', {';
-#$editor .= 'autoHeightMode : true,';
-#$editor .= 'afterCreate : function() { this.loadPlugin(\'autoheight\'); },';
 $editor .= 'urlType:\'domain\',';
-#$editor .= 'newlineTag:\'br\',';
 if($toolbarset == 'Destoon') {
-	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'multiimage', 'media', 'hr', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($moduleid == 18 ? "'emoticons', " : "")."'fullscreen'],";
+	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'multiimage', 'media', 'hr', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($MODULE[$moduleid]['module'] == 'club' ? "'emoticons', " : "")."'fullscreen'],";
 } else if($toolbarset == 'Simple') {
-	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($moduleid == 18 ? "'emoticons', " : "")."'fullscreen'],";
+	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($MODULE[$moduleid]['module'] == 'club' ? "'emoticons', " : "")."'fullscreen'],";
 } else if($toolbarset == 'Basic') {
-	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'justifyleft', 'justifycenter', 'justifyright', ".($moduleid == 18 ? "'emoticons', " : "")."'fullscreen'],";
+	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'justifyleft', 'justifycenter', 'justifyright', ".($MODULE[$moduleid]['module'] == 'club' ? "'emoticons', " : "")."'fullscreen'],";
 } else if($toolbarset == 'Message') {
-	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'emoticons', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($moduleid == 18 ? "'emoticons', " : "")."'fullscreen'],";
-} else if($toolbarset == 'Touch') {
-	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")." 'image'".($moduleid == 18 ? " ,'emoticons'" : "")."],";
+	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'wordpaste', 'plainpaste', '|', 'bold', 'forecolor', 'fontsize', 'link', 'unlink', 'image', 'emoticons', 'justifyleft', 'justifycenter', 'justifyright', 'insertfile', ".($MODULE[$moduleid]['module'] == 'club' ? "'emoticons', " : "")."'fullscreen'],";
 } else {
 	$editor .= "items : [".(defined('DT_ADMIN') ? "'source', '|', " : "")."'undo', 'redo', '|', 'preview', 'print', 'template', 'cut', 'copy', 'paste', 'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',	'justifyfull', 'insertorderedlist', 'insertunorderedlist', '|', 'removeformat', 'clearhtml', 'quickformat', '|', 'fullscreen', '/', 'link', 'unlink', 'anchor','formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',	'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'emoticons', '|', 'image', 'multiimage', 'media', 'insertfile'],";
 }

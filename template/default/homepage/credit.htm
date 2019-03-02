@@ -1,15 +1,14 @@
 {template 'header', $template}
-<div class="dsn" id="pos_show">您当前的位置：<a href="{$COM[linkurl]}">首页</a> &raquo; <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a></div>
-
+<div class="dsn" id="pos_show"><a href="{$COM[linkurl]}">首页</a> <i>&gt;</i> <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a></div>
 <div class="main_head"><div><strong>公司档案</strong></div></div>
 <div class="main_body">
-	<div class="px13 lh18">
-	<table width="98%" cellpadding="3" cellspacing="1" align="center">
+	<div class="px14 lh18">
+	<table width="100%" cellpadding="10" cellspacing="1">
 	<tr>
-	<td width="90" class="f_b">公司名称：</td>
-	<td width="260">{$COM[company]}</td>
-	<td width="90" class="f_b">公司类型：</td>
-	<td width="260">{$COM[type]} ({$COM[mode]})</td>
+	<td width="100" class="f_b">公司名称：</td>
+	<td width="340">{$COM[company]}</td>
+	<td width="100" class="f_b">公司类型：</td>
+	<td>{$COM[type]} ({$COM[mode]})</td>
 	</tr>
 	<tr>
 	<td class="f_b">所在地区：</td>
@@ -24,16 +23,16 @@
 	<td>{$COM[regyear]}</td>
 	</tr>
 	</table>
-	<table width="98%" cellpadding="3" cellspacing="1" align="center">
+	<table width="100%" cellpadding="10" cellspacing="1">
 	<tr>
-	<td class="f_b">资料认证：</td>
+	<td width="100" class="f_b">资料认证：</td>
 	<td>
 	{if $COM[vcompany]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_company.gif" width="16" height="16" align="absmiddle" title="资料通过工商认证"/>{/if}
 	{if $COM[vtruename]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_truename.gif" width="16" height="16" align="absmiddle" title="资料通过实名认证"/>{/if}
 	{if $COM[vbank]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_bank.gif" width="16" height="16" align="absmiddle" title="资料通过银行帐号认证"/>{/if}
 	{if $COM[vmobile]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_mobile.gif" width="16" height="16" align="absmiddle" title="资料通过手机认证"/>{/if}
 	{if $COM[vemail]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_email.gif" width="16" height="16" align="absmiddle" title="资料通过邮件认证"/>{/if}
-	{if $COM[validated]}&nbsp;<img src="{DT_SKIN}image/check_right.gif" align="absmiddle"/> 企业资料通过{$COM[validator]}认证{/if}	
+	{if $COM[validated]}&nbsp;<img src="{DT_STATIC}file/image/check-ok.png" align="absmiddle"/> 企业资料通过{$COM[validator]}认证{/if}	
 	</td>
 	</tr>
 	{if $COM[deposit]}
@@ -68,7 +67,7 @@
 	{/if}
 	{if $COM[catid]}
 	<tr>
-	<td width="90"  class="f_b">主营行业：</td>
+	<td class="f_b">主营行业：</td>
 	<td>
 	{php $catids = explode(',', substr($COM['catid'], 1, -1));}
 	<table cellpadding="2" cellspacing="2" width="100%">
@@ -87,7 +86,7 @@
 {if $comment}
 <div class="main_head">
 <div>
-<span class="f_n px13">
+<span class="f_n px14">
 {if $view}
 <a href="{userurl($username, 'file=credit', $domain)}#comment">收到的评价(作为卖家)</a> | <strong>发出的评价(作为买家)</strong>
 {else}

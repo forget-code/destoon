@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -29,15 +29,15 @@ function template_parse($str) {
 	$str = preg_replace("/\'([A-Za-z]+)\[\'([A-Za-z\.]+)\'\](.?)\'/s", "'\\1[\\2]\\3'", $str);
 	$str = preg_replace("/(\r?\n)\\1+/", "\\1", $str);
 	$str = str_replace("\t", '', $str);
-	$str = "<?php defined('IN_DESTOON') or exit('Access Denied');?>".$str;
+	$str = "<?php defined('IN_DESTOON') or exit('Access Denied');?>".trim($str);
 	return $str;
 }
 
-function template_addquote1($matchs) {
-	return str_replace("\\\"", "\"", preg_replace("/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s", "['\\1']", $matchs[0]));
+function template_addquote1($matches) {
+	return str_replace("\\\"", "\"", preg_replace("/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s", "['\\1']", $matches[0]));
 }
 
-function template_addquote2($matchs) {
-	return '<?php echo '.str_replace("\\\"", "\"", preg_replace("/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s", "['\\1']", $matchs[1])).';?>';
+function template_addquote2($matches) {
+	return '<?php echo '.str_replace("\\\"", "\"", preg_replace("/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\]/s", "['\\1']", $matches[1])).';?>';
 }
 ?>

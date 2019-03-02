@@ -1,4 +1,5 @@
 <?php
+defined('IN_DESTOON') or exit('Access Denied');
 if($filepath && strpos($filepath, '/') !== false) {
 	$total = 1;
 	$file_dir = DT_ROOT.'/api/flashpageflip';

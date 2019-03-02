@@ -14,6 +14,7 @@ if($itemid) {
 	$content_table = content_table($moduleid, $itemid, $MOD['split'], $table_data);
 	$t = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 	$content = $t['content'];
+	$content = $DT_PC ? parse_video($content) : video5($content);
 	$CP = $MOD['cat_property'] && $CAT['property'];
 	if($CP) {
 		require DT_ROOT.'/include/property.func.php';
@@ -23,21 +24,38 @@ if($itemid) {
 	$adddate = timetodate($addtime, 3);
 	$editdate = timetodate($edittime, 3);
 	$linkurl = $MOD['linkurl'].$linkurl;
+	$keytags = $tag ? explode(' ', $tag) : array();
+	$UA = strtolower($_SERVER['HTTP_USER_AGENT']);
+	$video_i = (strpos($UA, 'ipad') !== false || strpos($UA, 'ipod') !== false || strpos($UA, 'iphone') !== false || strpos($UA, 'android') !== false) ? 1 : 0;
 	$video_s = $video;
 	$video_w = $width;
 	$video_h = $height;
-	$video_p = $player;
-	if(in_array(file_ext($video), array('flv', 'mp4')) && strpos($video, '?') === false) $video_p = -1;
 	$video_a = $MOD['autostart'] ? 'true' : 'false';
-	$UA = strtolower($_SERVER['HTTP_USER_AGENT']);
-	$video_i = (strpos($UA, 'ipad') !== false || strpos($UA, 'ipod') !== false || strpos($UA, 'iphone') !== false || strpos($UA, 'android') !== false) ? 1 : 0;
+	$video_p = 0;
+	$video_e = file_ext($video);
+	$video_d = cutstr($video, '://', '/');
+	if(in_array($video_e, array('flv', 'mp4'))) {
+		$video_p = 1;
+	} else if(in_array($video_e, array('wma', 'wmv'))) {
+		$video_p = 2;
+	} else if(in_array($video_e, array('rm', 'rmvb', 'ram'))) {
+		$video_p = 3;
+	} else if(in_array($video_d, array('player.youku.com', 'v.qq.com', 'm.iqiyi.com', 'liveshare.huya.com'))) {
+		$video_p = 4;
+	} else if($video_d == 'staticlive.douyucdn.cn') {
+		$video_p = 5;
+	}
 	$update = '';
-	include DT_ROOT.'/include/update.inc.php';
+	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
 	$head_canonical = $linkurl;
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $keyword;
 	$head_description = $introduce ? $introduce : $title;
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);;
+	if($DT_PC) {
+		//
+	} else {
+		$back_link = userurl($username, "file=$file", $domain);
+	}
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -52,14 +70,14 @@ if($itemid) {
 	$offset = ($page-1)*$pagesize;
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition", 'CACHE');
 	$items = $r['num'];
-	$pages = home_pages($items, $pagesize, $demo_url, $page);
+	$pages = $DT_PC ? home_pages($items, $page, $pagesize, $demo_url) : mobile_pages($items, $page, $pagesize, $demo_url);
 	$lists = array();
 	if($items) {
 		$result = $db->query("SELECT ".$MOD['fields']." FROM {$table} WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
-			$r['linkurl'] = $homeurl ? $MOD['linkurl'].$r['linkurl'] : userurl($username, "file=$file&itemid=$r[itemid]", $domain);
+			$r['linkurl'] = $homeurl ? ($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$r['linkurl'] : userurl($username, "file=$file&itemid=$r[itemid]", $domain);
 			if($kw) {
 				$r['title'] = str_replace($kw, '<span class="highlight">'.$kw.'</span>', $r['title']);
 				$r['introduce'] = str_replace($kw, '<span class="highlight">'.$kw.'</span>', $r['introduce']);
@@ -68,7 +86,11 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
+	if($DT_PC) {
+		//
+	} else {
+		if($kw) $back_link = userurl($username, "file=$file", $domain);
+	}
 }
 include template('video', $template);
 ?>

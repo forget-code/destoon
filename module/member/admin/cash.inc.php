@@ -112,11 +112,11 @@ switch($action) {
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'fee DESC', 'fee ASC', 'addtime DESC', 'addtime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$status = isset($status) && isset($dstatus[$status]) ? intval($status) : '';
-		isset($username) or $username = '';
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		(isset($username) && check_name($username)) or $username = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($bank) or $bank = '';
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		isset($timetype) or $timetype = 'addtime';
@@ -129,8 +129,8 @@ switch($action) {
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($bank) $condition .= " AND bank='$bank'";
-		if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND $timetype>=$fromtime";
+		if($totime) $condition .= " AND $timetype<=$totime";
 		if($status !== '') $condition .= " AND status='$status'";
 		if($username) $condition .= " AND username='$username'";
 		if($itemid) $condition .= " AND itemid=$itemid";

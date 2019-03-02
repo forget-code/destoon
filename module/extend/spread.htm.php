@@ -43,7 +43,7 @@ foreach($itemids as $v) {//Order
 }
 ob_start();
 echo '<!--'.$totime.'-->';
-include template('spread_code', $module);
+include template('spread', 'chip');
 $data = ob_get_contents();
 ob_clean();
 file_put($filename, $data);

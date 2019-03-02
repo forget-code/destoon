@@ -2,7 +2,6 @@
 defined('IN_DESTOON') or exit('Access Denied');
 isset($name) or $name = '';
 if(!$name || strlen($name) < 2 || strlen($name) > 30) exit;
-$name = convert($name, 'UTF-8', DT_CHARSET);
 $limit = $DT['schcate_limit'] ? intval($DT['schcate_limit']) : 10;
 $html = '';
 $result = $db->query("SELECT catid,arrparentid FROM {$DT_PRE}category WHERE moduleid=$moduleid AND catname LIKE '%$name%' ORDER BY item DESC,catid DESC LIMIT $limit");

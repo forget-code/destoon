@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -95,22 +95,26 @@ switch($action) {
 		isset($video) or exit;
 		include tpl('header');
 		load('player.js');
-		exit('<script type="text/javascript">document.write(player("'.$video.'", 480, 360, 0 ,1));</script></body></html>');
+		exit('<script type="text/javascript">document.write(player("'.$video.'", 480, 360, 1));</script></body></html>');
 	break;
 	case 'find':
-		$kw or msg();
-		dheader('?file='.$file.'&id='.(match_userid($kw)%10).'&kw='.$kw);
+		is_url($url) or msg();
+		$t = parse_url($url);
+		$kw = $t['path'];
+		if(strpos($url, '/file/upload/') !== false) $kw = str_replace('/file/upload/', '', $kw);
+		dheader('?file='.$file.'&id='.(match_userid($url)%10).'&kw='.$kw);
 	break;
 	default:
-		$sfields = array('按条件', '文件名', '会员', '来源', '后缀', '信息ID');
-		$dfields = array('fileurl', 'fileurl', 'username', 'upfrom', 'fileext', 'itemid');
+		$sfields = array('按条件', '文件名', '会员', '来源', '后缀', '信息ID', '表名');
+		$dfields = array('fileurl', 'fileurl', 'username', 'upfrom', 'fileext', 'itemid', 'tb');
 		$sorder  = array('排序方式', '文件大小降序', '文件大小升序', '上传时间降序', '上传时间升序', '图片宽度降序', '图片宽度升序', '图片高度降序', '图片高度升序');
 		$dorder  = array('pid DESC', 'filesize DESC', 'filesize ASC', 'addtime DESC', 'addtime ASC', 'width DESC', 'width ASC', 'height DESC', 'height ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($order) && isset($dorder[$order]) or $order = 0;
-		$username = isset($username) ? $username : '';
+		(isset($username) && check_name($username)) or $username = '';
 		$thumb = isset($thumb) ? intval($thumb) : 0;
 		$upfrom = isset($upfrom) ? $upfrom : '';
+		$tb = isset($tb) ? $tb : '';
 		$fromdate = isset($fromdate) ? $fromdate : '';
 		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
 		$todate = isset($todate) ? $todate : '';
@@ -119,12 +123,13 @@ switch($action) {
 		$order_select = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= $fields < 2 ? " AND $dfields[$fields] LIKE '%$keyword%'" : " AND $dfields[$fields]='$keyword'";
-		if($fromtime) $condition .= " AND addtime>$fromtime";
-		if($totime) $condition .= " AND addtime<$totime";
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($mid) $condition .= " AND moduleid='$mid'";	
 		if($itemid) $condition .= " AND itemid='$itemid'";	
 		if($username) $condition .= " AND username='$username'";
 		if($upfrom) $condition .= " AND upfrom='$upfrom'";
+		if($tb) $condition .= " AND tb='$tb'";
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {

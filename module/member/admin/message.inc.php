@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/message.class.php';
+require DT_ROOT.'/module/'.$module.'/message.class.php';
 $menus = array (
     array('发送信件', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
     array('会员信件', '?moduleid='.$moduleid.'&file='.$file),

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -46,11 +46,8 @@ if($success) {
 			$do = new member;
 			$user = $do->login($U['username'], '', 0, true);
 			if($user) {
-				$forward = get_cookie('forward_url');
-				if($forward) set_cookie('forward_url', '');
 				if(strpos($forward, 'api/oauth') !== false) $forward = '';
-				$forward or $forward = $MODULE[2]['linkurl'];
-				if($DT_TOUCH && strpos($forward, $EXT['mobile_url']) === false) $forward = $EXT['mobile_url'].'my.php';
+				$forward or $forward = $DT_PC ? $MODULE[2]['linkurl'] : $MODULE[2]['mobile'];
 				del_token($DS);
 				$api_msg = '';
 				if($MOD['passport'] == 'uc') {				
@@ -65,18 +62,15 @@ if($success) {
 			}
 		} else {
 			set_cookie('bind', encrypt($U['itemid'].'|'.$site, DT_KEY.'BIND'));
-			if($DT_TOUCH) {
-				dheader($EXT['mobile_url'].'bind.php');
+			if(DT_TOUCH) {
+				dheader($MODULE[2]['mobile'].'oauth.php?action=bind');
 			} else {
 				if(!get_cookie('oauth_site')) {
 					set_cookie('oauth_user', $nickname);
 					set_cookie('oauth_site', $site);
 					dheader(DT_PATH);
 				}				
-				$moduleid = 2;
-				$module = 'member';
-				$MOD = cache_read('module-2.php');
-				include template('bind', 'member');
+				dheader($MODULE[2]['linkurl'].'oauth.php?action=bind');
 			}
 		}
 	}

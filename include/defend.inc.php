@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -23,8 +23,8 @@ if($DT['defend_cc']) {
 }
 if($DT['defend_reload'] && !$DT_BOT) {
 	$lastvisit = intval(decrypt(get_cookie('lastvisit'), DT_KEY.'LAST'));
-	set_cookie('lastvisit', encrypt("$DT_TIME", DT_KEY.'LAST'));
-	if($DT_TIME - $lastvisit < $DT['defend_reload']) {
+	set_cookie('lastvisit', encrypt(DT_TIME, DT_KEY.'LAST'));
+	if(DT_TIME - $lastvisit < $DT['defend_reload']) {
 		if(defined('DT_TASK')) exit;
 		message(lang('include->defend_reload', array($DT['defend_reload'])).'<script>setTimeout("this.location.reload();", '.($DT['defend_reload']*3000).');</script>');
 	}

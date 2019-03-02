@@ -1,12 +1,12 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/down.class.php';
-$do = new down($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加'.$MOD['name'], '?moduleid='.$moduleid.'&action=add'),
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('审核'.$MOD['name'], '?moduleid='.$moduleid.'&action=check'),
-    array('未通过'.$MOD['name'], '?moduleid='.$moduleid.'&action=reject'),
+    array('未通过', '?moduleid='.$moduleid.'&action=reject'),
     array('回收站', '?moduleid='.$moduleid.'&action=recycle'),
     array('移动分类', '?moduleid='.$moduleid.'&action=move'),
 );
@@ -25,16 +25,16 @@ if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$sfields = array('模糊', '标题', '文件地址', '下载系列', '简介', '会员名', '编辑', 'IP', '文件路径', '内容模板');
 	$dfields = array('keyword', 'title', 'fileurl', 'tag', 'introduce', 'username', 'editor', 'ip', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '下载次数降序', '下载次数升序', '下载ID降序', '下载ID升序');
-	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'download DESC', 'download ASC', 'itemid DESC', 'itemid ASC');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '下载次数降序', '下载次数升序', '下载ID降序', '下载ID升序');
+	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'download DESC', 'download ASC', 'itemid DESC', 'itemid ASC');
 	$level = isset($level) ? intval($level) : 0;
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime')) or $datetype = 'addtime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$fileext = isset($fileext) ? trim($fileext) : '';

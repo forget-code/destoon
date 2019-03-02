@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -19,7 +19,7 @@ switch($action) {
 		$dfields = array('qstring', 'qstring', 'username', 'ip');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$ip = isset($ip) ? $ip : '';
-		$username = isset($username) ? $username : '';
+		(isset($username) && check_name($username)) or $username = '';
 		$fromdate = isset($fromdate) ? $fromdate : '';
 		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
 		$todate = isset($todate) ? $todate : '';
@@ -27,8 +27,8 @@ switch($action) {
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND logtime>$fromtime";
-		if($totime) $condition .= " AND logtime<$totime";
+		if($fromtime) $condition .= " AND logtime>=$fromtime";
+		if($totime) $condition .= " AND logtime<=$totime";
 		if($ip) $condition .= " AND ip='$ip'";
 		if($username) $condition .= " AND username='$username'";
 		if($page > 1 && $sum) {

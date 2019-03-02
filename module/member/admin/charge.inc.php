@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
-    array('充值记录', '?moduleid='.$moduleid.'&file='.$file),
+    array('支付记录', '?moduleid='.$moduleid.'&file='.$file),
     array('统计报表', '?moduleid='.$moduleid.'&file='.$file.'&action=stats'),
 );
 $PAY = cache_read('pay.php');
@@ -39,7 +39,7 @@ switch($action) {
 				$chart_data .= ';'.$num;
 				$T4 += $num;
 			}
-			$title = $year.'年'.$month.'月会员充值统计报表';
+			$title = $year.'年'.$month.'月会员支付统计报表';
 		} else {
 			for($i = 1; $i < 13; $i++) {
 				if($i > 1) $chart_data .= '\n';
@@ -63,7 +63,7 @@ switch($action) {
 				$chart_data .= ';'.$num;
 				$T4 += $num;
 			}
-			$title = $year.'年会员充值统计报表';
+			$title = $year.'年会员支付统计报表';
 		}
 		include tpl('charge_stats', $module);
 	break;
@@ -75,7 +75,7 @@ switch($action) {
 		while($r = $db->fetch_array($result)) {
 			$money = $r['amount'] + $r['fee'];
 			money_add($r['username'], $r['amount']);
-			money_record($r['username'], $r['amount'], $PAY[$r['bank']]['name'], $_username, '在线充值', '人工');
+			money_record($r['username'], $r['amount'], $PAY[$r['bank']]['name'], $_username, '在线支付', '人工');
 			$db->query("UPDATE {$table} SET money='$money',status=4,editor='$_username',receivetime=$DT_TIME WHERE itemid=$r[itemid]");
 			$i++;
 		}
@@ -95,16 +95,16 @@ switch($action) {
 	break;
 	default:
 		$_status = array('<span style="color:blue;">等待支付</span>', '<span style="color:red;">支付失败</span>', '<span style="color:#FF00FF;">记录作废</span>', '<span style="color:green;">支付成功</span>', '<span style="color:green;">人工审核</span>');
-		$sfields = array('按条件', '会员名', '充值金额', '手续费', '实收金额', '备注', '操作人');
+		$sfields = array('按条件', '会员名', '支付金额', '手续费', '实收金额', '备注', '操作人');
 		$dfields = array('username', 'username', 'amount', 'fee', 'money', 'note', 'editor');
-		$sorder  = array('结果排序方式', '充值金额降序', '充值金额升序', '手续费降序', '手续费升序', '实收金额降序', '实收金额升序', '下单时间降序', '下单时间升序', '支付时间降序', '支付时间升序');
+		$sorder  = array('结果排序方式', '支付金额降序', '支付金额升序', '手续费降序', '手续费升序', '实收金额降序', '实收金额升序', '下单时间降序', '下单时间升序', '支付时间降序', '支付时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'fee DESC', 'fee ASC', 'money DESC', 'money ASC', 'sendtime DESC', 'sendtime ASC', 'reveicetime DESC', 'reveicetime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($username) or $username = '';
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		(isset($username) && check_name($username)) or $username = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($bank) or $bank = '';
 		isset($timetype) or $timetype = 'sendtime';
 		isset($mtype) or $mtype = 'amount';
@@ -119,8 +119,8 @@ switch($action) {
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($bank) $condition .= " AND bank='$bank'";
-		if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND $timetype>=$fromtime";
+		if($totime) $condition .= " AND $timetype<=$totime";
 		if($status !== '') $condition .= " AND status=$status";
 		if($username) $condition .= " AND username='$username'";
 		if($itemid) $condition .= " AND itemid=$itemid";

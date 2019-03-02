@@ -3,11 +3,10 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">检测条件</div>
 <form action="?">
 <input type="hidden" name="ok" value="1"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 模块</td>
 <td>
@@ -29,7 +28,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 关键词</td>
-<td><input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/></td>
+<td><input type="text" size="30" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 状态</td>
@@ -45,15 +44,14 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"></td>
-<td height="30">&nbsp;<input type="submit" name="submit" value="开始检测" class="btn" onclick="this.value='检测中..';this.blur();this.className='btn f_gray';"/>&nbsp;
+<td height="30">&nbsp;<input type="submit" name="submit" value="开始检测" class="btn-g" onclick="this.value='检测中..';this.blur();this.className='btn f_gray';"/>&nbsp;
 <input type="button" value="重新检测" class="btn" onclick="Go('?file=<?php echo $file;?>');"/>
 </td>
 </tr>
 </table>
 </form>
 <?php if($submit) { ?>
-<div class="tt">检测结果</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <?php if($lists) { ?>
 <tr>
 <th>名称</th>
@@ -61,7 +59,7 @@ show_menu($menus);
 <th width="60">查看</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td align="left">&nbsp;&nbsp;<img src="admin/image/htm.gif" align="absmiddle"/> <a href="?moduleid=<?php echo $mid;?>&action=<?php echo $act;?>&kw=<?php echo $v['kw'];?>" target="_blank"><?php echo $v[$key];?></a></td>
 <td><?php echo $v['num'];?></td>
 <td><a href="?moduleid=<?php echo $mid;?>&action=<?php echo $act;?>&kw=<?php echo $v['kw'];?>" target="_blank"><img src="admin/image/view.png" width="16" height="16"/></a></td>

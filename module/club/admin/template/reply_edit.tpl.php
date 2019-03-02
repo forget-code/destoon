@@ -9,11 +9,10 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">修改回复 </div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员昵称</td>
-<td><a href="javascript:_user('<?php echo $username;?>');"><?php echo $username ? $passport : 'Guest';?></a></td>
+<td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $passport : 'Guest';?></a></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 回复内容</td>
@@ -31,7 +30,7 @@ show_menu($menus);
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">Menuon(<?php echo $status == 3 ? 0 : 1;?>);</script>

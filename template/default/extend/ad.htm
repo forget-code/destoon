@@ -1,52 +1,58 @@
 {template 'header'}
-<div class="m">
-	<table cellpadding="0" cellspacing="0" width="100%">
-	<tr>
-	<td valign="top" class="left_menu">
+<div class="m m1">
+	<div class="m1l">
+		{if $action == 'view'}
+		<br/><br/><br/>
+		<center>
+		{if $ad_moduleid}
+			{ad($ad_moduleid,$ad_catid,$ad_kw,$typeid)}
+		{elseif $pid}
+			{ad($pid)}
+		{/if}
+		</center>
+		<br/><br/><br/>
+		<br/><br/><br/>
+		<center class="f_gray">以上为广告效果预览，如未看到任何内容，表明此广告为空或不可预览</center>
+		<br/><br/><br/>
+		{else}
+		<table cellpadding="16" cellspacing="0" class="tb">
+		<tr>
+		<th width="60">编号</th>
+		{if !$typeid}<th>广告类型</th>{/if}
+		<th>广告位名称</th>
+		<th>规格(px)</th>
+		<th width="60">价格</th>
+		<th width="80">示意图</th>
+		{if $MOD[ad_buy]}<th width="60">预定</th>{/if}
+		</tr>
+		{loop $lists $k $v}
+		<tr align="center" title="{$v[introduce]}">
+		<td id="a_{$v[pid]}">A{$v[pid]}</td>
+		{if !$typeid}<td><a href="{$url}{list_url($v[typeid])}">{$v[typename]}</a></td>{/if}
+		<td class="px14"><a href="{$url}{show_url($v[pid])}" title="效果预览">{$v[name]}</a></td>
+		<td class="f_gray">{$v[width]} x {$v[height]}</td>
+		<td class="f_orange">{if $v[price]}{$v[price]}{$unit}/月{else}面议{/if}</td>
+		<td{if $v[thumb]} onmouseover="show_tip(Dd('a_{$v[pid]}'),'{$v[thumb]}');" onmouseout="show_tip(0,0);" onclick="View('{$v[thumb]}');" title="点击查看大图"{/if} class="{if $v[thumb]}f_dblue c_p{else}f_gray{/if}">{if $v[thumb]}查看{else}暂无{/if}</td>
+		{if $MOD[ad_buy]}
+		<td><a href="{$MODULE[2][linkurl]}ad.php?action=add&pid={$v[pid]}" class="b">预定</a></td>
+		{/if}
+		</tr>
+		{/loop}
+		</table>
+		{if $pages}<div class="pages">{$pages}</div>{/if}
+		{/if}
+	</div>
+	<div class="m1r side">
 		<ul>
-		<li class="left_menu_li"><a href="{$MODULE[1][linkurl]}">网站首页</a></li>
-		<li class="left_menu_li" id="type_0"><a href="{$EXT[ad_url]}">广告中心</a></li>
+		<li class="side_li" id="type_0"><a href="{$url}">广告中心</a></li>
+		<li class="side_li" id="type_my"><a href="{$MODULE[2][linkurl]}ad.php">我的广告</a></li>
 		{loop $TYPE $k $v}
-		{if $k}<li class="left_menu_li" id="type_{$k}"><a href="{$EXT[ad_url]}{list_url($k)}">{$v}</a></li>{/if}
+		{if $k}<li class="side_li" id="type_{$k}"><a href="{$url}{list_url($k)}">{$v}</a></li>{/if}
 		{/loop}
 		</ul>
-	</td>
-	<td valign="top">
-		<div class="left_box">		
-			<div class="pos"><span class="f_r"><a href="{$MODULE[2][linkurl]}ad.php">[我的广告]</a></span>当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$EXT[ad_url]}">广告中心</a>{if $typeid} &raquo; <a href="{$EXT[ad_url]}{list_url($typeid)}">{$TYPE[$typeid]}</a>{/if}</div>
-			<div class="b15">&nbsp;</div>
-			<table cellpadding="8" cellspacing="1" width="96%" align="center" bgcolor="#E3EEF5">
-			<tr bgcolor="#F1F7FC">
-			<th>编号</th>
-			<th>广告位名称</th>
-			{if !$typeid}<th>广告类型</th>{/if}
-			<th>规格(px)</th>
-			<th title="({$DT[money_unit]}/月)">价格</th>
-			<th title="({$DT[money_unit]}/月)">单位</th>
-			<th>示意图</th>
-			{if $MOD[ad_buy]}<th>预定</th>{/if}
-			</tr>
-			{loop $ads $k $v}
-			<tr align="center" bgcolor="#FFFFFF" title="{$v[introduce]}">
-			<td id="a_{$v[pid]}">A{$v[pid]}</td>
-			<td><a href="{$EXT[ad_url]}{show_url($v[pid])}" title="效果预览">{$v[name]}</a></td>
-			{if !$typeid}<td><a href="{$EXT[ad_url]}{list_url($v[typeid])}">{$v[typename]}</a></td>{/if}
-			<td class="f_gray">{$v[width]} x {$v[height]}</td>
-			<td class="f_orange f_b">{if $v[price]}{$v[price]}{else}面议{/if}</td>
-			<td>{$unit}</td>
-			<td{if $v[thumb]} onmouseover="show_tip(Dd('a_{$v[pid]}'),'{$v[thumb]}');" onmouseout="show_tip(0,0);" onclick="View('{$v[thumb]}');" title="点击查看大图"{/if} class="f_gray">{if $v[thumb]}<img src="{DT_SKIN}image/zoomin.gif" class="c_p"/>{else}暂无{/if}</td>
-			{if $MOD[ad_buy]}
-			<td><a href="{$MODULE[2][linkurl]}ad.php?action=add&pid={$v[pid]}" class="b">预定</a></td>
-			{/if}
-			</tr>
-			{/loop}
-			</table>
-			<div class="pages">{$pages}</div>
-			<div class="b10">&nbsp;</div>
-		</div>
-	</td>
-	</tr>
-	</table>
+		<form action="index.php"><input type="search" name="kw" value="{$kw}" ondblclick="if(this.value){Go('./');}" placeholder="搜索" title="输入关键词，按回车搜索"/></form>
+	</div>
+	<div class="c_b"></div>
 </div>
 <div class="img_tip" id="show_tip" style="display:none;">&nbsp;</div>
 <script type="text/javascript">
@@ -65,6 +71,6 @@ function show_tip(o, i) {
 		Dh('show_tip');
 	}
 }
-try{Dd('type_{$typeid}').className = 'left_menu_on';}catch(e){}
+$(function(){$('#type_{$typeid}').attr('class', 'side_on');});
 </script>
 {template 'footer'}

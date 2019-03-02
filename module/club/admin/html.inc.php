@@ -1,8 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
-    array('生成网页', '?moduleid='.$moduleid.'&file='.$file),
-    array('数据统计', 'javascript:Dwidget(\'?file=count&action=stats&&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
+    array('更新数据', '?moduleid='.$moduleid.'&file='.$file),
     array('模块首页', $MOD['linkurl'], ' target="_blank"'),
 );
 $all = (isset($all) && $all) ? 1 : 0;
@@ -50,7 +49,7 @@ switch($action) {
 			$all ? msg('商圈生成成功', '?moduleid='.$moduleid.'&file='.$file.'&action=show&all='.$all.'&one='.$one) : msg('商圈生成成功', $this_forward);
 		}
 		if(isset($catids)) {
-			$GRP = $db->get_one("SELECT * FROM {$table}_group WHERE status=3 AND itemid>$catids ORDER BY itemid");
+			$GRP = $db->get_one("SELECT * FROM {$table_group} WHERE status=3 AND itemid>$catids ORDER BY itemid");
 			if($GRP) {
 				$bitemid = $itemid = $GRP['itemid'];
 				$total = max(ceil($GRP['post']/$MOD['pagesize']), 1);
@@ -69,7 +68,7 @@ switch($action) {
 				$all ? msg('商圈生成成功', '?moduleid='.$moduleid.'&file='.$file.'&action=show&all='.$all.'&one='.$one) : msg('商圈生成成功', $this_forward);
 			}		
 		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table}_group WHERE status=3");
+			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_group} WHERE status=3");
 			$tid = $r['num'];
 			msg('', '?moduleid='.$moduleid.'&file='.$file.'&action='.$action.'&catids=0&fid=1&&tid='.$tid.'&all='.$all.'&one='.$one);
 		}
@@ -92,8 +91,8 @@ switch($action) {
 			$tid = $r['tid'] ? $r['tid'] : 0;
 		}
 		if($update) {
-			require MD_ROOT.'/club.class.php';
-			$do = new club($moduleid);
+			require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+			$do = new $module($moduleid);
 		}
 		isset($num) or $num = 100;
 		if($fid <= $tid) {
@@ -126,19 +125,19 @@ switch($action) {
 	break;
 	case 'groups':
 		if(!isset($fid)) {
-			$r = $db->get_one("SELECT min(itemid) AS fid FROM {$table}_group WHERE status>2");
+			$r = $db->get_one("SELECT min(itemid) AS fid FROM {$table_group} WHERE status>2");
 			$fid = $r['fid'] ? $r['fid'] : 0;
 		}
 		isset($sid) or $sid = $fid;
 		if(!isset($tid)) {
-			$r = $db->get_one("SELECT max(itemid) AS tid FROM {$table}_group WHERE status>2");
+			$r = $db->get_one("SELECT max(itemid) AS tid FROM {$table_group} WHERE status>2");
 			$tid = $r['tid'] ? $r['tid'] : 0;
 		}
-		require MD_ROOT.'/group.class.php';
+		require DT_ROOT.'/module/'.$module.'/group.class.php';
 		$do = new group();
 		isset($num) or $num = 100;
 		if($fid <= $tid) {
-			$result = $db->query("SELECT itemid FROM {$table}_group WHERE status=3 AND itemid>=$fid ORDER BY itemid LIMIT 0,$num ");
+			$result = $db->query("SELECT itemid FROM {$table_group} WHERE status=3 AND itemid>=$fid ORDER BY itemid LIMIT 0,$num ");
 			if($db->affected_rows($result)) {
 				while($r = $db->fetch_array($result)) {
 					$itemid = $r['itemid'];

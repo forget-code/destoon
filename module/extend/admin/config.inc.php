@@ -2,7 +2,7 @@
 defined('DT_ADMIN') or exit('Access Denied');
 $MCFG['module'] = 'extend';
 $MCFG['name'] = '扩展';
-$MCFG['author'] = 'DESTOON.COM';
+$MCFG['author'] = 'DESTOON';
 $MCFG['homepage'] = 'www.destoon.com';
 $MCFG['copy'] = false;
 $MCFG['uninstall'] = false;

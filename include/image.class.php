@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -106,7 +106,6 @@ class image {
 			if($this->g_w < $min_wh || $this->g_h < $min_wh) $this->make = false;
 		}
 		if(!$this->make) return false;
-		$this->text = convert($this->text, DT_CHARSET, 'UTF-8');
 		$this->save_name = $save_name ? $save_name : $this->g_img;
 		$temp_text = $this->get_pos('text');
 		$text_x = $temp_text['dest_x'];

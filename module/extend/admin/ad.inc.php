@@ -2,7 +2,7 @@
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = $L['ad_type'];
 $AREA or $AREA = cache_read('area.php');
-require MD_ROOT.'/ad.class.php';
+require DT_ROOT.'/module/'.$module.'/ad.class.php';
 isset($pid) or $pid = 0;
 isset($aid) or $aid = 0;
 $menus = array (
@@ -11,8 +11,7 @@ $menus = array (
     array('广告管理', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list\', \'广告管理\');'),
     array('广告审核', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list&job=check\', \'广告审核\');'),
     array('更新广告', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 $menusad = array (
     array('添加广告', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=add'),
@@ -84,7 +83,6 @@ switch($action) {
 		dmsg('排序成功', $forward);
 	break;
 	case 'list':
-		$job = isset($job) ? $job : '';
 		$P = $do->get_place();
 		$sfields = array('按条件', '广告名称', '广告介绍', '广告代码', '关键词', '文字链接名称', '文字链接地址', '文字链接提示', '图片地址', '图片链接地址', '图片链接提示', 'Flash地址', 'Flash链接地址', '会员名', '备注');
 		$dfields = array('title', 'title', 'introduce', 'code', 'key_word', 'text_name', 'text_url', 'text_title', 'image_src', 'image_url', 'image_alt', 'flash_src', 'flash_url', 'username', 'note');
@@ -136,6 +134,8 @@ switch($action) {
 		}
 	break;
 	case 'view':
+		$url = $EXT['ad_url'];
+		$mob = $EXT['ad_mob'];
 		$destoon_task = '';
 		$filename = '';
 		$ad_moduleid = 0;
@@ -156,7 +156,7 @@ switch($action) {
 				$ad_kw = $a['key_word'];
 			}
 		}
-		include template('ad_view', $module);
+		include template('ad', $module);
 	break;
 	case 'runcode':
 		$destoon_task = '';

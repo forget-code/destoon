@@ -21,8 +21,8 @@ if(isset($user) && check_name($user)) {
 		if($could_credit) {
 			credit_add($username, $MOD['credit_ip']);
 			credit_record($username, $MOD['credit_ip'], 'system', $reason, $DT_IP);
-			set_cookie('inviter', encrypt($username, DT_KEY.'INVITER'), $DT_TIME + 30*86400);
 		}
+		set_cookie('inviter', encrypt($username, DT_KEY.'INVITER'), $DT_TIME + 30*86400);
 	} else {
 		dheader(DT_PATH);
 	}

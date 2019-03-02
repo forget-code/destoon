@@ -13,7 +13,7 @@ function make_sign($arr, $key) {
 	$str .= 'key='.$key;
 	return strtoupper(md5($str));
 }
-$xml = $GLOBALS["HTTP_RAW_POST_DATA"];
+$xml = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : file_get_contents("php://input");
 $xml or wx_exit();
 $bank = 'weixin';
 $PAY = cache_read('pay.php');

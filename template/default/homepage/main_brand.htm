@@ -5,7 +5,7 @@
 {loop $tags $i $t}
 {if $i%3==0}<tr align="center">{/if}
 <td valign="top" width="33%" height="100">
-<div class="thumb" onmouseover="this.className='thumb thumb_on';" onmouseout="this.className='thumb';">
+<div class="thumb">
 	<a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=brand&itemid='.$t['itemid'], $domain)}{/if}"><img src="{$t[thumb]}" width="180" height="60" alt="{$t[alt]}"/></a>
 	<div><a href="{if $homeurl}{$t[linkurl]}{else}{userurl($username, 'file=brand&itemid='.$t['itemid'], $domain)}{/if}" title="{$t[alt]}">{$t[title]}</a></div>
 	<p>{timetodate($t[edittime], 3)}</p>

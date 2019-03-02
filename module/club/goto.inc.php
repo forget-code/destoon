@@ -4,20 +4,20 @@ require DT_ROOT.'/module/'.$module.'/common.inc.php';
 if($action == 'master') {
 	$name = isset($name) ? urldecode($name) : '';
 	if($name && $catid) {
-		$T = $db->get_one("SELECT manager FROM {$table}_group WHERE itemid=$catid");
+		$T = $db->get_one("SELECT manager FROM {$table_group} WHERE itemid=$catid");
 		if($T && $T['manager'] && strpos($T['manager'], $name) !== false) {
 			$username = get_user($name, 'passport', 'username');
 			if($username) dheader(userurl($username));
 		}
 	}
-	dheader($MOD['linkurl']);
+	dheader($DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
 } else {
-	$itemid or dheader($MOD['linkurl']);
-	$R = $db->get_one("SELECT * FROM {$table}_reply WHERE itemid=$itemid");
-	$R or dheader($MOD['linkurl']);
+	$itemid or dheader($DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
+	$R = $db->get_one("SELECT * FROM {$table_reply} WHERE itemid=$itemid");
+	$R or dheader($DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
 	$tid = $R['tid'];
 	$T = $db->get_one("SELECT * FROM {$table} WHERE itemid=$tid");
-	$T or dheader($MOD['linkurl']);
+	$T or dheader($DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
 	if($MOD['reply_pagesize']) $pagesize = $MOD['reply_pagesize'];
 	if($R['fid']) {
 		$page = ceil($R['fid']/$pagesize);
@@ -29,6 +29,6 @@ if($action == 'master') {
 	} else {
 		$linkurl = itemurl($T, $page);
 	}
-	dheader($MOD['linkurl'].$linkurl.'#R'.$itemid);
+	dheader(($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$linkurl.'#R'.$itemid);
 }
 ?>

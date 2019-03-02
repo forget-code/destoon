@@ -4,7 +4,7 @@ include tpl('header');
 show_menu($menus);
 ?>
 <div class="tt">新数据</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>字段</th>
 <th>数据</th>
@@ -17,7 +17,7 @@ show_menu($menus);
 <?php } ?>
 </table>
 <div class="tt">源数据</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>字段</th>
 <th>数据</th>

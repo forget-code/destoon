@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/job.class.php';
-$do = new job($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加招聘', '?moduleid='.$moduleid.'&action=add'),
     array('招聘列表', '?moduleid='.$moduleid),
@@ -13,7 +13,7 @@ $menus = array (
 );
 
 if(in_array($action, array('add', 'edit'))) {
-	$FD = cache_read('fields-job.php');
+	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
 	isset($post_fields) or $post_fields = array();
 	$CP = $MOD['cat_property'];
@@ -28,10 +28,10 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$TYPE[0] = '工作性质';
 	$MARRIAGE[0] = '婚姻状况';
 	$EDUCATION[0] = '学历要求';
-	$sfields = array('模糊', '职位名称', '简介', '招聘部门', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', 'IP');
-	$dfields = array('keyword', 'title', 'introduce', 'department', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'ip');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '招聘人数降序', '招聘人数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'total DESC', 'total ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊', '职位名称', '简介', '招聘部门', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', 'IP');
+	$dfields = array('keyword', 'title', 'introduce', 'department', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'ip');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '招聘人数降序', '招聘人数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'total DESC', 'total ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
 
 	$level = isset($level) ? intval($level) : 0;
 	$gender = isset($gender) ? intval($gender) : 0;
@@ -47,9 +47,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime')) or $datetype = 'edittime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$areaid = isset($areaid) ? intval($areaid) : 0;
@@ -137,7 +137,7 @@ switch($action) {
 			$item = $do->get_one();
 			extract($item);
 			$addtime = timetodate($addtime);
-			$totime = $totime ? timetodate($totime, 3) : '';
+			$totime = $totime ? timetodate($totime, 6) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
 			include tpl($action, $module);

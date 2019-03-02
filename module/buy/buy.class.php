@@ -3,7 +3,6 @@ defined('IN_DESTOON') or exit('Access Denied');
 class buy {
 	var $moduleid;
 	var $itemid;
-	var $db;
 	var $table;
 	var $table_data;
 	var $split;
@@ -11,13 +10,12 @@ class buy {
 	var $errmsg = errmsg;
 
     function __construct($moduleid) {
-		global $db, $table, $table_data, $MOD;
+		global $table, $table_data, $MOD;
 		$this->moduleid = $moduleid;
 		$this->table = $table;
 		$this->table_data = $table_data;
 		$this->split = $MOD['split'];
-		$this->db = &$db;
-		$this->fields = array('catid','areaid','typeid','level','title','style','fee','introduce','n1','n2','n3','v1','v2','v3','amount','price','pack','days','thumb','thumb1','thumb2','tag','status','hits','username','totime','editor','addtime','adddate','edittime','editdate','ip','template','linkurl','filepath','note','company','truename','telephone','mobile','address','email','msn','qq','ali','skype');
+		$this->fields = array('catid','areaid','typeid','level','title','style','fee','introduce','n1','n2','n3','v1','v2','v3','amount','price','pack','days','thumb','thumb1','thumb2','tag','status','hits','username','totime','editor','addtime','adddate','edittime','editdate','ip','template','linkurl','filepath','note','company','truename','telephone','mobile','address','email','qq','wx','ali','skype');
     }
 
     function buy($moduleid) {
@@ -25,30 +23,30 @@ class buy {
     }
 
 	function pass($post) {
-		global $DT_TIME, $MOD;
+		global $MOD;
 		if(!is_array($post)) return false;
 		if(!$post['catid']) return $this->_(lang('message->pass_cate'));
 		if(strlen($post['title']) < 3) return $this->_(lang('message->pass_title'));
 		if($post['totime']) {
-			if(!is_date($post['totime'])) return $this->_(lang('message->pass_date'));
-			if(strtotime($post['totime'].' 23:59:59') < $DT_TIME) return $this->_(lang('message->pass_todate'));
+			if(!is_time($post['totime'])) return $this->_(lang('message->pass_date'));
+			if(strtotime($post['totime']) < DT_TIME) return $this->_(lang('message->pass_todate'));
 		}
-		if(DT_MAX_LEN && strlen($post['content']) > DT_MAX_LEN) return $this->_(lang('message->pass_max'));
+		if(DT_MAX_LEN && strlen(clear_img($post['content'])) > DT_MAX_LEN) $this->_(lang('message->pass_max'));
 		return true;
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $DT_IP, $TYPE, $_username, $_userid;
+		global $MOD, $TYPE, $_username, $_userid;
 		is_url($post['thumb']) or $post['thumb'] = '';
 		is_url($post['thumb1']) or $post['thumb1'] = '';
 		is_url($post['thumb2']) or $post['thumb2'] = '';
 		$post['filepath'] = (isset($post['filepath']) && is_filepath($post['filepath'])) ? file_vname($post['filepath']) : '';
 		$post['editor'] = $_username;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
 		$post['adddate'] = timetodate($post['addtime'], 3);
-		$post['edittime'] = $DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['editdate'] = timetodate($post['edittime'], 3);
-		$post['totime'] = $post['totime'] ? strtotime($post['totime'].' 23:59:59') : 0;
+		$post['totime'] = is_time($post['totime']) ? strtotime($post['totime']) : 0;
 		$post['fee'] = dround($post['fee']);
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
@@ -67,7 +65,7 @@ class buy {
 			if($r['thumb2']) $old .= '<img src="'.$r['thumb2'].'"/>';
 			delete_diff($new, $old);
 		} else {
-			$post['ip'] = $DT_IP;
+			$post['ip'] = DT_IP;
 		}
 		$content = $post['content'];
 		unset($post['content']);
@@ -77,10 +75,10 @@ class buy {
 	}
 
 	function get_one() {
-		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
+		$r = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$this->itemid");
 		if($r) {
 			$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-			$t = $this->db->get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
+			$t = DB::get_one("SELECT content FROM {$content_table} WHERE itemid=$this->itemid");
 			$r['content'] = $t ? $t['content'] : '';
 			return $r;
 		} else {
@@ -93,14 +91,14 @@ class buy {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
 			$items = $r['num'];
 		}
 		$pages = defined('CATID') ? listpages(1, CATID, $items, $page, $pagesize, 10, $MOD['linkurl']) : pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = $catids = $CATS = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
+		while($r = DB::fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
 			$r['linkurl'] = $MOD['linkurl'].$r['linkurl'];
@@ -108,8 +106,8 @@ class buy {
 			$lists[] = $r;
 		}
 		if($catids) {
-			$result = $this->db->query("SELECT catid,catname,linkurl FROM {$this->db->pre}category WHERE catid IN (".implode(',', $catids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT catid,catname,linkurl FROM ".DT_PRE."category WHERE catid IN (".implode(',', $catids).")");
+			while($r = DB::fetch_array($result)) {
 				$CATS[$r['catid']] = $r;
 			}
 			if($CATS) {
@@ -131,10 +129,10 @@ class buy {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		DB::query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		if($post['status'] == 3 && $post['username'] && $MOD['credit_add']) {
 			credit_add($post['username'], $MOD['credit_add']);
@@ -152,9 +150,9 @@ class buy {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-		$this->db->query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
+		DB::query("REPLACE INTO {$content_table} (itemid,content) VALUES ('$this->itemid', '$post[content]')");
 		$this->update($this->itemid);
 		clear_upload($post['content'].$post['thumb'].$post['thumb1'].$post['thumb2'], $this->itemid);
 		if($post['status'] > 2) $this->tohtml($this->itemid, $post['catid']);
@@ -168,7 +166,7 @@ class buy {
 
 	function update($itemid) {
 		global $TYPE;
-		$item = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
+		$item = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
 		$update = '';
 		$keyword = $item['title'].','.($item['tag'] ? $item['tag'].',' : '').$TYPE[$item['typeid']].','.strip_tags(cat_pos(get_cat($item['catid']), ','));
 		if($keyword != $item['keyword']) {
@@ -180,14 +178,14 @@ class buy {
 		if($linkurl != $item['linkurl']) $update .= ",linkurl='$linkurl'";
 		$member = $item['username'] ? userinfo($item['username']) : array();
 		if($member) $update .= update_user($member, $item);
-		if($update) $this->db->query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
+		if($update) DB::query("UPDATE {$this->table} SET ".(substr($update, 1))." WHERE itemid=$itemid");
 	}
 
 	function recycle($itemid) {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->recycle($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
 			$this->delete($itemid, false);
 			return true;
 		}		
@@ -198,7 +196,7 @@ class buy {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->restore($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
 			if($MOD['show_html']) tohtml('show', $module, "itemid=$itemid");
 			return true;
 		}		
@@ -223,10 +221,10 @@ class buy {
 				if($r['thumb1']) delete_upload($r['thumb1'], $userid);
 				if($r['thumb2']) delete_upload($r['thumb2'], $userid);
 				if($r['content']) delete_local($r['content'], $userid);
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 				$content_table = content_table($this->moduleid, $this->itemid, $this->split, $this->table_data);
-				$this->db->query("DELETE FROM {$content_table} WHERE itemid=$itemid");
-				if($MOD['cat_property']) $this->db->query("DELETE FROM {$this->db->pre}category_value WHERE moduleid=$this->moduleid AND itemid=$itemid");
+				DB::query("DELETE FROM {$content_table} WHERE itemid=$itemid");
+				if($MOD['cat_property']) DB::query("DELETE FROM ".DT_PRE."category_value WHERE moduleid=$this->moduleid AND itemid=$itemid");
 				if($r['username'] && $MOD['credit_del']) {
 					credit_add($r['username'], -$MOD['credit_del']);
 					credit_record($r['username'], -$MOD['credit_del'], 'system', lang('my->credit_record_del', array($MOD['name'])), 'ID:'.$this->itemid);
@@ -236,7 +234,7 @@ class buy {
 	}
 
 	function check($itemid) {
-		global $_username, $DT_TIME, $MOD;
+		global $_username, $MOD;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->check($v); }
 		} else {
@@ -246,55 +244,48 @@ class buy {
 				credit_add($item['username'], $MOD['credit_add']);
 				credit_record($item['username'], $MOD['credit_add'], 'system', lang('my->credit_record_add', array($MOD['name'])), 'ID:'.$this->itemid);
 			}
-			$editdate = timetodate($DT_TIME, 3);
-			$this->db->query("UPDATE {$this->table} SET status=3,hits=hits+1,editor='$_username',edittime=$DT_TIME,editdate='$editdate' WHERE itemid=$itemid");
+			$editdate = timetodate(DT_TIME, 3);
+			DB::query("UPDATE {$this->table} SET status=3,editor='$_username',edittime=".DT_TIME.",editdate='$editdate' WHERE itemid=$itemid");
 			$this->tohtml($itemid);
 			return true;
 		}
 	}
 
 	function reject($itemid) {
-		global $_username, $DT_TIME;
+		global $_username;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->reject($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=1,editor='$_username' WHERE itemid=$itemid");
 			return true;
 		}
 	}
 
 	function expire($condition = '') {
-		global $DT_TIME;
-		$this->db->query("UPDATE {$this->table} SET status=4 WHERE status=3 AND totime>0 AND totime<$DT_TIME $condition");
+		DB::query("UPDATE {$this->table} SET status=4 WHERE status=3 AND totime>0 AND totime<".DT_TIME." $condition");
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT itemid FROM {$this->table} WHERE $condition");
+		while($r = DB::fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
 	}
 
 	function level($itemid, $level) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
+		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function type($itemid, $typeid) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET typeid=$typeid WHERE itemid IN ($itemids)");
+		DB::query("UPDATE {$this->table} SET typeid=$typeid WHERE itemid IN ($itemids)");
 	}
 
 	function refresh($itemid) {
-		global $DT_TIME;
-		$editdate = timetodate($DT_TIME, 3);
+		$editdate = timetodate(DT_TIME, 3);
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET edittime='$DT_TIME',editdate='$editdate' WHERE itemid IN ($itemids)");
-	}
-
-	function _update($username) {
-		global $DT_TIME;
-		$this->db->query("UPDATE {$this->table} SET status=4 WHERE status=3 AND totime>0 AND totime<$DT_TIME AND username='$username'");
+		DB::query("UPDATE {$this->table} SET edittime='".DT_TIME."',editdate='$editdate' WHERE itemid IN ($itemids)");
 	}
 
 	function _($e) {

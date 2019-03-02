@@ -2,7 +2,7 @@
 defined('DT_ADMIN') or exit('Access Denied');
 $tid = isset($tid) ? intval($tid) : 0;
 $gid = isset($gid) ? intval($gid) : 0;
-require MD_ROOT.'/reply.class.php';
+require DT_ROOT.'/module/'.$module.'/reply.class.php';
 $do = new reply();
 $menus = array (
     array('回复列表', '?moduleid='.$moduleid.'&file='.$file.'&tid='.$tid),
@@ -19,9 +19,9 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	isset($ip) or $ip = '';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);

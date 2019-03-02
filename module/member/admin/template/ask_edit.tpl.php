@@ -3,14 +3,13 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">问题受理</div>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 问题分类</td>
 <td><?php echo $TYPE[$typeid]['typename'];?></td>
@@ -45,9 +44,9 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 受理状态</td>
 <td>
-<input type="radio" name="status" value="0" id="status_0" onclick="Dh('notice');"<?php echo $status == 0 ? ' checked' : '';?>/><label for="status_0"> 待受理</label>
-<input type="radio" name="status" value="1" id="status_1" onclick="Dh('notice');"<?php echo $status == 1 ? ' checked' : '';?>/><label for="status_1"> 受理中</label>
-<input type="radio" name="status" value="2" id="status_2" onclick="Ds('notice');"<?php echo $status == 2 ? ' checked' : '';?>/><label for="status_2"> 已解决</label>
+<input type="radio" name="status" value="0" id="status_0" onclick="Dh('notice');"<?php echo $status == 0 ? ' checked' : '';?>/><label for="status_0"> 待受理</label>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="status" value="1" id="status_1" onclick="Dh('notice');"<?php echo $status == 1 ? ' checked' : '';?>/><label for="status_1"> 受理中</label>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="status" value="2" id="status_2" onclick="Ds('notice');"<?php echo $status == 2 ? ' checked' : '';?>/><label for="status_2"> 已解决</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="status" value="3" id="status_3" onclick="Ds('notice');"<?php echo $status == 3 ? ' checked' : '';?>/><label for="status_3"> 未解决</label>
 </td>
 </tr>
@@ -83,7 +82,7 @@ show_menu($menus);
 </tr>
 </table>
 <?php if($status < 2) { ?>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="回 复" class="btn-g">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&status=<?php echo $status;?>');"/></div>
 <?php } ?>
 </form>
 <script type="text/javascript">Menuon(<?php echo $status;?>);</script>

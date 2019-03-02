@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -22,5 +22,4 @@ $introduce = $item['introduce'];
 $thumb = str_replace('.thumb.', '.middle.', $item['thumb']);
 $linkurl = strpos($item['linkurl'], '://') !== false ? $item['linkurl'] : $MODULE[$moduleid]['linkurl'].$item['linkurl'];
 $content = ob_template('weibo', 'chip');
-$content = convert($content, DT_CHARSET, 'UTF-8');
 ?>

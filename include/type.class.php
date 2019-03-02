@@ -1,19 +1,16 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class dtype {
 	var $item;
-	var $db;
 	var $table;
 	var $cache = 0;
 
 	function __construct() {
-		global $db;
-		$this->db = &$db;
-		$this->table = $this->db->pre.'type';
+		$this->table = DT_PRE.'type';
 	}
 
 	function dtype() {
@@ -22,8 +19,8 @@ class dtype {
 
 	function get_list() {
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE item='$this->item' ORDER BY listorder ASC,typeid DESC ");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE item='$this->item' ORDER BY listorder ASC,typeid DESC ");
+		while($r = DB::fetch_array($result)) {
 			$lists[$r['typeid']] = $r;
 		}
 		return $lists;
@@ -51,7 +48,7 @@ class dtype {
 		$post['parentid'] = intval($post['parentid']);
 		if($post['parentid'] && !isset($TYPE[$post['parentid']])) $post['parentid'] = 0;
 		$post['style'] = dhtmlspecialchars($post['style']);
-		$this->db->query("INSERT INTO {$this->table} (listorder,typename,style,parentid,item,cache) VALUES('$post[listorder]','$post[typename]','$post[style]','$post[parentid]','$this->item','$this->cache')");
+		DB::query("INSERT INTO {$this->table} (listorder,typename,style,parentid,item,cache) VALUES('$post[listorder]','$post[typename]','$post[style]','$post[parentid]','$this->item','$this->cache')");
 	}
 
 	function edit($post) {
@@ -65,13 +62,13 @@ class dtype {
 			if($v['parentid'] && !isset($TYPE[$v['parentid']])) continue;
 			$v['style'] = dhtmlspecialchars($v['style']);
 			$k = intval($k);
-			$this->db->query("UPDATE {$this->table} SET listorder='$v[listorder]',typename='$v[typename]',style='$v[style]',parentid='$v[parentid]' WHERE typeid='$k' AND item='$this->item'");
+			DB::query("UPDATE {$this->table} SET listorder='$v[listorder]',typename='$v[typename]',style='$v[style]',parentid='$v[parentid]' WHERE typeid='$k' AND item='$this->item'");
 		}
 	}
 
 	function delete($typeid) {
 		$typeid = intval($typeid);
-		$this->db->query("DELETE FROM {$this->table} WHERE typeid=$typeid AND item='$this->item'");
+		DB::query("DELETE FROM {$this->table} WHERE typeid=$typeid AND item='$this->item'");
 		if($this->cache) cache_type($this->item);
 	}
 

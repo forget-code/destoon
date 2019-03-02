@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">申请详单</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">会员名</td>
 <td><a href="javascript:_user('<?php echo $item['username'];?>');" class="t"><?php echo $item['username'];?></a></td>
@@ -62,6 +61,6 @@ show_menu($menus);
 <td><?php echo $item['edittime'];?></td>
 </tr>
 </table>
-<div class="sbt"><input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
+<div class="sbt"><input type="button" value=" 返 回 " class="btn-g" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 <script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

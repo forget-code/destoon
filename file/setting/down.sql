@@ -8,9 +8,11 @@ CREATE TABLE `destoon_down_15` (
   `style` varchar(50) NOT NULL default '',
   `fee` float NOT NULL default '0',
   `tag` varchar(255) NOT NULL default '',
+  `album` varchar(100) NOT NULL,
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
+  `comments` int(10) unsigned NOT NULL default '0',
   `download` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `fileurl` varchar(255) NOT NULL default '',
@@ -31,7 +33,8 @@ CREATE TABLE `destoon_down_15` (
   PRIMARY KEY  (`itemid`),
   KEY `username` (`username`),
   KEY `addtime` (`addtime`),
-  KEY `catid` (`catid`)
+  KEY `catid` (`catid`),
+  KEY `album` (`album`)
 ) TYPE=MyISAM COMMENT='下载';
 
 DROP TABLE IF EXISTS `destoon_down_data_15`;

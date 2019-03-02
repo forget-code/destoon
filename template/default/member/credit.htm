@@ -1,5 +1,4 @@
-{template 'header', $module}
-<script type="text/javascript">c(2);</script>
+{template 'header', 'member'}
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
@@ -8,7 +7,7 @@
 <td class="tab" id="action_exchange"><a href="?action=exchange"><span>{$DT[credit_name]}兑换</span></a></td>
 {/if}
 <td class="tab" id="action"><a href="?action=index"><span>{$DT[credit_name]}记录</span></a></td>
-<td class="tab" id="action_invite"><a href="?action=invite"><span>推广赚{$DT[credit_name]}</span></a></td>
+<td class="tab" id="action_invite"><a href="?action=invite"><span>{$DT[credit_name]}推广</span></a></td>
 {if $action == 'less'}
 <td class="tab" id="action_less"><a href="?action=less"><span>{$DT[credit_name]}不足</span></a></td>
 {/if}
@@ -22,7 +21,7 @@
 <form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="submit" value="1"/>
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl">可用{$MOD[ex_name]}</td>
 <td class="tr"><strong class="f_blue">{$num}</strong></td>
@@ -59,11 +58,7 @@ function check() {
 <form method="post" action="?" onsubmit="return check();" id="dform">
 <input type="hidden" name="action" value="{$action}"/>
 <input type="hidden" name="forward" value="{$forward}"/>
-<table cellspacing="1" cellpadding="6" class="tb">
-<tr>
-<td class="tl">账户余额</td>
-<td class="tr"><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
-</tr>
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 购买额度</td>
 <td class="tr c_p">
@@ -76,16 +71,40 @@ function check() {
 {loop $C $k $v}
 <tr align="center" onclick="Dd('type_{$k}').checked=true;k={$k};">
 <td><input type="radio" name="type" id="type_{$k}" value="{$k}" {if $k==$select}checked{/if}/></td>
-<td class="f_red" id="c_{$k}">{$v}</td>
-<td class="f_blue" id="p_{$k}">{$P[$k]}</td>
+<td id="c_{$k}">{$v}</td>
+<td class="f_red" id="p_{$k}">{$P[$k]}</td>
 </tr>
 {/loop}
 </table>
 </td>
 </tr>
+<tr>
+<td class="tl">应付总额</td>
+<td class="tr"><span class="f_price px16" id="money">0.00</span> {$DT[money_unit]}</td>
+</tr>
+<tr id="mymoney" style="display:none;">
+<td class="tl">账户余额</td>
+<td class="tr"><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
+</tr>
 <tr id="payword" style="display:none;">
 <td class="tl"><span class="f_red">*</span> 支付密码</td>
 <td class="tr">{template 'password', 'chip'}&nbsp;<span id="dpassword" class="f_red"></span></td>
+</tr>
+<tr id="paytype" style="display:none;">
+<td class="tl"><span class="f_red">*</span> 支付方式</td>
+<td class="tr">
+	<table cellspacing="5" cellpadding="5">
+	{php $PAYLIST = get_paylist();}
+	<input type="hidden" name="bank" id="bank" value="{$PAYLIST[0][bank]}"/>
+	{loop $PAYLIST $k $v}
+	<tr onclick="$('#bank').val($('#paytype :checked').val());">
+	<td><input type="radio" name="bank" value="{$v[bank]}" id="bank-{$v[bank]}"{if $k==0} checked{/if}/></td>
+	<td><label for="bank-{$v[bank]}" class="c_p"><img src="{DT_PATH}api/pay/{$v[bank]}/logo.gif" alt=""/></label></td>
+	<td>{if $v[percent]>0}手续费 {$v[percent]}%{/if}</td>
+	</tr>
+	{/loop}
+	</table>
+</td>
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
@@ -93,31 +112,9 @@ function check() {
 </tr>
 </table>
 </form>
-<script type="text/javascript">
-var k = {$select};
-function check() {
-	if($('#p_'+k).html() > {$_money}) {
-		Go('charge.php?action=pay&reason=credit|'+k+'&amount='+($('#p_'+k).html() - {$_money}));
-		return false;
-	}
-	var f,l;
-	f = 'password';
-	l = Dd(f).value.length;
-	if(l < 6) {
-		Dmsg('请填写支付密码', f);
-		return false;
-	}
-	return true;
-}
-window.setInterval(
-	function() {
-		$('#p_'+k).html() > {$_money} ? Dh('payword') : Ds('payword');
-	}, 
-500);
-</script>
 <script type="text/javascript">s('credit');m('action_buy');</script>
 {elseif $action == 'invite'}
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl">引导至</td>
 <td class="tr">
@@ -133,12 +130,12 @@ window.setInterval(
 <tr>
 <td class="tl">推广方法</td>
 <td class="tr">
-- 将上面的网址发给您QQ/MSN/Email等好友<br/>
+- 将上面的网址发给您QQ/微信/Email等好友<br/>
 - 在论坛签名,博客链接,网站等加上上面的网址<br/>
 </td>
 </tr>
 <tr>
-<td class="tl">奖励方法</td>
+<td class="tl">奖励规则</td>
 <td class="tr">
 - 每引导一个IP访问您可以获赠 <strong class="f_blue">{$MOD[credit_ip]}</strong> {$DT[credit_name]} (24小时内最多积{$MOD[credit_maxip]}{$DT[credit_name]})<br/>
 - 每引导一个用户注册您可以获赠 <strong class="f_blue">{$MOD[credit_user]}</strong> {$DT[credit_name]}<br/>
@@ -160,7 +157,7 @@ window.setInterval(
 <script type="text/javascript">s('credit');m('action_invite');</script>
 {elseif $action == 'less'}
 <div class="warn">抱歉！由于您的{$DT[credit_name]}不足，无法进行此操作</div>
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <td class="tl">可用{$DT[credit_name]}</td>
 <td class="tr"><strong class="f_blue">{$_credit}</strong></td>
 </tr>
@@ -187,14 +184,14 @@ window.setInterval(
 <option value="2" {if $type==2}selected{/if}>支出</option>
 </select>
 &nbsp;
-{dcalendar('fromtime', $fromtime)} 至 {dcalendar('totime', $totime)}
+{dcalendar('fromdate', $fromdate)} 至 {dcalendar('todate', $todate)}
 &nbsp;
 <input type="submit" value=" 搜 索 " class="btn"/>&nbsp;
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?action={$action}');"/>
 </div>
 </form>
 <div class="bd">
-<table cellpadding="1" cellspacing="0" class="tb">
+<table cellpadding="10" cellspacing="0" class="tb">
 <tr>
 <th>流水号</th>
 <th>收入</th>
@@ -204,25 +201,55 @@ window.setInterval(
 <th width="150">事由</th>
 <th width="150">备注</th>
 </tr>
-{loop $records $k $v}
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
-<td height="30" class="px11">{$v[itemid]}</td>
-<td class="px11 f_blue">{if $v[amount] > 0}{$v[amount]}{else}&nbsp;{/if}</td>
-<td class="px11 f_red">{if $v[amount] < 0}{$v[amount]}{else}&nbsp;{/if}</td>
-<td class="px11">{if $v[balance]}{$v[balance]}{else}&nbsp;{/if}</td>
-<td class="px11 f_gray">{$v[addtime]}</td>
+{loop $lists $k $v}
+<tr align="center">
+<td height="30">{$v[itemid]}</td>
+<td class="f_blue">{if $v[amount] > 0}{$v[amount]}{else}&nbsp;{/if}</td>
+<td class="f_red">{if $v[amount] < 0}{$v[amount]}{else}&nbsp;{/if}</td>
+<td>{if $v[balance]}{$v[balance]}{else}&nbsp;{/if}</td>
+<td class="f_gray">{$v[addtime]}</td>
 <td title="{$v[reason]}"><input type="text" size="20" value="{$v[reason]}"/></td>
 <td title="{$v[note]}"><input type="text" size="20" value="{$v[note]}"/></td>
 </tr>
 {/loop}
 <tr align="center">
 <td height="35"><strong>小计</strong></td>
-<td class="px11 f_blue">{$income}</td>
-<td class="px11 f_red">{$expense}</td>
+<td class="f_blue">{$income}</td>
+<td class="f_red">{$expense}</td>
 <td colspan="4">&nbsp;</td>
 </tr>
 </table>
 <div class="pages">{$pages}</div>
 <script type="text/javascript">s('credit');m('action');</script>
 {/if}
-{template 'footer', $module}
+{if $action == 'buy'}
+<script type="text/javascript">
+var k = {$select};
+function check() {
+	var money = $('#p_'+k).html();
+	if(money > {$_money}) {
+		Go('charge.php?action=pay&reason=credit|'+k+'&amount='+money+'&bank='+$('#bank').val());
+		return false;
+	}
+	if(money > {$DT[quick_pay]}){
+		if(Dd('password').value.length < 6) {
+			Dmsg('请填写支付密码', 'password');
+			return false;
+		}
+	}
+	return true;
+}
+window.setInterval(
+	function() {
+		var money = $('#p_'+k).html();
+		$('#money').html(money);
+		if(money > {$_money} || {$_money} < 0.01) {
+			$('#mymoney').hide();$('#paytype').show();$('#payword').hide();
+		} else {
+			$('#mymoney').show();$('#paytype').hide();if(money > {$DT[quick_pay]}){$('#payword').show();}
+		}
+	}, 
+500);
+</script>
+{/if}
+{template 'footer', 'member'}

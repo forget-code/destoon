@@ -5,7 +5,7 @@ if($EXT['mobile_enable']) {
 	$str = $EXT['mobile_sitename'] ? $EXT['mobile_sitename'] : $DT['sitename'];
 	$str .= '#DESTOON#';
 	$str .= $EXT['mobile_url'];
-	echo convert($str, DT_CHARSET, 'UTF-8');
+	echo $str;
 } else {
 	echo '0';
 }

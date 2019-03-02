@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>证书</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员名</td>
 <td><input name="post[username]" type="text" id="username" size="20" value="<?php echo $username;?>"/> <a href="javascript:_user(Dd('username').value);" class="t">[资料]</a> <span id="dusername" class="f_red"></span></td>
@@ -35,7 +34,7 @@ show_menu($menus);
 <td class="tl"><span class="f_red">*</span> 证书图片</td>
 <td>
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
-	<table width="120">
+	<table width="120" class="ctb">
 	<tr align="center" height="120" class="c_p">
 	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,120, 90, Dd('thumb').value, true);}"/></td>
 	</tr>
@@ -67,10 +66,10 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

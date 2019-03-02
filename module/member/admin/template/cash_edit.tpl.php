@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">申请受理</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员名</td>
 <td><a href="javascript:_user('<?php echo $item['username'];?>');" class="t"><?php echo $item['username'];?></a></td>
@@ -58,7 +57,7 @@ show_menu($menus);
 unset($_status[0]);
 foreach($_status as $k=>$v) {
 ?>
-<input name="status" type="radio" value="<?php echo $k;?>"/> <?php echo $v;?>&nbsp;
+<input name="status" type="radio" value="<?php echo $k;?>"/> <?php echo $v;?>&nbsp;&nbsp;&nbsp;&nbsp;
 <?php } ?>
 </td>
 </tr>
@@ -71,7 +70,7 @@ foreach($_status as $k=>$v) {
 <td class="f_red">此表单一经提交，将不可再修改或删除，请务必谨慎操作</td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

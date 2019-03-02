@@ -13,7 +13,7 @@ if($page == 1) {
 	$items = $db->count($table, $condition);
 	if($items != $GRP['post']) {
 		$GRP['post'] = $items;
-		$db->query("UPDATE {$table}_group SET post=$items WHERE itemid=$catid");
+		$db->query("UPDATE {$table_group} SET post=$items WHERE itemid=$catid");
 	}
 } else {
 	$items = $GRP['post'];
@@ -77,8 +77,9 @@ for(; $page <= $total; $page++) {
 	$head_keywords = $GRP['title'].$MOD['seo_name'].','.$MOD['name'];
 	$head_description = dsubstr(dtrim($GRP['content']), 200);
 	$destoon_task = "moduleid=$moduleid&html=list&catid=$catid&page=$page";
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, $catid, 0, $page);
+	if($EXT['mobile_enable']) $head_mobile = $MOD['mobile'].listurl($_CAT, $page);
 	$filename = DT_ROOT.'/'.$MOD['moduledir'].'/'.listurl($_CAT, $page);
+	$DT_PC = $GLOBALS['DT_PC'] = 1;
 	ob_start();
 	include template($template, $module);
 	$data = ob_get_contents();
@@ -89,6 +90,27 @@ for(; $page <= $total; $page++) {
 		$indexname = DT_ROOT.'/'.$MOD['moduledir'].'/'.listurl($_CAT, 0);
 		if($DT['pcharset']) $indexname = convert($indexname, DT_CHARSET, $DT['pcharset']);
 		file_copy($filename, $indexname);
+	}
+	if($EXT['mobile_enable']) {		
+		$pages = mobile_pages($items, $page, $pagesize, $MOD['mobile'].listurl($_CAT, '{destoon_page}'));
+		$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'edittime';
+		$lists = array();
+		foreach($tags as $r) {
+			$r['title'] = str_replace('style="color:', 'style="font-size:16px;color:', $r['title']);
+			$r['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $r['linkurl']);
+			$r['date'] = timetodate($r[$time], 5);
+			$lists[] = $r;
+		}
+		$back_link = $MOD['mobile'].$CAT['linkurl'];
+		$head_name = $GRP['title'].$MOD['seo_name'];
+		$filename = str_replace(DT_ROOT, DT_ROOT.'/mobile', $filename);
+		$DT_PC = $GLOBALS['DT_PC'] = 0;
+		ob_start();
+		include template($template, $module);
+		$data = ob_get_contents();
+		ob_clean();
+		file_put($filename, $data);
+		if($page == 1) file_copy($filename, str_replace(DT_ROOT, DT_ROOT.'/mobile', $indexname));
 	}
 }
 return true;

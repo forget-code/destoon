@@ -3,14 +3,11 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">时间范围</div>
+<div class="sbox">
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td>&nbsp;
 <select name="year">
 <option value="0">选择年</option>
 <?php for($i = date("Y", $DT_TIME); $i >= 2000; $i--) { ?>
@@ -23,14 +20,11 @@ show_menu($menus);
 <option value="<?php echo $i;?>"<?php echo $i == $month ? ' selected' : ''?>><?php echo $i;?>月</option>
 <?php } ?>
 </select>&nbsp;
-<input type="submit" value="生成报表" class="btn"/>&nbsp;
+<input type="submit" value="生成报表" class="btn-g"/>&nbsp;
 <input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
-</td>
-</tr>
-</table>
 </form>
-<div class="tt">统计报表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+</div>
+<table cellspacing="0" class="tb">
 <tr>
 <td style="padding:10px;">
 <?php load('swfobject.js');?>

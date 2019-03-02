@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>投票</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 投票分类</td>
 <td><span id="type_box"><?php echo type_select('vote', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='vote',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $file;?>', '投票分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
@@ -36,7 +35,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 投票类别</td>
 <td>
-<input type="radio" name="post[choose]" value="0" id="choose_0"<?php if(!$choose) echo ' checked';?> onclick="Dh('vote_num');"/><label for="choose_0"> 单选</label>
+<input type="radio" name="post[choose]" value="0" id="choose_0"<?php if(!$choose) echo ' checked';?> onclick="Dh('vote_num');"/><label for="choose_0"> 单选</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[choose]" value="1" id="choose_1"<?php if($choose) echo ' checked';?> onclick="Ds('vote_num');"/><label for="choose_1"> 多选</label>
 </td>
 </tr>
@@ -57,7 +56,7 @@ show_menu($menus);
 <?php } ?>
 <tr title="请保持时间格式">
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 限制会员</td>
@@ -67,8 +66,8 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 验证方式</td>
 <td>
 <select name="post[verify]">
-<option value="0"<?php if($verify == 0) echo ' selected';?>>不验证</option>
-<option value="1"<?php if($verify == 1) echo ' selected';?>>验证码</option> 
+<option value="0"<?php if($verify == 0) echo ' selected';?>>不验证</option>&nbsp;&nbsp;&nbsp;&nbsp;
+<option value="1"<?php if($verify == 1) echo ' selected';?>>验证码</option>&nbsp;&nbsp;&nbsp;&nbsp;
 <option value="2"<?php if($verify == 2) echo ' selected';?>>验证问题</option> 
 </select>
 </td>
@@ -88,7 +87,7 @@ show_menu($menus);
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

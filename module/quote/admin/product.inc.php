@@ -50,6 +50,12 @@ switch($action) {
 		$do->delete($itemid);
 		dmsg('删除成功', $forward);
 	break;
+	case 'level':
+		$itemid or msg('请选择产品');
+		$level = intval($level);
+		$do->level($itemid, $level);
+		dmsg('级别设置成功', $forward);
+	break;
 	default:
 		$sfields = array('标题', '简介', '计量单位', '主要市场', '编辑', '参数名1', '参数名2', '参数名3', '参数值1', '参数值2', '参数值3');
 		$dfields = array('title', 'content', 'unit', 'market', 'editor', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3');
@@ -78,14 +84,12 @@ switch($action) {
 
 class product {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 
 	function __construct() {
-		global $db;
-		$this->table = $db->pre.'quote_product';
-		$this->db = &$db;
+		global $table_product;
+		$this->table = $table_product;
 		$this->fields = array('title','catid','level','style','unit','minprice','maxprice','n1','n2','n3','v1','v2','v3','market','addtime','editor','edittime','seo_title','seo_keywords','seo_description','content');
 	}
 
@@ -102,14 +106,13 @@ class product {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $_username;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
+		global $MOD, $_username;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
 		$post['editor'] = $_username;
-		$post['edittime'] = $DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['minprice'] = dround($post['minprice']);
 		$post['maxprice'] = dround($post['maxprice']);
 		$post['content'] = addslashes(save_remote(save_local(stripslashes($post['content']))));
-		clear_upload($post['content']);
 		if($this->itemid) {
 			$new = $post['content'];
 			$r = $this->get_one();
@@ -120,7 +123,7 @@ class product {
 	}
 
 	function get_one($condition = '') {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
 	}
 
 	function get_list($condition = '1', $order = 'addtime DESC') {
@@ -128,13 +131,13 @@ class product {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		$lists = $catids = $CATS = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['alt'] = $r['title'];
@@ -144,8 +147,8 @@ class product {
 			$lists[] = $r;
 		}
 		if($catids) {
-			$result = $this->db->query("SELECT catid,catname,linkurl FROM {$this->db->pre}category WHERE catid IN (".implode(',', $catids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT catid,catname,linkurl FROM ".DT_PRE."category WHERE catid IN (".implode(',', $catids).")");
+			while($r = DB::fetch_array($result)) {
 				$CATS[$r['catid']] = $r;
 			}
 			if($CATS) {
@@ -167,8 +170,9 @@ class product {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
+		clear_upload($post['content'], $this->itemid, $this->table);
 		return $this->itemid;
 	}
 
@@ -179,7 +183,8 @@ class product {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+		clear_upload($post['content'], $this->itemid, $this->table);
 		return true;
 	}
 
@@ -192,8 +197,13 @@ class product {
 			$r = $this->get_one();
 			$userid = get_user($r['username']);
 			if($r['content']) delete_local($r['content'], $userid);
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
+	}
+
+	function level($itemid, $level) {
+		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
+		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function _($e) {

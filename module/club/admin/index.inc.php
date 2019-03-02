@@ -37,8 +37,8 @@ $menus = array (
     array('移动帖子', '?moduleid='.$moduleid.'&gid='.$gid.'&action=move'),
 );
 
-require MD_ROOT.'/club.class.php';
-$do = new club($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
@@ -65,9 +65,9 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$style = isset($COLOR[$style]) ? '#'.$style : '';
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'replytime')) or $datetype = 'addtime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 
@@ -166,7 +166,7 @@ switch($action) {
 			if($tocatid) {
 				$db->query("UPDATE {$table} SET gid=$tocatid WHERE `{$fromtype}` IN ($fromids)");
 				$fromtype = $fromtype == 'itemid' ? 'tid' : 'gid';
-				$db->query("UPDATE {$table}_reply SET gid=$tocatid WHERE `{$fromtype}` IN ($fromids)");
+				$db->query("UPDATE {$table_reply} SET gid=$tocatid WHERE `{$fromtype}` IN ($fromids)");
 				dmsg('移动成功', $forward);
 			} else {
 				msg('请填写目标商圈ID');

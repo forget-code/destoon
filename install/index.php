@@ -1,17 +1,19 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 Destoon.COM
+	[Destoon B2B System] Copyright (c) 2008-2018 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 error_reporting(0);
 set_time_limit(0);
 if(function_exists('set_magic_quotes_runtime')) @set_magic_quotes_runtime(0);
-define('IN_DESTOON', true);
 define('DT_ADMIN', true);
+define('IN_DESTOON', true);
+define('IN_ADMIN', defined('DT_ADMIN') ? true : false);
 define('DT_DEBUG', 0);
 define('IN_ROOT', str_replace("\\", '/', dirname(__FILE__)));
 define('DT_ROOT', substr(IN_ROOT, 0, -8));
 define('DT_CACHE', DT_ROOT.'/file/cache');
+define('DT_WIN', strpos(strtoupper(PHP_OS), 'WIN') !== false ? true: false);
 if($_POST) extract($_POST, EXTR_SKIP);
 if($_GET) extract($_GET, EXTR_SKIP);
 $submit = isset($_POST['submit']) ? true : false;
@@ -19,7 +21,16 @@ $step = isset($_POST['step']) ? $_POST['step'] : 1;
 $percent = '0%';
 include DT_ROOT.'/config.inc.php';
 include DT_ROOT.'/version.inc.php';
-define('DT_CHMOD', $CFG['file_mod'] ? $CFG['file_mod'] : '');
+define('DT_TIME', time());
+define('DT_CHMOD', ($CFG['file_mod'] && !DT_WIN) ? $CFG['file_mod'] : 0);
+define('DT_LANG', $CFG['language']);
+define('DT_KEY', $CFG['authkey']);
+define('DT_EDITOR', $CFG['editor']);
+define('DT_CDN', $CFG['cdn'] ? 1 : 0);
+define('DT_CLOUD_UID', $CFG['cloud_uid']);
+define('DT_CLOUD_KEY', $CFG['cloud_key']);
+define('DT_CHARSET', strtoupper($CFG['charset']));
+define('DT_MOB', '');
 header("Content-Type:text/html;charset=".$CFG['charset']);
 if(file_exists(DT_CACHE.'/install.lock')) {
 	$msg = '安装程序已经被锁定，如果需要解除锁定继续安装<br/>请删除 ./file/cache/install.lock 文件';
@@ -35,7 +46,7 @@ switch($step) {
 	case '1'://协议
 		$license = file_get_contents(DT_ROOT.'/license.txt');
 		$DT_LICENSE = md5($license);
-		if($DT_LICENSE != '15b4b2ae1be9e2020f8de85fc4d81148' && $DT_LICENSE != '49ced4ae66626e1d9d261a7dcaac2ff9') {
+		if($DT_LICENSE != '0f974f89aa216d38ed232b0ccb957614') {
 			$msg = '请检查网站根目录下 license.txt 文件是否存在或被修改<br/>使用Destoon B2B网站管理系统，必须同意license.txt内容，并保留此文件<br/>如果使用FTP上传文件，请使用二进制模式上传 license.txt';
 			include IN_ROOT.'/msg.tpl.php';
 			exit;
@@ -126,7 +137,7 @@ switch($step) {
 			exit;
 		}
 		if(!preg_match("/^[a-z0-9]+$/i", $username) || strlen($username) < 4) dexit('请填写正确的超级管理员户名');
-		if(strlen($password) < 6) dexit('超级管理员密码最少6位');
+		if(strlen($password) < 8) dexit('超级管理员密码最少8位');
 		if(strlen($email) < 6 || !preg_match("/^[\w\-\.]+@[\w\-\.]+(\.\w+)+$/", $email)) dexit('请填写正确的超级管理员Email');
 		$db_name or dexit('请填写数据库名');
 		if($CFG['database'] == 'mysqli') {
@@ -162,11 +173,10 @@ switch($step) {
 		file_put(DT_ROOT.'/config.inc.php', $tmp);
 		define('DT_PATH', $url);
 		define('DT_STATIC', $CFG['static'] ? $CFG['static'] : $CFG['url']);
-		define('DT_LANG', $CFG['language']);
-		define('DT_KEY', $CFG['authkey']);
-		define('DT_CHARSET', $CFG['charset']);
 		define('DT_SKIN', DT_PATH.'skin/'.$CFG['skin'].'/');
 		define('SKIN_PATH', DT_PATH.'skin/'.$CFG['skin'].'/');
+		define('DT_PRE', $CFG['tb_pre']);
+		define('DT_CHARSET', strtoupper($CFG['charset']));
 		define('VIP', $CFG['com_vip']);
 		define('DT_DOMAIN', $CFG['cookie_domain'] ? substr($CFG['cookie_domain'], 1) : '');
 		define('errmsg', 'Invalid Request');
@@ -180,6 +190,7 @@ switch($step) {
 		$db = new $db_class;
 		$db->connect($db_host, $db_user, $db_pass, $db_name, $CFG['db_expires'], $CFG['db_charset'], $CFG['pconnect']);
 		$db->pre = $DT_PRE;
+		require DT_ROOT.'/include/db.class.php';
 		sql_execute(file_get_contents(IN_ROOT.'/table.sql'));
 		sql_execute(file_get_contents(IN_ROOT.'/query.sql'));
 
@@ -188,7 +199,8 @@ switch($step) {
 		for($i = 1; $i <= 22; $i++) {
 			$setting = include DT_ROOT.'/file/setting/module-'.$i.'.php';
 			if($setting) {
-				if($i == 1) $DT = $setting;			unset($setting['moduleid'],$setting['name'],$setting['moduledir'],$setting['ismenu'],$setting['domain'],$setting['linkurl']);
+				if($i == 1) $DT = $setting;
+				unset($setting['moduleid'],$setting['name'],$setting['moduledir'],$setting['ismenu'],$setting['domain'],$setting['linkurl']);
 				if($i == 3) {
 					foreach($setting as $k=>$v) {
 						$setting[$k] = str_replace('http://demo.destoon.com/v'.DT_VERSION.'/', $CFG['url'], $v);
@@ -236,6 +248,7 @@ switch($step) {
 
 		$db->query("UPDATE {$DT_PRE}member SET username='$username',passport='$username',password='$_password',passsalt='$passsalt',payword='$payword',paysalt='$paysalt',email='$email',regip='$DT_IP',regtime='$DT_TIME',loginip='$DT_IP',logintime='$DT_TIME' WHERE userid=1");
 		$userurl = $CFG['url'].'index.php?homepage='.$username;
+		$db->query("UPDATE {$DT_PRE}member_misc SET username='$username' WHERE userid=1");
 		$db->query("UPDATE {$DT_PRE}company SET username='$username',linkurl='$userurl' WHERE userid=1");
 
 		//替换广告位 单网页路径
@@ -268,19 +281,19 @@ switch($step) {
 		tohtml('index');
 
 		$msgs = array(
-			'保存系统配置.................成功',
-			'数据库连接....................成功',
-			'创建数据库....................成功',
-			'创建数据表....................成功',
-			'插入初始数据.................成功',
-			'设置管理员....................成功',
-			'安装系统模型.................成功',
-			'更新系统缓存.................成功',
-			'更新模块缓存.................成功',
-			'更新模板缓存.................成功',
-			'生成网站密钥.................成功',
-			'生成网站首页.................成功',
-			'锁定安装程序.................就绪',
+			'保存系统配置....................成功',
+			'数据库连接......................成功',
+			'创建数据库......................成功',
+			'创建数据表......................成功',
+			'插入初始数据....................成功',
+			'设置管理员......................成功',
+			'安装系统模型....................成功',
+			'更新系统缓存....................成功',
+			'更新模块缓存....................成功',
+			'更新模板缓存....................成功',
+			'生成网站密钥....................成功',
+			'生成网站首页....................成功',
+			'锁定安装程序....................就绪',
 		);
 		$percent = '80%';
 		include IN_ROOT.'/step_'.$step.'.tpl.php';
@@ -292,7 +305,7 @@ switch($step) {
 		file_put(DT_CACHE.'/install.lock', $DT_TIME);
 		$index = file_get(DT_ROOT.'/index.html');
 		if(strpos($index, 'install/') !== false) file_del(DT_ROOT.'/index.html');
-		file_put(DT_ROOT.'/install/index.php', '<script type="text/javascript">window.location="../?success="+Math.random();</script>');
+		file_put(DT_ROOT.'/install/index.php', '<script type="text/javascript">window.location="../";</script>');
 	break;
 	case 'db_test':
 		if($CFG['database'] == 'mysqli') {

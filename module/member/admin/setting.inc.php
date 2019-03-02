@@ -21,6 +21,7 @@ if($submit) {
 	$setting['uc_dbpwd'] = pass_decode($setting['uc_dbpwd'], $MOD['uc_dbpwd']);
 	$setting['ex_pass'] = pass_decode($setting['ex_pass'], $MOD['ex_pass']);
 	$setting['edit_check'] = implode(',', $setting['edit_check']);
+	$setting['login_time'] = $setting['login_time'] >= 86400 ? $setting['login_time'] : 0;
 	foreach($pay as $k=>$v) {
 		update_setting('pay-'.$k, $v);
 	}
@@ -36,8 +37,9 @@ if($submit) {
 	if($oauth['qq']['enable'] && $oauth['qq']['sync']) $ext_oauth .= ',qq';
 	$db->query("UPDATE {$DT_PRE}setting SET item_value='$ext_oauth' WHERE item_key='oauth' AND item='3'");
 	cache_module(3);
-	dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
+	dmsg('设置保存成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
 } else {
+	$GROUP = cache_read('group.php');
 	extract(dhtmlspecialchars($MOD));
 	cache_pay();
 	$P = cache_read('pay.php');

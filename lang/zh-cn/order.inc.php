@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -47,7 +47,7 @@ $L['group_msg_null'] = '订单不存在';
 $L['group_success'] = '恭喜！此订单交易成功';
 $L['group_detail_title'] = '订单详情';
 $L['group_express_title'] = '物流追踪';
-$L['group_title'] = '团购订单';
+$L['group_title'] = '订单管理';
 $L['group_sfields'] = array('按条件', '商品', '金额', '密码', '买家', '买家姓名', '买家地址', '买家邮编', '买家手机', '买家电话', '发货方式', '物流号码', '备注');
 $L['group_order_title'] = '团购订单';
 $L['group_order_sfields'] = array('按条件', '商品', '金额', '密码', '卖家', '发货方式', '物流号码', '备注');
@@ -102,10 +102,11 @@ $L['trade_msg_bind_edit'] = '您的帐号已经绑定，不可再修改<br/>如�
 $L['trade_msg_bind_exists'] = '帐号绑定已经存在，请检查您的帐号';
 $L['trade_msg_bind_success'] = '更新成功';
 $L['trade_msg_muti_choose'] = '请选择需要支付的订单';
-$L['trade_msg_muti_empty'] = '暂无符合条件的待付款订单';
+$L['trade_msg_muti_empty'] = '暂无符合条件的订单';
 $L['trade_bind_title'] = '绑定{V0}帐号';
 $L['trade_bind_error'] = '{V0}帐号格式不正确';
 $L['trade_muti_title'] = '批量付款';
+$L['trade_muti_send_title'] = '批量发货';
 
 $L['trade_price_fee_null'] = '请填写附加金额';
 $L['trade_price_fee_name'] = '请填写附加金额名称';
@@ -140,7 +141,7 @@ $L['trade_pay0_success'] = '订单已经发出，请等待卖家确认';
 $L['trade_order_sfields'] = array('按条件', '商品', '金额', '附加金额', '附加名称', '卖家', '发货方式', '物流号码', '备注');
 $L['trade_order_title'] = '我的订单';
 $L['trade_sfields'] = array('按条件', '商品', '金额', '附加金额', '附加名称', '买家', '买家姓名', '买家地址', '买家邮编', '买家手机', '买家电话', '发货方式', '物流号码', '备注');
-$L['trade_title'] = '我的订单';
+$L['trade_title'] = '订单管理';
 $L['trade_record_pay'] = '交易成功';
 $L['trade_record_payfor'] = '站内付款';
 $L['trade_record_receive'] = '站内收款';

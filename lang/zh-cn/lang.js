@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 var L = new Array();
@@ -90,12 +90,6 @@ L['chrome_fav_tip']			= '请按快捷键Ctrl+D收藏本页，谢谢';
 
 /* player.js */
 L['iso_tips_video']			= '暂不支持此视频，请在电脑上观看';
-
-/* profile.js */
-L['max_mode']				= '最多可选{V0}种经营模式';
-L['max_cate']				= '最多可添加{V0}个分类';
-L['choose_category']		= '请选择分类';
-L['category_chosen']		= '已添加过此分类';
 
 /*weibo.js*/
 L['sync_sina'] = '同步到新浪微博';

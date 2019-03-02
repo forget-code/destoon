@@ -1,5 +1,10 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
+if($EXT['mobile_enable']) {
+	if(DT_TOUCH) include DT_ROOT.'/include/mobile.inc.php';
+	$head_mobile = $DT_URL;
+	$foot = '';
+}
 isset($file) or $file = 'homepage';
 if(isset($update) || isset($preview)) {
 	$db->cids = 1;
@@ -84,7 +89,7 @@ if($rewrite) {
 	if($rc%2 == 0) {
 		for($i = 0; $i < $rc; $i++) {
 			if(in_array($r[$i], array('itemid', 'typeid', 'page', 'view', 'kw', 'preview', 'update'))) {
-				$$r[$i] = $r[++$i];
+				${$r[$i]} = $r[++$i];
 			} else {
 				++$i;
 			}
@@ -149,11 +154,18 @@ $menuid = 0;
 foreach($HMENU as $k=>$v) {
 	if($menu_show[$k] && in_array($menu_file[$k], $MFILE)) {
 		$MENU[$k]['name'] = $menu_name[$k];
+		$MENU[$k]['file'] = $menu_file[$k];
 		$MENU[$k]['linkurl'] = userurl($username, 'file='.$menu_file[$k], $domain);
 	}
 	if($file == $menu_file[$k]) $menuid = $k;
 	if($menu_num[$k] < 1 || $menu_num[$k] > 50) $menu_num[$k] = 10;
 }
+
+isset($_MENU['introduce']) or $_MENU['introduce'] = $L['com_introduce'];
+isset($_MENU['news']) or $_MENU['news'] = $L['com_news'];
+isset($_MENU['credit']) or $_MENU['credit'] = $L['com_credit'];
+isset($_MENU['contact']) or $_MENU['contact'] = $L['com_contact'];
+
 $side_show = explode(',', isset($HOME['side_show']) ? $HOME['side_show'] : $_side_show);
 $side_order = explode(',', isset($HOME['side_order']) ? $HOME['side_order'] : $_side_order);
 $side_num = explode(',', isset($HOME['side_num']) ? $HOME['side_num'] : $_side_num);
@@ -201,6 +213,11 @@ $banner2 = isset($HOME['banner2']) ? $HOME['banner2'] : '';
 $banner3 = isset($HOME['banner3']) ? $HOME['banner3'] : '';
 $banner4 = isset($HOME['banner4']) ? $HOME['banner4'] : '';
 $banner5 = isset($HOME['banner5']) ? $HOME['banner5'] : '';
+$bannerlink1 = isset($HOME['bannerlink1']) ? $HOME['bannerlink1'] : '';
+$bannerlink2 = isset($HOME['bannerlink2']) ? $HOME['bannerlink2'] : '';
+$bannerlink3 = isset($HOME['bannerlink3']) ? $HOME['bannerlink3'] : '';
+$bannerlink4 = isset($HOME['bannerlink4']) ? $HOME['bannerlink4'] : '';
+$bannerlink5 = isset($HOME['bannerlink5']) ? $HOME['bannerlink5'] : '';
 if($bannert == 2) {
 	if($banner1) {
 		if(!$banner2) {
@@ -250,19 +267,23 @@ if($domain) {
 	}
 }
 $comment_proxy = encrypt($comment_proxy, DT_KEY.'PROXY');
-
 $album_js = 0;
-$head_title = $MENU[$menuid]['name'];
+$head_title = $head_name = $MENU[$menuid]['name'];
 $seo_keywords = isset($HOME['seo_keywords']) ? $HOME['seo_keywords'] : '';
 $seo_description = isset($HOME['seo_description']) ? $HOME['seo_description'] : '';
 $head_keywords = strip_tags($seo_keywords ? $seo_keywords : $COM['company'].','.str_replace('|', ',', $COM['business']));
 $head_description = strip_tags($seo_description ? $seo_description : $COM['introduce']);
-if(!$DT_BOT) {
+if(!$DT_BOT && $MOD['hits']) {
 	if($DT['cache_hits']) {
 		 cache_hits($moduleid, $userid);
 	} else {
 		$db->query("UPDATE LOW_PRIORITY {$table} SET hits=hits+1 WHERE userid=$userid", 'UNBUFFERED');
 	}
+}
+if($DT_PC) {
+	//
+} else {
+	$back_link = $linkurl;
 }
 include DT_ROOT.'/module/company/'.$file.'.inc.php';
 ?>

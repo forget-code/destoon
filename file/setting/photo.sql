@@ -12,6 +12,7 @@ CREATE TABLE `destoon_photo_12` (
   `pptword` varchar(255) NOT NULL default '',
   `items` int(10) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
+  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
   `addtime` int(10) unsigned NOT NULL default '0',

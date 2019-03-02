@@ -19,4 +19,3 @@ if(strpos($rec, 'access_token') !== false) {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);
 }
 ?>
-?>

@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
 <td><?php echo $_admin == 1 ? category_select('post[catid]', '选择分类', $catid, $moduleid) : ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?>&nbsp;&nbsp;<input type="checkbox" name="post[islink]" value="1" id="islink" onclick="_islink();" <?php if($islink) echo 'checked';?>/> 外部链接 <span id="dcatid" class="f_red"></span></td>
@@ -52,8 +51,8 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl" height="30"><span class="f_hid">*</span> 内容选项</td>
-<td><input type="checkbox" name="post[save_remotepic]" value="1"<?php if($MOD['save_remotepic']) echo 'checked';?>/>下载远程图片&nbsp;&nbsp;
-<input type="checkbox" name="post[clear_link]" value="1"<?php if($MOD['clear_link']) echo 'checked';?>/>清除链接
+<td><input type="checkbox" name="post[save_remotepic]" value="1"<?php if($MOD['save_remotepic']) echo 'checked';?>/> 下载远程图片&nbsp;&nbsp;
+<input type="checkbox" name="post[clear_link]" value="1"<?php if($MOD['clear_link']) echo 'checked';?>/> 清除链接
 </td>
 </tr>
 <tr>
@@ -96,7 +95,7 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 <?php if($DT['city']) { ?>
 <tr>
@@ -112,6 +111,10 @@ var property_admin = 1;
 <td class="tl"><span class="f_hid">*</span> 内容模板</td>
 <td><?php echo tpl_select('show', $module, 'post[template]', '默认模板', $template, 'id="template"');?><?php tips('如果没有特殊需要，一般不需要选择<br/>系统会自动继承分类或模块设置');?></td>
 </tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 类别模板</td>
+<td><?php echo tpl_select('type', $module, 'post[template_type]', '默认模板', $template_type, 'id="template_type"');?></td>
+</tr>
 <?php if($MOD['show_html']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 自定义文件路径</td>
@@ -125,7 +128,7 @@ var property_admin = 1;
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php if($action == 'add') { ?>
@@ -134,7 +137,7 @@ var property_admin = 1;
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
 <td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>

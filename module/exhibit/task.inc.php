@@ -21,10 +21,8 @@ if($html == 'show') {
 					if(check_pay($mid, $itemid)) {
 						$user_status = 3;
 					} else {
-						$user_status = 2;						
-						$linkurl = $MOD['linkurl'].$linkurl;
-						$fee_back = $currency == 'money' ? dround($fee*intval($MOD['fee_back'])/100) : ceil($fee*intval($MOD['fee_back'])/100);
-						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid.'&username='.$username.'&fee_back='.$fee_back.'&fee='.$fee.'&currency='.$currency.'&sign='.crypt_sign($_username.$mid.$itemid.$username.$fee.$fee_back.$currency.$linkurl.$title).'&title='.rawurlencode($title).'&forward='.urlencode($linkurl);
+						$user_status = 2;
+						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid;
 					}
 				} else {
 					$user_status = 0;
@@ -44,14 +42,15 @@ if($html == 'show') {
 			$content = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 			$content = $content['content'];
 			if($MOD['keylink']) $content = keylink($content, $moduleid);
+			$content = parse_video($content);
 			if($user_status == 2) $description = get_description($content, $MOD['pre_view']);
 		}
 		$content = strip_nr(ob_template('content', 'chip'), true);
 		echo 'Inner("content", \''.$content.'\');';
 	}
 	$update = '';
-	include DT_ROOT.'/include/update.inc.php';
-	echo 'Inner("hits", \''.$item['hits'].'\');';
+	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
+	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
 	echo 'Dd("process").src = \''.(DT_PATH.'file/image/process_'.get_process($item['fromtime'], $item['totime']).'.gif').'\';';
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
@@ -68,7 +67,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits']) {
+	if($DT['cache_hits'] && $MOD['hits']) {
 		$file = DT_CACHE.'/hits-'.$moduleid;
 		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
 	}

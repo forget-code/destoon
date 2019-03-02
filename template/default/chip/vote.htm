@@ -2,7 +2,7 @@
 <form action="{$MOD[vote_url]}index.php" method="post" target="_blank" id="vote_{$itemid}" onsubmit="return check_vote_{$itemid}();">
 <input type="hidden" name="itemid" value="{$itemid}"/>
 <input type="hidden" name="submit" value="1"/>
-<div><a href="{if $linkto}{$linkto}{else}{$linkurl}{/if}"{if $linkto} target="_blank"{/if}>{$title}</a></div>
+<div id="vote_title_{$itemid}"><a href="{if $linkto}{$linkto}{else}{$linkurl}{/if}"{if $linkto} target="_blank"{/if}>{$title}</a></div>
 <ul>
 {loop $votes $k $v}
 <li><input type="{$type}" name="vote[]" value="{$k}" id="vote_{$itemid}_{$k}"/> <label for="vote_{$itemid}_{$k}"> {$v}</label></li>
@@ -15,8 +15,8 @@
 {if $verify == 2}
 <p>验证问题&nbsp;&nbsp;{template 'question', 'chip'}</p>
 {/if}
-<p><input type="submit" value="投票"/>
-<input type="button" value="结果" onclick="Go('{$linkurl}');"/></p>
+<p><input type="submit" value="投票" class="btn-blue" style="width:86px;"/>&nbsp;&nbsp;
+<input type="button" value="结果" class="btn" style="width:86px;" onclick="Go('{$linkurl}');"/></p>
 </form>
 </div>
 <script type="text/javascript">
@@ -38,14 +38,14 @@ function check_vote_{$itemid}() {
 	}
 	{/if}
 	{if $verify == 1}
-	if(!is_captcha(Dd('captcha').value)) {
+	if($('#ccaptcha').html().indexOf('ok.png') == -1) {
 		alert('请填写验证码');
 		Dd('captcha').focus();
 		return false;
 	}
 	{/if}
 	{if $verify == 2}
-	if(Dd('answer').value == '') {
+	if($('#canswer').html().indexOf('ok.png') == -1) {
 		alert('请回答验证问题');
 		Dd('answer').focus();
 		return false;

@@ -9,7 +9,7 @@ if(!$pagesize || $pagesize > 100) $pagesize = 33;
 $offset = ($page-1)*$pagesize;
 $r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition", 'CACHE');
 $items = $r['num'];
-$pages = home_pages($items, $pagesize, $demo_url, $page);
+$pages = $DT_PC ? home_pages($items, $page, $pagesize, $demo_url) : mobile_pages($items, $page, $pagesize, $demo_url);
 $lists = array();
 if($items) {
 	$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY listorder DESC,addtime DESC LIMIT $offset,$pagesize");
@@ -20,6 +20,5 @@ if($items) {
 	}
 	$db->free_result($result);
 }
-if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
 include template('link', $template);
 ?>

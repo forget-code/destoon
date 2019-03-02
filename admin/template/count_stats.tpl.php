@@ -3,14 +3,11 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 if(!$itemid) show_menu($menus);
 ?>
+<div class="sbox">
 <form action="?">
-<div class="tt">统计报表</div>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td>&nbsp;
 <select name="mid">
 <?php
 	foreach($MODULE as $m) {
@@ -31,12 +28,10 @@ if(!$itemid) show_menu($menus);
 <option value="<?php echo $i;?>"<?php echo $i == $month ? ' selected' : ''?>><?php echo $i;?>月</option>
 <?php } ?>
 </select>&nbsp;
-<input type="submit" value="生成报表" class="btn"/>&nbsp;
+<input type="submit" value="生成报表" class="btn-g"/>&nbsp;&nbsp;
 <input type="button" value="重 置" class="btn" onclick="Go('?file=<?php echo $file;?>&action=<?php echo $action;?>&mid=<?php echo $mid;?>&itemid=<?php echo $itemid;?>');"/>
-</td>
-</tr>
-</table>
 </form>
+</div>
 <?php
 	if($year && $month && $mid) {
 	$tb = get_table($mid);
@@ -54,7 +49,7 @@ if(!$itemid) show_menu($menus);
 	}
 ?>
 <div class="tt"><?php echo $MODULE[$mid]['name'];?> <?php echo $year;?>年<?php echo $month;?>月统计报表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td style="padding:10px;">
 <?php load('swfobject.js');?>
@@ -103,7 +98,7 @@ if (swfobject.hasFlashPlayerVersion("8")) {
 	}
 ?>
 <div class="tt"><?php echo $MODULE[$mid]['name'];?> <?php echo $year;?>年统计报表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td style="padding:10px;">
 <?php load('swfobject.js');?>

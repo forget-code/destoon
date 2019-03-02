@@ -1,5 +1,6 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
+login();
 if($action) {
 	$gid = isset($gid) ? intval($gid) : 0;
 	$gid or message();
@@ -21,7 +22,7 @@ if($action) {
 switch($action) {
 	case 'edit':
 		$itemid or message();
-		require MD_ROOT.'/club.class.php';
+		require DT_ROOT.'/module/'.$module.'/club.class.php';
 		$do = new club($moduleid);
 		$do->itemid = $itemid;
 		$T = $do->get_one();
@@ -41,8 +42,8 @@ switch($action) {
 				if($reason == $L['my_manage_reason']) $reason = '';
 				$reason = dhtmlspecialchars($reason);
 				$message = isset($message) ? 1 : 0;
-				if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $L['my_manage_type_edit'])), lang($L['manage_msg_content'], array($MOD['linkurl'].$T['linkurl'], nl2br($reason), $_username)));
-				$db->query("INSERT INTO {$table}_manage (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$itemid','$_username','$DT_TIME','2','$title','$content','$reason','$message')");
+				if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $L['my_manage_type_edit'])), lang($L['manage_msg_content'], array(($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$T['linkurl'], nl2br($reason), $_username)));
+				$db->query("INSERT INTO {$table_manage} (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$itemid','$_username','$DT_TIME','2','$title','$content','$reason','$message')");
 				dmsg($L['post_success_edit'], $forward);
 			} else {
 				message($do->errmsg);
@@ -57,16 +58,16 @@ switch($action) {
 		if($reason == $L['my_manage_reason']) $reason = '';
 		$reason = dhtmlspecialchars($reason);
 		$message = isset($message) ? 1 : 0;
-		require MD_ROOT.'/club.class.php';
+		require DT_ROOT.'/module/'.$module.'/club.class.php';
 		$do = new club($moduleid);
 		foreach($itemid as $tid) {
 			$do->itemid = $tid;
 			$T = $do->get_one();
 			if(!$T || $T['status'] != 3 || $T['gid'] != $gid) continue;
 			$do->recycle($tid);
-			if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $L['my_manage_type_del'])), lang($L['manage_msg_content'], array($MOD['linkurl'].$T['linkurl'], nl2br($reason), $_username)));
+			if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $L['my_manage_type_del'])), lang($L['manage_msg_content'], array(($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$T['linkurl'], nl2br($reason), $_username)));
 			$title = addslashes($T['title']);
-			$db->query("INSERT INTO {$table}_manage (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','1','$title','$content','$reason','$message')");
+			$db->query("INSERT INTO {$table_manage} (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','1','$title','$content','$reason','$message')");
 		}
 		dmsg($L['post_success_del'], $forward);
 	break;
@@ -85,7 +86,7 @@ switch($action) {
 			$db->query("UPDATE {$table} SET style='$style' WHERE itemid=$tid");
 			if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $style ? $L['my_manage_type_style'] : $L['my_manage_type_style_cancel'])), lang($L['manage_msg_content'], array($MOD['linkurl'].$T['linkurl'], nl2br($reason), $_username)));
 			$title = addslashes($T['title']);
-			$db->query("INSERT INTO {$table}_manage (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','5','$title','$content','$reason','$message')");
+			$db->query("INSERT INTO {$table_manage} (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','5','$title','$content','$reason','$message')");
 			if($MOD['show_html']) tohtml('show', $module, "itemid=$tid");
 		}
 		dmsg($style ? $L['post_success_style'] : $L['post_cancel_style'], $forward);
@@ -103,7 +104,7 @@ switch($action) {
 			$db->query("UPDATE {$table} SET ontop=$ontop WHERE itemid=$tid");
 			if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $ontop ? $L['my_manage_type_ontop'] : $L['my_manage_type_ontop_cancel'])), lang($L['manage_msg_content'], array($MOD['linkurl'].$T['linkurl'], nl2br($reason), $_username)));
 			$title = addslashes($T['title']);
-			$db->query("INSERT INTO {$table}_manage (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','4','$title','$content','$reason','$message')");
+			$db->query("INSERT INTO {$table_manage} (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','4','$title','$content','$reason','$message')");
 			if($MOD['show_html']) tohtml('show', $module, "itemid=$tid");
 		}
 		dmsg($ontop ? $L['post_success_ontop'] : $L['post_cancel_ontop'], $forward);
@@ -122,13 +123,13 @@ switch($action) {
 			$db->query("UPDATE {$table} SET level=$level WHERE itemid=$tid");
 			if($message) send_message($T['username'], lang($L['manage_msg_title'], array($L['my_manage_type_post'], dsubstr($T['title'], 20, '...'), $level ? $L['my_manage_type_level'] : $L['my_manage_type_level_cancel'])), lang($L['manage_msg_content'], array($MOD['linkurl'].$T['linkurl'], nl2br($reason), $_username)));
 			$title = addslashes($T['title']);
-			$db->query("INSERT INTO {$table}_manage (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','3','$title','$content','$reason','$message')");
+			$db->query("INSERT INTO {$table_manage} (gid,tid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$tid','$_username','$DT_TIME','3','$title','$content','$reason','$message')");
 			if($MOD['show_html']) tohtml('show', $module, "itemid=$tid");
 		}
 		dmsg($level ? $L['post_success_level'] : $L['post_cancel_level'], $forward);
 	break;
 	case 'post':
-		require MD_ROOT.'/club.class.php';
+		require DT_ROOT.'/module/'.$module.'/club.class.php';
 		$do = new club($moduleid);
 		$sfields = $L['my_fields_post'];
 		$dfields = array('keyword', 'title', 'username');
@@ -153,7 +154,7 @@ switch($action) {
 		$lists = $do->get_list($condition);
 	break;
 	case 'reply':
-		require MD_ROOT.'/reply.class.php';
+		require DT_ROOT.'/module/'.$module.'/reply.class.php';
 		$do = new reply();
 		$sfields = $L['my_fields_reply'];
 		$dfields = array('content', 'username');
@@ -167,7 +168,7 @@ switch($action) {
 	break;
 	case 'reply_edit':
 		$itemid or message();
-		require MD_ROOT.'/reply.class.php';
+		require DT_ROOT.'/module/'.$module.'/reply.class.php';
 		$do = new reply();
 		$do->itemid = $itemid;
 		$R = $do->get_one();
@@ -184,8 +185,8 @@ switch($action) {
 				if($reason == $L['my_manage_reason']) $reason = '';
 				$reason = dhtmlspecialchars($reason);
 				$message = isset($message) ? 1 : 0;
-				if($message) send_message($R['username'], lang($L['manage_msg_title'], array($L['my_manage_type_reply'], get_intro($R['content'], 20), $L['my_manage_type_edit'])), lang($L['manage_msg_content'], array($MOD['linkurl'].'goto.php?itemid='.$R['itemid'], nl2br($reason), $_username)));
-				$db->query("INSERT INTO {$table}_manage (gid,rid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$itemid','$_username','$DT_TIME','2','$title','$content','$reason','$message')");
+				if($message) send_message($R['username'], lang($L['manage_msg_title'], array($L['my_manage_type_reply'], get_intro($R['content'], 20), $L['my_manage_type_edit'])), lang($L['manage_msg_content'], array(($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).'goto.php?itemid='.$R['itemid'], nl2br($reason), $_username)));
+				$db->query("INSERT INTO {$table_manage} (gid,rid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$itemid','$_username','$DT_TIME','2','$title','$content','$reason','$message')");
 				dmsg($L['reply_success_edit'], $forward);
 			} else {
 				message($do->errmsg);
@@ -200,7 +201,7 @@ switch($action) {
 		if($reason == $L['my_manage_reason']) $reason = '';
 		$reason = dhtmlspecialchars($reason);
 		$message = isset($message) ? 1 : 0;
-		require MD_ROOT.'/reply.class.php';
+		require DT_ROOT.'/module/'.$module.'/reply.class.php';
 		$do = new reply();
 		foreach($itemid as $rid) {
 			$do->itemid = $rid;
@@ -209,12 +210,12 @@ switch($action) {
 			$do->recycle($rid);
 			if($message) send_message($R['username'], lang($L['manage_msg_title'], array($L['my_manage_type_reply'], get_intro($R['content'], 20), $L['my_manage_type_del'])), lang($L['manage_msg_content'], array($MOD['linkurl'].'goto.php?itemid='.$R['itemid'], nl2br($reason), $_username)));
 			$title = addslashes(get_intro($R['content'], 50));
-			$db->query("INSERT INTO {$table}_manage (gid,rid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$rid','$_username','$DT_TIME','1','$title','$content','$reason','$message')");
+			$db->query("INSERT INTO {$table_manage} (gid,rid,username,addtime,typeid,title,content,reason,message) VALUES ('$gid','$rid','$_username','$DT_TIME','1','$title','$content','$reason','$message')");
 		}
 		dmsg($L['reply_success_del'], $forward);
 	break;
 	default:
-		require MD_ROOT.'/manage.class.php';
+		require DT_ROOT.'/module/'.$module.'/manage.class.php';
 		$do = new manage();
 		$sfields = $L['my_fields_manage'];
 		$dfields = array('title', 'reason', 'content');
@@ -256,7 +257,7 @@ switch($action) {
 		} else if(isset($rid)) {
 			$rid = intval($rid);
 			if($rid) {
-				$T = $db->get_one("SELECT * FROM {$table}_reply WHERE itemid=$rid");
+				$T = $db->get_one("SELECT * FROM {$table_reply} WHERE itemid=$rid");
 				if($T && $T['status'] == 3) {
 					$gid = $T['gid'];
 					$tid = $T['tid'];
@@ -270,6 +271,22 @@ switch($action) {
 		}
 	break;
 }
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?mid='.$mid.'&job='.$job;
+	} else {
+		foreach($lists as $k=>$v) {
+			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
+			$lists[$k]['date'] = timetodate($v['addtime'], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$foot = '';
+		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&job='.$job.'&status='.$status : '?mid='.$mid.'&job='.$job;
+	}
+}
 $head_title = $L['my_manage_title'];
-if($action) exit(include template('my_club_manage', 'member'));
+include template($MOD['template_my_manage'] ? $MOD['template_my_manage'] : 'my_club_manage', 'member');
 ?>

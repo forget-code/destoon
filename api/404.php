@@ -1,7 +1,3 @@
 <?php
-if(@chdir('../')) {
-	@include '404.php';
-} else {
-	@include '../404.php';
-}
+include '../404.php';
 ?>

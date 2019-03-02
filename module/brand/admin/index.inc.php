@@ -1,12 +1,12 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/brand.class.php';
-$do = new brand($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加'.$MOD['name'], '?moduleid='.$moduleid.'&action=add'),
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('审核'.$MOD['name'], '?moduleid='.$moduleid.'&action=check'),
-    array('未通过'.$MOD['name'], '?moduleid='.$moduleid.'&action=reject'),
+    array('未通过', '?moduleid='.$moduleid.'&action=reject'),
     array('回收站', '?moduleid='.$moduleid.'&action=recycle'),
     array('移动分类', '?moduleid='.$moduleid.'&action=move'),
 );
@@ -23,18 +23,18 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', '编辑', 'IP', '文件路径', '内容模板');
-	$dfields = array('keyword', 'title', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'editor', 'ip', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '品牌ID降序', '品牌ID升序');
-	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊', '标题', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', '编辑', 'IP', '文件路径', '内容模板');
+	$dfields = array('keyword', 'title', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'editor', 'ip', 'filepath', 'template');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '品牌ID降序', '品牌ID升序');
+	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'itemid DESC', 'itemid ASC');
 	$level = isset($level) ? intval($level) : 0;
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime')) or $datetype = 'edittime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$areaid = isset($areaid) ? intval($areaid) : 0;

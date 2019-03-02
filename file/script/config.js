@@ -1,1 +1,1 @@
-var DTPath = "http://demo.destoon.com/v6.0/";var SKPath = "http://demo.destoon.com/v6.0/skin/default/";var MEPath = "http://demo.destoon.com/v6.0/member/";var DTEditor = "kindeditor";var CKDomain = ".destoon.org";var CKPath = "/";var CKPrex = "esf_";
+var DTPath = "http://demo.destoon.com/v7.0/";var DTMob = "http://demo.destoon.com/v7.0/mobile/";var SKPath = "http://demo.destoon.com/v7.0/skin/default/";var MEPath = "http://demo.destoon.com/v7.0/member/";var DTEditor = "fckeditor";var CKDomain = "";var CKPath = "/";var CKPrex = "ck7_";

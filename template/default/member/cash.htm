@@ -1,5 +1,4 @@
-{template 'header', $module}
-<script type="text/javascript">c(2);</script>
+{template 'header', 'member'}
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
@@ -20,14 +19,14 @@
 {/loop}
 </select>
 &nbsp;
-{dcalendar('fromtime', $fromtime)} 至 {dcalendar('totime', $totime)}
+{dcalendar('fromdate', $fromdate)} 至 {dcalendar('todate', $todate)}
 &nbsp;
 <input type="submit" value=" 搜 索 " class="btn"/>&nbsp;
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?action={$action}');"/>
 </div>
 </form>
 <div class="bd">
-<table cellpadding="1" cellspacing="0" class="tb">
+<table cellpadding="10" cellspacing="0" class="tb">
 <tr>
 <th>流水号</th>
 <th>实收</th>
@@ -39,23 +38,23 @@
 <th width="130">受理时间</th>
 <th>状态</th>
 </tr>
-{loop $cashs $k $v}
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
-<td height="30"class="px11">{$v[itemid]}</td>
-<td class="px11 f_red">{$v[amount]}</td>
-<td class="px11 f_blue">{$v[fee]}</td>
+{loop $lists $k $v}
+<tr align="center">
+<td height="30">{$v[itemid]}</td>
+<td class="f_red">{$v[amount]}</td>
+<td class="f_blue">{$v[fee]}</td>
 <td title="{$v[branch]}">{$v[bank]}</td>
 <td>{$v[truename]}</td>
-<td class="px11">{$v[account]}</td>
-<td class="px11 f_gray">{$v[addtime]}</td>
-<td class="px11 f_gray">{$v[edittime]}</td>
+<td>{$v[account]}</td>
+<td class="f_gray">{$v[addtime]}</td>
+<td class="f_gray">{$v[edittime]}</td>
 <td{if $v[note]} title="原因及备注:{$v[note]}"{/if}>{$v[dstatus]}</td>
 </tr>
 {/loop}
 <tr align="center">
 <td height="35"><strong>小计</strong></td>
-<td class="px11 f_red">{$amount}</td>
-<td class="px11 f_blue">{$fee}</td>
+<td class="f_red">{$amount}</td>
+<td class="f_blue">{$fee}</td>
 <td colspan="6">&nbsp;</td>
 </tr>
 </table>
@@ -64,7 +63,7 @@
 <script type="text/javascript">s('cash');m('action_record');</script>
 {elseif $action == 'setting'}
 {if $vbank}
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl">开户银行</td>
 <td class="tr">{$member[bank]}</td>
@@ -93,7 +92,7 @@
 {else}
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="action" value="{$action}"/>
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 开户银行</td>
 <td class="tr">{$bank_select} <span id="dbank" class="f_red"></span></td>
@@ -155,7 +154,7 @@ function check() {
 	}
 	return true;
 }
-$(document).ready(function(){
+$(function(){
 	$('#bank').change(function(){
 		var bank = $('#bank').val();
 		if(bank == '支付宝') {
@@ -172,7 +171,7 @@ $(document).ready(function(){
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="action" value="confirm"/>
 <input type="hidden" name="amount" value="{$amount}"/>
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl">可用金额</td>
 <td class="tr"><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
@@ -217,7 +216,7 @@ function check() {
 {else}
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="action" value="confirm"/>
-<table cellspacing="1" cellpadding="6" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 <tr>
 <td class="tl">账户余额</td>
 <td class="tr"><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
@@ -259,4 +258,4 @@ function check() {
 </script>
 <script type="text/javascript">s('cash');m('action');</script>
 {/if}
-{template 'footer', $module}
+{template 'footer', 'member'}

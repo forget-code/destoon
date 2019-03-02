@@ -7,7 +7,7 @@ $special or msg($MOD['name'].'不存在');
 !$special['islink'] or msg($MOD['name'].'为外部链接，无需添加信息');
 $tid = 'special-'.$specialid;
 $TYPE = get_type($tid);
-require MD_ROOT.'/item.class.php';
+require DT_ROOT.'/module/'.$module.'/item.class.php';
 $do = new item($specialid);
 $_mid = 5;
 foreach($MODULE as $m) {
@@ -20,7 +20,7 @@ $menus = array (
     array('添加信息', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid.'&action=add'),
     array('批量添加', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid.'&action=batch&mid='.$_mid),
     array('信息列表', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid),
-    array('信息分类', 'javascript:Dwidget(\'?file=type&item='.$tid.'\', \'['.$special['title'].'] 专题信息分类\', 550, 250);'),
+    array('信息分类', 'javascript:Dwidget(\'?file=type&item='.$tid.'\', \'['.$special['title'].'] 专题信息分类\');'),
 );
 $MOD['level'] = $MOD['level_item'];
 switch($action) {

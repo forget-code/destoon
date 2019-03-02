@@ -3,7 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 $MCFG = array();
 $MCFG['module'] = 'photo';
 $MCFG['name'] = '图库';
-$MCFG['author'] = 'DESTOON.COM';
+$MCFG['author'] = 'DESTOON';
 $MCFG['homepage'] = 'www.destoon.com';
 $MCFG['copy'] = true;
 $MCFG['uninstall'] = true;

@@ -8,25 +8,36 @@ if($itemid) {
 	extract($item);
 	$t = $db->get_one("SELECT content FROM {$table_data} WHERE itemid=$itemid");
 	$content = $t['content'];
+	$content = $DT_PC ? parse_video($content) : video5($content);
 	if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$table} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $title.','.$COM['company'];
 	$head_description = get_intro($content, 200);
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.'&itemid='.$itemid;
+	if($DT_PC) {
+		//
+	} else {
+		$back_link = userurl($username, "file=$file", $domain);
+		$head_name = $title;
+	}
 } else {
 	$content_table = content_table(4, $userid, is_file(DT_CACHE.'/4.part'), $DT_PRE.'company_data');
 	$t = $db->get_one("SELECT content FROM {$content_table} WHERE userid=$userid");
 	$content = $t['content'];
-	$COM['thumb'] = $COM['thumb'] ? $COM['thumb'] : DT_SKIN.'image/company.jpg';
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file;
+	$thumb = $COM['thumb'];
+	$video = isset($HOME['video']) ? $HOME['video'] : '';
+	if($DT_PC) {
+		//
+	} else {
+		$head_name = $head_title;
+	}
 }
 $TYPE = array();
-$result = $db->query("SELECT itemid,title,style FROM {$table} WHERE status=3 AND username='$username' ORDER BY listorder DESC,addtime DESC");
+$result = $db->query("SELECT itemid,title,style FROM {$table} WHERE status=3 AND username='$username' ORDER BY listorder DESC,addtime DESC", 'CACHE');
 while($r = $db->fetch_array($result)) {
 	$r['alt'] = $r['title'];
 	$r['title'] = set_style($r['title'], $r['style']);
 	$r['linkurl'] = userurl($username, "file=$file&itemid=$r[itemid]", $domain);
 	$TYPE[] = $r;
 }
-include template('introduce', $template);
+include template($file, $template);
 ?>

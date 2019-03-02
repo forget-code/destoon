@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 define('DT_DEBUG', 0);
@@ -35,11 +35,12 @@ define('DT_WIN', strpos(strtoupper(PHP_OS), 'WIN') !== false ? true: false);
 define('DT_CHMOD', ($CFG['file_mod'] && !DT_WIN) ? $CFG['file_mod'] : 0);
 define('DT_LANG', $CFG['language']);
 define('DT_KEY', $CFG['authkey']);
+define('DT_PRE', $CFG['tb_pre']);
 define('DT_EDITOR', $CFG['editor']);
+define('DT_CDN', $CFG['cdn'] ? 1 : 0);
 define('DT_CLOUD_UID', $CFG['cloud_uid']);
 define('DT_CLOUD_KEY', $CFG['cloud_key']);
 define('DT_CHARSET', strtoupper($CFG['charset']));
-define('DT_CHARLEN', DT_CHARSET == 'GBK' ? 2 : 3);
 define('DT_CACHE', $CFG['cache_dir'] ? $CFG['cache_dir'] : DT_ROOT.'/file/cache');
 define('DT_SKIN', DT_STATIC.'skin/'.$CFG['skin'].'/');
 define('VIP', $CFG['com_vip']);
@@ -68,6 +69,10 @@ $DT_REF = get_env('referer');
 $DT_MOB = get_env('mobile');
 $DT_BOT = is_robot();
 $DT_TOUCH = is_touch();
+$DT_PC = $GLOBALS['DT_PC'] = 1;
+define('DT_TIME', $DT_TIME);
+define('DT_IP', $DT_IP);
+define('DT_TOUCH', $DT_TOUCH);
 header("Content-Type:text/html;charset=".DT_CHARSET);
 require DT_ROOT.'/include/db_'.$CFG['database'].'.class.php';
 require DT_ROOT.'/include/cache_'.$CFG['cache'].'.class.php';
@@ -91,6 +96,7 @@ $db->pre = $CFG['tb_pre'];
 $db->connect($CFG['db_host'], $CFG['db_user'], $CFG['db_pass'], $CFG['db_name'], $CFG['db_expires'], $CFG['db_charset'], $CFG['pconnect']);
 $dc = new dcache();
 $dc->pre = $CFG['cache_pre'];
+require DT_ROOT.'/include/db.class.php';
 $DT = $MOD = $EXT = $CSS = $JS = $DTMP = $CAT = $ARE = $AREA = array();
 $CACHE = cache_read('module.php');
 if(!$CACHE) {
@@ -104,7 +110,8 @@ $DT = $CACHE['dt'];
 $MODULE = $CACHE['module'];
 $EXT = cache_read('module-3.php');
 define('DT_MAX_LEN', $DT['max_len']);
-define('RE_WRITE', $DT['rewrite']);
+define('DT_MOB', $EXT['mobile_url']);
+define('RE_WRITE', $DT['rewrite'] ? ($DT['search_rewrite'] ? 2 : 1) : 0);
 $lazy = $DT['lazy'] ? 1 : 0;
 if(!IN_ADMIN && ($DT['close'] || $DT['defend_cc'] || $DT['defend_reload'] || $DT['defend_proxy'])) include DT_ROOT.'/include/defend.inc.php';
 unset($CACHE, $CFG['db_host'], $CFG['db_user'], $CFG['db_pass'], $db_class, $db_file);
@@ -132,7 +139,8 @@ if(isset($forward)) {
 }
 strip_uri($forward);
 (isset($action) && check_name($action)) or $action = '';
-$submit = (isset($_POST['submit']) || isset($_POST['dsubmit'])) ? 1 : 0;
+(isset($job) && check_name($job)) or $job = '';
+$submit = isset($_POST['submit']) ? 1 : 0;
 if($submit) {
 	isset($captcha) or $captcha = '';
 	isset($answer) or $answer = '';
@@ -149,6 +157,7 @@ $kw = isset($_GET['kw']) ? strip_kw($_GET['kw'], $DT['max_kw']) : '';
 $keyword = $kw ? str_replace(array(' ', '*'), array('%', '%'), $kw) : '';
 $today_endtime = strtotime(date('Y-m-d', $DT_TIME).' 23:59:59');
 $seo_file = $seo_title = $head_title = $head_keywords = $head_description = $head_canonical = $head_mobile = '';
+$head_pc = $moduleid > 1 ? str_replace(DT_MOB.$MODULE[$moduleid]['moduledir'].'/', $MODULE[$moduleid]['linkurl'], $DT_URL) : str_replace(DT_MOB, DT_PATH, $DT_URL);
 if($catid) $CAT = get_cat($catid);
 if($areaid) $ARE = get_area($areaid);
 $_userid = $_admin = $_aid = $_message = $_chat = $_sound = $_online = $_money = $_credit = $_sms = 0;
@@ -161,7 +170,7 @@ if($destoon_auth) {
 	$_userid = isset($_dauth[0]) ? intval($_dauth[0]) : 0;
 	if($_userid) {
 		$_password = isset($_dauth[1]) ? trim($_dauth[1]) : '';
-		$USER = $db->get_one("SELECT username,passport,company,truename,password,groupid,email,message,chat,sound,online,sms,credit,money,loginip,admin,aid,edittime,trade FROM {$DT_PRE}member WHERE userid=$_userid");
+		$USER = $db->get_one("SELECT username,passport,company,truename,mobile,password,groupid,email,message,chat,sound,online,sms,credit,money,loginip,admin,aid,edittime,trade FROM {$DT_PRE}member WHERE userid=$_userid");
 		if($USER && $USER['password'] == $_password) {
 			if($USER['groupid'] == 2) dalert(lang('message->common_forbidden'));
 			if($USER['loginip'] != $DT_IP && ($DT['ip_login'] == 2 || ($DT['ip_login'] == 1 && IN_ADMIN))) {
@@ -179,9 +188,7 @@ if($destoon_auth) {
 if($_userid == 0) { $_groupid = 3; $_username = ''; }
 if(!IN_ADMIN) {
 	if($_groupid == 1) include DT_ROOT.'/module/member/admin.inc.php';
-	if($_userid) {
-		$db->query("REPLACE INTO {$DT_PRE}online (userid,username,ip,moduleid,online,lasttime) VALUES ('$_userid','$_username','$DT_IP','$moduleid','$_online','$DT_TIME')");
-	}
+	if($_userid) $db->query("REPLACE INTO {$DT_PRE}online (userid,username,ip,moduleid,online,lasttime) VALUES ('$_userid','$_username','$DT_IP','$moduleid','$_online','$DT_TIME')");
 	if($DT_BOT && $moduleid >= 4) $MOD['order'] = $moduleid == 4 ? 'userid DESC' : 'addtime DESC';
 }
 $MG = cache_read('group-'.$_groupid.'.php');

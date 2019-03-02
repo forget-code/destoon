@@ -1,7 +1,7 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
 require_once DT_ROOT.'/module/member/global.func.php';
-function home_pages($total, $pagesize, $demo_url, $page = 1) {
+function home_pages($total, $page, $pagesize, $demo_url) {
 	global $MOD, $L;
 	$pages = '';
 	$items = $total;

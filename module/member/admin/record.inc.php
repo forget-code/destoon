@@ -45,7 +45,7 @@ switch($action) {
 				money_record($username, $amount, $bank, $_username, $reason, $note);
 				$success++;
 			}
-			if($error) message('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
+			if($error) msg('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
 			dmsg('操作成功', '?moduleid='.$moduleid.'&file='.$file);
 		} else {
 			if(isset($userid)) {
@@ -72,10 +72,11 @@ switch($action) {
 		$sorder  = array('排序方式', '金额降序', '金额升序', '时间降序', '时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'addtime DESC', 'addtime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		(isset($username) && check_name($username)) or $username = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($bank) or $bank = '';
 		isset($type) or $type = 0;
 		isset($mtype) or $mtype = 'amount';
@@ -87,8 +88,8 @@ switch($action) {
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($bank) $condition .= " AND bank='$bank'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($type) $condition .= $type == 1 ? " AND amount>0" : " AND amount<0";
 		if($username) $condition .= " AND username='$username'";
 		if($itemid) $condition .= " AND itemid=$itemid";

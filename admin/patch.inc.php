@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -25,17 +25,11 @@ if($action == 'view') {
 	dmsg('删除成功', '?file='.$file);
 } else {
 	if($submit) {
-		is_date($fd) or $fd = timetodate($DT_TIME, 3);
-		if($fh < 0 || $fh > 23) $fh = 0;
-		if($fm < 0 || $fm > 59) $fm = 0;
-		$ft = strtotime($fd.' '.($fh > 9 ? $fh : '0'.$fh).':'.($fm > 9 ? $fm : '0'.$fm).':00');
-
-		is_date($td) or $td = timetodate($DT_TIME, 3);
-		if($th < 0 || $th > 23) $th = 23;
-		if($tm < 0 || $tm > 59) $tm = 59;
-		$tt = strtotime($td.' '.($th > 9 ? $th : '0'.$th).':'.($tm > 9 ? $tm : '0'.$tm).':59');
-		
-		$tt > $ft or msg('日期范围设置错误');
+		is_time($fd) or msg('开始时间设置错误');
+		$ft = strtotime($fd);
+		is_time($td) or msg('结束时间设置错误');
+		$tt = strtotime($td);		
+		$tt > $ft or msg('时间范围设置错误');
 
 		isset($filedir) or $filedir = $sys;
 		$fileext or $fileext = $ext;
@@ -77,6 +71,7 @@ if($action == 'view') {
 				file_copy($f, $dir.str_replace(DT_ROOT.'/', '', $f));
 				@touch($dir.str_replace(DT_ROOT.'/', '', $f), filemtime($f));
 			}
+			cache_write('patch.php', array($td));
 			msg('备份成功 '.$find.' 个文件，已保存于file/patch目录', '?file='.$file, 5);
 		}
 		msg('没有符合条件的文件');
@@ -91,8 +86,10 @@ if($action == 'view') {
 				$dirs[] = $bn;
 			}
 		}
-		$fd = substr(DT_RELEASE, 0, 4).'-'.substr(DT_RELEASE, 4, 2).'-'.substr(DT_RELEASE, 6, 2);
-		$td = timetodate($DT_TIME, 3);
+		$fd = substr(DT_RELEASE, 0, 4).'-'.substr(DT_RELEASE, 4, 2).'-'.substr(DT_RELEASE, 6, 2).' 00:00:00';
+		$tt = cache_read('patch.php');
+		if($tt && is_time($tt[0])) $fd = $tt[0];
+		$td = timetodate($DT_TIME, 6);
 		$files = glob(DT_ROOT.'/file/patch/*');
 		foreach($files as $f) {
 			if(is_dir($f)) {

@@ -4,8 +4,7 @@ include tpl('header');
 show_menu($menus);
 ?>
 <?php if($submit) { ?>
-<div class="tt">扫描结果</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <?php if($lists) { ?>
 <tr>
 <th>文件</th>
@@ -18,9 +17,9 @@ show_menu($menus);
 	<tr align="center">
 	<td align="left" class="f_fd">&nbsp;<?php echo $v['file'];?></td>
 	<td><input type="text" size="30" value="<?php echo $v['code'];?>" class="f_fd f_red"/></td>
-	<td class="px11<?php echo $v['num'] > 2 ? ' f_red' : '';?>"><?php echo $v['num'];?></td>
-	<td class="px11"><?php echo dround(filesize(DT_ROOT.'/'.$v['file'])/1024);?> Kb</td>
-	<td class="px11"><?php echo timetodate(filemtime(DT_ROOT.'/'.$v['file']), 6);?></td>
+	<td class="px12<?php echo $v['num'] > 2 ? ' f_red' : '';?>"><?php echo $v['num'];?></td>
+	<td class="px12"><?php echo dround(filesize(DT_ROOT.'/'.$v['file'])/1024);?> Kb</td>
+	<td class="px12"><?php echo timetodate(filemtime(DT_ROOT.'/'.$v['file']), 6);?></td>
 	</tr>
 	<?php } ?>
 	<tr>
@@ -36,12 +35,11 @@ show_menu($menus);
 <?php } else { ?>
 <form method="post" action="?" id="dform">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<div class="tt">木马扫描</div>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">选择目录</td>
 <td>
-<table cellpadding="2" cellspacing="2" width="600">
+<table cellspacing="2" width="600" class="ctb">
 <?php foreach($dirs as $k=>$d) { ?>
 <?php if($k%4==0) {?><tr><?php } ?>
 <td width="150"><input type="checkbox" name="filedir[]" value="<?php echo $d;?>" checked id="dir_<?php echo $d;?>"/><label for="dir_<?php echo $d;?>">&nbsp;<img src="admin/image/folder.gif" width="16" height="14" alt="" align="absmiddle"/> <?php echo $d;?></label></td>
@@ -62,8 +60,8 @@ show_menu($menus);
 <tr>
 <td class="tl">文件编码</td>
 <td>
-&nbsp;<input type="radio" name="charset" value="gbk" checked/> GBK&nbsp;&nbsp;
-<input type="radio" name="charset" value="utf-8"/> UTF-8
+<input type="radio" name="charset" value="utf-8" checked/> UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="charset" value="gbk"/> GBK
 </td>
 </tr>
 <tr>
@@ -76,7 +74,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td></td>
-<td height="30">&nbsp;<input type="submit" name="submit" value="开始扫描" class="btn" onclick="this.value='扫描中..';this.blur();this.className='btn f_gray';"/>
+<td height="30">&nbsp;<input type="submit" name="submit" value="开始扫描" class="btn-g" onclick="this.value='扫描中..';this.blur();this.className='btn f_gray';"/>
 </td>
 </tr>
 </table>

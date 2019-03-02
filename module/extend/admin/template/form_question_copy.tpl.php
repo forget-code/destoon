@@ -10,12 +10,11 @@ show_menu($menus);
 <input type="hidden" name="job" value="<?php echo $job;?>"/>
 <input type="hidden" name="fid" value="<?php echo $fid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">属性复制</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 复制方式</td>
 <td>
-	<input type="radio" name="type" value="1" id="t1" onclick="Ds('f1');Dh('f2');" checked/> <label for="t1">批量</label>&nbsp;&nbsp;
+	<input type="radio" name="type" value="1" id="t1" onclick="Ds('f1');Dh('f2');" checked/> <label for="t1">批量</label>&nbsp;&nbsp;&nbsp;&nbsp;
 	<input type="radio" name="type" value="0" id="t2" onclick="Ds('f2');Dh('f1');"/> <label for="t2">单项</label>
 </td>
 </tr>
@@ -30,13 +29,12 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 同名过滤</td>
 <td>
-	<input type="radio" name="name" value="1" id="n1" checked/> <label for="n1">是</label>&nbsp;&nbsp;
+	<input type="radio" name="name" value="1" id="n1" checked/> <label for="n1">是</label>&nbsp;&nbsp;&nbsp;&nbsp;
 	<input type="radio" name="name" value="0" id="n2"/> <label for="n2">否</label>
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="复 制" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value=" 关 闭 " class="btn" onclick="window.parent.location.reload();"/></div>
+<div class="sbt"><input type="submit" name="submit" value="复 制" class="btn-g"/></div>
 </form>
 <script type="text/javascript">
 function check() {

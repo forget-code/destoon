@@ -15,7 +15,7 @@ $editor .= 'var EDD = "'.($draft ? 1 : 0).'";';
 $editor .= 'var EID = "'.$textareaid.'";';
 $editor .= 'var FCKID = "'.$textareaid.'";';
 $editor .= '</script>';
-$editor .= '<script type="text/javascript" src="'.$moddir.'fckeditor/fckeditor.js?v=6.0"></script>';
+$editor .= '<script type="text/javascript" src="'.$moddir.'fckeditor/fckeditor.js"></script>';
 $editor .= '<script type="text/javascript">';
 $editor .= 'window.onload = function() {';
 $editor .= 'var sBasePath = "'.$moddir.'fckeditor/";';

@@ -13,7 +13,7 @@ $text = $v_amount.$v_moneytype.$v_oid.$v_mid.$v_url.$key; //md5加密拼凑串,�
 $v_md5info = strtoupper(md5($text));
 
 $remark1 = $charge_title ? $charge_title : '会员('.$_username.')充值(流水号:'.$orderid.')'; //备注字段1
-$remark1 = convert($remark1, DT_CHARSET, 'GBK');
+if($key != 'SANDBOX') $remark1 = convert($remark1, DT_CHARSET, 'GBK');
 $remark2 = '[url:='.$notify_url.']'; //备注字段2
 ?>
 <html>

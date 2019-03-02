@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -11,12 +11,10 @@ class captcha {
 	var $soundstr;
 	var $cn;
 	var $font;
-	var $ip;
 
 	function question($id) {
-		global $db;
-		$r = $db->get_one("SELECT * FROM {$db->pre}question ORDER BY rand()");
-		$_SESSION['answerstr'] = md5(md5($r['answer'].DT_KEY.$this->ip));
+		$r = DB::get_one("SELECT * FROM ".DT_PRE."question ORDER BY rand()");
+		$_SESSION['answerstr'] = encrypt($r['answer'], DT_KEY.'ANS');
 		exit('document.getElementById("'.$id.'").innerHTML = "'.$r['question'].'";');
 	}
 
@@ -30,16 +28,16 @@ class captcha {
 		header('Expires: '.gmdate('D, d M Y H:i:s').' GMT');
 		header("Content-type: image/png");	
 		$string = $this->mk_str();
-		$_SESSION['captchastr'] = md5(md5(strtoupper($string).DT_KEY.$this->ip));
-		$imageX = $this->length*25;
-		$imageY = 25;
+		$_SESSION['captchastr'] = encrypt(strtoupper($string), DT_KEY.'CPC');
+		$imageX = $this->length*26;
+		$imageY = 32;
 		$im = imagecreatetruecolor($imageX, $imageY);  
 		imagefill($im, 0, 0, imagecolorallocate($im, 250, 250, 250));
 		$color = imagecolorallocate($im, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
 		if($this->cn) {
-			$string = convert($string, DT_CHARSET, 'UTF-8');
-			$angle = mt_rand(-10, 10);
-			$size = mt_rand(13, 20);
+			$string = $string;
+			$angle = mt_rand(-15, 15);
+			$size = mt_rand(12, 22);
 			$font = $this->font;
 			$X = $size + mt_rand(5, 10);
 			$Y = $size + mt_rand(5, 10);

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -35,8 +35,8 @@ switch($action) {
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>$fromtime";
-		if($totime) $condition .= " AND addtime<$totime";
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($ip) $condition .= " AND ip='$ip'";
 		if($robot) $condition .= " AND robot='$robot'";
 		if($username) $condition .= " AND username='$username'";

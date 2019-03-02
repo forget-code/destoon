@@ -24,7 +24,7 @@ if($DT_QST) {
 	$pagesize = $MOD['pagesize'];
 	$offset = ($page-1)*$pagesize;
 	$sx->SetLimits($offset, $pagesize);
-	$_kw = convert($kw, DT_CHARSET, 'utf-8');
+	$_kw = $kw;
 	$r = $sx->Query($_kw, $MOD['sphinx_name']);
 	$time = $r['time'];
 	$items = $r['total_found'];

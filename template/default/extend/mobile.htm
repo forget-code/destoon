@@ -4,21 +4,25 @@
 .qr_li {line-height:32px;height:32px;padding-left:20px;overflow:hidden;}
 .qr_on {line-height:32px;height:32px;padding-left:20px;overflow:hidden;background:#FFFFFF;border-radius:0 10px 10px 0;}
 </style>
-<div class="m">	
-	<div class="nav">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; 手机浏览</div>
-</div>
 <div class="m">
 	<div style="background:url('{DT_STATIC}file/image/mobile_bg.png') no-repeat;height:500px;">
-		<div style="padding:48px 50px 0 520px;">
+		<div style="padding:48px 32px 0 560px;">
 			<div style="line-height:22px;font-size:14px;">
 			<strong>功能简介：</strong><br/>您可以通过手机上网，随时随地浏览商机资讯，享用会员功能...<br/>
 			<br/>
-			<strong>访问网址：</strong>{if $action=='device'}<span class="f_red">抱歉，请用手机访问</span>{/if}<br/>
+			{if $action=='device'}
+			<strong>设备错误：</strong><br/>
+			<span class="f_red">抱歉，请用手机访问</span><br/><br/>
+			或点击以下网址用电脑继续访问：<br/>
+			<a href="{$url}" class="b">{$url}</a><br/>
+			{else}
+			<strong>手机访问：</strong><br/>
 			在手机浏览器地址栏输入：<a href="{$url}" class="b">{$url}</a><br/><br/>
 			或者用二维码扫描软件(微信、QQ等)扫描下面的二维码<br/>
+			{/if}
 			</div>
 			<br/>
-			<div>			
+			<div{if $action=='device'} style="display:none;"{/if}>			
 				<table cellpadding="0" cellspacing="0" width="100%">
 				<tr>
 				<td valign="top" class="qr">
@@ -64,8 +68,8 @@ function Dqr(id) {
 	$('#qrcode-img').fadeIn(200);
 	tid = id;
 }
-$(document).ready(function() {
-	if($('.qr li').length== 1) $('.qr').html('');
+$(function(){
+	if($('.qr li').length == 1) $('.qr').html('');
 	$('.qr').show('slow');
 });
 </script>

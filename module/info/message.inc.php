@@ -34,7 +34,7 @@ if($_userid) {
 	$telephone = $user['telephone'] ? $user['telephone'] : $user['mobile'];
 	$email = $user['mail'] ? $user['mail'] : $user['email'];
 	$qq = $user['qq'];
-	$msn = $user['msn'];
+	$wx = $user['wx'];
 	$ali = $user['ali'];
 	$skype = $user['skype'];
 }
@@ -52,20 +52,20 @@ if($submit) {
 		if(!$telephone) message($L['msg_type_telephone']);
 		$email = dhtmlspecialchars(trim($email));
 		$company = dhtmlspecialchars(trim($company));
-		$qq = dhtmlspecialchars(trim($qq));
-		$msn = dhtmlspecialchars(trim($msn));
-		$ali = dhtmlspecialchars(trim($ali));
-		$skype = dhtmlspecialchars(trim($skype));
+		if($DT['im_qq']) $qq = dhtmlspecialchars(trim($qq));
+		if($DT['im_wx']) $wx = dhtmlspecialchars(trim($wx));
+		if($DT['im_ali'])$ali = dhtmlspecialchars(trim($ali));
+		if($DT['im_skype']) $skype = dhtmlspecialchars(trim($skype));
 	}
 	$content = nl2br($content);
 	if($company) $content .= '<br/>'.$L['content_company'].$company;
 	if($truename) $content .= '<br/>'.$L['content_truename'].$truename;
 	if($telephone) $content .= '<br/>'.$L['content_telephone'].$telephone;
 	if(is_email($email)) $content .= '<br/>'.$L['content_email'].$email;
-	if(is_numeric($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
-	if($ali) $content .= '<br/>'.$L['content_ali'].' '.im_ali($ali).' '.$ali;
-	if(is_email($msn)) $content .= '<br/>'.$L['content_msn'].' '.im_msn($msn).' '.$msn;
-	if($skype) $content .= '<br/>'.$L['content_skype'].' '.im_skype($skype).' '.$skype;
+	if($DT['im_qq'] && is_qq($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
+	if($DT['im_wx'] && is_wx($wx)) $content .= '<br/>'.$L['content_wx'].' '.im_wx($wx, $_username).' '.$wx;
+	if($DT['im_ali'] && $ali) $content .= '<br/>'.$L['content_ali'].' '.im_ali($ali).' '.$ali;
+	if($DT['im_skype'] && $skype) $content .= '<br/>'.$L['content_skype'].' '.im_skype($skype).' '.$skype;
 	if(is_date($date)) $content .= '<br/>'.lang($L['content_date'], array($date));	
 	$message = $L['content_info'].'<a href="'.$linkurl.'"><strong>'.$item['title'].'</strong></a><br/>'.$content;
 	//send sms
@@ -88,18 +88,24 @@ if($submit) {
 		}
 	}
 	//send sms
+	$forward = $DT_PC ? $linkurl : str_replace($MOD['linkurl'], $MOD['mobile'], $linkurl);
 	if(send_message($item['username'], $title, $message, 3, $_username)) {
-		message($L['msg_message_success'], $linkurl);
+		message($L['msg_message_success'], $forward);
 	} else {
 		message($_userid ? $L['msg_member_failed'] : $L['msg_guest_failed']);
 	}
-} else {	
-	$iask = explode('|', trim($MOD['message_ask']));
-	isset($content) or $content = '';
-	$date = timetodate($DT_TIME + 5*86400, 3);
-	$title = lang($L['info_message_title'], array($item['title']));
-	$head_title = $L['info_head_title'].$DT['seo_delimiter'].$item['title'].$DT['seo_delimiter'].$MOD['name'];
-	$template = $MOD['template_message'] ? $MOD['template_message'] : 'message';
-	include template($template, $module);
 }
+$iask = explode('|', trim($MOD['message_ask']));
+isset($content) or $content = '';
+$date = timetodate($DT_TIME + 5*86400, 3);
+$title = lang($L['info_message_title'], array($item['title']));
+$head_title = $L['info_head_title'].$DT['seo_delimiter'].$item['title'].$DT['seo_delimiter'].$MOD['name'];
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MOD['linkurl'], $MOD['mobile'], $DT_URL);
+} else {
+	$back_link = $forward = $MOD['mobile'].$item['linkurl'];
+	$head_name = $L['info_head_title'];
+	$foot = '';
+}
+include template($MOD['template_message'] ? $MOD['template_message'] : 'message', $module);
 ?>

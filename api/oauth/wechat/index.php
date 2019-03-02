@@ -11,7 +11,7 @@ if($_SESSION['wx_access_token']) {
 		$success = 1;
 		$arr = json_decode($rec, true);
 		$openid = $arr['openid'];
-		$nickname = convert($arr['nickname'], 'UTF-8', DT_CHARSET);
+		$nickname = $arr['nickname'];
 		$avatar = $arr['headimgurl'];
 		$url = '';
 		$DS = array('wx_access_token', 'wx_openid');

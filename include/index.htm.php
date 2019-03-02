@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -13,6 +13,7 @@ if($DT['city']) {
 }
 $data = '';
 $data .= 'var DTPath = "'.DT_PATH.'";';
+$data .= 'var DTMob = "'.DT_MOB.'";';
 $data .= 'var SKPath = "'.DT_SKIN.'";';
 $data .= 'var MEPath = "'.$M.'";';
 $data .= 'var DTEditor = "'.DT_EDITOR.'";';
@@ -33,6 +34,7 @@ $index = 1;
 $seo_title = $DT['seo_title'];
 $head_keywords = $DT['seo_keywords'];
 $head_description = $DT['seo_description'];
+$CSS = array('index');
 ob_start();
 include template('index');
 $data = ob_get_contents();

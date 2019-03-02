@@ -2,16 +2,13 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class guestbook {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'guestbook';
-		$this->db = &$db;
-		$this->fields = array( 'title','areaid','content','truename','telephone','email','qq','msn','ali','skype','hidden','status','username','addtime', 'ip', 'reply','editor','edittime');
+		$this->table = DT_PRE.'guestbook';
+		$this->fields = array( 'title','areaid','content','truename','telephone','email','qq','wx','ali','skype','hidden','status','username','addtime', 'ip', 'reply','editor','edittime');
     }
 
     function guestbook() {
@@ -26,20 +23,20 @@ class guestbook {
 	}
 
 	function set($post) {
-		global $DT_TIME, $_username, $DT_IP, $TYPE;
+		global $_username, $TYPE;
 		$post['content'] = strip_tags($post['content']);
 		$post['title'] = in_array($post['type'], $TYPE) ? '['.$post['type'].']' : '';
 		$post['title'] .= dsubstr($post['content'], 30);
 		$post['title'] = daddslashes($post['title']);
-		$post['hidden'] = isset($post['hidden']) ? 1 : 0;
+		$post['hidden'] = (isset($post['hidden']) && $post['hidden']) ? 1 : 0;
 		if($this->itemid) {
 			$post['status'] = $post['status'] == 2 ? 2 : 3;
 			$post['editor'] = $_username;
-			$post['edittime'] = $DT_TIME;
+			$post['edittime'] = DT_TIME;
 		} else {
 			$post['username'] = $_username;
-			$post['addtime'] =  $DT_TIME;
-			$post['ip'] =  $DT_IP;
+			$post['addtime'] =  DT_TIME;
+			$post['ip'] =  DT_IP;
 			$post['edittime'] = 0;
 			$post['reply'] = '';
 			$post['status'] = 2;
@@ -49,22 +46,22 @@ class guestbook {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'itemid DESC') {
-		global $MOD, $pages, $page, $pagesize, $offset, $sum;
+		global $MOD, $pages, $page, $pagesize, $offset, $sum, $items;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['content'] = nl2br($r['content']);
 			$r['editdate'] = '--';
@@ -85,7 +82,7 @@ class guestbook {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		return $this->itemid;
 	}
 
@@ -96,7 +93,7 @@ class guestbook {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -104,7 +101,7 @@ class guestbook {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->delete($v); }
 		} else {
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 
@@ -112,7 +109,7 @@ class guestbook {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->check($v, $status); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 if(DT_DEBUG) {
-	echo '<br/><center class="f_gray px11">';
+	echo '<br/><center class="f_gray px12">';
 	debug();
 	echo '</center><br/>';
 }
@@ -12,7 +12,7 @@ if(DT_DEBUG) {
 Dnotification('new_message', '<?php echo $MODULE[2]['linkurl'];?>message.php', '<?php echo useravatar($_username, 'large');?>', '站内信(<?php echo $_message;?>)', '收到新的站内信件，点击查看');
 <?php } ?>
 <?php if(isset($_chat) && $_chat) { ?>
-Dnotification('new_chat', '<?php echo $MODULE[2]['linkurl'];?>chat.php', '<?php echo useravatar($_username, 'large');?>', '新对话(<?php echo $_chat;?>)', '收到新的对话请求，点击交谈');
+Dnotification('new_chat', '<?php echo $MODULE[2]['linkurl'];?>im.php', '<?php echo useravatar($_username, 'large');?>', '新交谈(<?php echo $_chat;?>)', '收到新的对话请求，点击交谈');
 <?php } ?>
 </script>
 </body>

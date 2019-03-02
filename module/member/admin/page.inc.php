@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/page.class.php';
+require DT_ROOT.'/module/'.$module.'/page.class.php';
 $do = new page();
 $menus = array (
     array('添加单页', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),

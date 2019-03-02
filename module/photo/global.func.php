@@ -23,14 +23,15 @@ function side_photo($T, $page, $demo_url) {
 }
 
 function next_photo($page, $items, $demo_url) {
+	if($page == $items) return 'javascript:PhotoLast();';
 	$demo_url = str_replace(array('%7B', '%7D'), array('{', '}'), $demo_url);
 	$p = $page == $items ? 1 : $page + 1;
-	return str_replace('{destoon_page}', $p, $demo_url);
+	return str_replace('{destoon_page}', $p, $demo_url).'#p';
 }
 
 function prev_photo($page, $items, $demo_url) {
 	$demo_url = str_replace(array('%7B', '%7D'), array('{', '}'), $demo_url);
 	$p = $page == 1 ? $items : $page - 1;
-	return str_replace('{destoon_page}', $p, $demo_url);
+	return str_replace('{destoon_page}', $p, $demo_url).'#p';
 }
 ?>

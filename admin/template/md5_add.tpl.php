@@ -7,7 +7,7 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">文件校验</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td width="80">&nbsp;镜像文件</td>
 <td>
@@ -21,11 +21,11 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="add"/>
 <div class="tt">创建镜像</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td width="80">&nbsp;选择目录</td>
 <td>
-<table cellpadding="2" cellspacing="2" width="600">
+<table cellspacing="2" width="600">
 <?php foreach($dirs as $k=>$d) { ?>
 <?php if($k%4==0) {?><tr><?php } ?>
 <td width="150"><input type="checkbox" name="dirs[]" value="<?php echo $d;?>"<?php echo in_array($d, $sys) ? ' checked' : '';?>/>&nbsp;<img src="admin/image/dir.gif" width="16" height="16" alt="" align="absmiddle"/> <?php echo $d;?></td>

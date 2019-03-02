@@ -1,15 +1,14 @@
 {template 'header', 'member'}
-<script type="text/javascript">c(1);</script>
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="add"><a href="?mid={$mid}&action=add"><span>添加{$MOD[name]}</span></a></td>
 {if $_userid}
-<td class="tab" id="s3"><a href="?mid={$mid}"><span>已发布<span class="px10">({$nums[3]})</span></span></a></td>
-<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
-<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
-<td class="tab" id="s4"><a href="?mid={$mid}&status=4"><span>已过期<span class="px10">({$nums[4]})</span></span></a></td>
-<td class="tab" id="type"><a href="group.php"><span>订单管理<span class="px10">({$nums[9]})</span></span></a></td>
+<td class="tab" id="s3"><a href="?mid={$mid}"><span>已发布({$nums[3]})</span></a></td>
+<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中({$nums[2]})</span></a></td>
+<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过({$nums[1]})</span></a></td>
+<td class="tab" id="s4"><a href="?mid={$mid}&status=4"><span>已过期({$nums[4]})</span></a></td>
+<td class="tab" id="type"><a href="group.php"><span>订单管理({$nums[9]})</span></a></td>
 {/if}
 </tr>
 </table>
@@ -21,7 +20,7 @@
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
 <input type="hidden" name="forward" value="{$forward}"/>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 {if $status==1 && $action=='edit' && $note}
 <tr>
 <td class="tl">未通过原因</td>
@@ -104,7 +103,7 @@ var property_admin = 0;
 {deditor($moduleid, 'content', $group_editor, '100%', 350)}<br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
-{if $MOD[swfu] == 1 && DT_EDITOR == 'fckeditor' && !$DT_TOUCH}
+{if $MOD[swfu] == 1 && DT_EDITOR == 'fckeditor'}
 {php include DT_ROOT.'/api/swfupload/editor.inc.php';}
 {/if}
 <tr>
@@ -181,42 +180,42 @@ var property_admin = 0;
 <option value="2"{if $process == 2} selected{/if}>已结束</option>
 </select>&nbsp;
 {$order_select}&nbsp;
-<input type="submit" value=" 搜 索 " class="btn"/>
+<input type="submit" value=" 搜 索 " class="btn"/>&nbsp;
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?mid={$mid}&status={$status}');"/>
 </form>
 </div>
 <div class="ls">
 <form method="post">
-<table cellpadding="0" cellspacing="0" class="tb">
+<table cellpadding="10" cellspacing="0" class="tb">
 <tr>
 <th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
-<th>图片</th>
+<th width="90">图片</th>
 <th>标题</th>
 <th>分类</th>
 <th>价格</th>
 <th>折扣</th>
 <th>订单</th>
 <th>销量</th>
-<th>人气</th>
+{if $MOD[hits]}<th>人气</th>{/if}
 <th width="100">管理</th>
 </tr>
 {loop $lists $k $v}
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="checkbox" name="itemid[]" value="{$v[itemid]}"/></td>
 <td><a href="javascript:_preview('{$v[thumb]}');"><img src="{if $v[thumb]}{$v[thumb]}{else}{DT_SKIN}image/nopic50.gif{/if}" width="50" class="thumb"/></a></td>
-<td align="left" title="{$v[alt]}"><ul><li>{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</li><li title="更新时间 {timetodate($v[edittime], 5)} 添加时间 {timetodate($v[addtime], 5)}" class="px11 f_gray">{if $timetype=='add'}{timetodate($v[addtime], 5)}{else}{timetodate($v[edittime], 5)}{/if} {$_process[$v[process]]}</li></ul></td>
+<td align="left" title="{$v[alt]}"><ul><li>{if $v[status]==3}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="image/why.gif" title="未通过原因"/></a>{/if}</li><li title="更新时间 {timetodate($v[edittime], 5)} 添加时间 {timetodate($v[addtime], 5)}" class="f_gray">{if $timetype=='add'}{timetodate($v[addtime], 5)}{else}{timetodate($v[edittime], 5)}{/if} {$_process[$v[process]]}</li></ul></td>
 <td><a href="{$v[caturl]}" target="_blank">{$v[catname]}</a></td>
 
 <td class="f_price">{$v[price]}</td>
-<td class="px11">{$v[discount]}</td>
-<td class="px11{if $v[orders]>0} f_blue f_b c_p" title="查看订单" onclick="Go('group.php?gid={$v[itemid]}');{/if}">{$v[orders]}</td>
-<td class="px11">{$v[sales]}</td>
-<td class="px11">{$v[hits]}</td>
+<td>{$v[discount]}</td>
+<td class="{if $v[orders]>0}f_blue f_b c_p" title="查看订单" onclick="Go('group.php?gid={$v[itemid]}');{/if}">{$v[orders]}</td>
+<td>{$v[sales]}</td>
+{if $MOD[hits]}<td>{$v[hits]}</td>{/if}
 <td>
-<a href="group.php?gid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/order.gif" title="订单管理" alt=""/></a>
-<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
-{if $MG[copy]}&nbsp;<a href="?mid={$mid}&action=add&itemid={$v[itemid]}&catid={$v[catid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/new.png" title="复制信息" alt=""/></a>{/if}
-{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
+<a href="group.php?gid={$v[itemid]}"><img width="16" height="16" src="image/order.gif" title="订单管理" alt=""/></a>
+<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="image/edit.png" title="修改" alt=""/></a>
+{if $MG[copy]}&nbsp;<a href="?mid={$mid}&action=add&itemid={$v[itemid]}"><img width="16" height="16" src="image/new.png" title="复制信息" alt=""/></a>{/if}
+{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="image/delete.png" title="删除" alt=""/></a>{/if}
 </td>
 </tr>
 {/loop}
@@ -237,16 +236,16 @@ var property_admin = 0;
 </div>
 {/if}
 </form>
-{if $MG[group_limit] || (!$MG['fee_mode'] && $MOD[fee_add])}
+{if $mod_limit || (!$MG[fee_mode] && $MOD[fee_add])}
 <div class="limit">
-{if $MG[group_limit]}
-总共可发 <span class="f_b f_red">{$MG[group_limit]}</span> 条&nbsp;&nbsp;&nbsp;
+{if $mod_limit}
+总共可发 <span class="f_b f_red">{$mod_limit}</span> 条&nbsp;&nbsp;&nbsp;
 当前已发 <span class="f_b">{$limit_used}</span> 条&nbsp;&nbsp;&nbsp;
 还可以发 <span class="f_b f_blue">{$limit_free}</span> 条&nbsp;&nbsp;&nbsp;
 {/if}
-{if !$MG['fee_mode'] && $MOD[fee_add]}
+{if !$MG[fee_mode] && $MOD[fee_add]}
 发布信息收费 <span class="f_b f_red">{$MOD[fee_add]}</span> {if $MOD[fee_currency] == 'money'}{$DT[money_unit]}{else}{$DT[credit_unit]}{/if}/条&nbsp;&nbsp;&nbsp;
-可免费发布 <span class="f_b">{if $MG[group_free_limit]<0}无限{else}{$MG[group_free_limit]}{/if}</span> 条&nbsp;&nbsp;&nbsp;
+可免费发布 <span class="f_b">{if $mod_free_limit<0}无限{else}{$mod_free_limit}{/if}</span> 条&nbsp;&nbsp;&nbsp;
 {/if}
 </div>
 {/if}
@@ -314,25 +313,15 @@ function check() {
 {/if}
 {if $need_question}
 	f = 'answer';
-	l = Dd(f).value.length;
-	if(l < 1) {
-		Dmsg('请填写验证问题', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
+		Dmsg('请填写正确的验证问题', f);
 		return false;
 	}
 {/if}
 {if $need_captcha}
 	f = 'captcha';
-	l = Dd(f).value;
-	if(!is_captcha(l)) {
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
 		Dmsg('请填写正确的验证码', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
 		return false;
 	}
 {/if}

@@ -12,7 +12,7 @@ if($submit) {
 		delete_upload($MOD['flvend']);
 		$tmp .= $setting['flvend'];
 	}
-	if($tmp) clear_upload($tmp);
+	if($tmp) clear_upload($tmp, $_userid, 'setting');
 	if($setting['split']) {
 		$setting['fulltext'] = 0;
 		cache_write($moduleid.'.part', $moduleid);
@@ -38,8 +38,9 @@ if($submit) {
 	if($setting['php_item_urlid'] != $MOD['php_item_urlid'] || $setting['htm_item_urlid'] != $MOD['htm_item_urlid'] || $setting['htm_item_prefix'] != $MOD['htm_item_prefix'] || $setting['show_html'] != $MOD['show_html']) {
 		msg('设置保存成功，开始更新地址', '?moduleid='.$moduleid.'&file=html&action=show&update=1&num=1000');
 	}
-	dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
+	dmsg('设置保存成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
 } else {
+	$GROUP = cache_read('group.php');
 	$r = $db->get_one("SELECT MAX(itemid) AS maxid FROM {$table}");
 	$maxid = $r['maxid'];
 	extract(dhtmlspecialchars($MOD));

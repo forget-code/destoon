@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require '../common.inc.php';
@@ -61,5 +61,6 @@ while($r = $db->fetch_array($result)) {
 	$lists[strtoupper($r['letter'])][] = $r;
 }
 $head_title = $L['citytitle'];
+if($EXT['mobile_enable']) $head_mobile = str_replace(DT_PATH, DT_MOB, $DT_URL);
 include template('city', 'city');
 ?>

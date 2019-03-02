@@ -3,16 +3,13 @@ defined('IN_DESTOON') or exit('Access Denied');
 class ad {
 	var $aid;
 	var $pid;
-	var $db;
 	var $table;
 	var $table_place;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db;
-		$this->db = &$db;
-		$this->table = $this->db->pre.'ad';
-		$this->table_place = $this->db->pre.'ad_place';
+		$this->table = DT_PRE.'ad';
+		$this->table_place = DT_PRE.'ad_place';
     }
 
     function ad() {
@@ -31,21 +28,20 @@ class ad {
 			if(!$place['moduleid']) return $this->_($L['pass_place_module']);
 			$condition = "moduleid=$place[moduleid] AND typeid=$place[typeid]";
 			if($this->pid) $condition .= " AND pid<>$this->pid";
-			$r = $this->db->get_one("SELECT pid FROM {$this->table_place} WHERE $condition");
+			$r = DB::get_one("SELECT pid FROM {$this->table_place} WHERE $condition");
 			if($r) return $this->_($L['pass_place_repeat']);
 		}
 		return true;
 	}
 
 	function set_place($place) {
-		global $DT_TIME, $_username;
+		global $_username;
 		$place = array_map('ad_restore', $place);
-		if(!$this->pid) $place['addtime'] = $DT_TIME;
-		$place['edittime'] = $DT_TIME;
+		if(!$this->pid) $place['addtime'] = DT_TIME;
+		$place['edittime'] = DT_TIME;
 		$place['editor'] = $_username;
 		$place['width'] = intval($place['width']);
 		$place['height'] = intval($place['height']);
-		clear_upload($place['thumb']);
 		return $place;
 	}
 
@@ -57,8 +53,9 @@ class ad {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table_place} ($sqlk) VALUES ($sqlv)");
-		$this->pid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table_place} ($sqlk) VALUES ($sqlv)");
+		$this->pid = DB::insert_id();
+		clear_upload($place['thumb'], $this->pid, $this->table_place);
 		return $this->pid;
 	}
 	
@@ -69,27 +66,28 @@ class ad {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table_place} SET $sql WHERE pid=$this->pid");
+	    DB::query("UPDATE {$this->table_place} SET $sql WHERE pid=$this->pid");
+		clear_upload($place['thumb'], $this->pid, $this->table_place);
 		return true;
 	}
 
 	function get_one_place() {
-        return $this->db->get_one("SELECT * FROM {$this->table_place} WHERE pid='$this->pid'");
+        return DB::get_one("SELECT * FROM {$this->table_place} WHERE pid='$this->pid'");
 	}
 
 	function get_list_place($condition = '1', $order = 'listorder DESC,pid DESC') {
-		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $DT_TIME, $sum;
+		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $sum, $items;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table_place} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table_place} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$ads = array();
-		$result = $this->db->query("SELECT * FROM {$this->table_place} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table_place} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['alt'] = $r['name'];
 			$r['name'] = set_style($r['name'], $r['style']);
 			$r['adddate'] = timetodate($r['addtime'], 5);
@@ -105,8 +103,8 @@ class ad {
 
 	function get_place() {
 		$ads = array();
-		$result = $this->db->query("SELECT * FROM {$this->table_place} ORDER BY listorder DESC,pid DESC");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table_place} ORDER BY listorder DESC,pid DESC");
+		while($r = DB::fetch_array($result)) {
 			$ads[$r['pid']] = $r;
 		}
 		return $ads;
@@ -117,7 +115,7 @@ class ad {
 		foreach($listorder as $k=>$v) {
 			$k = intval($k);
 			$v = intval($v);
-			$this->db->query("UPDATE {$this->table_place} SET listorder=$v WHERE pid=$k");
+			DB::query("UPDATE {$this->table_place} SET listorder=$v WHERE pid=$k");
 		}
 		return true;
 	}
@@ -128,14 +126,14 @@ class ad {
 				$this->delete_place($v); 
 			}
 		} else {			
-			$p = $this->db->get_one("SELECT * FROM {$this->table_place} WHERE pid=$pid");
-			$this->db->query("DELETE FROM {$this->table_place} WHERE pid=$pid");
+			$p = DB::get_one("SELECT * FROM {$this->table_place} WHERE pid=$pid");
+			DB::query("DELETE FROM {$this->table_place} WHERE pid=$pid");
 			$filename = $p['typeid'] > 5 ? 'ad_'.$p['moduleid'].'_d'.$p['typeid'].'.htm' : 'ad_'.$a['pid'].'_d0.htm';
 			file_del(DT_CACHE.'/htm/'.$filename);
 			file_del(DT_CACHE.'/htm/ad_'.$pid.'.htm');
 			file_del(DT_ROOT.'/file/script/A'.$pid.'.js');
-			$result = $this->db->query("SELECT aid FROM {$this->table} WHERE pid=$pid ORDER BY aid DESC");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT aid FROM {$this->table} WHERE pid=$pid ORDER BY aid DESC");
+			while($r = DB::fetch_array($result)) {
 				$this->delete($r['aid']);
 			}
 		}
@@ -162,10 +160,10 @@ class ad {
 	}
 
 	function set_ad($ad) {
-		global $DT_TIME, $_username;
+		global $_username;
 		$ad = array_map('ad_restore', $ad);
-		if(!$this->aid) $ad['addtime'] = $DT_TIME;
-		$ad['edittime'] = $DT_TIME;
+		if(!$this->aid) $ad['addtime'] = DT_TIME;
+		$ad['edittime'] = DT_TIME;
 		$ad['editor'] = $_username;
 		$ad['fromtime'] = strtotime($ad['fromtime'].' 0:0:0');
 		$ad['totime'] = strtotime($ad['totime'].' 23:59:59');
@@ -178,35 +176,34 @@ class ad {
 		} else if($ad['typeid'] == 4) {
 			$ad['url'] = $ad['flash_url'];
 		}
-		clear_upload($ad['image_src'].$ad['flash_src'].$ad['code']);
 		return $ad;
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE aid='$this->aid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE aid='$this->aid'");
 	}
 
 	function get_list($condition = '1', $order = 'fromtime DESC') {
-		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $DT_TIME, $L, $sum;
+		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $L, $sum;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();	
 		$ads = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['fromdate'] = timetodate($r['fromtime'], 3);
 			$r['todate'] = timetodate($r['totime'], 3);			
-			$r['days'] = $r['totime'] > $DT_TIME ? intval(($r['totime']-$DT_TIME)/86400) : 0;
-			if($r['totime'] < $DT_TIME) {
+			$r['days'] = $r['totime'] > DT_TIME ? intval(($r['totime']-DT_TIME)/86400) : 0;
+			if($r['totime'] < DT_TIME) {
 				$r['process'] = $L['status_expired'];
-			} else if($r['fromtime'] > $DT_TIME) {
+			} else if($r['fromtime'] > DT_TIME) {
 				$r['process'] = $L['status_not_start'];
 			} else {
 				$r['process'] = $L['status_displaying'];
@@ -224,9 +221,10 @@ class ad {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->aid = $this->db->insert_id();
-		$this->db->query("UPDATE {$this->table_place} SET ads=ads+1 WHERE pid='$ad[pid]'");
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->aid = DB::insert_id();
+		DB::query("UPDATE {$this->table_place} SET ads=ads+1 WHERE pid='$ad[pid]'");
+		clear_upload($ad['image_src'].$ad['flash_src'].$ad['code'], $this->aid, $this->table);
 		return $this->aid;
 	}
 
@@ -237,7 +235,8 @@ class ad {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE aid=$this->aid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE aid=$this->aid");
+		clear_upload($ad['image_src'].$ad['flash_src'].$ad['code'], $this->aid, $this->table);
 		return true;
 	}
 
@@ -254,8 +253,8 @@ class ad {
 			$userid = get_user($a['username']);
 			if($a['image_src']) delete_upload($a['image_src'], $userid);
 			if($a['flash_src']) delete_upload($a['flash_src'], $userid);
-			$this->db->query("DELETE FROM {$this->table} WHERE aid=$aid");
-			$this->db->query("UPDATE {$this->table_place} SET ads=ads-1 WHERE pid=$a[pid]");
+			DB::query("DELETE FROM {$this->table} WHERE aid=$aid");
+			DB::query("UPDATE {$this->table_place} SET ads=ads-1 WHERE pid=$a[pid]");
 		}
 	}
 
@@ -264,7 +263,7 @@ class ad {
 		foreach($listorder as $k=>$v) {
 			$k = intval($k);
 			$v = intval($v);
-			$this->db->query("UPDATE {$this->table} SET listorder=$v WHERE aid=$k");
+			DB::query("UPDATE {$this->table} SET listorder=$v WHERE aid=$k");
 		}
 		return true;
 	}

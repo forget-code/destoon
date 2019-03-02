@@ -1,8 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $menus = array (
-    array('生成网页', '?moduleid='.$moduleid.'&file='.$file),
-    array('数据统计', 'javascript:Dwidget(\'?file=count&action=stats&&mid='.$moduleid.'\', \'['.$MOD['name'].']数据统计\');'),
+    array('更新数据', '?moduleid='.$moduleid.'&file='.$file),
     array('模块首页', $MOD['linkurl'], ' target="_blank"'),
 );
 $all = (isset($all) && $all) ? 1 : 0;
@@ -63,8 +62,8 @@ switch($action) {
 			$tid = $r['tid'] ? $r['tid'] : 0;
 		}
 		if($update) {
-			require MD_ROOT.'/buy.class.php';
-			$do = new buy($moduleid);
+			require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+			$do = new $module($moduleid);
 		}
 		isset($num) or $num = 100;
 		if($fid <= $tid) {

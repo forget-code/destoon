@@ -4,7 +4,7 @@ include tpl('header');
 show_menu($menus);
 ?>
 <div class="tt">电子邮件</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">标题</td>
 <td class="f_b"><?php echo $title;?></td>

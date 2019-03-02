@@ -3,7 +3,7 @@ ErrorDocument 404 /404.php
 RewriteEngine On
 RewriteBase /
 RewriteRule ^(.*)\.(asp|aspx|asa|asax|dll|jsp|cgi|fcgi|pl)(.*)$ /404.php
-RewriteRule ^(.*)/(admin|cache|editor|file|include|lang|module|skin|template)/(.*)\.php(.*)$ /404.php
+RewriteRule ^(admin|cache|file|include|lang|module|skin|template)/(.*)\.php(.*)$ /404.php
 RewriteRule ^(.*)-htm-(.*)$ $1.php?$2
 RewriteRule ^(.*)/show-([0-9]+)([\-])?([0-9]+)?\.html$ $1/show.php?itemid=$2&page=$4
 RewriteRule ^(.*)/list-([0-9]+)([\-])?([0-9]+)?\.html$ $1/list.php?catid=$2&page=$4

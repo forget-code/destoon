@@ -1,51 +1,52 @@
 {template 'header'}
-<script type="text/javascript">var sh = '{$MOD[linkurl]}search.php?catid={$catid}';</script>
-<div class="m">
-<div class="m_l_1 f_l">
-	<div class="left_box">		
-		<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; {cat_pos($CAT, ' &raquo; ')}</div>
-		<div class="category">
-			<p><img src="{DT_SKIN}image/arrow.gif" width="17" height="12" alt=""/> <strong>按行业浏览</strong></p>
-			<div>
-			<table width="100%" cellpadding="3">
-			{loop $maincat $k $v}
-			{if $k%$MOD[page_subcat]==0}<tr>{/if}
-			<td{if $v[catid]==$catid} class="f_b"{/if}><a href="{$MOD[linkurl]}{$v[linkurl]}">{set_style($v[catname],$v[style])}</a>{if !$cityid} <span class="f_gray px10">({$v[item]})</span>{/if}</td>
-			{if $k%$MOD[page_subcat]==($MOD[page_subcat]-1)}</tr>{/if}
-			{/loop}
-			</table>
+<div class="m">	
+	<div class="nav bd-b"><a href="{$MODULE[1][linkurl]}">首页</a> <i>&gt;</i> <a href="{$MOD[linkurl]}">{$MOD[name]}</a> <i>&gt;</i> {cat_pos($CAT, ' <i>&gt;</i> ')}</div>
+</div>
+<div class="m m2">
+	<div class="m2l">
+		<div class="sort">
+			<div class="sort-k">行业</div>
+			<div class="sort-v">
+				<ul>
+				{loop $maincat $k $v}
+				<li{if $v[catid]==$catid} class="on"{/if}><a href="{$MOD[linkurl]}{$v[linkurl]}">{set_style($v[catname],$v[style])}</a>{if !$cityid} <i>({$v[item]})</i>{/if}<li>
+				{/loop}
+				</ul>
 			</div>
+			<div class="c_b"></div>
 		</div>
-		{if $CP}
-		{loop $PPT $p}
-		<div class="ppt">
-			<table cellpadding="0" cellspacing="0" width="100%">
-			<tr>
-			<td class="ppt_l" valign="top">按{$p[name]}</td>
-			<td class="ppt_r" valign="top">
-			{loop $p[options] $o}
-			<a href="###" onclick="Go(sh+'&ppt_{$p[oid]}={urlencode($o)}');">{$o}</a>&nbsp;|&nbsp;
-			{/loop}
-			</td>
-			</tr>
-			</table>
+		<div class="sort">
+			<div class="sort-k">地区</div>
+			<div class="sort-v">
+				<ul>
+				{php $mainarea = get_mainarea(0)}
+				{loop $mainarea $k $v}
+				<li><a href="{$MOD[linkurl]}{rewrite('search.php?catid='.$catid.'&areaid='.$v['areaid'])}">{$v[areaname]}</a></li>
+				{/loop}
+				</ul>
+			</div>
+			<div class="c_b"></div>
 		</div>
-		{/loop}
+		{if $TYPE}
+		<div class="sort">
+			<div class="sort-k">类别</div>
+			<div class="sort-v">
+				<ul>
+				{loop $TYPE $k $v}
+				<li><a href="{$MOD[linkurl]}{rewrite('search.php?catid='.$catid.'&typeid='.$k)}">{$v}</a></li>
+				{/loop}
+				</ul>
+			</div>
+			<div class="c_b"></div>
+		</div>
 		{/if}
-		<div class="b10">&nbsp;</div>
-		<div class="type">
-		<a href="{$MOD[linkurl]}{$linkurl}" class="type_1">全部</a>
-		{loop $TYPE $k $v}
-		<a href="javascript:Go('{$MOD[linkurl]}{rewrite('index.php?typeid='.$k.'&catid='.$catid)}');" class="type_2">{$v}</a>
-		{/loop}
-		</div>
-		<div class="b10 c_b">&nbsp;</div>
+		{if $CP}{template 'property_list', 'chip'}{/if}
 		<form method="post">
 		<div class="sell_tip" id="sell_tip" style="display:none;" title="双击关闭" ondblclick="Dh(this.id);">
 			<div>
 				<p>您可以</p>
-				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/> 或 
-				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/>
+				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="tool-btn"/> 或 
+				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="tool-btn"/>
 			</div>
 		</div>
 		<div class="img_tip" id="img_tip" style="display:none;">&nbsp;</div>
@@ -54,10 +55,11 @@
 			<tr height="30">
 			<td width="25" align="center"><input type="checkbox" onclick="checkall(this.form);"/></td>
 			<td>
-				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/>&nbsp;
-				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/>
+				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="tool-btn"/>&nbsp; &nbsp;
+				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="tool-btn"/>
 			</td>
 			<td align="right">
+			<script type="text/javascript">var sh = '{$MOD[linkurl]}search.php?catid={$catid}';</script>
 			<input type="checkbox" onclick="Go(sh+'&price=1');"/>标价&nbsp;
 			<input type="checkbox" onclick="Go(sh+'&thumb=1');"/>图片&nbsp;
 			<input type="checkbox" onclick="Go(sh+'&vip=1');"/>{VIP}&nbsp;
@@ -79,8 +81,7 @@
 			<option value="7">供货量由低到高</option>
 			<option value="8">起订量由高到低</option>
 			<option value="9">起订量由低到高</option>
-			</select>&nbsp;			
-			<img src="{DT_SKIN}image/list_txt.gif" width="16" height="16" alt="文字列表" align="absmiddle" class="c_p" onclick="Go(sh+'&list=2');"/>&nbsp;
+			</select>&nbsp;
 			<img src="{DT_SKIN}image/list_img.gif" width="16" height="16" alt="图片列表" align="absmiddle" class="c_p" onclick="Go(sh+'&list=1');"/>&nbsp;
 			<img src="{DT_SKIN}image/list_mix_on.gif" width="16" height="16" alt="图文列表" align="absmiddle" class="c_p" onclick="Go(sh+'&list=0');"/>&nbsp;
 			</td>
@@ -94,37 +95,21 @@
 			<tr height="30">
 			<td width="25"></td>
 			<td>
-				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/>&nbsp;
-				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="btn_1" onmouseover="this.className='btn_2'" onmouseout="this.className='btn_1'"/>
+				<input type="submit" value="对比选中" onclick="this.form.action='{$MOD[linkurl]}compare.php';" class="tool-btn"/>&nbsp; &nbsp;
+				<input type="submit" value="批量询价" onclick="this.form.action='{$MOD[linkurl]}inquiry.php';" class="tool-btn"/>
 			</td>
 			</tr>
 			</table>
 		</div>
 		</form>
-		<br/>
 	</div>
-</div>
-<div class="m_n f_l">&nbsp;</div>
-<div class="m_r_1 f_l">
-	<div class="sponsor">{ad($moduleid,$catid,$kw,7)}</div>
-	<div class="box_head"><div><strong>本周搜索排行</strong></div></div>
-	<div class="box_body">
-		<div class="rank_list">
-			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=$moduleid and status=3 and updatetime>$today_endtime-86400*7&pagesize=10&order=week_search desc&key=week_search&template=list-search_rank")}-->
-		</div>		
+	<div class="m2r">
+		<div class="sponsor">{ad($moduleid,$catid,$kw,7)}</div>
+		<div class="head-sub"><strong>搜索排行</strong></div>
+		<div class="list-rank">
+			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=$moduleid and status=3 and updatetime>$today_endtime-86400*30&pagesize=9&order=week_search desc&key=week_search&template=list-search_rank")}-->
+		</div>
 	</div>
-	<div class="b10">&nbsp;</div>
-	<div class="box_head"><div><strong>按地区浏览</strong></div></div>
-	<div class="box_body">
-		<table width="100%" cellpadding="3">
-		{php $mainarea = get_mainarea(0)}
-		{loop $mainarea $k $v}
-		{if $k%2==0}<tr>{/if}
-		<td><a href="{$MOD[linkurl]}search.php?areaid={$v[areaid]}&catid={$catid}" rel="nofollow">{$v[areaname]}</a></td>
-		{if $k%2==1}</tr>{/if}
-		{/loop}
-		</table>
-	</div>
-</div>
+	<div class="c_b"></div>
 </div>
 {template 'footer'}

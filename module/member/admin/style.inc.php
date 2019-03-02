@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('style', 1);
-require MD_ROOT.'/style.class.php';
+require DT_ROOT.'/module/'.$module.'/style.class.php';
 $do = new style();
 $menus = array (
     array('安装模板', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -42,8 +42,9 @@ switch($action) {
 	break;
 	case 'show':
 		$itemid or msg();
-		$u = $db->get_one("SELECT username FROM {$DT_PRE}company ORDER BY vip DESC");
-		dheader(DT_PATH.'index.php?homepage='.$u['username'].'&preview='.$itemid);
+		$u = $db->get_one("SELECT c.username FROM {$DT_PRE}company c,{$DT_PRE}member m WHERE c.userid=m.userid AND c.vip>0 AND m.edittime>0 ORDER BY m.logintimes DESC");
+		if($u) dheader(DT_PATH.'index.php?homepage='.$u['username'].'&preview='.$itemid);
+		msg('暂无符合条件的会员');
 	break;
 	case 'order':
 		$do->order($listorder);

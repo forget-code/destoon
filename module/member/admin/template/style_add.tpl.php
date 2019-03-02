@@ -7,8 +7,7 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<div class="tt">安装模板</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 模板分类</td>
 <td><?php echo type_select($TYPE, 1, 'post[typeid]', '请选择分类', 0, 'id="typeid"');?> <span id="dtypeid" class="f_red"></span></td>
@@ -73,10 +72,10 @@ foreach(glob($d.'*') as $v) {
 </tr>
 <tr title="请保持时间格式">
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">
 function Dskin(i) {

@@ -1,14 +1,12 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/company.class.php';
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module();
 $menus = array (
     array('添加'.VIP, '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array(VIP.'列表', '?moduleid='.$moduleid.'&file='.$file),
     array('过期'.VIP, '?moduleid='.$moduleid.'&file='.$file.'&action=expire'),
-    array('公司列表', '?moduleid='.$moduleid),
-    array('会员列表', '?moduleid=2'),
 );
-$do = new company;
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
 if($_catids || $_areaids) {
 	if(isset($userid)) $itemid = $userid;
@@ -99,8 +97,10 @@ switch($action) {
 	
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($order) && isset($dorder[$order]) or $order = 0;
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($vipt) or $vipt = '';
 		isset($vipr) or $vipr = '';
 		isset($timetype) or $timetype = 'fromtime';
@@ -119,8 +119,8 @@ switch($action) {
 		if($_areaids) $condition .= " AND areaid IN (".$_areaids.")";//CITY
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($groupid) $condition .= " AND groupid=$groupid";
-		if($dfromtime) $condition .= " AND $timetype>".(strtotime($dfromtime.' 00:00:00'));
-		if($dtotime) $condition .= " AND $timetype<".(strtotime($dtotime.' 23:59:59'));
+		if($fromtime) $condition .= " AND $timetype>=$fromtime";
+		if($totime) $condition .= " AND $timetype<=$totime";
 		if($vipt != '') $condition .= " AND vipt=".intval($vipt);
 		if($vipr != '') $condition .= " AND vipr=".intval($vipr);
 		$companys = $do->get_list($condition, $dorder[$order]);

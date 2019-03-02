@@ -1,17 +1,16 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function property_update($post_ppt, $moduleid, $catid, $itemid) {
-	global $db;
 	$catid = intval($catid);
 	if(!$post_ppt || !$moduleid || !$catid || !$itemid) return;
 	$OP = property_option($catid);
 	if(!$OP) return;
 	$post_ppt = dhtmlspecialchars($post_ppt);	
-	$db->query("DELETE FROM {$db->pre}category_value WHERE moduleid=$moduleid AND itemid=$itemid");
+	DB::query("DELETE FROM ".DT_PRE."category_value WHERE moduleid=$moduleid AND itemid=$itemid");
 	$ppt = array();
 	foreach($OP as $v) {
 		if($v['type'] > 1 && $v['search']) $ppt[] = $v['oid'];
@@ -28,9 +27,9 @@ function property_update($post_ppt, $moduleid, $catid, $itemid) {
 			}
 		}
 		if(is_array($v)) $v = implode(',', $v);
-		$db->query("INSERT INTO {$db->pre}category_value (oid,moduleid,itemid,value) VALUES ('$k','$moduleid','$itemid','$v')");
+		DB::query("INSERT INTO ".DT_PRE."category_value (oid,moduleid,itemid,value) VALUES ('$k','$moduleid','$itemid','$v')");
 	}
-	if($pptword) $db->query("UPDATE ".get_table($moduleid)." SET pptword='$pptword' WHERE itemid=$itemid");
+	if($pptword) DB::query("UPDATE ".get_table($moduleid)." SET pptword='$pptword' WHERE itemid=$itemid");
 }
 
 function property_check($post_ppt) {
@@ -47,32 +46,29 @@ function property_check($post_ppt) {
 }
 
 function property_option($catid) {
-	global $db;
 	$catid = intval($catid);
 	$lists = array();
-	$result = $db->query("SELECT * FROM {$db->pre}category_option WHERE catid=$catid ORDER BY listorder ASC,oid ASC");
-	while($r = $db->fetch_array($result)) {
+	$result = DB::query("SELECT * FROM ".DT_PRE."category_option WHERE catid=$catid ORDER BY listorder ASC,oid ASC");
+	while($r = DB::fetch_array($result)) {
 		$lists[] = $r;
 	}
 	return $lists;
 }
 
 function property_value($moduleid, $itemid) {
-	global $db;
 	$lists = array();
-	$result = $db->query("SELECT oid,value FROM {$db->pre}category_value WHERE moduleid=$moduleid AND itemid=$itemid");
-	while($r = $db->fetch_array($result)) {
+	$result = DB::query("SELECT oid,value FROM ".DT_PRE."category_value WHERE moduleid=$moduleid AND itemid=$itemid");
+	while($r = DB::fetch_array($result)) {
 		$lists[$r['oid']] = $r['value'];
 	}
 	return $lists;
 }
 
 function property_condition($catid) {
-	global $db;
 	$catid = intval($catid);
 	$lists = array();
-	$result = $db->query("SELECT * FROM {$db->pre}category_option WHERE catid=$catid AND type>1 AND search>0 ORDER BY listorder ASC,oid ASC");
-	while($r = $db->fetch_array($result)) {
+	$result = DB::query("SELECT * FROM ".DT_PRE."category_option WHERE catid=$catid AND type>1 AND search>0 ORDER BY listorder ASC,oid ASC");
+	while($r = DB::fetch_array($result)) {
 		$r['options'] = explode('|', str_replace('(*)', '', $r['value']));
 		$lists[] = $r;
 	}
@@ -84,7 +80,7 @@ function property_js() {
 }
 
 function property_html($var, $oid, $type, $value, $extend = '') {
-	global $L;
+	global $L, $DT_PC;
 	$str = '';
 	if($type == 0) {
 		if(strpos($extend, 'size=') === false) $extend .= ' size="50"';
@@ -123,7 +119,7 @@ function property_html($var, $oid, $type, $value, $extend = '') {
 		}
 		$str .= '</span>';
 	}
-	$str .= ' <span id="dproperty-'.$oid.'" class="f_red"></span>';
+	if($DT_PC) $str .= ' <span id="dproperty-'.$oid.'" class="f_red"></span>';
 	return $str;
 }
 ?>

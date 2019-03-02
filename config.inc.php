@@ -1,7 +1,7 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 Destoon.COM
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 $CFG['database'] = 'mysql';
@@ -23,17 +23,18 @@ $CFG['file_mod'] = 0777;
 $CFG['cache'] = 'file';
 $CFG['cache_pre'] = 'b2b_';
 $CFG['cache_dir'] = '';
-$CFG['tag_expires'] = '0';
-$CFG['template_refresh'] = '1';
 $CFG['cookie_domain'] = '';
 $CFG['cookie_path'] = '/';
 $CFG['cookie_pre'] = 'destoon_';
 $CFG['session'] = 'file';
+$CFG['cdn'] = '0';
 $CFG['editor'] = 'fckeditor';
 $CFG['timezone'] = 'Etc/GMT-8';
 $CFG['timediff'] = '0';
 $CFG['skin'] = 'default';
 $CFG['template'] = 'default';
+$CFG['template_mobile'] = 'mobile';
+$CFG['template_refresh'] = '1';
 $CFG['language'] = 'zh-cn';
 $CFG['authadmin'] = 'session';
 $CFG['authkey'] = 'destoonauthkey';

@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 @set_time_limit(0);
@@ -32,7 +32,7 @@ if($CFG['authadmin'] == 'cookie') {
 	$session = new dsession();
 	$_destoon_admin = isset($_SESSION[$secretkey]) ? intval($_SESSION[$secretkey]) : 0;
 }
-$_founder = $CFG['founderid'] == $_userid ? $_userid : 0;
+$_founder = is_founder($_userid) ? $_userid : 0;
 $_catids = $_childs = '';
 $_catid = $_child = array();
 if($file != 'login') {
@@ -46,6 +46,7 @@ if($file != 'login') {
 if($DT['admin_log'] && $action != 'import') admin_log();
 if($DT['admin_online']) admin_online();
 if(isset($reason) && is_array($itemid)) admin_notice();
+$search = isset($search) ? intval($search) : 0;
 $widget = isset($widget) ? intval($widget) : 0;
 $psize = isset($psize) ? intval($psize) : 0;
 if($psize > 0 && $psize != $pagesize) {
@@ -56,6 +57,6 @@ if($module == 'destoon') {
 	(include DT_ROOT.'/admin/'.$file.'.inc.php') or msg();
 } else {
 	include DT_ROOT.'/module/'.$module.'/common.inc.php';
-	(include MD_ROOT.'/admin/'.$file.'.inc.php') or msg();
+	(include DT_ROOT.'/module/'.$module.'/admin/'.$file.'.inc.php') or msg();
 }
 ?>

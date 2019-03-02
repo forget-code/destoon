@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $gid = isset($gid) ? intval($gid) : 0;
-require MD_ROOT.'/manage.class.php';
+require DT_ROOT.'/module/'.$module.'/manage.class.php';
 $do = new manage();
 $menus = array (
     array('记录列表', '?moduleid='.$moduleid.'&file='.$file.'&gid='.$gid),
@@ -10,7 +10,7 @@ $menus = array (
 switch($action) {
 	case 'clear':
 		$time = $today_endtime - 30*86400;
-		$db->query("DELETE FROM {$table}_manage WHERE addtime<$time");
+		$db->query("DELETE FROM {$table_manage} WHERE addtime<$time");
 		dmsg('清理成功', $forward);
 	break;
 	default:

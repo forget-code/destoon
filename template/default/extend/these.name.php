@@ -1,12 +1,10 @@
 <?php
 $names = array (
   'ad' => '广告',
-  'ad_code' => '广告代码',
-  'ad_view' => '广告预览',
+  'address' => '地址导航',
   'announce' => '公告',
   'archiver' => '无图版',
   'comment' => '评论',
-  'comment_list' => '评论列表',
   'feed' => 'RSS订阅',
   'form' => '表单',
   'gift' => '积分换礼',
@@ -14,12 +12,12 @@ $names = array (
   'link' => '友情链接',
   'mobile' => '手机版介绍',
   'poll' => '票选',
-  'poll_show' => '票选内容',
+  'share' => '分享好友',
   'sitemap' => '网站地图',
   'spread' => '排名推广',
-  'spread_code' => '推广代码',
   'view' => '查看大图',
   'vote' => '投票',
   'webpage' => '单网页',
+  'wx' => '微信联系',
 );
 ?>

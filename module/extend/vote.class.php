@@ -2,17 +2,14 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class vote {
 	var $itemid;
-	var $db;
 	var $table;
 	var $table_record;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'vote';
-		$this->table_record = $DT_PRE.'vote_record';
-		$this->db = &$db;
+		$this->table = DT_PRE.'vote';
+		$this->table_record = DT_PRE.'vote_record';
 		$this->fields = array('typeid','areaid', 'title','style','level','linkto','content','groupid','verify','addtime','fromtime','totime','editor','edittime','template_vote','template', 'vote_min', 'vote_max', 'linkurl', 'choose', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10');
     }
 
@@ -29,12 +26,11 @@ class vote {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $_username, $_userid;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		global $MOD, $_username, $_userid;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['editor'] = $_username;
 		$post['content'] = addslashes(save_remote(save_local(stripslashes($post['content']))));
-		clear_upload($post['content']);
 		if($this->itemid) {
 			$new = $post['content'];
 			$r = $this->get_one();
@@ -49,22 +45,22 @@ class vote {
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = '1', $order = 'addtime DESC') {
-		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $L, $sum;
+		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $L, $sum, $items;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
 			$r['adddate'] = timetodate($r['addtime'], 5);
@@ -83,14 +79,14 @@ class vote {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table_record} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table_record} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table_record} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table_record} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['votedate'] = timetodate($r['votetime'], 6);
 			$lists[] = $r;
 		}
@@ -106,10 +102,11 @@ class vote {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		$linkurl = $this->linkurl($this->itemid);
-		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		DB::query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		clear_upload($post['content'], $this->itemid, $this->table);
 		tohtml('vote', $module, "itemid=$this->itemid");
 		return $this->itemid;
 	}
@@ -122,9 +119,10 @@ class vote {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		$linkurl = $this->linkurl($this->itemid);
-		$this->db->query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		DB::query("UPDATE {$this->table} SET linkurl='$linkurl' WHERE itemid=$this->itemid");
+		clear_upload($post['content'], $this->itemid, $this->table);
 		tohtml('vote', $module, "itemid=$this->itemid");
 		return true;
 	}
@@ -145,15 +143,15 @@ class vote {
 			$r = $this->get_one();
 			$userid = get_user($r['editor']);
 			if($r['content']) delete_local($r['content'], $userid);
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
-			$this->db->query("DELETE FROM {$this->table_record} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table_record} WHERE itemid=$itemid");
 			unlink(DT_CACHE.'/htm/vote_'.$r['itemid'].'.htm');
 		}
 	}
 
 	function level($itemid, $level) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
+		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function _($e) {

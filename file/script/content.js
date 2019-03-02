@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function fontZoom(z, i) {
@@ -11,21 +11,21 @@ function fontZoom(z, i) {
 	$('#'+i).css('font-size', new_size+'px');
 	$('#'+i+' *').css('font-size', new_size+'px');
 }
-$(document).ready(function(){
-	try {
-		$(content_id ? '#'+content_id+' img' : 'img').each(function(i){
-			var m = img_max_width ? img_max_width : 550;
-			var w = $(this).width();
-			if(w >= m) {
-				$(this).css({'width':m+'px','height':parseInt($(this).height()*m/w)+'px'});
-				$(this).attr('title', L['click_open']);
-				$(this).click(function(){window.open(DTPath+'api/view.php?img='+$(this).attr('src'));});
-			}
-		});
-		if(CKDomain) {
-			$('#'+(content_id ? content_id : 'content')+' a').each(function(i){
-				if($(this).attr('target') != '_blank') {if($(this).attr('href').indexOf(CKDomain) == -1) $(this).attr('target', '_blank');}
-			});
+$(function(){
+	$(content_id ? '#'+content_id+' img' : 'img').each(function(i){
+		var m = img_max_width ? img_max_width : 550;
+		var w = $(this).width();
+		if(w >= m) {
+			$(this).css({'width':m+'px','height':parseInt($(this).height()*m/w)+'px'});
+			$(this).attr('title', L['click_open']);
+			$(this).click(function(){window.open(DTPath+'api/view.php?img='+$(this).attr('src'));});
+		} else if(w == 0) {
+			//$(this).css({'display':'none'});
 		}
-	} catch(e) {}
+	});
+	if(CKDomain) {
+		$('#'+(content_id ? content_id : 'content')+' a').each(function(i){
+			if($(this).attr('target') != '_blank') {if($(this).attr('href').indexOf(CKDomain) == -1) $(this).attr('target', '_blank');}
+		});
+	}
 });

@@ -10,7 +10,7 @@ if($_SESSION['bd_access_token']) {
 		$success = 1;
 		$arr = json_decode($rec, true);
 		$openid = $arr['uid'];
-		$nickname = convert($arr['uname'], 'UTF-8', DT_CHARSET);
+		$nickname = $arr['uname'];
 		$avatar = '';
 		$url = '';
 		$DS = array('bd_access_token');

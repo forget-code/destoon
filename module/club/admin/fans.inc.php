@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $gid = isset($gid) ? intval($gid) : 0;
-require MD_ROOT.'/fans.class.php';
+require DT_ROOT.'/module/'.$module.'/fans.class.php';
 $do = new fans();
 $menus = array (
     array('粉丝列表', '?moduleid='.$moduleid.'&file='.$file.'&gid='.$gid),

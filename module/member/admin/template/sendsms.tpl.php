@@ -3,19 +3,18 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">发送短信</div>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="send" value="1"/>
 <input type="hidden" name="preview" id="preview" value="0"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 收信人</td>
 <td>
-	<input type="radio" name="sendtype" value="1" id="s1" onclick="ck(1);"<?php echo $sendtype == 1 ? ' checked' : '';?>/> <label for="s1">单收信人</label>
-	<input type="radio" name="sendtype" value="2" id="s2" onclick="ck(2);"<?php echo $sendtype == 2 ? ' checked' : '';?>/> <label for="s2">多收信人</label>
+	<input type="radio" name="sendtype" value="1" id="s1" onclick="ck(1);"<?php echo $sendtype == 1 ? ' checked' : '';?>/> <label for="s1">单收信人</label>&nbsp;&nbsp;
+	<input type="radio" name="sendtype" value="2" id="s2" onclick="ck(2);"<?php echo $sendtype == 2 ? ' checked' : '';?>/> <label for="s2">多收信人</label>&nbsp;&nbsp;
 	<input type="radio" name="sendtype" value="3" id="s3" onclick="ck(3);"<?php echo $sendtype == 3 ? ' checked' : '';?>/> <label for="s3">列表群发</label>
 </td>
 </tr>
@@ -59,10 +58,10 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 短信内容</td>
 <td>
-<table cellpadding="0" cellspacing="0" width="100%">
+<table cellpadding="0" cellspacing="0" width="100%" class="ctb">
 <tr>
 <td valign="top" width="250"><textarea name="content" id="content" rows="15" cols="35" onkeyup="S();" onblur="S();"></textarea></td>
-<td valign="top" class="f_gray">
+<td valign="top" class="f_gray lh20">
 - 当前已输入<strong id="len1">0</strong>字，签名<strong id="len2">0</strong>字，共<strong id="len3" class="f_red">0</strong>字，分<strong id="len4" class="f_blue">0</strong>条短信 (<?php echo $DT['sms_len'];?>字/条)<br/>
 - 以上分条仅为系统估算，实际分条以运营商返回数据为准<br/>
 - 内容支持变量，会员资料保存于$user数组<br/>
@@ -74,7 +73,7 @@ show_menu($menus);
 <?php } else { ?>
 
 <span class="f_red">
-- 由于政策原因，并非所有内容都可以正常发送...<a href="<?php echo DT_PATH;?>api/redirect.php?url=http://help.destoon.com/use/29.html%23faq" target="_blank" class="t">了解详情</a><br/>
+- 由于政策原因，并非所有内容都可以正常发送...<a href="<?php echo DT_PATH;?>api/redirect.php?url=https://www.destoon.com/doc/use/29.html%23faq" target="_blank" class="t">了解详情</a><br/>
 - 发送任何违法信息，帐号会被禁用且不退款<br/>
 </span><br/>
 <?php } ?>
@@ -89,7 +88,7 @@ show_menu($menus);
 <td><input type="text" size="35" name="sign" id="sign" value="<?php echo $DT['sms_sign'];?>" onkeyup="S();" onblur="S();"/></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn" onclick="Dd('preview').value=0;this.form.target='';"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value=" 预 览 " class="btn" onclick="Dd('preview').value=1;this.form.target='_blank';"/></div>
+<div class="sbt"><input type="submit" name="submit" value="发 送" class="btn-g" onclick="Dd('preview').value=0;this.form.target='';"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="预 览" class="btn" onclick="Dd('preview').value=1;this.form.target='_blank';"/></div>
 </form>
 <script type="text/javascript">
 var sms_len = <?php echo $DT['sms_len'];?>;

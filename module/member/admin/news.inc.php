@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/news.class.php';
+require DT_ROOT.'/module/'.$module.'/news.class.php';
 $do = new news();
 $menus = array (
     array('添加新闻', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -19,6 +19,7 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
+	$thumb = isset($thumb) ? intval($thumb) : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
@@ -27,6 +28,7 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$condition = '';
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($level) $condition .= " AND level=$level";
+	if($thumb) $condition .= " AND thumb<>''";
 }
 switch($action) {
 	case 'add':

@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function Mshow(i) {
@@ -35,12 +35,7 @@ function load_comment(p) {
 		return;
 	}
 	if(p == 0 && Dd('c_comment').innerHTML != c_c) return;
-	makeRequest('action=mall&job=comment&moduleid=16&sum='+n_c+'&itemid='+mallid+'&page='+p, AJPath, '_load_comment');
-}
-function _load_comment() {
-	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
-		Dd('c_comment').innerHTML= xmlHttp.responseText;
-	}
+	$('#c_comment').load(AJPath+'?action=mall&job=comment&moduleid='+mallmid+'&sum='+n_c+'&itemid='+mallid+'&page='+p);
 }
 function load_order(p) {
 	if(n_o == 0) {
@@ -48,13 +43,8 @@ function load_order(p) {
 		return;
 	}
 	if(p == 0 && Dd('c_order').innerHTML != c_o) return;
-	makeRequest('action=mall&job=order&moduleid=16&sum='+n_o+'&itemid='+mallid+'&page='+p, AJPath, '_load_order');
+	$('#c_order').load(AJPath+'?action=mall&job=order&moduleid='+mallmid+'&sum='+n_o+'&itemid='+mallid+'&page='+p);
 
-}
-function _load_order() {
-	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
-		Dd('c_order').innerHTML= xmlHttp.responseText;
-	}
 }
 function addE(i) {
 	$('#p'+i+' li').mouseover(function() {
@@ -70,10 +60,10 @@ function addE(i) {
 	});
 }
 function BuyNow() {
-	Go(mallurl+'buy.php?itemid='+mallid+'&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]+'&a='+Dd('amount').value);
+	Go(MEPath+'buy.php?mid='+mallmid+'&itemid='+mallid+'&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]+'&a='+Dd('amount').value);
 }
 function AddCart() {
-	Go(mallurl+'cart.php?itemid='+mallid+'&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]+'&a='+Dd('amount').value);
+	Go(MEPath+'cart.php?mid='+mallmid+'&itemid='+mallid+'&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]+'&a='+Dd('amount').value);
 }
 function Malter(t, min, max) {
 	if(t == '+') {

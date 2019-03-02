@@ -1,8 +1,11 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-define('MD_ROOT', DT_ROOT.'/module/'.$module);
 require_once DT_ROOT.'/include/module.func.php';
-require MD_ROOT.'/global.func.php';
-$table = $DT_PRE.$module;
-$table_data = $DT_PRE.$module.'_data';
+require DT_ROOT.'/module/'.$module.'/global.func.php';
+$table = $DT_PRE.$module.'_'.$moduleid;
+$table_data = $DT_PRE.$module.'_data_'.$moduleid;
+$table_fans = $DT_PRE.$module.'_fans_'.$moduleid;
+$table_group = $DT_PRE.$module.'_group_'.$moduleid;
+$table_manage = $DT_PRE.$module.'_manage_'.$moduleid;
+$table_reply = $DT_PRE.$module.'_reply_'.$moduleid;
 ?>

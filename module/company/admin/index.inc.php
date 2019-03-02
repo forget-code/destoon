@@ -1,13 +1,11 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/company.class.php';
-$do = new company;
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module();
 $menus = array (
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('绑定域名', '?moduleid='.$moduleid.'&action=domain'),
     array('移动地区', '?moduleid='.$moduleid.'&action=move'),
-    array(VIP.'管理', '?moduleid='.$moduleid.'&file=vip'),
-    array('会员列表', '?moduleid=2'),
 );
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
 
@@ -20,8 +18,8 @@ if($_catids || $_areaids) {
 if(in_array($action, array('', 'domain'))) {
 	$sfields = array('按条件', '公司名', '会员名', '公司类型', '公司规模', '销售', '采购', '主营行业', '经营模式', '电话', '传真',  'Email',  '地址',  '邮编', '主页', '风格目录', '模板目录', '绑定域名', '备案号');
 	$dfields = array('keyword', 'company', 'username', 'type', 'size', 'sell', 'buy', 'business', 'mode', 'telephone', 'fax', 'mail', 'address', 'postcode', 'homepage', 'skin', 'template', 'domain', 'icp');
-	$sorder  = array('结果排序方式', VIP.'指数降序', VIP.'指数升序', '注册年份降序', '注册年份升序', '注册资本降序', '注册资本升序', '服务开始降序', '服务开始升序', '服务结束降序', '服务结束升序','浏览人气降序','浏览人气升序');
-	$dorder  = array('userid DESC', 'vip DESC', 'vip ASC', 'regyear DESC', 'regyear ASC', 'capital DESC', 'capital ASC', 'fromtime DESC', 'fromtime ASC', 'totime DESC', 'totime ASC', 'hits DESC', 'hits ASC');
+	$sorder  = array('结果排序方式', VIP.'指数降序', VIP.'指数升序', '注册年份降序', '注册年份升序', '注册资本降序', '注册资本升序', '服务开始降序', '服务开始升序', '服务结束降序', '服务结束升序','浏览人气降序','浏览人气升序', '评论数量降序', '评论数量升序');
+	$dorder  = array('userid DESC', 'vip DESC', 'vip ASC', 'regyear DESC', 'regyear ASC', 'capital DESC', 'capital ASC', 'fromtime DESC', 'fromtime ASC', 'totime DESC', 'totime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC');
 	$svalid = array('认证', '已通过' , '未通过');
 	$MS = cache_read('module-2.php');
 	$modes = explode('|', '经营模式|'.$MS['com_mode']);
@@ -45,9 +43,11 @@ if(in_array($action, array('', 'domain'))) {
 	$valid = isset($valid) ? intval($valid) : 0;
 	$level = isset($level) ? intval($level) : 0;
 	$uid = isset($uid) ? intval($uid) : '';
-	$username = isset($username) ? trim($username) : '';
-	isset($fromtime) or $fromtime = '';
-	isset($totime) or $totime = '';
+	(isset($username) && check_name($username)) or $username = '';
+	$fromdate = isset($fromdate) ? $fromdate : '';
+	$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+	$todate = isset($todate) ? $todate : '';
+	$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 	isset($timetype) or $timetype = 'totime';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
@@ -77,8 +77,8 @@ if(in_array($action, array('', 'domain'))) {
 	if($thumb)  $condition .= " AND thumb<>''";
 	if($uid) $condition .= " AND userid=$uid";
 	if($username) $condition .= " AND username='$username'";
-	if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
-	if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
+	if($fromtime) $condition .= " AND $timetype>=$fromtime";
+	if($totime) $condition .= " AND $timetype<=$totime";
 }
 
 switch($action) {

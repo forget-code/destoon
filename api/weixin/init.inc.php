@@ -1,14 +1,12 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-require DT_ROOT.'/api/weixin/config.inc.php';
+include_once DT_ROOT.'/api/weixin/config.inc.php';
 $session = new dsession();
 class weixin {
-	var $time;
 	var $access_token;
 
 	function __construct() {
-		global $DT_TIME;
-		$this->time = $DT_TIME;
+		$this->access_token = $this->get_token();
 	}
 
 	function weixin() {
@@ -75,9 +73,13 @@ class weixin {
 	}
 	
 	function get_token() {
+		$wt = cache_read('weixin-token.php');
+		if($wt && $wt['token'] && DT_TIME - $wt['time'] < 7000) return $wt['token'];
 		$url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.WX_APPID.'&secret='.WX_APPSECRET;
 		$arr = $this->http_get($url);
-		return isset($arr['access_token']) ? $arr['access_token'] : '';
+		$access_token = isset($arr['access_token']) ? $arr['access_token'] : '';
+		cache_write('weixin-token.php', array('time' => DT_TIME, 'token' => $access_token));
+		return $access_token;
 	}
 
 	function get_user($openid) {
@@ -85,7 +87,7 @@ class weixin {
 		$arr = $this->http_get($url);
 		if(is_array($arr)) {
 			foreach($arr as $k=>$v) {
-				$arr[$k] = convert($v, 'UTF-8', DT_CHARSET);
+				$arr[$k] = $v;
 			}
 		}
 		return $arr;
@@ -98,7 +100,7 @@ class weixin {
 		$par['msgtype'] = $type;
 		switch($type) {
 			case 'text':
-				$par[$type]['content'] = urlencode(convert($content, DT_CHARSET, 'UTF-8'));
+				$par[$type]['content'] = urlencode($content);
 			break;
 			case 'image':
 				$par[$type]['media_id'] = $content;
@@ -108,12 +110,12 @@ class weixin {
 			break;
 			case 'video':
 				$par[$type]['media_id'] = $content;
-				$par[$type]['title'] = isset($misc['title']) ? urlencode(convert($misc['title'], DT_CHARSET, 'UTF-8')) : '';
-				$par[$type]['description'] = isset($misc['description']) ? urlencode(convert($misc['description'], DT_CHARSET, 'UTF-8')) : '';
+				$par[$type]['title'] = isset($misc['title']) ? urlencode($misc['title']) : '';
+				$par[$type]['description'] = isset($misc['description']) ? urlencode($misc['description']) : '';
 			break;
 			case 'music':
-				$par[$type]['title'] = isset($misc['title']) ? urlencode(convert($misc['title'], DT_CHARSET, 'UTF-8')) : '';
-				$par[$type]['description'] = isset($misc['description']) ? urlencode(convert($misc['description'], DT_CHARSET, 'UTF-8')) : '';
+				$par[$type]['title'] = isset($misc['title']) ? urlencode($misc['title']) : '';
+				$par[$type]['description'] = isset($misc['description']) ? urlencode($misc['description']) : '';
 				$par[$type]['musicurl'] = isset($misc['musicurl']) ? $misc['musicurl'] : '';
 				$par[$type]['hqmusicurl'] = isset($misc['hqmusicurl']) ? $misc['hqmusicurl'] : '';
 				$par[$type]['thumb_media_id'] = isset($misc['thumb_media_id']) ? $misc['thumb_media_id'] : '';
@@ -121,8 +123,8 @@ class weixin {
 			case 'news':
 				if($misc && count($misc) < 11) {
 					foreach($misc as $k=>$v) {
-						$misc[$k]['title'] = urlencode(convert($v['title'], DT_CHARSET, 'UTF-8'));
-						$misc[$k]['description'] = urlencode(convert($v['description'], DT_CHARSET, 'UTF-8'));
+						$misc[$k]['title'] = urlencode($v['title']);
+						$misc[$k]['description'] = urlencode($v['description']);
 					}
 					$par[$type]['articles'] = $misc;
 				} else {
@@ -140,7 +142,7 @@ class weixin {
 		$xml = '<xml>';
 		$xml .= '<ToUserName><![CDATA['.$openid.']]></ToUserName>';
 		$xml .= '<FromUserName><![CDATA['.$from.']]></FromUserName>';
-		$xml .= '<CreateTime>'.$this->time.'</CreateTime>';
+		$xml .= '<CreateTime>'.DT_TIME.'</CreateTime>';
 		$xml .= '<MsgType><![CDATA['.$type.']]></MsgType>';
 		switch($type) {
 			case 'text':
@@ -196,33 +198,24 @@ class weixin {
 			break;
 		}
 		$xml .= '</xml>';
-		echo convert($xml, DT_CHARSET, 'UTF-8');
+		echo $xml;
 	}
 }
 $wx = new weixin;
-$access_token = $dc->get('weixin_access_token');
-if(!$access_token) {
-	$access_token = $wx->get_token();
-	$dc->set('weixin_access_token', $access_token, 7000);
-}
-$wx->access_token = $access_token;
-
+$access_token = $wx->access_token;
 function weixin_user($openid) {
-	global $db;
-	return $db->get_one("SELECT * FROM {$db->pre}weixin_user WHERE openid='$openid'");
+	return DB::get_one("SELECT * FROM ".DT_PRE."weixin_user WHERE openid='$openid'");
 }
 
 function weixin_bind($openid, $username) {
-	global $db;
 	if(check_name($username)) {
-		$db->query("UPDATE {$db->pre}weixin_user SET username='' WHERE username='$username'");
-		$db->query("UPDATE {$db->pre}weixin_user SET username='$username' WHERE openid='$openid'");
+		DB::query("UPDATE ".DT_PRE."weixin_user SET username='' WHERE username='$username'");
+		DB::query("UPDATE ".DT_PRE."weixin_user SET username='$username' WHERE openid='$openid'");
 	}
 }
 
 function weixin_log() {
-	global $DT_TIME, $DT_IP, $DT_REF;
-	log_write($DT_IP."\nPOST:\n".var_export($_POST, true)."\nGET:".var_export($_GET, true)."\nGLB:".var_export($GLOBALS["HTTP_RAW_POST_DATA"], true), 'wx', 1);
+	log_write(DT_IP."\nPOST:\n".var_export($_POST, true)."\nGET:".var_export($_GET, true)."\nGLB:".var_export($GLOBALS["HTTP_RAW_POST_DATA"], true), 'wx', 1);
 }
 #if($GLOBALS["HTTP_RAW_POST_DATA"]) weixin_log();
 ?>

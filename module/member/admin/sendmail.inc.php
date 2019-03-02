@@ -7,11 +7,10 @@ $menus = array (
     array('邮件列表', '?moduleid='.$moduleid.'&file='.$file.'&action=list'),
 );
 function _userinfo($fields, $email) {
-	global $db, $DT_PRE;
 	if($fields == 'mail') {
-		return $db->get_one("SELECT * FROM {$DT_PRE}member m,{$DT_PRE}company c WHERE m.userid=c.userid AND c.mail='$email'");
+		return DB::get_one("SELECT * FROM ".DT_PRE."member m,".DT_PRE."company c WHERE m.userid=c.userid AND c.mail='$email'");
 	} else {
-		return $db->get_one("SELECT * FROM {$DT_PRE}member m,{$DT_PRE}company c WHERE m.userid=c.userid AND m.email='$email'");
+		return DB::get_one("SELECT * FROM ".DT_PRE."member m,".DT_PRE."company c WHERE m.userid=c.userid AND m.email='$email'");
 	}
 }
 function _safecheck($content) {
@@ -112,16 +111,16 @@ switch($action) {
 		$dfields = array('title', 'title', 'email', 'content', 'note');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($email) or $email = '';
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
-		isset($dfromtime) or $dfromtime = '';
-		isset($dtotime) or $dtotime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($type) or $type = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($type) $condition .= $type == 1 ? " AND status=3" : " AND status=2";
 		if($email) $condition .= " AND email='$email'";
 		if($page > 1 && $sum) {
@@ -154,7 +153,7 @@ switch($action) {
 		while($r = $db->fetch_array($result)) {
 			if($r['status'] == 3) continue;
 			if(send_mail($r['email'], $r['title'], $r['content'])) {
-				$db->query("UPDATE {$DT_PRE}mail_log SET status=3,edittime='$DT_TIME',editor='$_username',note='' WHERE itemid=$r[itemid]");
+				$db->query("UPDATE {$DT_PRE}mail_log SET status=3,edittime='".DT_TIME."',editor='$_username',note='' WHERE itemid=$r[itemid]");
 				$i++;
 			}
 		}
@@ -198,7 +197,7 @@ switch($action) {
 				($template || $content) or msg('请填写邮件内容');
 				$email = trim($email);
 				$content = save_local(stripslashes($content));
-				clear_upload($content);
+				clear_upload($content, $_userid, 'sendmail');
 				$DT['mail_name'] = $name;
 				if($template) {
 					$user = _userinfo($fields, $email);
@@ -212,7 +211,7 @@ switch($action) {
 				($template || $content) or msg('请填写邮件内容');
 				$emails = explode("\n", $emails);
 				$content = save_local(stripslashes($content));
-				clear_upload($content);
+				clear_upload($content, $_userid, 'sendmail');
 				$DT['mail_name'] = $name;
 				$_content = $content;
 				foreach($emails as $email) {
@@ -243,7 +242,7 @@ switch($action) {
 					$maillist or msg('请选择邮件列表');
 					($template || $content) or msg('请填写邮件内容');
 					$content = save_local(stripslashes($content));
-					clear_upload($content);
+					clear_upload($content, $_userid, 'sendmail');
 					$data = array();
 					$data['title'] = $title;
 					$data['content'] = $content;

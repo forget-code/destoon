@@ -1,17 +1,16 @@
 {template 'header', $template}
-<div class="dsn" id="pos_show">您当前的位置：<a href="{$COM[linkurl]}">首页</a> &raquo; <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a></div>
-
+<div class="dsn" id="pos_show"><a href="{$COM[linkurl]}">首页</a> <i>&gt;</i> <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a></div>
 <div class="main_head"><div><strong>{$MENU[$menuid][name]}</strong></div></div>
 <div class="main_body">
-	<div class="px13 lh18">
-	<table width="98%" cellpadding="3" cellspacing="3" align="center">
+	<div class="px14 lh18">
+	<table width="100%" cellpadding="10" cellspacing="1">
 	<tr>
 	<td width="100">公司名称：</td>
 	<td>{$COM[company]}</td>
 	</tr>
 	<tr>
 	<td>公司地址：</td>
-	<td>{$COM[address]}</td>
+	<td><a href="{DT_PATH}api/address.php?auth={encrypt($COM[address].'|'.$COM[company], DT_KEY.'MAP')}" target="_blank">{$COM[address]}</a></td>
 	</tr>
 	<tr>
 	<td>所在地区：</td>
@@ -59,7 +58,19 @@
 	{if $COM[mobile]}
 	<tr>
 	<td>手机号码：</td>
-	<td>{if $domain}{$COM[mobile]}{else}{anti_spam($COM[mobile])}{/if}{if $DT[sms] && $COM[vmobile]}&nbsp;&nbsp;<a href="{$MODULE[2][linkurl]}sms.php?action=add&auth={encrypt($COM[mobile], DT_KEY.'SMS')}" target="_blank"><img src="{DT_SKIN}image/sendsms.gif" align="absmiddle" title="发送短信" alt=""/></a>{/if}</td>
+	<td>{if $domain}{$COM[mobile]}{else}{anti_spam($COM[mobile])}{/if}</td>
+	</tr>
+	{/if}
+	{if $COM[gzh]}
+	<tr>
+	<td>微信公众号：</td>
+	<td>{$COM[gzh]} &nbsp; <a href="javascript:;" onclick="prompt('请按Ctrl+C复制微信号', '{$COM[gzh]}');" class="b">复制</a></td>
+	</tr>
+	{/if}
+	{if $COM[gzhqr]}
+	<tr>
+	<td>扫码关注：</td>
+	<td><img src="{$COM[gzhqr]}"/></td>
 	</tr>
 	{/if}
 	<tr>
@@ -67,8 +78,8 @@
 	<td>
 	{if $COM[username] && $DT[im_web]}{im_web($COM[username])}&nbsp;{/if}
 	{if $COM[qq] && $DT[im_qq]}{im_qq($COM[qq])}&nbsp;{/if}
+	{if $COM[wx] && $DT[im_wx]}{im_wx($COM[wx], $COM[username])}&nbsp;{/if}
 	{if $COM[ali] && $DT[im_ali]}{im_ali($COM[ali])}&nbsp;{/if}
-	{if $COM[msn] && $DT[im_msn]}{im_msn($COM[msn])}&nbsp;{/if}
 	{if $COM[skype] && $DT[im_skype]}{im_skype($COM[skype])}&nbsp;{/if}
 	</td>
 	</tr>

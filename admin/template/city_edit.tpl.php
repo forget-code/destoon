@@ -7,8 +7,7 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">分站添加</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所在地区</td>
 <td class="tr"><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?> <span id="dareaid" class="f_red"></span></td>
@@ -51,9 +50,7 @@ show_menu($menus);
 <td><textarea name="post[seo_description]" cols="60" rows="3" id="seo_description"><?php echo $seo_description;?></textarea></td>
 </tr>
 </table>
-
-
-<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $areaid ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $areaid ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -68,5 +65,5 @@ function check() {
 	return true;
 }
 </script>
-<script type="text/javascript">Menuon(0);</script>
+<script type="text/javascript">Menuon(<?php echo $areaid ? 1 : 0;?>);</script>
 <?php include tpl('footer');?>

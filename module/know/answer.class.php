@@ -2,14 +2,12 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class answer {
 	var $itemid;
-	var $db;
 	var $table;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'know_answer';
-		$this->db = &$db;
+		global $table_answer;
+		$this->table = $table_answer;
     }
 
     function answer() {
@@ -23,31 +21,34 @@ class answer {
 	}
 
 	function set($post) {
-		global $DT_TIME, $_username;
+		global $_username;
 		$post['status'] = $post['status'] == 3 ? 3 : 2;
 		$post['editor'] = $_username;
-		$post['edittime'] = $DT_TIME;
+		$post['edittime'] = DT_TIME;
 		return array_map("trim", $post);
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'itemid DESC') {
-		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $items, $sum;
+		global $MOD, $TYPE, $moduleid, $pages, $page, $pagesize, $offset, $items, $sum;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();	
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 6);
+			$r['title'] = get_intro($r['content'], 50);
+			$r['alt'] = get_intro($r['content'], 500);
+			$r['linkurl'] = DT_PATH.'api/redirect.php?mid='.$moduleid.'&itemid='.$r['qid'];
 			$lists[] = $r;
 		}
 		return $lists;
@@ -60,13 +61,13 @@ class answer {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
-		clear_upload($post['content']);
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+		clear_upload($post['content'], $this->itemid, $this->table);
 		return true;
 	}
 
 	function delete($itemid) {
-		global $MOD, $DT_PRE;
+		global $MOD, $table_vote;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { 
 				$this->delete($v); 
@@ -75,8 +76,8 @@ class answer {
 			$this->itemid = $itemid;
 			$r = $this->get_one();
 			if($r) {
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
-				$this->db->query("DELETE FROM {$DT_PRE}know_vote WHERE aid=$itemid");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$table_vote} WHERE aid=$itemid");
 				if($r['content']) delete_local($r['content'], get_user($r['username']));
 				if($r['username'] && $MOD['credit_del_answer']) {
 					credit_add($r['username'], -$MOD['credit_del_answer']);
@@ -87,7 +88,7 @@ class answer {
 	}
 
 	function check($itemid, $status = 3) {
-		global $MOD, $DT_TIME;
+		global $MOD;
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { 
 				$this->check($v, $status); 
@@ -100,7 +101,7 @@ class answer {
 					$could_credit = true;
 					$reason = lang('my->credit_record_answer_add');
 					if($MOD['credit_maxanswer'] > 0) {					
-						$r = $this->db->get_one("SELECT SUM(amount) AS total FROM {$this->db->pre}finance_credit WHERE username='$item[username]' AND addtime>$DT_TIME-86400  AND reason='".$reason."'");
+						$r = DB::get_one("SELECT SUM(amount) AS total FROM ".DT_PRE."finance_credit WHERE username='$item[username]' AND addtime>".DT_TIME."-86400  AND reason='".$reason."'");
 						if($r['total'] >= $MOD['credit_maxanswer']) $could_credit = false;
 					}
 					if($could_credit) {
@@ -109,7 +110,7 @@ class answer {
 					}
 				}
 			}
-			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
 		}
 	}
 

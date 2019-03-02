@@ -1,11 +1,12 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/alert.class.php';
+require DT_ROOT.'/module/'.$module.'/alert.class.php';
 $do = new alert();
 $menus = array (
-    array('发送商机', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
+    array('添加提醒', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('贸易提醒', '?moduleid='.$moduleid.'&file='.$file),
     array('审核提醒', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
+    array('发送商机', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
 );
 $mids = array();
 $tmp = explode('|', $MOD['alertid']);
@@ -126,7 +127,7 @@ switch($action) {
 				if($do->pass($post)) {
 					$do->add($post);
 				} else {
-					message($do->errmsg);
+					msg($do->errmsg);
 				}
 			}
 			dmsg('添加成功', '?moduleid='.$moduleid.'&file='.$file);
@@ -151,10 +152,10 @@ switch($action) {
 		}
 	break;
 	case 'edit':
-		$itemid or message();
+		$itemid or msg();
 		$do->itemid = $itemid;
 		$r = $do->get_one();
-		if(!$r) message();
+		if(!$r) msg();
 		if($submit) {
 			if($do->pass($post)) {
 				$user = userinfo($post['username']);
@@ -164,10 +165,10 @@ switch($action) {
 					$db->query("UPDATE {$DT_PRE}alert SET email='$email' WHERE username='$post[username]'");
 					dmsg('修改成功', $forward);
 				} else {
-					message('会员不存在');
+					msg('会员不存在');
 				}
 			} else {
-				message($do->errmsg);
+				msg($do->errmsg);
 			}
 		} else {
 			extract($r);

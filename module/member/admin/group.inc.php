@@ -88,13 +88,10 @@ class group {
 	var $groupname;
 	var $vip;
 	var $listorder;
-	var $db;
 	var $table;
 
 	function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'member_group';
-		$this->db = &$db;
+		$this->table = DT_PRE.'member_group';
 	}
 
 	function group() {
@@ -103,9 +100,9 @@ class group {
 
 	function add($setting) {
 		if(!is_array($setting)) return false;
-		$this->db->query("INSERT INTO {$this->table} (groupname,vip) VALUES('$this->groupname','$this->vip')");
-		$this->groupid = $this->db->insert_id();
-		$this->db->query("UPDATE {$this->table} SET `listorder`=`groupid` WHERE groupid=$this->groupid");
+		DB::query("INSERT INTO {$this->table} (groupname,vip) VALUES('$this->groupname','$this->vip')");
+		$this->groupid = DB::insert_id();
+		DB::query("UPDATE {$this->table} SET `listorder`=`groupid` WHERE groupid=$this->groupid");
 		update_setting('group-'.$this->groupid, $setting);
 		cache_group();
 		return $this->groupid;
@@ -115,7 +112,7 @@ class group {
 		if(!is_array($setting)) return false;
 		update_setting('group-'.$this->groupid, $setting);
 		$setting = addslashes(serialize(dstripslashes($setting)));
-		$this->db->query("UPDATE {$this->table} SET groupname='$this->groupname',vip='$this->vip',listorder='$this->listorder' WHERE groupid=$this->groupid");
+		DB::query("UPDATE {$this->table} SET groupname='$this->groupname',vip='$this->vip',listorder='$this->listorder' WHERE groupid=$this->groupid");
 		cache_group();
 		return true;
 	}
@@ -125,7 +122,7 @@ class group {
 		foreach($listorder as $k=>$v) {
 			$k = intval($k);
 			$v = intval($v);
-			if($v > 6) $this->db->query("UPDATE {$this->table} SET listorder=$v WHERE groupid=$k");
+			if($v > 6) DB::query("UPDATE {$this->table} SET listorder=$v WHERE groupid=$k");
 		}
 		cache_group();
 		return true;
@@ -133,14 +130,14 @@ class group {
 
 	function delete() {
 		if($this->groupid < 5) return false;
-		$this->db->query("DELETE FROM {$this->table} WHERE groupid=$this->groupid");
+		DB::query("DELETE FROM {$this->table} WHERE groupid=$this->groupid");
 		cache_delete('group-'.$this->groupid.'.php');
 		cache_group();
 		return true;
 	}
 
 	function get_one() {
-		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE groupid=$this->groupid");
+		$r = DB::get_one("SELECT * FROM {$this->table} WHERE groupid=$this->groupid");
 		$tmp = get_setting('group-'.$this->groupid);
 		if($tmp) {
 			foreach($tmp as $k=>$v) {

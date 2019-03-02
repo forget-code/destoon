@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -39,7 +39,6 @@ if($submit) {
 		'api/memcache.php' => 3,
 		'api/avatar/upload.php' => 1,
 		'api/oauth/baidu/callback.php' => 1,
-		'api/oauth/msn/callback.php' => 1,
 		'api/oauth/netease/callback.php' => 1,
 		'api/oauth/qq/callback.php' => 1,
 		'api/oauth/qq/index.php' => 1,

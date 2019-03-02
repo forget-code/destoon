@@ -2,15 +2,12 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class style {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'style';
-		$this->db = &$db;
+		$this->table = DT_PRE.'style';
 		$this->fields = array('typeid','title','skin','template','author','groupid','fee','currency','hits', 'addtime','editor','edittime');
     }
 
@@ -33,9 +30,9 @@ class style {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $_username, $_userid;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		global $MOD, $_username, $_userid;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['editor'] = $_username;		
 		$post['groupid'] = (isset($post['groupid']) && $post['groupid']) ? ','.implode(',', $post['groupid']).',' : '';
 		$post['fee'] = dround($post['fee']);
@@ -44,7 +41,7 @@ class style {
 	}
 
 	function get_one($condition = '') {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
 	}
 
 	function get_list($condition = '1', $order = 'listorder DESC, itemid DESC') {
@@ -52,15 +49,15 @@ class style {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$GROUP = cache_read('group.php');
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['thumb'] = is_file(DT_ROOT.'/'.$MODULE[4]['moduledir'].'/skin/'.$r['skin'].'/thumb.gif') ? $MODULE[4]['linkurl'].'skin/'.$r['skin'].'/thumb.gif' : $MODULE[4]['linkurl'].'image/nothumb.gif';
 			$groupid = explode(',', substr($r['groupid'], 1, -1));
@@ -82,7 +79,7 @@ class style {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		return $this->itemid;
 	}
 
@@ -93,7 +90,7 @@ class style {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -101,9 +98,9 @@ class style {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->delete($v); }
 		} else {
-			$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
-			$this->db->query("UPDATE {$this->db->pre}company SET skin='',template='' WHERE skin='".$r['skin']."' AND template='".$r['template']."'");
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			$r = DB::get_one("SELECT * FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("UPDATE ".DT_PRE."company SET skin='',template='' WHERE skin='".$r['skin']."' AND template='".$r['template']."'");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 
@@ -112,7 +109,7 @@ class style {
 		foreach($listorder as $k=>$v) {
 			$k = intval($k);
 			$v = intval($v);
-			$this->db->query("UPDATE {$this->table} SET listorder=$v WHERE itemid=$k");
+			DB::query("UPDATE {$this->table} SET listorder=$v WHERE itemid=$k");
 		}
 		return true;
 	}

@@ -11,8 +11,7 @@ show_menu($menus);
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="post[pid]" value="<?php echo $pid;?>"/>
 <input type="hidden" name="pid" value="<?php echo $pid;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>报价</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <?php if($M) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所属市场</td>
@@ -63,6 +62,12 @@ foreach($M as $k=>$v) {
 <td><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
+<?php if($DT['im_wx']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 微信</td>
+<td><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+</tr>
+<?php } ?>
 </tbody>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 备注</td>
@@ -77,10 +82,10 @@ foreach($M as $k=>$v) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 报价时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&pid=<?php echo $pid;?>');"/></div>
 </form>
 <?php load('guest.js'); ?>
 <script type="text/javascript">

@@ -5,15 +5,15 @@ $MOD['poll_enable'] or dheader(DT_PATH);
 require DT_ROOT.'/include/post.func.php';
 $ext = 'poll';
 $url = $EXT[$ext.'_url'];
+$mob = $EXT[$ext.'_mob'];
 $TYPE = get_type($ext, 1);
 $_TP = sort_type($TYPE);
-require MD_ROOT.'/'.$ext.'.class.php';
+require DT_ROOT.'/module/'.$module.'/'.$ext.'.class.php';
 $do = new $ext();
 $typeid = isset($typeid) ? intval($typeid) : 0;
-$destoon_task = rand_task();
 if($action == 'js') {
 	$itemid or exit;
-	echo 'document.write(\'<iframe src="'.$url.'index.php?action=show&itemid='.$itemid.'" style="width:99%;height:0;" scrolling="no" frameborder="0" id="destoon_poll_'.$itemid.'"></iframe>\');';
+	exit('document.write(\'<iframe src="'.($DT_PC ? $url : $mob).'index.php?action=show&itemid='.$itemid.'" style="width:99%;height:0;" scrolling="no" frameborder="0" id="destoon_poll_'.$itemid.'"></iframe>\');');
 } else if($action == 'ajax') {
 	$itemid or exit($L['poll_error_3']);
 	$I = $db->get_one("SELECT * FROM {$DT_PRE}poll_item WHERE itemid=$itemid");
@@ -50,7 +50,7 @@ if($action == 'js') {
 	$P or exit;
 	extract($P);
 	$cols = $poll_cols;
-	$percent = dround(100/$cols).'%';	
+	$percent = dround(100/$cols).'%';
 	$pagesize = $poll_page;
 	$offset = ($page-1)*$pagesize;
 	$order = $poll_cols ? 'polls DESC,listorder DESC,itemid DESC' : 'listorder DESC,itemid DESC';
@@ -61,25 +61,44 @@ if($action == 'js') {
 	while($r = $db->fetch_array($result)) {
 		$votes[$r['itemid']] = $r['itemid'];
 	}
-	$db->query("UPDATE {$DT_PRE}poll SET hits=hits+1 WHERE itemid=$itemid");
+	if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$DT_PRE}{$ext} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');	
 	$template_poll = $P['template_poll'] ? $P['template_poll'] : 'poll';
-	include template('poll_show', $module);
+	$template = $ext;
 } else {
 	if($itemid) {
 		$do->itemid = $itemid;
 		$item = $do->get_one();
-		$item or dheader($url);
+		$item or dheader($DT_PC ? $url : $mob);
 		extract($item);
 		$adddate = timetodate($addtime, 3);
 		$fromdate = $fromtime ? timetodate($fromtime, 3) : $L['timeless'];
 		$todate = $totime ? timetodate($totime, 3) : $L['timeless'];
+		$content = $DT_PC ? parse_video($content) : video5($content);
 		$head_title = $title.$DT['seo_delimiter'].$L['poll_title'];
 		$template = $item['template'] ? $item['template'] : $ext;
-		include template($template, $module);
+		if($DT_PC) {
+			//
+		} else {
+			$P = $item;
+			$pagesize = 1000;
+			$offset = ($page-1)*$pagesize;
+			$order = $poll_cols ? 'polls DESC,listorder DESC,itemid DESC' : 'listorder DESC,itemid DESC';
+			$polls = $do->item_list("pollid=$itemid", $order);
+			$condition = $_username ? "AND username='$_username'" : "AND ip='$DT_IP' AND polltime>".($DT_TIME - 86400);
+			$votes = array();
+			$result = $db->query("SELECT * FROM {$DT_PRE}poll_record WHERE pollid=$itemid $condition");
+			while($r = $db->fetch_array($result)) {
+				$votes[$r['itemid']] = $r['itemid'];
+			}
+			if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$DT_PRE}{$ext} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');	
+			$template_poll = $P['template_poll'] ? $P['template_poll'] : 'poll';
+			$pages = '';
+		}
 	} else {
 		$head_title = $L['poll_title'];
 		if($catid) $typeid = $catid;
 		$condition = '1';
+		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
 		if($typeid) {
 			isset($TYPE[$typeid]) or dheader($url);
 			$condition .= " AND typeid IN (".type_child($typeid, $TYPE).")";
@@ -87,7 +106,20 @@ if($action == 'js') {
 		}
 		if($cityid) $condition .= ($AREA[$cityid]['child']) ? " AND areaid IN (".$AREA[$cityid]['arrchildid'].")" : " AND areaid=$cityid";
 		$lists = $do->get_list($condition, 'addtime DESC');
-		include template($ext, $module);
+		$template = $ext;
 	}
 }
+if($DT_PC) {
+	$destoon_task = rand_task();
+	if($EXT['mobile_enable']) $head_mobile = str_replace($url, $mob, $DT_URL);
+} else {
+	$foot = '';
+	if($itemid) {
+		$back_link = $mob;
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1 || $typeid) ? $mob : DT_MOB.'more.php';
+	}
+}
+include template($template, $module);
 ?>

@@ -3,11 +3,14 @@ defined('IN_DESTOON') or exit('Access Denied');
 if(!$MOD['show_html'] || !$itemid) return false;
 $item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 if(!$item || $item['status'] < 3) return false;
+$could_comment = in_array($moduleid, explode(',', $EXT['comment_module'])) ? 1 : 0;
 extract($item);
 $CAT = get_cat($catid);
 $content_table = content_table($moduleid, $itemid, $MOD['split'], $table_data);
 $t = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
-$content = $t['content'];
+$content = $_content =  $t['content'];
+$content = parse_video($content);
+if($MOD['keylink']) $content = keylink($content, $moduleid);
 if($lazy) $content = img_lazy($content);
 $CP = $MOD['cat_property'] && $CAT['property'];
 if($CP) {
@@ -28,16 +31,26 @@ if($fee) {
 }
 $pages = '';
 $total = 1;
-if(strpos($content, '<hr class="de-pagebreak" />') !== false) {
-	$contents = explode('<hr class="de-pagebreak" />', $content);
+if(strpos($content, 'de-pagebreak') !== false) {
+	$content = str_replace('"de-pagebreak" /', '"de-pagebreak"/', $content);
+	$contents = explode('<hr class="de-pagebreak"/>', $content);
 	$total = count($contents);	
 }
 $seo_file = 'show';
 include DT_ROOT.'/include/seo.inc.php';
-$template = $item['template'] ? $item['template'] : ($CAT['show_template'] ? $CAT['show_template'] : 'show');
+$template = $item['template'] ? $item['template'] : ($CAT['show_template'] ? $CAT['show_template'] : ($MOD['template_show'] ? $MOD['template_show'] : 'show'));
+if($EXT['mobile_enable']) {
+	include DT_ROOT.'/include/mobile.htm.php';	
+	$back_link = $MOD['mobile'].$CAT['linkurl'];
+	$head_name = $CAT['catname'];
+	$foot = '';
+}
 for(; $page <= $total; $page++) {
 	$destoon_task = "moduleid=$moduleid&html=show&itemid=$itemid&page=$page";
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, 0, $itemid, $page);
+	if($EXT['mobile_enable']) {
+		$head_mobile = $MOD['mobile'].($page > 1 ? itemurl($item, $page) : $item['linkurl']);
+		$head_pc = str_replace($MOD['mobile'], $MOD['linkurl'], $head_mobile);
+	}
 	$filename = $total == 1 ? DT_ROOT.'/'.$MOD['moduledir'].'/'.$fileurl : DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, $page);
 	if($total > 1) {
 		$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
@@ -45,6 +58,8 @@ for(; $page <= $total; $page++) {
 		$content = $contents[$page-1];
 	}
 	if($MOD['keylink']) $content = keylink($content, $moduleid);
+	$content = parse_video($content);
+	$DT_PC = $GLOBALS['DT_PC'] = 1;
 	ob_start();
 	include template($template, $module);
 	$data = ob_get_contents();
@@ -55,6 +70,19 @@ for(; $page <= $total; $page++) {
 		$indexname = DT_ROOT.'/'.$MOD['moduledir'].'/'.itemurl($item, 0);
 		if($DT['pcharset']) $indexname = convert($indexname, DT_CHARSET, $DT['pcharset']);
 		file_copy($filename, $indexname);
+	}
+	if($EXT['mobile_enable']) {
+		if($total > 1) $pages = mobile_pages($total, $page, 1, $MOD['mobile'].itemurl($item, '{destoon_page}'));
+		$content = video5($_content);
+		if($MOD['keylink']) $content = keylink($content, $moduleid, 1);
+		$filename = str_replace(DT_ROOT, DT_ROOT.'/mobile', $filename);
+		$DT_PC = $GLOBALS['DT_PC'] = 0;
+		ob_start();
+		include template($template, $module);
+		$data = ob_get_contents();
+		ob_clean();
+		file_put($filename, $data);
+		if($page == 1 && $total > 1) file_copy($filename, str_replace(DT_ROOT, DT_ROOT.'/mobile', $indexname));
 	}
 }
 return true;

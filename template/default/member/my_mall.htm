@@ -1,17 +1,16 @@
 {template 'header', 'member'}
-<script type="text/javascript">c(1);</script>
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
 <td class="tab" id="add"><a href="?mid={$mid}&action=add"><span>添加商品</span></a></td>
 {if $_userid}
-<td class="tab" id="s3"><a href="?mid={$mid}"><span>已上架<span class="px10">({$nums[3]})</span></span></a></td>
-<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中<span class="px10">({$nums[2]})</span></span></a></td>
-<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过<span class="px10">({$nums[1]})</span></span></a></td>
-<td class="tab" id="s4"><a href="?mid={$mid}&status=4"><span>已下架<span class="px10">({$nums[4]})</span></span></a></td>
-<td class="tab" id="trade"><a href="trade.php"><span>订单管理<span class="px10">({$nums[9]})</span></span></a></td>
-<td class="tab" id="type"><a href="javascript:Dwidget('type.php?item=mall', '[商品分类]', 600, 300);"><span>商品分类<span class="px10">({$nums[0]})</span></span></a></td>
-<td class="tab" id="express"><a href="express.php"><span>运费模板</span></a></td>
+<td class="tab" id="s3"><a href="?mid={$mid}"><span>已上架({$nums[3]})</span></a></td>
+<td class="tab" id="s2"><a href="?mid={$mid}&status=2"><span>审核中({$nums[2]})</span></a></td>
+<td class="tab" id="s1"><a href="?mid={$mid}&status=1"><span>未通过({$nums[1]})</span></a></td>
+<td class="tab" id="s4"><a href="?mid={$mid}&status=4"><span>已下架({$nums[4]})</span></a></td>
+<td class="tab" id="trade"><a href="trade.php"><span>订单管理({$nums[9]})</span></a></td>
+<td class="tab" id="type"><a href="javascript:Dwidget('type.php?item=mall', '[商品分类]', 600, 300);"><span>商品分类({$nums[0]})</span></a></td>
+<td class="tab" id="express"><a href="express.php?mid={$mid}"><span>运费模板</span></a></td>
 {/if}
 </tr>
 </table>
@@ -23,7 +22,7 @@
 <input type="hidden" name="mid" value="{$mid}"/>
 <input type="hidden" name="itemid" value="{$itemid}"/>
 <input type="hidden" name="forward" value="{$forward}"/>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellpadding="10" cellspacing="1" class="tb">
 {if $status==1 && $action=='edit' && $note}
 <tr>
 <td class="tl">未通过原因</td>
@@ -32,7 +31,7 @@
 {/if}
 <tr>
 <td class="tl"><span class="f_red">*</span> 商品分类</td>
-<td class="tr"><div id="catesch"></div>{ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, $DT_TOUCH ? '' : 'size="2" style="height:120px;width:180px;"')}{if !$DT_TOUCH}<br/>{/if}{if $DT[schcate_limit]}<input type="button" value="搜索分类" onclick="schcate({$moduleid});" class="btn"/> {/if}<span id="dcatid" class="f_red"></span></td>
+<td class="tr"><div id="catesch"></div>{ajax_category_select('post[catid]', '选择分类', $catid, $moduleid)}{if $DT[schcate_limit]} <a href="javascript:schcate({$moduleid});" class="t">搜索分类</a>{/if} <span id="dcatid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 商品名称</td>
@@ -80,7 +79,7 @@
 <td id="p_p_3"></td>
 </tr>
 </table>
-<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=100;Dd('p2').value=900;Dd('a3').value=500;Dd('p3').value=800;Dstep();">阶梯价格</span> / <span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=Dd('p2').value=Dd('a3').value=Dd('p3').value='';Dstep();">非阶梯价格</span></span>
+<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=100;Dd('p2').value=900;Dd('a3').value=500;Dd('p3').value=800;Dstep();">阶梯价格</span> / <span class="c_p" title="点击观看" onclick="Dd('a1').value=1;Dd('p1').value=1000;Dd('a2').value=Dd('p2').value=Dd('a3').value=Dd('p3').value='';Dstep();">非阶梯价格</span></span> <span id="dprice" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -105,7 +104,7 @@ var property_admin = 0;
 {if $FD}{fields_html('<td class="tl">', '<td class="tr">', $item)}{/if}
 
 <tr>
-<td class="tl">商品图片</td>
+<td class="tl"><span class="f_red">*</span> 商品图片</td>
 <td class="tr">
 	<input type="hidden" name="post[thumb]" id="thumb" value="{$thumb}"/>
 {if $IMVIP || !$MG[uploadpt]}
@@ -125,13 +124,13 @@ var property_admin = 0;
 {/if}
 	</tr>
 	<tr align="center" class="c_p">
-	<td><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum('',{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb').value, true);"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum('');"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum('','wait');"/></td>
+	<td><img src="image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum('',{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb').value, true);"/>&nbsp;&nbsp;<img src="image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum('');"/>&nbsp;&nbsp;<img src="image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum('','wait');"/></td>
 {if $IMVIP || !$MG[uploadpt]}
-	<td><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum(1,{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb1').value, true);"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum(1);"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum(1,'wait');"/></td>
-	<td><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum(2,{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb2').value, true);"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum(2);"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum(2,'wait');"/></td>
+	<td><img src="image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum(1,{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb1').value, true);"/>&nbsp;&nbsp;<img src="image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum(1);"/>&nbsp;&nbsp;<img src="image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum(1,'wait');"/></td>
+	<td><img src="image/img_upload.gif" width="12" height="12" title="上传" onclick="Dalbum(2,{$moduleid},{$MOD[thumb_width]},{$MOD[thumb_height]}, Dd('thumb2').value, true);"/>&nbsp;&nbsp;<img src="image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum(2);"/>&nbsp;&nbsp;<img src="image/img_delete.gif" width="12" height="12" title="删除" onclick="delAlbum(2,'wait');"/></td>
 {else}
-	<td onclick="if(confirm('此操作仅限{VIP}会员，是否现在申请？')) Go('grade.php');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_upload.gif" width="12" height="12" title="上传"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_select.gif" width="12" height="12" title="选择"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_delete.gif" width="12" height="12" title="删除"/></td>
-	<td onclick="if(confirm('此操作仅限{VIP}会员，是否现在申请？')) Go('grade.php');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_upload.gif" width="12" height="12" title="上传"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_select.gif" width="12" height="12" title="选择"/>&nbsp;&nbsp;<img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/img_delete.gif" width="12" height="12" title="删除"/></td>
+	<td onclick="if(confirm('此操作仅限{VIP}会员，是否现在申请？')) Go('grade.php');"><img src="image/img_upload.gif" width="12" height="12" title="上传"/>&nbsp;&nbsp;<img src="image/img_select.gif" width="12" height="12" title="选择"/>&nbsp;&nbsp;<img src="image/img_delete.gif" width="12" height="12" title="删除"/></td>
+	<td onclick="if(confirm('此操作仅限{VIP}会员，是否现在申请？')) Go('grade.php');"><img src="image/img_upload.gif" width="12" height="12" title="上传"/>&nbsp;&nbsp;<img src="image/img_select.gif" width="12" height="12" title="选择"/>&nbsp;&nbsp;<img src="image/img_delete.gif" width="12" height="12" title="删除"/></td>
 {/if}
 	</tr>
 	</table>
@@ -144,7 +143,7 @@ var property_admin = 0;
 {deditor($moduleid, 'content', $group_editor, '100%', 350)}<br/><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
-{if $MOD[swfu] == 1 && DT_EDITOR == 'fckeditor' && !$DT_TOUCH}
+{if $MOD[swfu] == 1 && DT_EDITOR == 'fckeditor'}
 {php include DT_ROOT.'/api/swfupload/editor.inc.php';}
 {/if}
 
@@ -174,6 +173,7 @@ var property_admin = 0;
 <td class="f_gray">例如：红色|蓝色|黑色|白色 多个属性用|分隔</td>
 </tr>
 </table>
+<span id="dnv" class="f_red"></span>
 </td>
 </tr>
 
@@ -185,7 +185,7 @@ var property_admin = 0;
 	<td>快递</td>
 	<td>默认运费</td>
 	<td>增加一件商品增加</td>
-	<td>选择模板 | <a href="express.php" class="t" target="_blank">管理模板</a></td>
+	<td>选择模板 | <a href="express.php?mid={$mid}" class="t" target="_blank">管理模板</a></td>
 	</tr>
 	<tr bgcolor="#FFFFFF" align="center">
 	<td><input name="post[express_name_1]" type="text" id="express_name_1" size="10" value="{$express_name_1}" /></td>
@@ -227,7 +227,7 @@ var property_admin = 0;
 	</td>
 	</tr>
 	</table>
-	<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Nexpress('0.00', '包邮');">包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');">满500包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('10.00', '快递');">快递10元</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');Dd('express_name_2').value = '快递';Dd('fee_start_2').value = '10.00';">快递10元，满500包邮</span></span>
+	<span class="f_gray">&nbsp;填写示例：<span class="c_p" title="点击观看" onclick="Nexpress('0.00', '包邮');">包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');">满500包邮</span> / <span class="c_p" title="点击观看" onclick="Nexpress('10.00', '快递');">快递10元</span> / <span class="c_p" title="点击观看" onclick="Nexpress('500.00', '包邮');Dd('express_name_2').value = '快递';Dd('fee_start_2').value = '10.00';">快递10元，满500包邮</span></span> <span id="dexpress" class="f_red"></span>
 </td>
 </tr>
 <tr{if !$_userid} style="display:none;"{/if}>
@@ -363,7 +363,7 @@ function add() {
 {$mycat_select}&nbsp;
 <input type="text" size="30" name="kw" value="{$kw}" title="关键词"/>&nbsp;
 {$order_select}&nbsp;
-<input type="submit" value=" 搜 索 " class="btn"/>
+<input type="submit" value=" 搜 索 " class="btn"/>&nbsp;
 <input type="button" value=" 重 置 " class="btn" onclick="Go('?mid={$mid}&status={$status}');"/>
 <div class="b10"></div>
 &nbsp;单价：<input type="text" size="3" name="minprice" value="{$minprice}"/> ~ <input type="text" size="3" name="maxprice" value="{$maxprice}"/>&nbsp;
@@ -375,35 +375,35 @@ function add() {
 </div>
 <div class="ls">
 <form method="post">
-<table cellpadding="0" cellspacing="0" class="tb">
+<table cellpadding="10" cellspacing="0" class="tb">
 <tr>
 <th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
-<th width="60">图片</th>
+<th width="90">图片</th>
 <th>商品</th>
 <th>价格</th>
 <th>订单</th>
 <th>销量</th>
 <th>库存</th>
 <th>评论</th>
-<th>人气</th>
+{if $MOD[hits]}<th>人气</th>{/if}
 <th width="100">管理</th>
 </tr>
 {loop $lists $k $v}
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="checkbox" name="itemid[]" value="{$v[itemid]}"/></td>
 <td><a href="javascript:_preview('{$v[thumb]}');"><img src="{if $v[thumb]}{$v[thumb]}{else}{DT_SKIN}image/nopic50.gif{/if}" width="50" class="thumb"/></a></td>
-<td align="left" title="{$v[alt]}"><ul><li>&nbsp;{if $v[elite]}<span class="f_red" title="公司主页推荐">[荐]</span> {/if}{if $v[status]>2}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="{DT_STATIC}{$MODULE[2][moduledir]}/image/why.gif" title="未通过原因"/></a>{/if}</li><li title="更新时间 {timetodate($v[edittime], 5)} 添加时间 {timetodate($v[addtime], 5)}" class="px11 f_gray">&nbsp;{if $timetype=='add'}{timetodate($v[addtime], 5)}{else}{timetodate($v[edittime], 5)}{/if}</li></ul></td>
+<td align="left" title="{$v[alt]}"><ul><li>&nbsp;{if $v[elite]}<span class="f_red" title="公司主页推荐">[荐]</span> {/if}{if $v[status]>2}<a href="{$v[linkurl]}" target="_blank" class="t">{else}<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}" class="t">{/if}{$v[title]}</a>{if $v[status]==1 && $v[note]} <a href="javascript:" onclick="alert('{$v[note]}');"><img src="image/why.gif" title="未通过原因"/></a>{/if}</li><li title="更新时间 {timetodate($v[edittime], 5)} 添加时间 {timetodate($v[addtime], 5)}" class="f_gray">&nbsp;{if $timetype=='add'}{timetodate($v[addtime], 5)}{else}{timetodate($v[edittime], 5)}{/if}</li></ul></td>
 <td class="f_price">{$v[price]}</td>
-<td class="px11 c_p{if $v[orders]>0} f_blue f_b{/if}" title="查看订单" onclick="Go('trade.php?mallid={$v[itemid]}');">{$v[orders]}</td>
-<td class="px11">{$v[sales]}</td>
-<td class="px11{if $v[amount]<5} f_red f_b" title="库存不足{/if}">{$v[amount]}</td>
-<td class="px11">{$v[comments]}</td>
-<td class="px11">{$v[hits]}</td>
+<td class="c_p{if $v[orders]>0} f_blue f_b{/if}" title="查看订单" onclick="Go('trade.php?mallid={$v[itemid]}');">{$v[orders]}</td>
+<td>{$v[sales]}</td>
+<td class="{if $v[amount]<5}f_red f_b" title="库存不足{/if}">{$v[amount]}</td>
+<td>{$v[comments]}</td>
+{if $MOD[hits]}<td>{$v[hits]}</td>{/if}
 <td>
-<a href="?mid={$mid}&action=relate&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/child.png" title="关联商品" alt=""/></a>
-<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/edit.png" title="修改" alt=""/></a>
-{if $MG[copy]}&nbsp;<a href="?mid={$mid}&action=add&itemid={$v[itemid]}&catid={$v[catid]}"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/new.png" title="复制信息" alt=""/></a>{/if}
-{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="{DT_STATIC}{$MODULE[2][moduledir]}/image/delete.png" title="删除" alt=""/></a>{/if}
+<a href="?mid={$mid}&action=relate&itemid={$v[itemid]}"><img width="16" height="16" src="image/child.png" title="关联商品" alt=""/></a>
+<a href="?mid={$mid}&action=edit&itemid={$v[itemid]}"><img width="16" height="16" src="image/edit.png" title="修改" alt=""/></a>
+{if $MG[copy]}&nbsp;<a href="?mid={$mid}&action=add&itemid={$v[itemid]}"><img width="16" height="16" src="image/new.png" title="复制信息" alt=""/></a>{/if}
+{if $MG[delete]}&nbsp;<a href="?mid={$mid}&action=delete&itemid={$v[itemid]}" onclick="return confirm('确定要删除吗？此操作将不可撤销');"><img width="16" height="16" src="image/delete.png" title="删除" alt=""/></a>{/if}
 </td>
 </tr>
 {/loop}
@@ -425,16 +425,16 @@ function add() {
 </div>
 {/if}
 </form>
-{if $MG[mall_limit] || (!$MG[fee_mode] && $MOD[fee_add])}
+{if $mod_limit || (!$MG[fee_mode] && $MOD[fee_add])}
 <div class="limit">
-{if $MG[mall_limit]}
-总共可发 <span class="f_b f_red">{$MG[mall_limit]}</span> 条&nbsp;&nbsp;&nbsp;
+{if $mod_limit}
+总共可发 <span class="f_b f_red">{$mod_limit}</span> 条&nbsp;&nbsp;&nbsp;
 当前已发 <span class="f_b">{$limit_used}</span> 条&nbsp;&nbsp;&nbsp;
 还可以发 <span class="f_b f_blue">{$limit_free}</span> 条&nbsp;&nbsp;&nbsp;
 {/if}
 {if !$MG[fee_mode] && $MOD[fee_add]}
 发布信息收费 <span class="f_b f_red">{$MOD[fee_add]}</span> {if $MOD[fee_currency] == 'money'}{$DT[money_unit]}{else}{$DT[credit_unit]}{/if}/条&nbsp;&nbsp;&nbsp;
-可免费发布 <span class="f_b">{if $MG[mall_free_limit]<0}无限{else}{$MG[mall_free_limit]}{/if}</span> 条&nbsp;&nbsp;&nbsp;
+可免费发布 <span class="f_b">{if $mod_free_limit<0}无限{else}{$mod_free_limit}{/if}</span> 条&nbsp;&nbsp;&nbsp;
 {/if}
 </div>
 {/if}
@@ -451,7 +451,6 @@ function _p() {
 function check() {
 	var l;
 	var f;
-
 	f = 'catid_1';
 	if(Dd(f).value == 0) {
 		Dmsg('请选择商品分类', 'catid', 1);
@@ -463,92 +462,92 @@ function check() {
 		Dmsg('商品名称最少2字，当前已输入'+l+'字', f);
 		return false;
 	}
-	f = 'price';
-	l = Dd(f).value;
-	if(l < 0.1) {
-		Dmsg('请填写商品价格', f);
-		return false;
-	}
 	f = 'amount';
 	l = Dd(f).value;
 	if(l < 1) {
 		Dmsg('请填写库存', f);
 		return false;
 	}
+	{if $DT_PC}
 	f = 'thumb';
 	l = Dd(f).value.length;
-	if(l < 5) {
-		Dmsg('请上传第一张商品图片', f, 1);
+	if(l < 10) {
+		Dmsg('请上传第一张商品图片', f);
+		return false;
+	}
+	{/if}
+	f = 'thumb0';
+	l = Dd(f).value.length;
+	if(l < 10) {
+		Dmsg('请上传第一张商品图片', f);
 		return false;
 	}
 	f = 'content';
-	l = FCKLen();
+	l = Dd(f).value.length;
 	if(l < 15 || l > 50000) {
-		Dmsg('详细说明应为15-50000字，当前已输入'+l+'字', f);
+		Dmsg('详细内容应为15-50000字，当前已输入'+l+'字', f);
 		return false;
 	}
-
 	if(Dd('v1').value) {
 		if(!Dd('n1').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称', 'nv');
 			Dd('n1').focus();
 			return false;
 		}
 		if(Dd('v1').value.indexOf('|') == -1) {
-			alert(Dd('n1').value+'至少需要两个属性');
+			Dmsg(Dd('n1').value+'至少需要两个属性', 'nv');
 			Dd('v1').focus();
 			return false;
 		}
 	}
 	if(Dd('v2').value) {
 		if(!Dd('n2').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称');
 			Dd('n2').focus();
 			return false;
 		}
 		if(Dd('v2').value.indexOf('|') == -1) {
-			alert(Dd('n2').value+'至少需要两个属性');
+			Dmsg(Dd('n2').value+'至少需要两个属性', 'nv');
 			Dd('v2').focus();
 			return false;
 		}
 	}
 	if(Dd('v3').value) {
 		if(!Dd('n3').value) {
-			alert('请填写属性名称');
+			Dmsg('请填写属性名称', 'nv');
 			Dd('n3').focus();
 			return false;
 		}
 		if(Dd('v3').value.indexOf('|') == -1) {
-			alert(Dd('n3').value+'至少需要两个属性');
+			Dmsg(Dd('n3').value+'至少需要两个属性', 'nv');
 			Dd('v3').focus();
 			return false;
 		}
 	}
 	if(Dd('n1').value && (Dd('n1').value == Dd('n2').value || Dd('n1').value == Dd('n3').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('n2').value && (Dd('n2').value == Dd('n1').value || Dd('n2').value == Dd('n3').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('n3').value && (Dd('n3').value == Dd('n1').value || Dd('n3').value == Dd('n2').value)) {
-		alert('属性名称不能重复');
+		Dmsg('属性名称不能重复', 'nv');
 		return false;
 	}
 	if(Dd('express_name_1').value && (Dd('express_name_1').value == Dd('express_name_2').value || Dd('express_name_1').value == Dd('express_name_3').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}
 	if(Dd('express_name_2').value && (Dd('express_name_2').value == Dd('express_name_1').value || Dd('express_name_2').value == Dd('express_name_3').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}
 	if(Dd('express_name_3').value && (Dd('express_name_3').value == Dd('express_name_1').value || Dd('express_name_3').value == Dd('express_name_2').value)) {
-		alert('快递名称不能重复');
+		Dmsg('快递名称不能重复', 'express');
 		return false;
 	}
-
 	{if $FD}{fields_js()}{/if}
 	{if $CP}{property_js()}{/if}
 {if $need_password}
@@ -561,29 +560,19 @@ function check() {
 {/if}
 {if $need_question}
 	f = 'answer';
-	l = Dd(f).value.length;
-	if(l < 1) {
-		Dmsg('请填写验证问题', f);
-		return false;
-	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
+		Dmsg('请填写正确的验证问题', f);
 		return false;
 	}
 {/if}
 {if $need_captcha}
 	f = 'captcha';
-	l = Dd(f).value;
-	if(!is_captcha(l)) {
+	if($('#c'+f).html().indexOf('ok.png') == -1) {
 		Dmsg('请填写正确的验证码', f);
 		return false;
 	}
-	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
-		Dd(f).focus();
-		return false;
-	}
 {/if}
-	return Dstep();
+return Dstep();
 }
 function Dexpress(i, s) {
 	if(Dd('express_'+i).value > 0) {
@@ -612,6 +601,7 @@ function Nexpress(i, s) {
 	Dd('fee_step_3').value = '0.00';
 	$('#express_3').val(0);
 }
+
 function Dstep() {
 	Dd('p_a_1').innerHTML=Dd('p_p_1').innerHTML=Dd('p_a_2').innerHTML=Dd('p_p_2').innerHTML=Dd('p_a_3').innerHTML=Dd('p_p_3').innerHTML='';
 	var a1 = parseInt(Dd('a1').value);
@@ -624,13 +614,13 @@ function Dstep() {
 	if(u.length < 1) Dd('unit').value = u = '件';
 	var m = '{$DT[money_unit]}';
 	if(!a1 || a1 < 1) {
-		alert('起订量必须大于0');
+		Dmsg('起订量必须大于0');
 		Dd('a1').value = '1';
 		Dd('a1').focus();
 		return false;
 	}
 	if(!p1 || p1 < 0.1) {
-		alert('请填写商品价格');
+		Dmsg('请填写商品价格');
 		Dd('p1').value = '';
 		Dd('p1').focus();
 		return false;
@@ -639,13 +629,13 @@ function Dstep() {
 	Dd('p_p_1').innerHTML = p1+m+'/'+u;
 	if(a2 > 1 && p2 > 0.01) {
 		if(a2 <= a1) {
-			alert('数量必须大于'+a1);
+			Dmsg('数量必须大于'+a1);
 			Dd('a2').value = '';
 			Dd('a2').focus();
 			return false;
 		}
 		if(p2 >= p1) {
-			alert('价格必须小于'+p1);
+			Dmsg('价格必须小于'+p1);
 			Dd('p2').value = '';
 			Dd('p2').focus();
 			return false;
@@ -657,13 +647,13 @@ function Dstep() {
 	}
 	if(a3 > 1 && p3 > 0.01) {
 		if(a3 <= a2) {
-			alert('数量必须大于'+a2);
+			Dmsg('数量必须大于'+a2);
 			Dd('a3').value = '';
 			Dd('a3').focus();
 			return false;
 		}
 		if(p3 >= p2) {
-			alert('价格必须小于'+p2);
+			Dmsg('价格必须小于'+p2);
 			Dd('p3').value = '';
 			Dd('p3').focus();
 			return false;
@@ -675,6 +665,7 @@ function Dstep() {
 	}
 	return true;
 }
+
 var destoon_oauth = '{$EXT[oauth]}';
 </script>
 {/if}

@@ -10,8 +10,7 @@ show_menu($menus);
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="post[mycatid]" value="<?php echo $mycatid;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息类型</td>
 <td>
@@ -26,8 +25,8 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
-<br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?>
+ <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <?php if($CP) { ?>
 <script type="text/javascript">
@@ -62,7 +61,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
 	<input type="hidden" name="post[thumb1]" id="thumb1" value="<?php echo $thumb1;?>"/>
 	<input type="hidden" name="post[thumb2]" id="thumb2" value="<?php echo $thumb2;?>"/>
-	<table width="360">
+	<table width="360" class="ctb">
 	<tr align="center" height="120" class="c_p">
 	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb').value, true);}"/></td>
 	<td width="120"><img src="<?php echo $thumb1 ? $thumb1 : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb1" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb1').src, 1);}else{Dalbum(1,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb1').value, true);}"/></td>
@@ -78,40 +77,40 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 过期时间</td>
-<td><?php echo dcalendar('post[totime]', $totime);?>&nbsp;
+<td><?php echo dcalendar('post[totime]', $totime, '-', 1);?>&nbsp;
 <select onchange="Dd('posttotime').value=this.value;">
 <option value="">快捷选择</option>
 <option value="">长期有效</option>
-<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?>">3天</option>
-<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?>">一周</option>
-<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?>">半月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?>">一月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?>">半年</option>
-<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?>">一年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?> 23:59:59">3天</option>
+<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?> 23:59:59">一周</option>
+<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?> 23:59:59">半月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?> 23:59:59">一月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?> 23:59:59">半年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?> 23:59:59">一年</option>
 </select>&nbsp;
 <span id="dposttotime" class="f_red"></span> 不选表示长期有效</td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 主要参数</td>
 <td class="nv">
-<table cellspacing="1">
-<tr>
+<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
+<tr align="center">
 <th>参数名称</th>
 <th>参数值</th>
 </tr>
-<tr>
+<tr bgcolor="#FFFFFF">
 <td><input name="post[n1]" type="text" size="10" value="<?php echo $n1;?>" id="n1"/></td>
 <td><input name="post[v1]" type="text" size="20" value="<?php echo $v1;?>" id="v1"/></td>
 </tr>
-<tr>
+<tr bgcolor="#FFFFFF">
 <td><input name="post[n2]" type="text" size="10" value="<?php echo $n2;?>" id="n2"/></td>
 <td><input name="post[v2]" type="text" size="20" value="<?php echo $v2;?>" id="v2"/></td>
 </tr>
-<tr>
+<tr bgcolor="#FFFFFF">
 <td><input name="post[n3]" type="text" size="10" value="<?php echo $n3;?>" id="n3"/></td>
 <td><input name="post[v3]" type="text" size="20" value="<?php echo $v3;?>" id="v3"/></td>
 </tr>
-<tr>
+<tr bgcolor="#FFFFFF">
 <td class="f_gray">例如：规格</td>
 <td class="f_gray">例如：10cm*20cm</td>
 </tr>
@@ -121,24 +120,24 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <tr>
 <td class="tl"><span class="f_hid">*</span> 交易条件</td>
 <td>
-	<table width="100%">
-	<tr>
+	<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
+	<tr bgcolor="#FFFFFF">
 	<td width="70">计量单位</td>
 	<td><input name="post[unit]" type="text" size="10" value="<?php echo $unit;?>" onblur="if(this.value){Dd('u1').innerHTML=Dd('u2').innerHTML=Dd('u3').innerHTML=this.value;}" id="u0"/><input type="hidden" id="uu" value="单位"/></td>
 	</tr>
-	<tr>
+	<tr bgcolor="#FFFFFF">
 	<td>产品单价</td>
 	<td><input name="post[price]" type="text" size="10" value="<?php echo $price;?>"/> <?php echo $DT['money_unit'];?>/<span id="u1"><?php echo $unit ? $unit : '单位';?></span></td>
 	</tr>
-	<tr>
+	<tr bgcolor="#FFFFFF">
 	<td>最小起订量</td>
 	<td><input name="post[minamount]" type="text" size="10" value="<?php echo $minamount;?>"/> <span id="u2"><?php echo $unit ? $unit : '单位';?></span></td>
 	</tr>
-	<tr>
+	<tr bgcolor="#FFFFFF">
 	<td>供货总量</td>
 	<td><input name="post[amount]" type="text" size="10" value="<?php echo $amount;?>"/> <span id="u3"><?php echo $unit ? $unit : '单位';?></span></td>
 	</tr>
-	<tr>
+	<tr bgcolor="#FFFFFF">
 	<td>发货期限</td>
 	<td>自买家付款之日起 <input name="post[days]" type="text" size="2" value="<?php echo $days;?>"/> 天内发货</td>
 	</tr>
@@ -200,16 +199,16 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <td class="tr"><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
+<?php if($DT['im_wx']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 微信</td>
+<td class="tr"><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+</tr>
+<?php } ?>
 <?php if($DT['im_ali']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
 <td class="tr"><input name="post[ali]" id="ali" type="text" size="30" value="<?php echo $ali;?>"/></td>
-</tr>
-<?php } ?>
-<?php if($DT['im_msn']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> MSN</td>
-<td class="tr"><input name="post[msn]" id="msn" type="text" size="30" value="<?php echo $msn;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_skype']) { ?>
@@ -235,7 +234,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
@@ -257,7 +256,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php load('guest.js'); ?>
@@ -267,7 +266,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
 <td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>

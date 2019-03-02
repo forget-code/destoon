@@ -6,7 +6,6 @@ $menus = array (
     array('SEO优化'),
     array('权限收费'),
     array('定义字段', 'javascript:Dwidget(\'?file=fields&tb='.$table.'\', \'['.$MOD['name'].']定义字段\');'),
-    array('模板管理', 'javascript:Dwidget(\'?file=template&dir='.$module.'\', \'['.$MOD['name'].']模板管理\');'),
 );
 show_menu($menus);
 ?>
@@ -15,8 +14,19 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<div class="tt">基本设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
+<tr>
+<td class="tl">首页默认模板</td>
+<td><?php echo tpl_select('index', $module, 'setting[template_index]', '默认模板', $template_index);?></td>
+</tr>
+<tr>
+<td class="tl">列表默认模板</td>
+<td><?php echo tpl_select('list', $module, 'setting[template_list]', '默认模板', $template_list);?></td>
+</tr>
+<tr>
+<td class="tl">搜索默认模板</td>
+<td><?php echo tpl_select('search', $module, 'setting[template_search]', '默认模板', $template_search);?></td>
+</tr>
 <tr>
 <td class="tl">信息排序方式</td>
 <td>
@@ -77,28 +87,28 @@ show_menu($menus);
 <tr>
 <td class="tl"><?php echo VIP;?>指数计算规则</td>
 <td>
-	<table cellpadding="3" cellspacing="1" width="400" bgcolor="#E5E5E5" style="margin:5px;">
-	<tr align="center">
+	<table cellpadding="3" cellspacing="1" width="400" bgcolor="#E5E5E5" style="margin:5px;" class="ctb">
+	<tr align="center" bgcolor="#F5F5F5">
 	<td>项目</td>
 	<td>值</td>
 	<td>最大值</td>
 	</tr>
-	<tr align="center">
+	<tr align="center" bgcolor="#FFFFFF">
 	<td>会员组<?php echo VIP;?>指数</td>
 	<td>相等</td>
 	<td><input type="text" size="2" name="setting[vip_maxgroupvip]" value="<?php echo $vip_maxgroupvip;?>"/></td>
 	</tr>
-	<tr align="center">
+	<tr align="center" bgcolor="#FFFFFF">
 	<td>企业资料认证</td>
 	<td><input type="text" size="2" name="setting[vip_cominfo]" value="<?php echo $vip_cominfo;?>"/></td>
 	<td><?php echo $vip_cominfo;?></td>
 	</tr>
-	<tr align="center">
+	<tr align="center" bgcolor="#FFFFFF">
 	<td>VIP年份（单位：值/年）</td>
 	<td><input type="text" size="2" name="setting[vip_year]" value="<?php echo $vip_year;?>"/></td>
 	<td><input type="text" size="2" name="setting[vip_maxyear]" value="<?php echo $vip_maxyear;?>"/></td>
 	</tr>
-	<tr align="center">
+	<tr align="center" bgcolor="#FFFFFF">
 	<td>5张以上资质证书</td>
 	<td><input type="text" size="2" name="setting[vip_honor]" value="<?php echo $vip_honor;?>"/></td>
 	<td><?php echo $vip_honor;?></td>
@@ -161,6 +171,11 @@ tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要�
 </tr>
 
 <tr>
+<td class="tl">按分类浏览列数</td>
+<td><input type="text" size="3" name="setting[page_subcat]" value="<?php echo $page_subcat;?>"/></td>
+</tr>
+
+<tr>
 <td class="tl">首页名企推荐数量</td>
 <td><input type="text" size="3" name="setting[page_irec]" value="<?php echo $page_irec;?>"/></td>
 </tr>
@@ -185,18 +200,27 @@ tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要�
 <td><input type="text" size="3" name="setting[pagesize]" value="<?php echo $pagesize;?>"/></td>
 </tr>
 
-
 <tr>
-<td class="tl">按分类浏览列数</td>
-<td><input type="text" size="3" name="setting[page_subcat]" value="<?php echo $page_subcat;?>"/></td>
+<td class="tl">内容点击次数</td>
+<td>
+<input type="radio" name="setting[hits]" value="1"  <?php if($hits) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[hits]" value="0"  <?php if(!$hits) echo 'checked';?>/> 关闭
+<?php tips('关闭后，有助于缓解频繁更新点击次数对数据表造成的压力');?>
+</td>
 </tr>
 
+<tr>
+<td class="tl">内容页评论列表</td>
+<td>
+<input type="radio" name="setting[page_comment]" value="1"  <?php if($page_comment==1) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[page_comment]" value="0"  <?php if($page_comment==0) echo 'checked';?>/> 关闭
+</td>
+</tr>
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<div class="tt">SEO优化</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">首页是否生成html</td>
 <td>
@@ -281,13 +305,29 @@ tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要�
 <?php echo seo_title('seo_description_show', array('showtitle', 'showintroduce', 'catname', 'catdescription', 'modulename', 'sitename', 'sitedescription'));?>
 </td>
 </tr>
+<tr>
+<td class="tl">搜索页Title<br/>(网页标题)</td>
+<td><input name="setting[seo_title_search]" type="text" id="seo_title_search" value="<?php echo $seo_title_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_title_search', array('kw', 'areaname', 'catname', 'cattitle', 'modulename', 'sitename', 'sitetitle', 'page', 'delimiter'));?>
+</td>
+</tr>
+<tr>
+<td class="tl">搜索页Keywords<br/>(网页关键词)</td>
+<td><input name="setting[seo_keywords_search]" type="text" id="seo_keywords_search" value="<?php echo $seo_keywords_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_keywords_search', array('kw', 'areaname', 'catname', 'catkeywords', 'modulename', 'sitename', 'sitekeywords'));?>
+</td>
+</tr>
+<tr>
+<td class="tl">搜索页Description<br/>(网页描述)</td>
+<td><input name="setting[seo_description_search]" type="text" id="seo_description_search" value="<?php echo $seo_description_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_description_search', array('kw', 'areaname', 'catname', 'catdescription', 'modulename', 'sitename', 'sitedescription'));?>
+</td>
+</tr>
 </table>
 </div>
 
 <div id="Tabs2" style="display:none">
-<div class="tt">权限收费</div>
-<table cellpadding="2" cellspacing="1" class="tb">
-
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">允许浏览模块首页</td>
 <td><?php echo group_checkbox('setting[group_index][]', $group_index);?></td>
@@ -303,12 +343,12 @@ tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要�
 </tr>
 
 <tr>
-<td class="tl">允许查看公司主页联系方式</td>
+<td class="tl">查看公司主页联系方式</td>
 <td><?php echo group_checkbox('setting[group_contact][]', $group_contact);?></td>
 </tr>
 
 <tr>
-<td class="tl">允许查看公司主页采购列表</td>
+<td class="tl">查看公司主页采购列表</td>
 <td><?php echo group_checkbox('setting[group_buy][]', $group_buy);?></td>
 </tr>
 
@@ -331,7 +371,7 @@ tips('位于./api/kf/目录,一个目录即为一个客服接口<br/>请不要�
 </div>
 
 <div class="sbt">
-<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -348,9 +388,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-window.onload=function() {
+$(function(){
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-}
+});
 </script>
 <?php include tpl('footer');?>

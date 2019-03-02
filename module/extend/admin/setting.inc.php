@@ -11,8 +11,9 @@ if($submit) {
 	if($setting['show_url'] != $MOD['show_url']) {
 		msg('设置保存成功，开始更新地址', '?moduleid='.$moduleid.'&file=html');
 	}
-	dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
+	dmsg('设置保存成功', '?moduleid='.$moduleid.'&file='.$file.'&tab='.$tab);
 } else {
+	$GROUP = cache_read('group.php');
 	extract(dhtmlspecialchars($MOD));
 	if($kw) {
 		$all = 1;

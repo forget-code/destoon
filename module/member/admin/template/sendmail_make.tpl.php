@@ -3,14 +3,13 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">获取会员邮件列表</div>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="make" value="1"/>
 <input type="hidden" name="first" value="1"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 数据表</td>
 <td><input type="text" size="50" name="tb" id="tb" value="<?php echo $DT_PRE;?>member"/></td>
@@ -59,7 +58,7 @@ function mk(v) {
 <td class="f_gray"><input type="text" size="20" id="title" name="title"/><br/>可填中文(如果服务器支持)，不填则系统自动生成</td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="获 取" class="btn-g"/></div>
 </form>
 <script type="text/javascript">Menuon(2);</script>
 <?php include tpl('footer');?>

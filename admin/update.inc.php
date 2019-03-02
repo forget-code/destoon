@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -12,12 +12,12 @@ switch($action) {
 		$PHP_URL = @get_cfg_var("allow_url_fopen");
 		if(!$PHP_URL) msg('当前服务器不支持URL打开文件，请修改php.ini中allow_url_fopen = on');
 		$url = 'http://www.destoon.com/update.php?product=b2b&release='.$release.'&version='.DT_VERSION.'&charset='.DT_CHARSET.'&lang='.DT_LANG.'&domain='.(DT_DOMAIN ? DT_DOMAIN : DT_PATH);
-		$code = @file_get_contents($url);
+		$code = dcurl($url);
 		if($code) {
 			if(substr($code, 0, 8) == 'StatusOk') {
 				$code = substr($code, 8);
 			} else {
-				msg(convert($code, 'UTF-8', DT_CHARSET));
+				msg($code);
 			}
 		} else {
 			msg('无法连接官方服务器，请重试或稍后更新');

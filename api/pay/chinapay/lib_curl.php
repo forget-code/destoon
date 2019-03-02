@@ -9,7 +9,6 @@ function HttpGet($http, $url) {
 	return $output;
 }   
 
-
 function HttpPost($http, $post_data, $url) {
 	// create curl resource 
 	curl_setopt($http, CURLOPT_POST, 1);
@@ -55,9 +54,6 @@ function curl_redir_exec($ch, $url){
     }
 }
 
-
-
-
 function HttpInit() {
 	$http = curl_init(); 
 	curl_setopt($http, CURLOPT_RETURNTRANSFER, 1);
@@ -75,5 +71,4 @@ function HttpDone($http) {
 	// close curl resource to free up system resources 
 	curl_close($http); 
 }
-
 ?>

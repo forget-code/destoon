@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -90,10 +90,29 @@ switch($seo_file) {
 		}
 	break;
 	case 'search':
-		$seo_title = $seo_modulename.$L['search'].$seo_delimiter.$seo_page.$seo_sitename;
-		if($catid) $seo_title = $seo_catname.$seo_title;
-		if($areaid) $seo_title = $seo_areaname.$seo_title;
-		if($kw) $seo_title = $kw.$seo_delimiter.$seo_title;
+		if($MOD['title_search']) {
+			$seo_kw = $kw ? $kw.$seo_delimiter : '';
+			eval("\$seo_title = \"$MOD[title_search]\";");
+		} else {
+			$seo_title = $seo_modulename.$L['search'].$seo_delimiter.$seo_page.$seo_sitename;
+			if($catid) $seo_title = $seo_catname.$seo_title;
+			if($areaid) $seo_title = $seo_areaname.$seo_title;
+			if($kw) $seo_title = $kw.$seo_delimiter.$seo_title;
+		}
+		$_seo_catname = $seo_catname;
+		$_seo_areaname = $seo_areaname;
+		if($MOD['keywords_search']) {
+			if($_seo_catname) $seo_catname = str_replace($seo_delimiter, ',', $_seo_catname);
+			if($_seo_areaname) $seo_areaname = str_replace($seo_delimiter, ',', $_seo_areaname);
+			$seo_kw = $kw ? $kw.',' : '';
+			eval("\$head_keywords = \"$MOD[keywords_search]\";");
+		}
+		if($MOD['description_search']) {
+			if($_seo_catname) $seo_catname = str_replace($seo_delimiter, ' ', $_seo_catname);
+			if($_seo_areaname) $seo_areaname = str_replace($seo_delimiter, ' ', $_seo_areaname);
+			$seo_kw = $kw ? $kw : '';
+			eval("\$head_description = \"$MOD[description_search]\";");
+		}
 	break;
 	default:
 	break;

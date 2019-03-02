@@ -1,15 +1,14 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('link', 1);
-require MD_ROOT.'/link.class.php';
+require DT_ROOT.'/module/'.$module.'/link.class.php';
 $do = new dlink();
 $menus = array (
     array('添加链接', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('链接列表', '?moduleid='.$moduleid.'&file='.$file),
     array('审核链接', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
     array('链接分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'链接分类\');'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
@@ -71,7 +70,7 @@ switch($action) {
 			}
 		} else {
 			extract($do->get_one());
-			$menuid = 1;
+			$menuid = $status == 3 ? 1 : 2;
 			include tpl('link_edit', $module);
 		}
 	break;
@@ -80,8 +79,9 @@ switch($action) {
 			$do->check($itemid);
 			dmsg('审核成功', $forward);
 		} else {
+			$menuid = 2;
 			$lists = $do->get_list("status=2 AND username=''".$condition, $dorder[$order]);
-			include tpl('link_check', $module);
+			include tpl('link', $module);
 		}
 	break;
 	case 'order':
@@ -100,6 +100,7 @@ switch($action) {
 		dmsg('级别设置成功', $forward);
 	break;
 	default:
+		$menuid = 1;
 		$lists = $do->get_list("status=3 AND username=''".$condition, $dorder[$order]);
 		include tpl('link', $module);
 	break;

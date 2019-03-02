@@ -1,10 +1,10 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="<?php echo DT_LANG;?>">
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset=<?php echo DT_CHARSET;?>"/>
+<meta charset="<?php echo DT_CHARSET;?>"/>
 <title>管理中心 - <?php echo $DT['sitename']; ?> - Powered By DESTOON B2B V<?php echo DT_VERSION; ?> R<?php echo DT_RELEASE;?></title>
 <meta name="robots" content="noindex,nofollow"/>
 <meta name="generator" content="DESTOON B2B - www.destoon.com"/>
@@ -15,7 +15,12 @@ defined('DT_ADMIN') or exit('Access Denied');
 <link rel="stylesheet" href="admin/image/style.css" type="text/css"/>
 <script type="text/javascript" src="<?php echo DT_STATIC;?>lang/<?php echo DT_LANG;?>/lang.js"></script>
 <script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/config.js"></script>
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery.js"></script>
+<!--[if lte IE 9]><!-->
+<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-1.5.2.min.js"></script>
+<!--<![endif]-->
+<!--[if (gte IE 10)|!(IE)]><!-->
+<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-2.1.1.min.js"></script>
+<!--<![endif]-->
 <script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/common.js"></script>
 <script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/admin.js"></script>
 </head>

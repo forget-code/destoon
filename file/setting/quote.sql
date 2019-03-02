@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_quote`;
-CREATE TABLE `destoon_quote` (
+DROP TABLE IF EXISTS `destoon_quote_7`;
+CREATE TABLE `destoon_quote_7` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -12,6 +12,7 @@ CREATE TABLE `destoon_quote` (
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
+  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
   `addtime` int(10) unsigned NOT NULL default '0',
@@ -30,15 +31,15 @@ CREATE TABLE `destoon_quote` (
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='行情';
 
-DROP TABLE IF EXISTS `destoon_quote_data`;
-CREATE TABLE `destoon_quote_data` (
+DROP TABLE IF EXISTS `destoon_quote_data_7`;
+CREATE TABLE `destoon_quote_data_7` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` longtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='行情内容';
 
-DROP TABLE IF EXISTS `destoon_quote_price`;
-CREATE TABLE `destoon_quote_price` (
+DROP TABLE IF EXISTS `destoon_quote_price_7`;
+CREATE TABLE `destoon_quote_price_7` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `pid` bigint(20) unsigned NOT NULL default '0',
   `price` decimal(10,2) NOT NULL,
@@ -48,6 +49,7 @@ CREATE TABLE `destoon_quote_price` (
   `company` varchar(100) NOT NULL,
   `telephone` varchar(50) NOT NULL,
   `qq` varchar(20) NOT NULL,
+  `wx` varchar(50) NOT NULL,
   `ip` varchar(50) NOT NULL,
   `addtime` int(10) unsigned NOT NULL default '0',
   `status` tinyint(1) unsigned NOT NULL default '0',
@@ -59,8 +61,8 @@ CREATE TABLE `destoon_quote_price` (
   KEY `pid` (`pid`)
 ) TYPE=MyISAM COMMENT='行情报价';
 
-DROP TABLE IF EXISTS `destoon_quote_product`;
-CREATE TABLE `destoon_quote_product` (
+DROP TABLE IF EXISTS `destoon_quote_product_7`;
+CREATE TABLE `destoon_quote_product_7` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',

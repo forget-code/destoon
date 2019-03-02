@@ -10,25 +10,40 @@ function get_reason_url($r = array()) {
 	$arr = explode('|', $r['reason']);
 	switch($arr[0]) {
 		case 'deposit':
-			$url = 'deposit.php?action=add&sum='.intval($arr[1]);
+			$url = 'deposit.php?action=add&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'credit':
-			$url = 'credit.php?action=buy&sum='.intval($arr[1]);
+			$url = 'credit.php?action=buy&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
+		break;
+		case 'sms':
+			$url = 'sms.php?action=buy&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'vip':
-			$url = 'vip.php?action=renew&sum='.intval($arr[1]);
+			$url = 'account.php?action=vip&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
+		break;
+		case 'grade':
+			$url = 'account.php?action=grade&groupid='.intval($arr[1]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
+		break;
+		case 'style':
+			if(is_numeric($arr[1]) && is_numeric($arr[2])) $url = 'style.php?action=buy&itemid='.intval($arr[1]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
+		break;
+		case 'spread':
+			if(is_numeric($arr[1]) && $arr[2]) $url = 'spread.php?action=add&mid='.intval($arr[1]).'&word='.urlencode(decrypt($arr[2], DT_KEY.'CR')).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'pay':
-			if(is_numeric($arr[1]) && is_numeric($arr[2])) $url = DT_PATH.'api/redirect.php?mid='.intval($arr[1]).'&itemid='.intval($arr[2]).'&sum=1';
+			if(is_numeric($arr[1]) && is_numeric($arr[2])) $url = 'pay.php?mid='.intval($arr[1]).'&itemid='.intval($arr[2]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
+		break;
+		case 'award':
+			if(is_numeric($arr[1]) && is_numeric($arr[2])) $url = 'award.php?mid='.intval($arr[1]).'&itemid='.intval($arr[2]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'trade':
-			if(is_numeric($arr[1])) $url = 'trade.php?action=update&step=pay&itemid='.intval($arr[1]).'&auth='.encrypt($r['amount'], DT_KEY.'CG', 600);
+			if(is_numeric($arr[1])) $url = 'order.php?action=update&step=pay&itemid='.intval($arr[1]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'trades':
-			$url = 'trade.php?action=muti&step=pay&auth='.encrypt($arr[1], DT_KEY.'CG', 600);
+			$url = 'order.php?action=muti&step=pay&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		case 'group':
-			if(is_numeric($arr[1])) $url = 'group.php?action=update&step=pay&itemid='.intval($arr[1]).'&auth='.encrypt($r['amount'], DT_KEY.'CG', 600);
+			if(is_numeric($arr[1])) $url = 'deal.php?mid='.intval($arr[2]).'&action=update&step=pay&itemid='.intval($arr[1]).'&auth='.encrypt($r['reason'], DT_KEY.'CG', 600);
 		break;
 		default:
 		break;
@@ -36,7 +51,7 @@ function get_reason_url($r = array()) {
 	return $url;
 }
 function get_reason($reason) {
-	global $db, $L;
+	global $L;
 	$str = '';
 	$arr = explode('|', $reason);
 	switch($arr[0]) {
@@ -46,29 +61,49 @@ function get_reason($reason) {
 		case 'credit':
 			$str = $L['charge_reason_credit'];
 		break;
+		case 'sms':
+			$str = $L['charge_reason_sms'];
+		break;
 		case 'vip':
 			$str = $L['charge_reason_vip'];
 		break;
+		case 'grade':
+			$str = $L['charge_reason_grade'];
+		break;
+		case 'style':
+			$str = $L['charge_reason_style'];
+		break;
+		case 'spread':
+			$str = $L['charge_reason_spread'];
+		break;
 		case 'pay':
+			$str = $L['charge_reason_pay'];
 			if(is_numeric($arr[1]) && is_numeric($arr[2])) {
-				$t = $db->get_one("SELECT title FROM ".get_table(intval($arr[1]))." WHERE itemid=".intval($arr[2]));
+				$t = DB::get_one("SELECT title FROM ".get_table(intval($arr[1]))." WHERE itemid=".intval($arr[2]));
+				if($t) $str = $t['title'];
+			}
+		break;
+		case 'award':
+			$str = $L['charge_reason_award'];
+			if(is_numeric($arr[1]) && is_numeric($arr[2])) {
+				$t = DB::get_one("SELECT title FROM ".get_table(intval($arr[1]))." WHERE itemid=".intval($arr[2]));
 				if($t) $str = $t['title'];
 			}
 		break;
 		case 'trade':
 			if(is_numeric($arr[1])) {
-				$t = $db->get_one("SELECT title FROM ".$db->pre."mall_order WHERE itemid=".intval($arr[1]));
+				$t = DB::get_one("SELECT title FROM ".DT_PRE."order WHERE itemid=".intval($arr[1]));
 				if($t) $str = $t['title'];
 			}
 		break;
 		case 'trades':
 			$ids = explode(',', $arr[1]);
-			$t = $db->get_one("SELECT title FROM ".$db->pre."mall_order WHERE itemid=".intval($ids[0]));
+			$t = DB::get_one("SELECT title FROM ".DT_PRE."order WHERE itemid=".intval($ids[0]));
 			if($t) $str = $L['charge_reason_muti'].$t['title'].'...';
 		break;
 		case 'group':
 			if(is_numeric($arr[1])) {
-				$t = $db->get_one("SELECT title FROM ".$db->pre."group_order WHERE itemid=".intval($arr[1]));
+				$t = DB::get_one("SELECT title FROM ".DT_PRE."group_order_".intval($arr[2])." WHERE itemid=".intval($arr[1]));
 				if($t) $str = $t['title'];
 			}
 		break;
@@ -81,20 +116,23 @@ switch($action) {
 	case 'record':
 		$PAY['card']['name'] = $L['charge_card_name'];
 		$_status = $L['charge_status'];
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		$minamount = isset($minamount) ? intval($minamount) : '';
 		$minamount or $minamount = '';
 		$maxamount = isset($maxamount) ? intval($maxamount) : '';
 		$maxamount or $maxamount = '';
 		$condition = "username='$_username'";
-		if($fromtime) $condition .= " AND sendtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND sendtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND sendtime>=$fromtime";
+		if($totime) $condition .= " AND sendtime<=$totime";
 		if($minamount)  $condition .= " AND amount>=$minamount";
 		if($maxamount)  $condition .= " AND amount<=$maxamount";
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}finance_charge WHERE $condition");
-		$pages = pages($r['num'], $page, $pagesize);		
-		$charges = array();
+		$items = $r['num'];
+		$pages = pages($items, $page, $pagesize);
+		$lists = array();
 		$amount = $fee = $money = $repay = 0;
 		$result = $db->query("SELECT * FROM {$DT_PRE}finance_charge WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
@@ -106,7 +144,7 @@ switch($action) {
 			$amount += $r['amount'];
 			$fee += $r['fee'];
 			$money += $r['money'];
-			$charges[] = $r;
+			$lists[] = $r;
 		}
 		$head_title = $L['charge_title_record'];
 	break;
@@ -145,13 +183,8 @@ switch($action) {
 		exit;
 	break;
 	case 'confirm':
-		$amount = dround($amount);
 		if($MOD['mincharge']) {
-			if(strpos($MOD['mincharge'], '|') !== false) {
-				in_array($amount, explode('|', $MOD['mincharge'])) or message($L['charge_pass_choose_amount']);
-			} else {
-				$amount >= intval($MOD['mincharge']) or message($L['charge_pass_amount_min'].$MOD['mincharge']);
-			}
+			$amount >= intval($MOD['mincharge']) or message($L['charge_pass_amount_min'].$MOD['mincharge']);
 		} else {			
 			$amount > 0 or message($L['charge_pass_type_amount']);
 		}
@@ -159,16 +192,17 @@ switch($action) {
 		$PAY[$bank]['enable'] or message($L['charge_pass_bank_close']);
 		$fee = $PAY[$bank]['percent'] ? dround($amount*$PAY[$bank]['percent']/100) : 0;
 		$charge = $fee + $amount;
-		preg_match("/^[a-z0-9\-\,\|]{3,}$/i", $reason) or $reason = '';
+		preg_match("/^[a-z0-9_\-\,\|]{3,}$/i", $reason) or $reason = '';
 		$auto = isset($auto) ? $auto : 1;//debug?
 		if($fee == 0) $auto = 1;
 		if($auto) $goto = 1;
 		if(isset($goto)) {
-			$receive_url = $MOD['linkurl'].'charge.php';
+			$receive_url = ($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).'charge.php';
 			$charge_title = get_reason($reason);
 			$db->query("INSERT INTO {$DT_PRE}finance_charge (username,bank,amount,fee,sendtime,reason) VALUES ('$_username','$bank','$amount','$fee','$DT_TIME','$reason')");
 			$orderid = $db->insert_id();
 			set_cookie('pay_id', $orderid);
+			set_cookie('pay_bank', $bank);
 			include DT_ROOT.'/api/pay/'.$bank.'/send.inc.php';
 			exit;
 		} else {
@@ -179,40 +213,16 @@ switch($action) {
 		$MOD['pay_online'] or dheader('?action=card');
 		$auto = 0;
 		if($MOD['mincharge']) {
-			if(strpos($MOD['mincharge'], '|') !== false) {				
-				$mincharge = 0;
-				$charges = explode('|', $MOD['mincharge']);
-			} else {
-				$mincharge = intval($MOD['mincharge']);
-				$charges = array();
-			}
+			$mincharge = intval($MOD['mincharge']);
 		} else {
 			$mincharge = 0;
-			$charges = array();
 			if($amount) $auto = 1;
 		}
 		isset($reason) or $reason = '';
-		if($DT_TOUCH) {
-			if($PAY['aliwap']['enable']) {
-				$PAY['alipay']['enable'] = 0;
-				$tmp = $PAY['aliwap'];
-				unset($PAY['aliwap']);
-				$PAY = array_merge(array('aliwap'=>$tmp), $PAY);
-			} else {
-				if($PAY['alipay']['enable']) {
-					$tmp = $PAY['alipay'];
-					unset($PAY['alipay']);
-					$PAY = array_merge(array('alipay'=>$tmp), $PAY);
-				}
-			}
-		} else {
-			$PAY['aliwap']['enable'] = 0;
-		}
-		if($DT_MOB['browser'] == 'weixin' && $PAY['weixin']['enable']) {
-			$tmp = $PAY['weixin'];
-			unset($PAY['weixin']);
-			$PAY = array_merge(array('weixin'=>$tmp), $PAY);
-		}
+		(isset($bank) && isset($PAY[$bank]) && $PAY[$bank]['enable']) or $bank = '';
+		$PAYLIST = get_paylist();
+		$bank or $bank = $PAYLIST[0]['bank'];
+		$total = count($PAYLIST);
 		$head_title = $L['charge_title_pay'];
 	break;
 	default:
@@ -295,6 +305,17 @@ switch($action) {
 		}
 		if($charge_forward) dheader($charge_forward);
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'record') {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = 'index.php';
+	} else {
+		$back_link = '?action=record';
+	}
 }
 include template('charge', $module);
 ?>

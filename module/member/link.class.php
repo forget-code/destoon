@@ -2,15 +2,12 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class dlink {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'link';
-		$this->db = &$db;
+		$this->table = DT_PRE.'link';
 		$this->fields = array('listorder', 'title','style','username','addtime','editor','edittime','status', 'linkurl');
     }
 
@@ -28,34 +25,35 @@ class dlink {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $_username, $_userid;
-		if(!$this->itemid) $post['addtime'] = $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		global $MOD, $_username, $_userid;
+		if(!$this->itemid) $post['addtime'] = DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['editor'] = $_username;
 		$post = dhtmlspecialchars($post);
 		return array_map("trim", $post);
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = '1', $order = 'listorder DESC, itemid DESC') {
-		global $pages, $page, $pagesize, $offset, $sum;
+		global $pages, $page, $pagesize, $offset, $items, $sum;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['title'] = set_style($r['title'], $r['style']);
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
+			$r['url'] = DT_PATH.'api/redirect.php?url='.urlencode(fix_link($r['linkurl']));
 			$lists[] = $r;
 		}
 		return $lists;
@@ -70,8 +68,8 @@ class dlink {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
 		return $this->itemid;
 	}
 
@@ -83,7 +81,7 @@ class dlink {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -96,7 +94,7 @@ class dlink {
 			$this->itemid = $itemid;
 			$r = $this->get_one();
 			if($all) {
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 			}
 		}
 	}
@@ -107,7 +105,7 @@ class dlink {
 				$this->check($v, $status); 
 			}
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
 		}
 	}
 

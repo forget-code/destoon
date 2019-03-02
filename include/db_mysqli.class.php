@@ -1,9 +1,10 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
+define('DB_ASSOC', MYSQLI_ASSOC);
 class db_mysqli {
 	var $connid;
 	var $pre;
@@ -16,8 +17,11 @@ class db_mysqli {
 
 	function connect($dbhost, $dbuser, $dbpass, $dbname, $dbttl, $dbcharset, $pconnect = 0) {
 		$this->ttl = $dbttl;
-		@list($dbhost, $dbport) = explode(':', $dbhost);
-		$dbport or $dbport = 3306;
+		if(strpos($dbhost, ':') === false) {
+			$dbport = 3306;
+		} else {
+			list($dbhost, $dbport) = explode(':', $dbhost);
+		}
 		$this->connid = mysqli_init();
 		if(mysqli_real_connect($this->connid, $dbhost, $dbuser, $dbpass, false, $dbport)) {
 			//

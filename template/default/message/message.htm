@@ -1,21 +1,23 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset={DT_CHARSET}"/>
+<meta charset="{DT_CHARSET}"/>
 <title>提示信息{$DT[seo_delimiter]}{$DT[sitename]}</title>
 <meta name="robots" content="noindex,nofollow"/>
+<meta name="generator" content="DESTOON B2B - www.destoon.com"/>
 <style type="text/css">
-*{font-size:12px;color:#2B61BA;}
-body{font-family: Verdana, Arial, Helvetica, sans-serif;background:#F0F2F7;margin:0;}
-input{color:#333333;}
-a:link,a:visited,a:active {color:#ABBBD6;text-decoration:none;}
-.msg{width:400px;background:#FFFFFF url('{DT_SKIN}image/messagebg.gif') repeat-x;margin:auto;}
-.head{letter-spacing:2px;line-height:29px;height:26px;overflow:hidden;font-weight:bold;}
-.content{padding:10px 20px 5px 20px;line-height:200%;word-break:break-all;border:#7998B7 1px solid;border-top:none;}
-.ml{color:#FFFFFF;background:url('{DT_SKIN}image/message.gif') no-repeat 0 0;padding-left:10px;}
-.mr{float:right;background:url('{DT_SKIN}image/message.gif') no-repeat 0 -34px;width:4px;font-size:1px;}
+*{font-size:14px;color:#000000;}
+body{font-family:'Microsoft YaHei',Verdana,Arial,Helvetica,sans-serif;background:#FFFFFF;margin:0;height:100%;}
+a:link,a:visited,a:active {color:#007AFF;text-decoration:none;}
+input{color:#000000;}
+.msg{width:400px;border:#E0E0E0 6px solid;border-radius:10px;margin:150px auto 0 auto;}
+.head{background:#F0F0F0;border-bottom:#E8E8E8 1px solid;border-radius:3px 3px 0 0;letter-spacing:1px;line-height:36px;height:36px;overflow:hidden;font-weight:bold;text-align:center;user-select:none;}
+.main{padding:16px 20px;line-height:200%;word-break:break-all;}
+.foot{padding:10px 3px;margin:0 16px;border-top:#EFF1F3 1px solid;background:url('{DT_SKIN}image/message-arrow.png') no-repeat right center;font-size:12px;color:#007AFF;}
+.progress {width:300px;height:6px;line-height:6px;font-size:1px;background:#E7E7E7;text-align:left;}
+.progress div {height:6px;line-height:6px;font-size:1px;background:#007AFF;}
+.f_gray{color:#666666;}
 </style>
-<script type="text/javascript">try {document.execCommand("BackgroundImageCache", false, true);} catch(e) {}</script>
 </head>
 {if $dtime == -1}
 <body style="background:#FFFFFF;margin:200px auto;">
@@ -24,27 +26,16 @@ a:link,a:visited,a:active {color:#ABBBD6;text-decoration:none;}
 <meta http-equiv="refresh" content="0;URL={$dforward}"/>
 {else}
 <body onkeydown="if(event.keyCode==13) window.history.back();">
-<table cellpadding="0" cellspacing="0" width="400"  align="center">
-<tr>
-<td height="150"></td>
-</tr>
-<tr>
-<td>
-	<div class="msg">
-		<div class="head"><div class="mr">&nbsp;</div><div class="ml">提示信息</div></div>
-		<div class="content">
-		{$dmessage}<br/>
-		{if $dforward == 'goback'}
-		<a href="javascript:window.history.back();">[ 点这里返回上一页 ]</a><br/>
-		{else}
-		<a href="{$dforward}">如果您的浏览器没有自动跳转，请点击这里</a><br/>
-		<meta http-equiv="refresh" content="{$dtime};URL={$dforward}">
-		{/if}
-		</div>
-	</div>
-</td>
-</tr>
-</table>
+<div class="msg">
+	<div class="head">提示信息</div>
+	<div class="main">{$dmessage}</div>	
+	{if $dforward == 'goback'}
+	<a href="javascript:window.history.back();"><div class="foot">点这里返回上一页</div></a>
+	{else}
+	<a href="{$dforward}"><div class="foot">如果您的浏览器没有自动跳转，请点击这里</div></a>
+	<meta http-equiv="refresh" content="{$dtime};URL={$dforward}">
+	{/if}
+</div>
 {/if}
 </body>
 </html>

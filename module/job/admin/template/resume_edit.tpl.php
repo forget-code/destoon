@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>简历</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 简历名称</td>
 <td><input name="post[title]" type="text" id="title" size="60" value="<?php echo $title;?>"/> <?php echo level_select('post[level]', '级别', $level);?> <?php echo dstyle('post[style]', $style);?> <br/><span id="dtitle" class="f_red"></span></td>
@@ -19,7 +18,7 @@ show_menu($menus);
 
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业/职位</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?><br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?> <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
 </tr>
 
 <tr>
@@ -189,16 +188,16 @@ foreach($TYPE as $k=>$v) {
 <td class="tr"><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
+<?php if($DT['im_wx']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 微信</td>
+<td class="tr"><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+</tr>
+<?php } ?>
 <?php if($DT['im_ali']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
 <td class="tr"><input name="post[ali]" id="ali" type="text" size="30" value="<?php echo $ali;?>"/></td>
-</tr>
-<?php } ?>
-<?php if($DT['im_msn']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> MSN</td>
-<td class="tr"><input name="post[msn]" id="msn" type="text" size="30" value="<?php echo $msn;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_skype']) { ?>
@@ -248,7 +247,7 @@ foreach($SITUATION as $k=>$v) {
 
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 
 <tr>
@@ -270,7 +269,7 @@ foreach($SITUATION as $k=>$v) {
 <td><?php echo tpl_select('resume', $module, 'post[template]', '默认模板', $template, 'id="template"');?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php load('guest.js'); ?>
@@ -280,7 +279,7 @@ foreach($SITUATION as $k=>$v) {
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
 <td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>

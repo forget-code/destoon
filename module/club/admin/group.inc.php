@@ -30,7 +30,7 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
 }
-require MD_ROOT.'/group.class.php';
+require DT_ROOT.'/module/'.$module.'/group.class.php';
 $do = new group();
 switch($action) {
 	case 'add':
@@ -59,7 +59,7 @@ switch($action) {
 		if($submit) {
 			if($MOD['list_html']) {
 				if(preg_match("/^[0-9a-z_\-\/]+$/i", $post['filepath'])) {
-					$t = $db->get_one("SELECT itemid FROM {$table}_group WHERE filepath='$post[filepath]' AND itemid<>$itemid");
+					$t = $db->get_one("SELECT itemid FROM {$table_group} WHERE filepath='$post[filepath]' AND itemid<>$itemid");
 					if($t) msg('静态目录有重复');
 				} else {
 					msg('静态目录规则错误');

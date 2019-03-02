@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">统计报表</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td style="padding:10px;"><?php load('swfobject.js');?>
 <script type="text/javascript" src="<?php echo DT_PATH;?>api/amcharts/amcharts.js"></script>

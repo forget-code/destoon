@@ -37,7 +37,7 @@ if(typeof destoon_member == 'undefined') {
 		destoon_chat = _destoon_chat;
 	}
 	{/if}
-	{if isset($MODULE[16])}
+	{if $DT[max_cart]}
 	$('#destoon_cart').html(_destoon_cart > 0 ? '<strong>'+_destoon_cart+'</strong>' : 0);
 	{/if}
 }

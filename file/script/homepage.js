@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function check_kw() {if(Dd('kw').value == L['keyword_value'] || Dd('kw').value.length<2) {alert(L['keyword_message']); Dd('kw').focus(); return false;}}

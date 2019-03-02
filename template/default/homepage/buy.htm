@@ -1,5 +1,5 @@
 {template 'header', $template}
-<div class="dsn" id="pos_show">您当前的位置：<a href="{$COM[linkurl]}">首页</a> &raquo; <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} &raquo; {$title}{/if}</div>
+<div class="dsn" id="pos_show"><a href="{$COM[linkurl]}">首页</a> <i>&gt;</i> <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} <i>&gt;</i> {$title}{/if}</div>
 {if $itemid}
 <div class="main_head"><div><strong>{$title}</strong></div></div>
 <div class="main_body">
@@ -21,10 +21,10 @@
 		<td width="15"> </td>
 		<td valign="top">
 			<div id="big_div" style="display:none;"><img src="" id="big_pic"/></div>
-			<table width="100%" cellpadding="5" cellspacing="5">
+			<table width="100%" cellpadding="10" cellspacing="1">
 			<tr>
 			<td width="80" class="f_dblue">产 品：</td>
-			<td><span id="hits" class="f_r">浏览次数：{$hits}</span><strong>{$title}</strong>&nbsp;</td>
+			<td>{if $MOD[hits]}<span id="hits" class="f_r">浏览次数：{$hits}</span>{/if}<strong>{$title}</strong>&nbsp;</td>
 			</tr>
 			{if $n1 && $v1}
 			<tr>
@@ -80,7 +80,7 @@
 
 	<div class="main_head"><div><strong>详细信息</strong></div></div>
 	<div class="main_body">
-		{if $CP}{template 'property', 'chip'}{/if}
+		{if $CP}{template 'property_show', 'chip'}{/if}
 		<div class="content" id="content">{$content}</div>
 	</div>
 	{if $could_price}
@@ -101,10 +101,10 @@
 {else}
 <div class="main_head"><div><strong>{$MENU[$menuid][name]}</strong></div></div>
 <div class="main_body">
-	<table cellpadding="8" cellspacing="1" width="100%" align="center">
+	<table cellpadding="10" cellspacing="1" width="100%" align="center">
 	{loop $lists $k $v}
 	<tr{if $k%2==1} bgcolor="#FBFBFB"{/if}>
-	<td align="left"><a href="{$v[linkurl]}" class="px13">{$v[title]}</a>
+	<td align="left"><a href="{$v[linkurl]}" class="px14">{$v[title]}</a>
 	</td>
 	<td align="center" width="80">{timetodate($v[edittime], 3)}</td>
 	</tr>

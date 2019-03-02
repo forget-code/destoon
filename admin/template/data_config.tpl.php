@@ -14,8 +14,7 @@ show_menu($menus);
 <input type="hidden" name="data[tb]" value="<?php echo $tb;?>"/>
 <input type="hidden" name="data[lasttime]" value="<?php echo $lasttime;?>"/>
 <input type="hidden" name="data[lastid]" value="<?php echo $lastid;?>"/>
-<div class="tt">导入设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 导入类型</td>
 <td>
@@ -110,7 +109,7 @@ show_menu($menus);
 </tr>
 </table>
 <div class="tt">字段对应关系</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl" align="center"><span class="f_hid">*</span> 对应说明</td>
 <td colspan="3" class="f_gray">
@@ -148,7 +147,7 @@ show_menu($menus);
 <?php } ?>
 </table>
 <div class="tt">PHP处理代码</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> PHP代码</td>
 <td class="f_gray">
@@ -158,7 +157,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"> </td>
-<td height="30"><input type="submit" name="submit" value="保 存" class="btn"/>&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?file=<?php echo $file;?>');"/></td>
+<td height="30"><input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?file=<?php echo $file;?>');"/></td>
 </tr>
 </table>
 </form>

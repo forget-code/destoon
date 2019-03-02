@@ -2,15 +2,13 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class expert {
 	var $itemid;
-	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db;
-		$this->table = $db->pre.'know_expert';
-		$this->db = &$db;
+		global $table_expert;
+		$this->table = $table_expert;
 		$this->fields = array('title','style','major','username','passport','addtime','editor','edittime','introduce','content');
     }
 
@@ -28,9 +26,9 @@ class expert {
 	}
 
 	function set($post) {
-		global $MOD, $DT_TIME, $_username, $_userid;
-		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
-		$post['edittime'] = $DT_TIME;
+		global $MOD, $_username, $_userid;
+		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		$post['edittime'] = DT_TIME;
 		$post['content'] = stripslashes($post['content']);
 		$post['content'] = save_local($post['content']);
 		if($MOD['save_remotepic']) $post['content'] = save_remote($post['content']);
@@ -47,12 +45,11 @@ class expert {
 		unset($post['content']);
 		$post = dhtmlspecialchars($post);
 		$post['content'] = addslashes(dsafe($content));
-		clear_upload($post['content']);
 		return array_map("trim", $post);
 	}
 
 	function get_one($condition = '') {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid' $condition");
 	}
 
 	function get_list($condition = '1', $order = 'addtime DESC') {
@@ -60,14 +57,14 @@ class expert {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['title'] = set_style($r['title'], $r['style']);
@@ -87,8 +84,9 @@ class expert {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = $this->db->insert_id();
+		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = DB::insert_id();
+		clear_upload($post['content'], $this->itemid, $this->table);
 		return $this->itemid;
 	}
 
@@ -99,7 +97,8 @@ class expert {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+		clear_upload($post['content'], $this->itemid, $this->table);
 		return true;
 	}
 
@@ -111,7 +110,7 @@ class expert {
 			$this->itemid = $itemid;
 			$r = $this->get_one();
 			if($r['content']) delete_local($r['content'], get_user($r['username']));
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 

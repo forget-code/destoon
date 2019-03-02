@@ -1,7 +1,7 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
 $TYPE = get_type('gift', 1);
-require MD_ROOT.'/gift.class.php';
+require DT_ROOT.'/module/'.$module.'/gift.class.php';
 $do = new gift();
 $menus = array (
     array('添加礼品', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -9,8 +9,7 @@ $menus = array (
     array('订单列表', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=order\', \'订单管理\');'),
     array('更新地址', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
     array('礼品分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'礼品分类\');'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 switch($action) {
@@ -26,6 +25,7 @@ switch($action) {
 			foreach($do->fields as $v) {
 				isset($$v) or $$v = '';
 			}
+			$maxorder = 1;
 			$groupid = '5,6,7';
 			$addtime = timetodate($DT_TIME);
 			$typeid = 0;
@@ -102,7 +102,7 @@ switch($action) {
 			dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&action='.$action.'&itemid='.$itemid);
 		} else {
 			$sfields = array('按条件', '礼品', '会员名', '状态', '备注');
-			$dfields = array('g.title','o.username','o.status','o.note');
+			$dfields = array('g.title','g.title','o.username','o.status','o.note');
 			isset($fields) && isset($dfields[$fields]) or $fields = 0;
 			$fields_select = dselect($sfields, 'fields', '', $fields);
 			$condition = "1";

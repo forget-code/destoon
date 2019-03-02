@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 function dslide(id, time) {
@@ -61,4 +61,4 @@ function dslide(id, time) {
 	if(!time) time = 5000;
 	this.t = setInterval(function() {_this.start();}, time);
 }
-//e.g. new dslide(id, src, url, alt, time);
+//e.g. new dslide(id, time);

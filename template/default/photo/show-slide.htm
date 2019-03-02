@@ -1,4 +1,3 @@
-{if $pass}
 {php $JS = array('jquery.slide');}
 {php $CSS = array('jquery.slide');}
 {template 'header'}
@@ -10,19 +9,31 @@ if(isIE) {
 	document.write(".jqslide .pic .nextbtn{cursor:url('{DT_SKIN}image/next.cur'),default;}");
 	document.write('</style>');
 }
+function PhotoLast() {
+	$('.photo_f').css('margin', '200px 0 0 370px');
+	$('.photo_f').fadeIn(300);
+}
 </script>
+<div class="m">	
+	<div class="nav"><div><img src="{DT_SKIN}image/ico-like.png" class="share" title="加入收藏" onclick="SendFav({$moduleid}, {$itemid});"/><img src="{DT_SKIN}image/ico-share.png" class="share" title="分享好友" onclick="Dshare({$moduleid}, {$itemid});"/></div><a href="{$MODULE[1][linkurl]}">首页</a> <i>&gt;</i> <a href="{$MOD[linkurl]}">{$MOD[name]}</a> <i>&gt;</i> {cat_pos($CAT, ' <i>&gt;</i> ')}</div>
+</div>
 <div class="m">
-	<div class="nav">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; {cat_pos($CAT, ' &raquo; ')} &raquo;</div>
+	<div class="photo_f">
+		<p>{$MOD[name]}浏览完毕</p>
+		<div onclick="Go('{$linkurl}');">重新浏览</div>
+		<div onclick="$('html,body').animate({scrollTop:$('#prec').offset().top}, 500);">推荐{$MOD[name]}</div>
+	</div>
 	<div class="photo_l">
 		<div class="photo_info">
-		<div class="photo_info_r"><span class="count_a">{$page}</span> <span class="count_b">/ {$items}</span></div>
-		<div>
-		<h1 class="title" id="title">{$title}</h1>
-		日期：<span class="px11">{$adddate}</span>&nbsp;&nbsp;&nbsp;
-		点击：<span id="hits" class="px11">{$hits}</span>&nbsp;&nbsp;&nbsp;
-		<a target="_blank" href="#" id="vbig" style="color:#F1F1F1;">查看原图</a>&nbsp;&nbsp;&nbsp;
-		<span onclick="Go('{$MOD[linkurl]}{rewrite('view.php?itemid='.$itemid)}#p');" class="c_p">全部展开</span>
-		</div>
+			<div class="photo_info_r"><span class="count_a">{$page}</span> <span class="count_b">/ {$items}</span></div>
+			<div>
+			<h1 class="title" id="title">{$title}</h1>
+			日期：{$adddate}&nbsp;&nbsp;&nbsp;&nbsp;
+			{if $MOD[hits]}点击：<span id="hits">{$hits}</span>&nbsp;&nbsp;&nbsp;&nbsp;{/if}
+			{if $could_comment}<a href="{$EXT[comment_url]}{rewrite('index.php?mid='.$moduleid.'&itemid='.$itemid)}"><span style="color:#F1F1F1;">评论：{$comments}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;{/if}
+			<span onclick="Go('{$MOD[linkurl]}{rewrite('view.php?itemid='.$itemid)}#p');" class="c_p">展开全部</span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<span onclick="View(Dd('photo').src);" class="c_p">查看原图</span>
+			</div>
 		</div>
 	</div>
 	<div class="jqslide">
@@ -56,34 +67,13 @@ if(isIE) {
 	</div>
 </div>
 <script type="text/javascript">var load_page = {$page};var load_item = {$items};</script>
-<div class="m">
-<div class="b10">&nbsp;</div>
-<div class="box_head">
-	<div><strong>{$MOD[name]}说明</strong></div>
-</div>
-<div class="box_body" style="padding:0;">
-{if $CP}{template 'property', 'chip'}{/if}
-<div class="content c_b" id="content">{$content}</div>
-<div class="left_head"><span class="f_r"><a href="{$MOD[linkurl]}{$CAT[linkurl]}">更多&raquo;</a></span>推荐{$MOD[name]}</div>
-<div class="b5">&nbsp;</div>
-<div class="thumb"><!--{tag("moduleid=$moduleid&condition=status=3 and open=3 and level=1 and items>0&catid=$catid&order=".$MOD[order]."&length=20&width=120&height=90&pagesize=6&cols=6&template=list-photo")}--></div>
-{template 'comment', 'chip'}
-</div>
-</div>
-<div class="m">
-	<br/>
-	<center>
-	[ <a href="{$MOD[linkurl]}search.php" rel="nofollow">{$MOD[name]}搜索</a> ]&nbsp;
-	[ <a href="javascript:SendFav();">加入收藏</a> ]&nbsp;
-	[ <a href="javascript:SendPage();">告诉好友</a> ]&nbsp;
-	[ <a href="javascript:Print();">打印本文</a> ]&nbsp;
-	[ <a href="javascript:SendReport();">违规举报</a> ]&nbsp;
-	[ <a href="javascript:window.close()">关闭窗口</a> ]
-	</center>
-	<br/>
+<div class="m o_h">
+	{if $CP}{template 'property_show', 'chip'}{/if}
+	{if $content}<div class="content c_b" id="content">{$content}</div>{/if}
+	{if $MOD[fee_award]}<div class="award"><div onclick="Go('{$MODULE[2][linkurl]}award.php?mid={$moduleid}&itemid={$itemid}');">打赏</div></div>{/if}
+	<div class="head-txt"><span><a href="{$MOD[linkurl]}{$CAT[linkurl]}">更多<i>&gt;</i></a></span><strong>推荐{$MOD[name]}</strong></div>
+	<div class="list-img list0" id="prec"><!--{tag("moduleid=$moduleid&condition=status=3 and open=3 and level>0 and items>0&catid=$catid&order=".$MOD[order]."&width=180&height=135&datetype=3&pagesize=6&template=list-photo")}--></div>
+	{if $MOD[page_comment]}{template 'comment', 'chip'}{/if}
 </div>
 {if $content}<script type="text/javascript" src="{DT_STATIC}file/script/content.js"></script>{/if}
 {template 'footer'}
-{else}
-<meta http-equiv="refresh" content="0;url={$MOD[linkurl]}private.php?itemid={$itemid}&page={$page}">
-{/if}

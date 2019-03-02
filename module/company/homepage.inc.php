@@ -34,9 +34,20 @@ foreach($main_order as $k=>$v) {
 	if($main_num[$k] < 1 || $main_num[$k] > 50) $main_num[$k] = 10;
 }
 $HMAIN = $_HMAIN;
-if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username;
 $seo_title = isset($HOME['seo_title']) && $HOME['seo_title'] ? $HOME['seo_title'] : '';
 $head_title = '';
+if($DT_PC) {
+	//
+} else {
+	$background = (isset($HOME['background']) && $HOME['background']) ? $HOME['background'] : '';
+	$logo = (isset($HOME['logo']) && $HOME['logo']) ? $HOME['logo'] : ($COM['thumb'] ? $COM['thumb'] : 'static/img/home-logo.png');
+	$M = array();
+	foreach($MENU as $v) {
+		if(in_array($v['file'], array('introduce', 'news', 'credit', 'contact'))) continue;
+		$M[] = $v;
+	}
+	$head_name = $L['com_home'];
+}
 include template('index', $template);
 if(isset($update) && $db->cache_ids && ($username == $_username || $_groupid == 1 || $domain)) {
 	foreach($db->cache_ids as $v) {

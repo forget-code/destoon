@@ -1,9 +1,9 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 if($DT_BOT) dhttp(403);
-$itemid or exit;
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
+$itemid or exit;
 $item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 $item['status'] > 2 or exit;
 if($action == 'best') {
@@ -19,7 +19,7 @@ $item or exit;
 include load('misc.lang');
 $linkurl = $MOD['linkurl'].$item['linkurl'];
 $aid = isset($aid) ? intval($aid) : 0;
-$aser = $aid ? $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid AND status=3") : array();
+$aser = $aid ? $db->get_one("SELECT * FROM {$table_answer} WHERE itemid=$aid AND status=3") : array();
 if($aser && $aser['qid'] != $itemid) exit;
 $could_admin = $could_addition = $could_close = $_username && $_username == $item['username'];
 if($item['process'] > 1) $could_addition = $could_close = false;
@@ -37,7 +37,7 @@ switch($action) {
 		$could_vote = $could_admin;
 		if($item['process'] != 1) $could_vote = false;
 		if($could_vote) {
-			$items = $db->count($table.'_answer', "qid=$itemid AND status=3");
+			$items = $db->count($table_answer, "qid=$itemid AND status=3");
 			if($items < 2) $could_vote = false;
 		}
 		if($could_vote) {
@@ -49,9 +49,9 @@ switch($action) {
 	break;
 	case 'vote_del':
 		if($item['process'] != 2) dalert($L['vote_end']);
-		$items = $db->count($table.'_answer', "qid=$itemid AND status=3");
+		$items = $db->count($table_answer, "qid=$itemid AND status=3");
 		if($items < 3) dalert($L['min_answer']);
-		if($aser['qid'] == $itemid) $db->query("DELETE FROM {$table}_answer WHERE itemid=$aid");
+		if($aser['qid'] == $itemid) $db->query("DELETE FROM {$table_answer} WHERE itemid=$aid");
 		dalert('', '', 'parent.window.location=parent.window.location;');
 	break;
 	case 'vote_add':
@@ -59,16 +59,16 @@ switch($action) {
 		if(get_cookie('answer_vote_'.$itemid)) $could_vote = false;
 		if($could_vote) {
 			if($_userid) {
-				$v = $db->get_one("SELECT itemid FROM {$table}_vote WHERE qid=$itemid AND username='$_username'");
+				$v = $db->get_one("SELECT itemid FROM {$table_vote} WHERE qid=$itemid AND username='$_username'");
 			} else {
-				$v = $db->get_one("SELECT itemid FROM {$table}_vote WHERE qid=$itemid AND ip='$DT_IP' AND addtime>$DT_TIME-86400");
+				$v = $db->get_one("SELECT itemid FROM {$table_vote} WHERE qid=$itemid AND ip='$DT_IP' AND addtime>$DT_TIME-86400");
 			}
 		}
 		if($v) $could_vote = false;
 		set_cookie('answer_vote_'.$itemid, 1, $DT_TIME + 86400);
 		if($could_vote) {
-			$db->query("INSERT INTO {$table}_vote (qid,aid,username,passport,addtime,ip) VALUES ('$itemid','$aid','$_username','$_passport','$DT_TIME','$DT_IP')");
-			$db->query("UPDATE {$table}_answer SET vote=vote+1 WHERE itemid=$aid");
+			$db->query("INSERT INTO {$table_vote} (qid,aid,username,passport,addtime,ip) VALUES ('$itemid','$aid','$_username','$_passport','$DT_TIME','$DT_IP')");
+			$db->query("UPDATE {$table_answer} SET vote=vote+1 WHERE itemid=$aid");
 			if($MOD['credit_vote'] && $_username) {
 				$could_credit = true;
 				if($MOD['credit_maxvote'] > 0) {					
@@ -88,7 +88,7 @@ switch($action) {
 	case 'vote_show':
 		if($item['process'] != 2) dalert($L['vote_end'], 'goback');
 		$votes = array();
-		$result = $db->query("SELECT * FROM {$table}_answer WHERE qid=$itemid AND status=3 ORDER BY itemid ASC");
+		$result = $db->query("SELECT * FROM {$table_answer} WHERE qid=$itemid AND status=3 ORDER BY itemid ASC");
 		$total = 0;
 		while($r = $db->fetch_array($result)) {
 			$total += $r['vote'];
@@ -111,11 +111,11 @@ switch($action) {
 		$aid = intval($aid);
 		if(!$aid) $could_choose = false;
 		if($could_choose) {
-			$a = $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid AND qid=$itemid");
+			$a = $db->get_one("SELECT * FROM {$table_answer} WHERE itemid=$aid AND qid=$itemid");
 			if($a) {
 				$content = dhtmlspecialchars($thx);
 				$expert = $a['expert'] ? $a['username'] : '';
-				if($expert) $db->query("UPDATE {$table}_expert SET best=best+1 WHERE username='$expert'");
+				if($expert) $db->query("UPDATE {$table_expert} SET best=best+1 WHERE username='$expert'");
 				$db->query("UPDATE {$table} SET process=3,aid=$aid,expert='$expert',comment='$content',updatetime='$DT_TIME' WHERE itemid=$itemid");
 				if($a['username']) {
 					if($item['credit']) {
@@ -172,9 +172,9 @@ switch($action) {
 		$need_question = $MOD['question_answer'] == 2 ? $MG['question'] : $MOD['question_answer'];
 		if($could_answer && !$MOD['answer_repeat']) {
 			if($_username) {
-				$r = $db->get_one("SELECT itemid FROM {$table}_answer WHERE username='$_username' AND qid=$itemid");
+				$r = $db->get_one("SELECT itemid FROM {$table_answer} WHERE username='$_username' AND qid=$itemid");
 			} else {
-				$r = $db->get_one("SELECT itemid FROM {$table}_answer WHERE ip='$DT_IP' AND qid=$itemid AND addtime>$DT_TIME-86400");
+				$r = $db->get_one("SELECT itemid FROM {$table_answer} WHERE ip='$DT_IP' AND qid=$itemid AND addtime>$DT_TIME-86400");
 			}
 			if($r) $could_answer = false;
 		}
@@ -187,19 +187,19 @@ switch($action) {
 			$content = dhtmlspecialchars(strip_tags(trim($content)));
 			if(!$content) dalert($L['type_answer']);
 			$content = nl2br($content);
-			$url = dhtmlspecialchars(trim($url));	
+			is_url($url) or $url = '';
 			$need_check =  $MOD['check_add'] == 2 ? $MG['check'] : $MOD['check_answer'];
 			$status = get_status(3, $need_check);
 			$hidden = isset($hidden) ? 1 : 0;
 			$expert = 0;
 			if($_username) {
-				$t = $db->get_one("SELECT itemid FROM {$table}_expert WHERE username='$_username'");
+				$t = $db->get_one("SELECT itemid FROM {$table_expert} WHERE username='$_username'");
 				if($t) {
 					$expert = 1;
-					$db->query("UPDATE {$table}_expert SET answer=answer+1 WHERE username='$_username'");
+					$db->query("UPDATE {$table_expert} SET answer=answer+1 WHERE username='$_username'");
 				}
 			}
-			$db->query("INSERT INTO {$table}_answer (qid,linkurl,content,username,passport,expert,addtime,ip,status,hidden) VALUES ('$itemid','$url','$content','$_username','$_passport','$expert','$DT_TIME','$DT_IP','$status','$hidden')");
+			$db->query("INSERT INTO {$table_answer} (qid,url,content,username,passport,expert,addtime,ip,status,hidden) VALUES ('$itemid','$url','$content','$_username','$_passport','$expert','$DT_TIME','$DT_IP','$status','$hidden')");
 			if($MOD['credit_answer'] && $_username && $status == 3) {
 				$could_credit = true;
 				if($MOD['credit_maxanswer'] > 0) {					
@@ -227,7 +227,7 @@ switch($action) {
 			if(get_cookie('answer_vote_'.$itemid)) $could_vote = false;
 			$pages = '';
 			$answers = array();
-			$items = $db->count($table.'_answer', "qid=$itemid AND status=3 AND itemid!=$item[aid]");
+			$items = $db->count($table_answer, "qid=$itemid AND status=3 AND itemid!=$item[aid]");
 			$a = $items;
 			if($item['aid']) $a += 1;
 			if($item['answer'] != $a) {
@@ -255,11 +255,11 @@ switch($action) {
 					}
 					$reload = true;
 				} else if($item['process'] == 2) {
-					$a = $db->get_one("SELECT * FROM {$table}_answer WHERE qid=$itemid ORDER BY vote DESC");
+					$a = $db->get_one("SELECT * FROM {$table_answer} WHERE qid=$itemid ORDER BY vote DESC");
 					if($a && $a['vote'] > $MOD['minvote']) {
 						$aid = intval($a['itemid']);
 						$expert = $a['expert'] ? $a['username'] : '';
-						if($expert) $db->query("UPDATE {$table}_expert SET best=best+1 WHERE username='$expert'");
+						if($expert) $db->query("UPDATE {$table_expert} SET best=best+1 WHERE username='$expert'");
 						$db->query("UPDATE {$table} SET process=3,aid=$aid,expert='$expert',updatetime='$DT_TIME' WHERE itemid=$itemid");
 						if($a['username']) {
 							if($item['credit']) {
@@ -282,7 +282,7 @@ switch($action) {
 				}
 			}
 			$pages = pages($items, $page, $pagesize);
-			$result = $db->query("SELECT * FROM {$table}_answer WHERE qid=$itemid AND status=3 ORDER BY itemid ASC LIMIT $offset,$pagesize");
+			$result = $db->query("SELECT * FROM {$table_answer} WHERE qid=$itemid AND status=3 ORDER BY itemid ASC LIMIT $offset,$pagesize");
 			while($r = $db->fetch_array($result)) {
 				if($r['itemid'] == $aid) continue;
 				$answers[] = $r;
@@ -291,5 +291,5 @@ switch($action) {
 		}
 	break;
 }
-include template('answer', $module);
+include template($MOD['template_answer'] ? $MOD['template_answer'] : 'answer', $module);
 ?>

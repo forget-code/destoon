@@ -5,12 +5,12 @@ $MOD['gift_enable'] or dheader(DT_PATH);
 require DT_ROOT.'/include/post.func.php';
 $ext = 'gift';
 $url = $EXT[$ext.'_url'];
+$mob = $EXT[$ext.'_mob'];
 $TYPE = get_type($ext, 1);
 $_TP = sort_type($TYPE);
-require MD_ROOT.'/'.$ext.'.class.php';
+require DT_ROOT.'/module/'.$module.'/'.$ext.'.class.php';
 $do = new $ext();
 $typeid = isset($typeid) ? intval($typeid) : 0;
-$destoon_task = rand_task();
 switch($action) {
 	case 'my':
 		login();
@@ -20,25 +20,32 @@ switch($action) {
 	break;
 	case 'order':
 		login();
-		$itemid or dheader($url);
+		$itemid or dheader($DT_PC ? $url : $mob);
 		$do->itemid = $itemid;
 		$item = $do->get_one();
-		$item or dheader($url);
+		$item or dheader($DT_PC ? $url : $mob);
 		extract($item);
 		$left = $amount - $orders > 0 ? $amount - $orders : 0;
 		$process = $left ? get_process($fromtime, $totime) : 4;
-		if($process == 1) dalert($L['gift_error_1'], $linkurl);
-		if($process == 3) dalert($L['gift_error_3'], $linkurl);
-		if($process == 4) dalert($L['gift_error_4'], $linkurl);
-		if($_credit < $credit) dalert($L['gift_error_5'], $linkurl);
-		if(!check_group($_groupid, $groupid)) dalert($L['gift_error_6'], $linkurl);
-		$t = $db->get_one("SELECT * FROM {$DT_PRE}gift_order WHERE itemid=$itemid AND username='$_username'");
-		if($t) dalert($L['gift_error_7'], $url.'index.php?action=my');		
+		$_url = $DT_PC ? $linkurl : str_replace($url, $mob, $linkurl);
+		if($process == 1) dalert($L['gift_error_1'], $_url);
+		if($process == 3) dalert($L['gift_error_3'], $_url);
+		if($process == 4) dalert($L['gift_error_4'], $_url);
+		if($_credit < $credit) dalert($L['gift_error_5'], $_url);
+		if(!check_group($_groupid, $groupid)) dalert($L['gift_error_6'], $_url);
+		if($maxorder) {
+			$num = $db->count($DT_PRE.'gift_order', "itemid=$itemid AND username='$_username'");
+			if($num >= $maxorder) dalert($L['gift_error_7'], 'index.php?action=my');
+		}
+		if($EXT['gift_time']) {
+			$t = $db->get_one("SELECT * FROM {$DT_PRE}gift_order WHERE username='$_username'");
+			if($t && $DT_TIME - $t['addtime'] < $EXT['gift_time']) dalert($L['gift_error_8'], $_url);
+		}
 		credit_add($_username, -$credit);
 		credit_record($_username, -$credit, 'system', $L['gift_credit_reason'], 'ID:'.$itemid);
 		$db->query("INSERT INTO {$DT_PRE}gift_order (itemid,credit,username,ip,addtime,status) VALUES ('$itemid','$credit','$_username','$DT_IP','$DT_TIME','".$L['gift_status']."')");
 		$db->query("UPDATE {$DT_PRE}gift SET orders=orders+1 WHERE itemid=$itemid");
-		dheader($url.'index.php?success=1&itemid='.$itemid);
+		dheader('index.php?success=1&itemid='.$itemid);
 	break;
 	default:
 		if($itemid) {
@@ -52,6 +59,7 @@ switch($action) {
 			$fromdate = $fromtime ? timetodate($fromtime, 3) : $L['timeless'];
 			$todate = $totime ? timetodate($totime, 3) : $L['timeless'];
 			$middle = str_replace('.thumb.', '.middle.', $thumb);
+			$large = str_replace('.thumb.'.file_ext($thumb), '', $thumb);
 			$gname = '';
 			if($groupid) {
 				$GROUP = cache_read('group.php');
@@ -59,7 +67,8 @@ switch($action) {
 					if(isset($GROUP[$gid])) $gname .= $GROUP[$gid]['groupname'].' ';
 				}
 			}
-			$db->query("UPDATE {$DT_PRE}gift SET hits=hits+1 WHERE itemid=$itemid");
+			$content = $DT_PC ? parse_video($content) : video5($content);
+			if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$DT_PRE}{$ext} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');
 			$head_title = $title.$DT['seo_delimiter'].$L['gift_title'];
 		} else {
 			$pagesize = 8;
@@ -78,5 +87,23 @@ switch($action) {
 		}
 	break;
 }
-include template($ext, $module);
+$template = $ext;
+if($DT_PC) {
+	$destoon_task = rand_task();
+	if($EXT['mobile_enable']) $head_mobile = str_replace($url, $mob, $DT_URL);
+} else {
+	$foot = '';
+	if($action == 'my') {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link =  $mob;
+	} else {
+		if($itemid) {
+			$back_link = $mob;
+		} else {
+			$pages = mobile_pages($items, $page, $pagesize);
+			$back_link = ($kw || $page > 1 || $typeid) ? $mob : DT_MOB.'more.php';
+		}
+	}
+}
+include template($template, $module);
 ?>

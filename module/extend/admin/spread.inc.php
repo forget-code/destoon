@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/spread.class.php';
+require DT_ROOT.'/module/'.$module.'/spread.class.php';
 $do = new spread();
 $menus = array (
     array('添加排名', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -8,8 +8,7 @@ $menus = array (
     array('排名审核', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
     array('起价设置', '?moduleid='.$moduleid.'&file='.$file.'&action=price'),
     array('生成排名', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
-    array('模块首页', $EXT[$file.'_url'], ' target="_blank"'),
-    array('模块设置', '?moduleid='.$moduleid.'&file=setting#'.$file),
+    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if(in_array($action, array('', 'check'))) {
 	$sfields = array('关键词', '会员名', '公司名', '信息ID', '价格');
@@ -18,8 +17,10 @@ if(in_array($action, array('', 'check'))) {
 	$dorder  = array('itemid DESC', 'price DESC', 'price ASC', 'addtime DESC', 'addtime ASC', 'fromtime DESC', 'fromtime ASC', 'totime DESC', 'totime ASC');
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
-	isset($fromtime) or $fromtime = '';
-	isset($totime) or $totime = '';
+	$fromdate = isset($fromdate) ? $fromdate : '';
+	$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+	$todate = isset($todate) ? $todate : '';
+	$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 	isset($type) or $type = 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
@@ -29,8 +30,8 @@ if(in_array($action, array('', 'check'))) {
 	if($mid) $condition .= " AND mid=$mid";
 	$times = array('fromtime', 'fromtime', 'totime', 'addtime');
 	$time = $times[$type];
-	if($fromtime) $condition .= " AND $time>=".(strtotime($fromtime.' 00:00:00'));
-	if($totime) $condition .= " AND $time<=".(strtotime($totime.' 23:59:59'));
+	if($fromtime) $condition .= " AND $time>=$fromtime";
+	if($totime) $condition .= " AND $time<=$totime";
 }
 switch($action) {
 	case 'add':
@@ -68,7 +69,7 @@ switch($action) {
 			$addtime = timetodate($addtime);
 			$fromtime = $fromtime ? timetodate($fromtime, 3) : '';
 			$totime = $totime ? timetodate($totime, 3) : '';
-			$menuid = 1;
+			$menuid = $status == 3 ? 1 : 2;
 			include tpl('spread_edit', $module);
 		}
 	break;
@@ -116,9 +117,26 @@ switch($action) {
 			$do->price_update($post);
 			dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&action='.$action.'&page='.$page);
 		} else {
+			$sfields = array('按条件', '关键词', '操作人');
+			$dfields = array('word', 'word', 'editor');
+			isset($fields) && isset($dfields[$fields]) or $fields = 0;
+			$fields_select = dselect($sfields, 'fields', '', $fields);
+			$sorder  = array('结果排序方式', '起价金额降序', '起价金额升序', '更新时间降序', '更新时间升序');
+			$dorder  = array('edittime DESC', 'price DESC', 'price ASC', 'edittime DESC', 'edittime ASC');
+			isset($order) && isset($dorder[$order]) or $order = 0;
+			$minprice = isset($minprice) ? dround($minprice) : '';
+			$minprice or $minprice = '';
+			$maxprice = isset($maxprice) ? dround($maxprice) : '';
+			$maxprice or $maxprice = '';
+			$empty = isset($empty) ? intval($empty) : 0;
+			$order_select  = dselect($sorder, 'order', '', $order);
 			$condition = 1;
-			if($mid) $condition = "moduleid=$mid";
-			$lists = $do->get_price_list($condition);
+			if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
+			if($mid) $condition .= " AND moduleid=$mid";
+			if($minprice)  $condition .= " AND price>=$minprice";
+			if($maxprice)  $condition .= " AND price<=$maxprice";
+			if($empty) $condition .= " AND word=''";
+			$lists = $do->get_price_list($condition, $dorder[$order]);
 			include tpl('spread_price', $module);
 		}
 	break;

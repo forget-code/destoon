@@ -5,8 +5,8 @@ if($html == 'show') {
 	if(!$item || $item['status'] < 3) exit;
 	extract($item);
 	$update = '';
-	include DT_ROOT.'/include/update.inc.php';
-	echo 'Inner("hits", \''.$item['hits'].'\');';
+	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
+	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
 	$item['linkurl'] = $item['domain'] ? $item['filepath'] : $item['linkurl'];
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
@@ -23,7 +23,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits']) {
+	if($DT['cache_hits'] && $MOD['hits']) {
 		$file = DT_CACHE.'/hits-'.$moduleid;
 		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
 	}

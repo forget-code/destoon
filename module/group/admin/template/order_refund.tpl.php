@@ -11,7 +11,7 @@ if(!$id) show_menu($menus);
 <input type="hidden" name="mallid" value="<?php echo $mallid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <div class="tt">商品信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">订单单号</td>
 <td><?php echo $td['itemid'];?></td>
@@ -41,7 +41,7 @@ if(!$id) show_menu($menus);
 </table>
 <?php if($td['logistic']) { ?>
 <div class="tt">快递信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">邮编</td>
 <td><?php echo $td['buyer_postcode'];?></td>
@@ -81,7 +81,7 @@ if(!$id) show_menu($menus);
 <td class="tl">追踪结果</td>
 <td style="line-height:200%;"><div id="express"><img src="<?php echo DT_SKIN;?>image/loading.gif" align="absmiddle"/> 正在查询...</div>
 <script type="text/javascript">
-$(document).ready(function(){
+$(function(){
 	$('#express').load(AJPath+'?action=express&moduleid=2&auth=<?php echo encrypt('group|'.$td['send_type'].'|'.$td['send_no'].'|'.$td['send_status'].'|'.$td['itemid'], DT_KEY.'EXPRESS');?>');
 });
 </script>
@@ -92,7 +92,7 @@ $(document).ready(function(){
 </table>
 <?php } else { ?>
 <div class="tt">验证信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">密码</td>
 <td><?php echo $td['password'];?></td>
@@ -104,7 +104,7 @@ $(document).ready(function(){
 </table>
 <?php } ?>
 <div class="tt">价格信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">商品单价</td>
 <td><?php echo $DT['money_sign'];?><?php echo $td['price'];?></td>
@@ -119,7 +119,7 @@ $(document).ready(function(){
 </tr>
 </table>
 <div class="tt">订单状态</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">下单时间</td>
 <td><?php echo $td['adddate'];?></td>
@@ -169,7 +169,7 @@ $(document).ready(function(){
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="history.back(-1);"/></div>
 </form>
 <script type="text/javascript">
 function check() {

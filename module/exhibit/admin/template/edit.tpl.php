@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?><?php echo $MOD['name'];?></div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
 <td><?php echo category_select('post[catid]', '选择分类', $catid, $moduleid);?> <span id="dcatid" class="f_red"></span></td>
@@ -107,14 +106,18 @@ var property_admin = 1;
 <td class="tl"><span class="f_hid">*</span> 电子邮件</td>
 <td><input name="post[email]" id="email" type="text" size="30" value="<?php echo $email;?>" /></td>
 </tr>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 联系MSN</td>
-<td><input name="post[msn]" id="msn" type="text" size="30" value="<?php echo $msn;?>" /></td>
-</tr>
+<?php if($DT['im_qq']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 联系QQ</td>
 <td><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
+<?php } ?>
+<?php if($DT['im_wx']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 联系微信</td>
+<td><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+</tr>
+<?php } ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 在线报名</td>
 <td>
@@ -138,7 +141,7 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
+<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
@@ -160,7 +163,7 @@ var property_admin = 1;
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <?php load('guest.js'); ?>
 <?php load('clear.js'); ?>
@@ -170,7 +173,7 @@ var property_admin = 1;
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
 <td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>

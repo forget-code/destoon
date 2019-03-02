@@ -1,12 +1,12 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/know.class.php';
-$do = new know($moduleid);
+require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
+$do = new $module($moduleid);
 $menus = array (
     array('添加'.$MOD['name'], '?moduleid='.$moduleid.'&action=add'),
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('审核'.$MOD['name'], '?moduleid='.$moduleid.'&action=check'),
-    array('未通过'.$MOD['name'], '?moduleid='.$moduleid.'&action=reject'),
+    array('未通过', '?moduleid='.$moduleid.'&action=reject'),
     array('回收站', '?moduleid='.$moduleid.'&action=recycle'),
     array('移动分类', '?moduleid='.$moduleid.'&action=move'),
 );
@@ -25,8 +25,8 @@ if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$sfields = array('模糊', '标题',  '补充', '评价', '会员名', '昵称', '专家', '提问对象', '编辑', 'IP', '文件路径', '内容模板');
 	$dfields = array('keyword', 'title', 'addition', 'comment', 'username', 'passport', 'expert', 'ask', 'editor', 'ip', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序', '答案数量降序', '答案数量升序', '悬赏'.$DT['credit_name'].'降序', '悬赏'.$DT['credit_name'].'升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'addtime DESC', 'addtime ASC', 'updatetime DESC', 'updatetime ASC', 'hits DESC', 'hits ASC', 'answer DESC', 'answer ASC', 'credit DESC', 'credit ASC', 'itemid DESC', 'itemid ASC');
+	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '更新时间降序', '更新时间升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '答案数量降序', '答案数量升序', '悬赏'.$DT['credit_name'].'降序', '悬赏'.$DT['credit_name'].'升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'addtime DESC', 'addtime ASC', 'updatetime DESC', 'updatetime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'answer DESC', 'answer ASC', 'credit DESC', 'credit ASC', 'itemid DESC', 'itemid ASC');
 
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
@@ -34,9 +34,9 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$process = isset($process) ? intval($process) : 99;
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'updatetime')) or $datetype = 'addtime';
-	$fromdate = isset($fromdate) && is_date($fromdate) ? $fromdate : '';
+	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	$todate = isset($todate) && is_date($todate) ? $todate : '';
+	(isset($todate) && is_date($todate)) or $todate = '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$thumb = isset($thumb) ? intval($thumb) : 0;
@@ -112,7 +112,7 @@ switch($action) {
 				if($post['aid'] != $post['nid']) {
 					if($post['nid']) {
 						$aid = $post['nid'];
-						$t = $db->get_one("SELECT * FROM {$table}_answer WHERE itemid=$aid AND qid=$itemid");
+						$t = $db->get_one("SELECT * FROM {$table_answer} WHERE itemid=$aid AND qid=$itemid");
 						if($t) {
 							$db->query("UPDATE {$table} SET process=3,updatetime=$DT_TIME,aid=$aid WHERE itemid=$itemid");
 						} else {

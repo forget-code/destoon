@@ -12,7 +12,6 @@ $menu = array(
 	array('投票管理', '?moduleid=3&file=vote'),
 	array('票选管理', '?moduleid=3&file=poll'),
 	array('表单管理', '?moduleid=3&file=form'),
-	array('更新数据', '?moduleid=3&file=html'),
 	array('模块设置', '?moduleid=3&file=setting'),
 );
 ?>

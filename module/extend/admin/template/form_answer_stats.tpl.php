@@ -9,7 +9,7 @@ show_menu($menus);
 <?php foreach($lists as $k=>$v) {?>
 <div class="tt"><?php echo $v['title'];?></div>
 <a name="q<?php echo $k;?>"></a>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td style="padding:10px;">
 <div id="chartdiv<?php echo $k;?>" style="width:600px;height:400px;background:#FFFFFF;"></div>

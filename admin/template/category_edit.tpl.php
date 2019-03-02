@@ -8,8 +8,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="mid" value="<?php echo $mid;?>"/>
 <input type="hidden" name="catid" value="<?php echo $catid;?>"/>
-<div class="tt">分类修改</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 上级分类</td>
 <td><?php echo category_select('category[parentid]', '请选择', $parentid, $mid);?><?php tips('如果不选择，则为顶级分类');?></td>
@@ -34,7 +33,7 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 分类模板</td>
 <td><?php echo tpl_select('list', $MODULE[$mid]['module'], 'category[template]', '默认模板', $template);?></td>
 </tr>
-<tr style="display:<?php echo $mid == 18 ? 'none' : '';?>;">
+<tr style="display:<?php echo $MODULE[$mid]['module'] == 'club' ? 'none' : '';?>;">
 <td class="tl"><span class="f_hid">*</span> 内容模板</td>
 <td><?php echo tpl_select('show', $MODULE[$mid]['module'], 'category[show_template]', '默认模板', $show_template);?></td>
 </tr>
@@ -66,11 +65,8 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 允许发布信息</td>
 <td><?php echo group_checkbox('category[group_add][]', $group_add);?></td>
 </tr>
-
 </table>
-
-
-<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?mid=<?php echo $mid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">
 function ckDir() {

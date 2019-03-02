@@ -12,7 +12,7 @@ $height = $p['height'];
 $areaid = intval($a['areaid']);
 $fileroot = DT_CACHE.'/htm/';
 $filename = $fileroot.ad_name($a);
-$template = $p['template'] ? $p['template'] : 'ad_code';
+$template = $p['template'] ? $p['template'] : 'ad';
 if($p['code']) {
 	$default = $typeid > 5 ? 'ad_'.$ad_moduleid.'_d'.$typeid.'.htm' : 'ad_'.$pid.'_d0.htm';
 	file_put($fileroot.$default, '<!--'.($DT_TIME+86400*365*10).'-->'.$p['code']);
@@ -46,7 +46,7 @@ if($typeid == 7) {
 		$d = $db->get_one("SELECT * FROM ".get_table($ad_moduleid)." WHERE `{$id}`=$t[key_id]");
 		if($d) {
 			if($t['stat']) {
-				$d['linkurl'] = DT_PATH.'api/'.rewrite('redirect.php?aid='.$t['aid']);
+				$d['linkurl'] = DT_PATH.'api/redirect.php?aid='.$t['aid'];
 			} else {
 				if(strpos($d['linkurl'], '://') === false) $d['linkurl'] = $MODULE[$ad_moduleid]['linkurl'].$d['linkurl'];
 			}
@@ -57,7 +57,7 @@ if($typeid == 7) {
 	}
 	if($tags) {
 		ob_start();
-		include template($template, $module);
+		include template($template, 'chip');
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);
@@ -73,13 +73,13 @@ if($typeid == 7) {
 		if(strpos($t['image_src'], '://') === false) $t['image_src'] = DT_PATH.$t['image_src'];
 		$t['alt'] = $t['image_alt'];
 		$t['thumb'] = $t['image_src'];
-		$t['linkurl'] = $t['stat'] ? DT_PATH.'api/'.rewrite('redirect.php?aid='.$t['aid']) : $t['url'];
+		$t['linkurl'] = $t['stat'] ? DT_PATH.'api/redirect.php?aid='.$t['aid'] : $t['url'];
 		if($t['totime'] > $totime) $totime = $t['totime'];
 		$tags[] = $t;
 	}
 	if($tags) {
 		ob_start();
-		include template($template, $module);
+		include template($template, 'chip');
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);
@@ -90,7 +90,7 @@ if($typeid == 7) {
 	$ad = $db->get_one("SELECT * FROM {$DT_PRE}ad WHERE pid=$p[pid] AND status=3 AND fromtime<$DT_TIME AND totime>$DT_TIME AND areaid=$areaid ORDER BY fromtime DESC");
 	if($ad) {
 		extract($ad);
-		if($url && $stat) $url = DT_PATH.'api/'.rewrite('redirect.php?aid='.$aid);
+		if($url && $stat) $url = DT_PATH.'api/redirect.php?aid='.$aid;
 		if($typeid == 2) {
 			$text_name = set_style($text_name, $text_style);
 		} else if($typeid == 3) {
@@ -105,7 +105,7 @@ if($typeid == 7) {
 			}
 		}
 		ob_start();
-		include template($template, $module);
+		include template($template, 'chip');
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);

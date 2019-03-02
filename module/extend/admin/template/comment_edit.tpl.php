@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">修改评论 </div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 评论人</td>
 <td><a href="javascript:_user('<?php echo $username;?>');" class="t"><?php echo $username ? $passport : 'Guest';?></a> <input type="checkbox" name="post[hidden]" value="1" <?php if($hidden) echo 'checked';?>/> 匿名评论</td>
@@ -51,12 +50,12 @@ if($reply) echo $editor ? '<br/>管理员 '.$editor.' 于 '.$replytime.' 回复'
 <tr>
 <td class="tl"><span class="f_hid">*</span> 评论状态</td>
 <td>
-<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 通过
+<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?>/> 通过&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[status]" value="2" <?php if($status == 2) echo 'checked';?>/> 待审
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?><?php echo $status == 2 ? '&action=check' : '';?>');"/></div>
 </form>
-<script type="text/javascript">Menuon(<?php echo $status == 3 ? 0 : 1;?>);</script>
+<script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

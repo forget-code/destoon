@@ -14,7 +14,7 @@ if($DT_MOB['browser'] == 'weixin' && $EXT['weixin']) {
 		if(is_openid($openid)) {
 			dheader(DT_PATH.'api/pay/weixin/jsapi.php?auth='.encrypt($orderid.'|'.$charge_title.'|'.$DT_IP.'|'.$openid, DT_KEY.'JSPAY'));
 		} else {
-			dheader($EXT['mobile_url'].'weixin.php?url='.urlencode(DT_PATH.'api/pay/weixin/openid.php?itemid='.$orderid));
+			dheader(DT_MOB.'api/weixin.php?url='.urlencode(DT_PATH.'api/pay/weixin/openid.php?itemid='.$orderid));
 		}
 	}
 }

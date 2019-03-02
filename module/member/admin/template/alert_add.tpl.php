@@ -8,8 +8,7 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt">添加提醒</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员名</td>
 <td><textarea name="post[username]" id="username" style="width:200px;height:100px;overflow:visible;"><?php echo $username;?></textarea><?php tips('允许批量添加，一行一个，点回车换行');?><br/><span id="dusername" class="f_red"></span></td>
@@ -30,7 +29,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 行业分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '请选择', $catid, $mid, 'size="2" style="height:120px;width:180px;"');?><span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '请选择', $catid, $mid);?><span id="dcatid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所在地区</td>
@@ -49,17 +48,15 @@ show_menu($menus);
 </select>
 </td>
 </tr>
-
 <tr>
 <td class="tl"><span class="f_hid">*</span> 提醒状态</td>
 <td>
-<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?> id="status_3"/><label for="status_3"> 通过</label>
+<input type="radio" name="post[status]" value="3" <?php if($status == 3) echo 'checked';?> id="status_3"/><label for="status_3"> 通过</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[status]" value="2" <?php if($status == 2) echo 'checked';?> id="status_2"/><label for="status_2"> 待审</label>
 </td>
 </tr>
-
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -77,5 +74,5 @@ function ch_mid(i) {
 	load_category(0, 1);
 }
 </script>
-<script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

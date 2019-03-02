@@ -1,5 +1,5 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 /* draft */
@@ -11,20 +11,19 @@ if(EDD == 1) {
 	document.write('<a href="javascript:" onclick="draft_save_draft();" class="t">'+L['save_draft']+'</a>');
 	document.write('&nbsp;|&nbsp;<span id="draft_switch"></span>&nbsp;&nbsp;<span id="draft_data_msg"></span>');
 	document.write('</div>');
-	function draft_get_data() {makeRequest('action=userdata&job=get&mid='+ModuleID, AJPath, '_draft_get_data');}
-	function _draft_get_data() {   
-		if(xmlHttp.readyState==4 && xmlHttp.status==200) {
-			if(xmlHttp.responseText) {
-				if(confirm(lang(L['if_cover_data'], [xmlHttp.responseText.substring(0, 19)]))) EditorAPI('content', 'set', xmlHttp.responseText.substring(19, xmlHttp.responseText.length));
+	function draft_get_data() {
+		$.post(AJPath, 'action=userdata&job=get&mid='+ModuleID, function(data) {
+			if(data) {
+				if(confirm(lang(L['if_cover_data'], [data.substring(0, 19)]))) EditorAPI('content', 'set', data.substring(19, data.length));
 			} else {
 				alert(L['no_data']);
 			}
-		}
+		});		
 	}
 	function draft_save_data() {
 		var l = EditorAPI('content', 'len'); if(l < 10) return;
 		var c = EditorAPI('content', 'get'); if(draft_html == c) return;
-		makeRequest('action=userdata&mid='+ModuleID+'&content='+encodeURIComponent(c), AJPath);
+		$.post(AJPath, 'action=userdata&mid='+ModuleID+'&content='+encodeURIComponent(c));
 		draft_html = c; var today = new Date();
 		Dd('draft_data_msg').innerHTML = '<img src="'+DTPath+'file/image/clock.gif"/>'+lang(L['draft_auto_saved'], [today.getHours(), today.getMinutes(), today.getSeconds()]);
 	}
@@ -33,7 +32,7 @@ if(EDD == 1) {
 		if(l < 10) {alert(lang(L['at_least_10_letters'], [l]));return;}
 		if(confirm(L['stop_auto_save'])) {
 			draft_stop();
-			makeRequest('action=userdata&mid='+ModuleID+'&content='+encodeURIComponent(EditorAPI('content', 'get')), AJPath);
+			$.post(AJPath, 'action=userdata&mid='+ModuleID+'&content='+encodeURIComponent(EditorAPI('content', 'get')));
 			Dd('draft_data_msg').innerHTML = L['draft_saved'];
 			window.setTimeout(function(){Dd('draft_data_msg').innerHTML = '';}, 3000);
 		}
@@ -51,7 +50,7 @@ if(EDD == 1) {
 	}
 	draft_init();
 }
-if(UA.indexOf('chrome') != -1) {
+if(UA.indexOf('chrome') != -1 && (DTEditor == 'fckeditor' || DTEditor == 'kindeditor')) {
 	setTimeout(function() {
 		if(DTEditor == 'fckeditor') {
 			var o = FCKeditorAPI.GetInstance(EID);

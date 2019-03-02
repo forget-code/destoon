@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -12,9 +12,11 @@ $menus = array (
     array('标签向导', '?file=tag'),
 );
 $this_forward = '?file='.$file;
-$skin_root = DT_ROOT.'/skin/'.$CFG['skin'].'/';
+$skin = get_cookie('skin');
+$skin = check_name($skin) ? $skin : $CFG['skin'];
+$skin_root = DT_ROOT.'/skin/'.$skin.'/';
 is_dir($skin_root) or dir_create($skin_root);
-$skin_path = './skin/'.$CFG['skin'].'/';
+$skin_path = 'skin/'.$skin.'/';
 isset($fileid) or $fileid = '';
 isset($bakid) or $bakid = '';
 if($fileid && !preg_match("/^[0-9a-z_\-]+$/", $fileid))  msg('文件格式错误');
@@ -74,6 +76,14 @@ switch($action) {
 		$file_ext = $bakid ? '.'.$bakid.'.bak' : '.css';
 		file_del($skin_root.$fileid.$file_ext);
 		dmsg('文件删除成功', $this_forward);
+	break;
+	case 'change':
+		$to = check_name($to) ? $to : '';
+		if($to && is_dir(DT_ROOT.'/skin/'.$to.'/')) {
+			if($to == $CFG['skin']) $to = '';
+			set_cookie('skin', $to);
+		}
+		dmsg('切换成功', $this_forward);	
 	break;
 	default:
 		$files = $skins = $baks = array();

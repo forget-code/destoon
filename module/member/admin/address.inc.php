@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/address.class.php';
+require DT_ROOT.'/module/'.$module.'/address.class.php';
 $do = new address();
 $menus = array (
     array('地址列表', '?moduleid='.$moduleid.'&file='.$file),
@@ -30,8 +30,8 @@ switch($action) {
 	default:
 		$sfields = array('按条件', '姓名', '地址', '邮编', '手机', '电话', '会员', '备注');
 		$dfields = array('address', 'truename', 'address', 'postcode', 'mobile', 'telephone', 'username', 'note');
-		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($username) or $username = '';
+		isset($fields) && isset($dfields[$fields]) or $fields = 0;		
+		(isset($username) && check_name($username)) or $username = '';
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";

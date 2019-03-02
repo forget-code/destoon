@@ -50,7 +50,7 @@
 		<form id="frmUpload" method="post" target="UploadWindow" enctype="multipart/form-data"
 			action="" onsubmit="return Dsubmit();">
 			<span fcklang="DlgLnkUpload">Upload</span><br />
-			<input id="txtUploadFile" style="width: 100%" type="file" size="40" name="NewFile" onblur="Dpreview();" onchange="Dsubmit();GetE('btnUpload').disabled=true;"/><br />
+			<input id="txtUploadFile" style="width:100%;" type="file" size="40" name="NewFile" accept="image/*" onblur="Dpreview();" onchange="Dsubmit();GetE('btnUpload').disabled=true;"/><br />
 			<br />
 			<script type="text/javascript">document.write(oEditor.FCKConfig.IsAdmin ? '<span>' : '<span style="display:none;">');</script>
 			<input type="checkbox" name="watermark" value="1" checked/>

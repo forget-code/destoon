@@ -11,13 +11,13 @@ include tpl('header');
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="update" value="1"/>
 <input type="hidden" name="swf_upload" id="swf_upload"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td>
 <?php foreach($lists as $k=>$v) { ?>
 <div style="width:130px;float:left;">
 	<input type="hidden" name="post[<?php echo $v['itemid'];?>][thumb]" id="thumb<?php echo $v['itemid'];?>" value="<?php echo $v['thumb'];?>"/>
-	<table width="120">
+	<table width="120" class="ctb">
 	<tr align="center" height="110" class="c_p">
 	<td width="120"><img src="<?php echo $v['thumb'];?>" width="100" height="100" id="showthumb<?php echo $v['itemid'];?>" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(this.src, 1);}else{Dphoto(<?php echo $v['itemid'];?>,<?php echo $moduleid;?>,100,100, Dd('thumb<?php echo $v['itemid'];?>').value, true);}"/></td>
 	</tr>
@@ -39,7 +39,7 @@ include tpl('header');
 <?php if($items < $MOD['maxitem']) { ?>
 <div style="width:130px;float:left;">
 	<input type="hidden" name="post[0][thumb]" id="thumb0"/>
-	<table width="120">
+	<table width="120" class="ctb">
 	<tr align="center" height="110" class="c_p">
 	<td width="120"><img src="<?php echo DT_SKIN?>image/waitpic.gif" width="100" height="100" id="showthumb0" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(this.src, 1);}else{Dphoto(0,<?php echo $moduleid;?>,100,100, Dd('thumb0').value, true);}"/></td>
 	</tr>
@@ -60,12 +60,11 @@ include tpl('header');
 </td>
 </tr>
 </table>
-<br/>
-<div class="t_c"><input type="submit" value=" 更 新 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 预 览 " class="btn" onclick="window.open('<?php echo $MOD['linkurl'].$item['linkurl'];?>');"/></div>
+<div class="btns" style="text-align:center;"><input type="submit" value="更 新" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="预 览" class="btn" onclick="window.open('<?php echo $MOD['linkurl'].$item['linkurl'];?>');"/></div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <div class="tt">方法二、批量上传图片</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">批量上传</td> 
 <td>
@@ -82,47 +81,45 @@ include tpl('header');
 <script type="text/javascript" src="<?php echo DT_PATH;?>api/swfupload/handlers_photo.js"></script>
 <script type="text/javascript">
 	var swfu;
-	//window.onload = function () {
-		swfu = new SWFUpload({
-			// Backend Settings
-			upload_url: UPPath,
-			post_params: {"from": "photo", "width": "100", "height": "100", "swf_userid": "<?php echo $_userid;?>", "swf_username": "<?php echo $_username;?>", "swf_groupid": "<?php echo $_groupid;?>", "swf_company": "<?php echo $_company;?>", "swf_auth": "<?php echo md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP);?>", "swfupload": "1"},
+	swfu = new SWFUpload({
+		// Backend Settings
+		upload_url: UPPath,
+		post_params: {"moduleid": "<?php echo $moduleid;?>", "from": "photo", "width": "100", "height": "100", "swf_userid": "<?php echo $_userid;?>", "swf_username": "<?php echo $_username;?>", "swf_groupid": "<?php echo $_groupid;?>", "swf_company": "<?php echo $_company;?>", "swf_auth": "<?php echo md5($_userid.$_username.$_groupid.$_company.DT_KEY.$DT_IP);?>", "swfupload": "1"},
 
-			// File Upload Settings
-			file_size_limit : "32 MB",	// 32MB
-			file_types : "*.jpg;*.gif;*.png",
-			file_types_description : "Images",
-			file_upload_limit : swfu_max,
+		// File Upload Settings
+		file_size_limit : "32 MB",	// 32MB
+		file_types : "*.jpg;*.gif;*.png",
+		file_types_description : "Images",
+		file_upload_limit : swfu_max,
 
-			// Event Handler Settings - these functions as defined in Handlers.js
-			//  The handlers are not part of SWFUpload but are part of my website and control how
-			//  my website reacts to the SWFUpload events.
-			file_queue_error_handler : fileQueueError,
-			file_dialog_complete_handler : fileDialogComplete,
-			upload_progress_handler : uploadProgress,
-			upload_error_handler : uploadError,
-			upload_success_handler : uploadSuccess,
-			upload_complete_handler : uploadComplete,
+		// Event Handler Settings - these functions as defined in Handlers.js
+		//  The handlers are not part of SWFUpload but are part of my website and control how
+		//  my website reacts to the SWFUpload events.
+		file_queue_error_handler : fileQueueError,
+		file_dialog_complete_handler : fileDialogComplete,
+		upload_progress_handler : uploadProgress,
+		upload_error_handler : uploadError,
+		upload_success_handler : uploadSuccess,
+		upload_complete_handler : uploadComplete,
 
-			// Button Settings
-			button_image_url : "<?php echo DT_PATH;?>api/swfupload/upload3.png",
-			button_placeholder_id : "spanButtonPlaceholder",
-			button_width: 195,
-			button_height: 25,
-			button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
-			button_cursor: SWFUpload.CURSOR.HAND,
-			
-			// Flash Settings
-			flash_url : "<?php echo DT_PATH;?>api/swfupload/swfupload.swf",
+		// Button Settings
+		button_image_url : "<?php echo DT_PATH;?>api/swfupload/upload3.png",
+		button_placeholder_id : "spanButtonPlaceholder",
+		button_width: 195,
+		button_height: 25,
+		button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+		button_cursor: SWFUpload.CURSOR.HAND,
+		
+		// Flash Settings
+		flash_url : "<?php echo DT_PATH;?>api/swfupload/swfupload.swf",
 
-			custom_settings : {
-				upload_target : "divFileProgressContainer"
-			},
-			
-			// Debug Settings
-			debug: false
-		});
-	//};
+		custom_settings : {
+			upload_target : "divFileProgressContainer"
+		},
+		
+		// Debug Settings
+		debug: false
+	});
 </script>
 </td>
 </tr>
@@ -136,17 +133,18 @@ include tpl('header');
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="action" value="zip"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">选择文件</td>
-<td>
-&nbsp;<input name="uploadfile" type="file" size="25"/>&nbsp;&nbsp;
-<input type="submit" value=" 上 传 " class="btn"/>
-</td>
+<td><input name="uploadfile" type="file" size="25"/></td>
 </tr>
 <tr>
 <td class="tl">提示信息</td>
 <td class="f_gray">&nbsp;如果同时上传多张图片，可以将图片压缩为zip格式上传，目录结构不限</td>
+</tr>
+<tr>
+<td class="tl"></td>
+<td><input type="submit" value="上 传" class="btn-b"/></td>
 </tr>
 </table>
 </form>
@@ -155,7 +153,7 @@ include tpl('header');
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="action" value="dir"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">请选择</td>
 <td>
@@ -173,14 +171,17 @@ foreach(glob(DT_ROOT.'/file/temp/*') as $v) {
 }
 ?>
 </select>
-&nbsp;
-<input type="button" value=" 刷 新 " class="btn" onclick="window.location.reload();"/>&nbsp;&nbsp;
-<input type="submit" value=" 读 取 " class="btn"/>
+&nbsp;&nbsp;
+<a href="javascript:window.location.reload();" class="t">[刷新]</a>
 </td>
 </tr>
 <tr>
 <td class="tl">提示信息</td>
 <td class="f_gray">&nbsp;可以创建目录存放图片，并FTP上传目录至 file/temp/ 目录，或者直接打包为zip格式上传至 file/temp/ 目录</td>
+</tr>
+<tr>
+<td class="tl"></td>
+<td><input type="submit" value="读 取" class="btn-b"/></td>
 </tr>
 </table>
 </form>

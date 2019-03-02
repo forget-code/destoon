@@ -1,7 +1,6 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-$destoon_task = rand_task();
 ($mid > 3 && isset($MODULE[$mid]) && !$MODULE[$mid]['islink']) or $mid = 0;
 $LETTER = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 $letter = isset($letter) ? strtolower($letter) : '';
@@ -25,5 +24,22 @@ if($mid) {
 } else {
 	$action = 'sitemap';
 }
-include template('sitemap', $module);
+$template = 'sitemap';
+$head_keywords = $head_description = '';
+if($DT_PC) {
+	$CSS = array('catalog');
+	$destoon_task = rand_task();
+	if($EXT['mobile_enable']) $head_mobile = str_replace(DT_PATH, DT_MOB, $DT_URL);
+} else {
+	$foot = '';
+	$head_name = $L['sitemap_title'];
+	if($action == 'letter') {
+		$back_link = DT_MOB.'sitemap/'.rewrite('index.php?mid='.$mid);
+	} elseif($action == 'module') {
+		$back_link = DT_MOB.'sitemap/';
+	} else {
+		$back_link = DT_MOB.'more.php';
+	}
+}
+include template($template, $module);
 ?>

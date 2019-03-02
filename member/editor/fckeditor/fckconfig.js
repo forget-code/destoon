@@ -74,7 +74,7 @@ if(window.parent.ModuleID == 18) FCKConfig.ToolbarSets["Destoon"][0].splice(-1,0
 
 
 FCKConfig.ToolbarSets["Simple"] = [
-	['Source','-','Bold','Italic','Underline','TextColor','-','FontSize','Link','Unlink','-','Image','JustifyLeft','JustifyCenter','JustifyRight','-','Attach','RemoveFormat','FitWindow']
+	['Source','-','Bold','Italic','Underline','TextColor','-','FontSize','Link','Unlink','-','Image','JustifyLeft','JustifyCenter','JustifyRight','-','RemoveFormat','Attach','FitWindow']
 ];
 if(!IsAdmin) FCKConfig.ToolbarSets["Simple"][0].splice(0,2);
 if(window.parent.ModuleID == 18) FCKConfig.ToolbarSets["Simple"][0].splice(-1,0,'Smiley');
@@ -87,14 +87,8 @@ if(!IsAdmin) FCKConfig.ToolbarSets["Basic"][0].splice(0,2);
 if(window.parent.ModuleID == 18) FCKConfig.ToolbarSets["Basic"][0].splice(-1,0,'Smiley');
 
 FCKConfig.ToolbarSets["Message"] = [
-	['Bold','Italic','Underline','TextColor','-','FontSize','Link','Unlink','-','Image','Smiley','JustifyLeft','JustifyCenter','JustifyRight','-','Attach','RemoveFormat','FitWindow']
+	['Bold','Italic','Underline','TextColor','-','FontSize','Link','Unlink','-','Image','Smiley','JustifyLeft','JustifyCenter','JustifyRight','-','RemoveFormat','Attach','FitWindow']
 ];
-
-FCKConfig.ToolbarSets["Touch"] = [
-	['Source','-','Image']
-];
-if(!IsAdmin) FCKConfig.ToolbarSets["Touch"][0].splice(0,2);
-if(window.parent.ModuleID == 18) FCKConfig.ToolbarSets["Touch"][0].splice(1,0,'Smiley');
 
 FCKConfig.EnterMode = 'br';
 FCKConfig.ShiftEnterMode = 'p';

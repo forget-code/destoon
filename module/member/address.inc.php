@@ -4,7 +4,7 @@ login();
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $MG['address_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/include/post.func.php';
-require MD_ROOT.'/address.class.php';
+require DT_ROOT.'/module/'.$module.'/address.class.php';
 $do = new address();
 include load('message.lang');
 switch($action) {
@@ -52,8 +52,7 @@ switch($action) {
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
 			$item = $do->get_one();
-			if(!$item || $item['username'] != $_username) message();
-			$do->delete($itemid);
+			if($item && $item['username'] == $_username) $do->delete($itemid);
 		}
 		dmsg($L['op_del_success'], $forward);
 	break;
@@ -66,6 +65,21 @@ switch($action) {
 		$limit_free = $MG['address_limit'] && $MG['address_limit'] > $limit_used ? $MG['address_limit'] - $limit_used : 0;
 		$head_title = $L['address_title'];
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'add' || $action == 'edit') {
+		$back_link = '?action=index';
+	} else {
+		$time = 'addtime';
+		foreach($lists as $k=>$v) {
+			$lists[$k]['date'] = timetodate($v[$time], 5);
+		}
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = ($kw || $page > 1) ? '?action=index' : 'index.php';
+	}
 }
 include template('address', $module);
 ?>

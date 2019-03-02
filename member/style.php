@@ -1,5 +1,5 @@
 <?php 
-require 'config.inc.php';
+$moduleid = 2;
 require '../common.inc.php';
 require DT_ROOT.'/module/'.$module.'/style.inc.php';
 ?>

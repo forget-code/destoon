@@ -8,12 +8,15 @@ switch($action) {
 	case 'update':
 		$t = $avatar ? 1 : 0;
 		$db->query("UPDATE {$DT_PRE}member SET avatar=$t WHERE userid=$_userid");
-		dheader('?itemid='.$DT_TIME);
+		dheader('?reload='.$DT_TIME);
 	break;
 	case 'upload':
-		$_FILES['upfile']['size'] or dheader('?itemid='.$DT_TIME);
+		if(!$_FILES['file']['size'] || !is_image($_FILES['file']['name'])) {
+			if($DT_PC) dheader('?action=html&reload='.$DT_TIME);
+			exit('{"error":1,"message":"Error FILE"}');
+		}
 		require DT_ROOT.'/include/upload.class.php';
-		$ext = file_ext($_FILES['upfile']['name']);
+		$ext = file_ext($_FILES['file']['name']);
 		$name = 'avatar'.$_userid.'.'.$ext;
 		$file = DT_ROOT.'/file/temp/'.$name;
 		if(is_file($file)) file_del($file);
@@ -22,11 +25,20 @@ switch($action) {
 		if($upload->save()) {
 			$file = DT_ROOT.'/file/temp/'.$name;
 			$img_info = @getimagesize($file);
-			if(!$img_info || $img_info[0] < 128 || $img_info[1] < 128) file_del($file);
-			$img_info or message($L['avatar_img_t']);
-			$img_info[0] >= 128 or message($L['avatar_img_w']);
-			$img_info[1] >= 128 or message($L['avatar_img_h']);
-			$ani = ($ext == 'gif' && strpos(file_get($file), chr(0x21).chr(0xff).chr(0x0b).'NETSCAPE2.0') !== false && $_FILES['upfile']['size'] < 200*1024) ? 1 : 0;
+			$upload_mime = array('jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif', 'png' => 'image/png');
+			if(!$img_info || $img_info['mime'] != $upload_mime[$ext] || $img_info[0] < 128 || $img_info[1] < 128) file_del($file);
+			if($DT_PC) {
+				$img_info or message($L['avatar_img_t'], '?action=html&reload='.$DT_TIME);
+				$img_info['mime'] == $upload_mime[$ext] or message($L['avatar_img_t'], '?action=html&reload='.$DT_TIME);
+				$img_info[0] >= 128 or message($L['avatar_img_w'], '?action=html&reload='.$DT_TIME);
+				$img_info[1] >= 128 or message($L['avatar_img_h'], '?action=html&reload='.$DT_TIME);
+			} else {				
+				$img_info or exit('{"error":1,"message":"'.$L['avatar_img_t'].'"}');
+				$img_info['mime'] == $upload_mime[$ext] or exit('{"error":1,"message":"'.$L['avatar_img_t'].'"}');
+				$img_info[0] >= 128 or exit('{"error":1,"message":"'.$L['avatar_img_w'].'"}');
+				$img_info[1] >= 128 or exit('{"error":1,"message":"'.$L['avatar_img_h'].'"}');
+			}
+			$ani = ($ext == 'gif' && strpos(file_get($file), chr(0x21).chr(0xff).chr(0x0b).'NETSCAPE2.0') !== false && $_FILES['file']['size'] < 200*1024) ? 1 : 0;
 			$md5 = md5($_userid);
 			$dir = DT_ROOT.'/file/avatar/'.substr($md5, 0, 2).'/'.substr($md5, 2, 2).'/'.$_userid;
 			$img = array();
@@ -68,9 +80,11 @@ switch($action) {
 					}
 				}
 			}
-			dheader('?itemid='.$DT_TIME);
+			if($DT_PC) dheader('?action=html&reload='.$DT_TIME);
+			exit('{"error":0}');
 		} else {
-			message($upload->errmsg);
+			if($DT_PC) message($upload->errmsg);
+			exit('{"error":1,"message":"'.$upload->errmsg.'"}');
 		}
 	break;
 	case 'delete':
@@ -97,12 +111,18 @@ switch($action) {
 			}
 		}
 		$db->query("UPDATE {$DT_PRE}member SET avatar=0 WHERE userid=$_userid");
-		dmsg($L['avatar_delete'], 'avatar.php?itemid='.$DT_TIME);
+		dmsg($L['avatar_delete'], '?'.(isset($html) ? 'action=html&' : '').'reload='.$DT_TIME);
 	break;
 	default:
 		$auth = encrypt($_userid.'|'.$_username, DT_KEY.'AVATAR');
 		$head_title = $L['avatar_title'];	
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	$back_link = DT_MOB.'my.php';
 }
 include template('avatar', $module);
 ?>

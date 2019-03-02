@@ -3,33 +3,27 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="sbox">
 <form action="?">
-<div class="tt"><?php echo $MOD['name'];?>[<?php echo $special['title'];?>]信息搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="specialid" value="<?php echo $specialid;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td>
-&nbsp;<?php echo $fields_select;?>&nbsp;
-<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo $fields_select;?>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
 <?php echo $type_select;?>&nbsp;
 <?php echo $level_select;?>&nbsp;
 ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&nbsp;
-<input type="checkbox" name="thumb" value="1"<?php echo $thumb ? ' checked' : '';?>/>图片&nbsp;
-<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>
+<input type="checkbox" name="thumb" value="1"<?php echo $thumb ? ' checked' : '';?>/> 图片&nbsp;
+<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
 <input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&specialid=<?php echo $specialid;?>');"/>
-</td>
-</tr>
-</table>
 </form>
+</div>
 <form method="post">
-<div class="tt"><?php echo $MOD['name'];?>[<?php echo $special['title'];?>]<?php echo $menus[$menuid][0];?></div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
-<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>ID</th>
 <th>分类</th>
 <th width="14"> </th>
@@ -39,7 +33,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><?php echo $v['itemid'];?></td>
 <td>
@@ -59,7 +53,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 <?php } ?>
 </td>
 
-<td class="px11"><?php echo $v['adddate'];?></td>
+<td class="px12"><?php echo $v['adddate'];?></td>
 <td>
 
 <a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&specialid=<?php echo $specialid;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;
@@ -69,7 +63,7 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 <?php }?>
 </table>
 <div class="btns">
-<input type="submit" value=" 删除信息 " class="btn" onclick="if(confirm('确定要删除选中信息吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&specialid=<?php echo $specialid;?>&action=delete'}else{return false;}"/>&nbsp;
+<input type="submit" value="删除信息" class="btn-r" onclick="if(confirm('确定要删除选中信息吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&specialid=<?php echo $specialid;?>&action=delete'}else{return false;}"/>&nbsp;
 <?php echo level_select('level', '设置级别为</option><option value="0">取消', 0, 'onchange="this.form.action=\'?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid.'&action=level\';this.form.submit();"');?>&nbsp;
 <select name="typeid" onchange="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&specialid=<?php echo $specialid;?>&action=type';this.form.submit();">
 <option value="0">设置分类为</option>
@@ -80,7 +74,6 @@ ID：<input type="text" size="4" name="itemid" value="<?php echo $itemid;?>"/>&n
 </select>
 </div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
-<br/>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

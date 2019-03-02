@@ -1,4 +1,5 @@
-{template 'header', $module}
+{template 'header', 'member'}
+{if $itemid==1}<div class="warn">尊敬的用户，为了保证信息的真实有效，请先<strong>绑定微信</strong>，绑定之后即可发布信息</div>{/if}
 <div class="menu">
 <table cellpadding="0" cellspacing="0">
 <tr>
@@ -57,10 +58,10 @@
 <td class="tl"></td>
 <td class="tr">
 用微信扫描下面的二维码添加关注并绑定<br/>
-<a href="?reload={$DT_TIME}"><img src="{DT_PATH}api/weixin/qrcode_bind.php?auth={$auth}" width="200" height="200" style="margin:10px;"/></a>
+<img src="{DT_PATH}api/weixin/qrcode_bind.php?auth={$auth}" width="200" height="200" style="margin:10px;"/>
 <script type="text/javascript">setTimeout('window.location.reload();', 1790000);</script>
 </td>
 </tr>
 {/if}
 <script type="text/javascript">s('weixin');</script>
-{template 'footer', $module}
+{template 'footer', 'member'}

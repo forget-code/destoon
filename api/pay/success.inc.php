@@ -25,7 +25,7 @@ if($r['reason']) {
 		foreach(explode(',', $arr[1]) as $id) {
 			$itemid = intval($id);
 			if($itemid < 1) continue;
-			$table = $DT_PRE.'mall_order';
+			$table = $DT_PRE.'order';
 			$td = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 			if($td && $td['buyer'] == $r['username'] && $td['status'] == 1) {
 				$mallid = $td['mallid'];
@@ -61,8 +61,8 @@ if($r['reason']) {
 						}
 					}
 					//send sms
-					if($td['mid'] == 16) {
-						$db->query("UPDATE {$DT_PRE}mall SET orders=orders+1,sales=sales+$td[number],amount=amount-$td[number] WHERE itemid=$mallid");
+					if($MODULE[$td['mid']]['module'] == 'mall') {
+						$db->query("UPDATE ".get_table($td['mid'])." SET orders=orders+1,sales=sales+$td[number],amount=amount-$td[number] WHERE itemid=$mallid");
 					} else {
 						$db->query("UPDATE ".get_table($td['mid'])." SET amount=amount-$td[number] WHERE itemid=$mallid");
 					}
@@ -71,7 +71,8 @@ if($r['reason']) {
 		}
 	} else if($arr[0] == 'group') {
 		$itemid = intval($arr[1]);
-		$table = $DT_PRE.'group_order';
+		$mid = intval($arr[2]);
+		$table = $DT_PRE.'group_order_'.$mid;
 		$td = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 		if($td && $td['buyer'] == $_username && $td['status'] == 6) {
 			$m = $db->get_one("SELECT money FROM {$DT_PRE}member WHERE username='$r[username]'");
@@ -90,7 +91,7 @@ if($r['reason']) {
 					}
 					//send sms
 				}
-				$db->query("UPDATE {$DT_PRE}group SET orders=orders+1,sales=sales+$td[number] WHERE itemid=$td[gid]");
+				$db->query("UPDATE ".get_table($mid)." SET orders=orders+1,sales=sales+$td[number] WHERE itemid=$td[gid]");
 			}
 		}
 	}

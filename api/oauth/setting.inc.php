@@ -27,14 +27,6 @@ defined('IN_DESTOON') or exit('Access Denied');
 <td class="tl">APP KEY</td>
 <td><input type="text" size="40" name="oauth[qq][key]" value="<?php echo $qq['key'];?>"/></td>
 </tr>
-<tr>
-<td class="tl">发布信息同步</td>
-<td>
-<input type="radio" name="oauth[qq][sync]" value="1"  <?php if($qq['sync']) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="oauth[qq][sync]" value="0"  <?php if(!$qq['sync']) echo 'checked';?>/> 关闭&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="<?php echo DT_PATH;?>api/redirect.php?url=http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91OpenAPI%E6%9D%83%E9%99%90%E7%94%B3%E8%AF%B7" target="_blank" class="t" title="需要开通的权限get_user_info,add_t,add_pic_t,add_share">[申请开通]</a>
-</td>
-</tr>
 </tbody>
 
 <tr>
@@ -176,33 +168,6 @@ defined('IN_DESTOON') or exit('Access Denied');
 <tr>
 <td class="tl">AppSecret</td>
 <td><input type="text" size="40" name="oauth[taobao][key]" value="<?php echo $taobao['key'];?>"/></td>
-</tr>
-</tbody>
-
-<tr>
-<td class="tl">MSN</td>
-<td>
-<input type="radio" name="oauth[msn][enable]" value="1" <?php if($msn['enable']) echo 'checked';?> onclick="Dd('oa_msn').style.display='';"/> 启用&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="oauth[msn][enable]" value="0" <?php if(!$msn['enable']) echo 'checked';?> onclick="Dd('oa_msn').style.display='none';"/> 禁用&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="<?php echo DT_PATH;?>api/oauth/msn/ico.png" align="absmiddle"/> <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://manage.dev.live.com/" target="_blank" class="t">帐号申请</a>
-</td>
-</tr>
-<tbody style="display:<?php echo $msn['enable'] ? '' : 'none';?>" id="oa_msn">
-<tr>
-<td class="tl">显示名称</td>
-<td><input type="text" size="30" name="oauth[msn][name]" value="<?php echo $msn['name'];?>"/></td>
-</tr>
-<tr>
-<td class="tl">显示顺序</td>
-<td><input type="text" size="2" name="oauth[msn][order]" value="<?php echo $msn['order'];?>"/></td>
-</tr>
-<tr>
-<td class="tl">Client ID</td>
-<td><input type="text" size="40" name="oauth[msn][id]" value="<?php echo $msn['id'];?>"/></td>
-</tr>
-<tr>
-<td class="tl">Client secret</td>
-<td><input type="text" size="40" name="oauth[msn][key]" value="<?php echo $msn['key'];?>"/></td>
 </tr>
 </tbody>
 </table>

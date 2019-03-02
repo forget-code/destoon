@@ -2,18 +2,15 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class comment {
 	var $itemid;
-	var $db;
 	var $table;
 	var $table_stat;
 	var $table_ban;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db;
-		$this->table = $db->pre.'comment';
-		$this->table_stat = $db->pre.'comment_stat';
-		$this->table_ban = $db->pre.'comment_ban';
-		$this->db = &$db;
+		$this->table = DT_PRE.'comment';
+		$this->table_stat = DT_PRE.'comment_stat';
+		$this->table_ban = DT_PRE.'comment_ban';
     }
 
     function comment() {
@@ -28,32 +25,34 @@ class comment {
 	}
 
 	function set($post) {
-		global $DT_TIME, $_username;
+		global $_username;
 		$post['hidden'] = isset($post['hidden']) ? 1 : 0;
 		$post['status'] = $post['status'] == 3 ? 3 : 2;
 		$post['star'] = intval($post['star']);
 		in_array($post['star'], array(1, 2, 3)) or $post['star'] = 3;
-		if($post['reply']) $post['replytime'] = $DT_TIME;
+		if($post['reply']) $post['replytime'] = DT_TIME;
 		$post['editor'] = $_username;
 		$post = dhtmlspecialchars($post);
 		return array_map("trim", $post);
 	}
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'itemid DESC') {
 		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $items;
-		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+		$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 		$items = $r['num'];
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();		
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 6);
 			$r['replydate'] = $r['replytime'] ? timetodate($r['replytime'], 6) : '';
+			if(strpos($r['content'], ')') !== false) $r['content'] = parse_face($r['content']);
+			if(strpos($r['quotation'], ')') !== false) $r['quotation'] = parse_face($r['quotation']);
 			$lists[] = $r;
 		}
 		return $lists;
@@ -64,16 +63,16 @@ class comment {
 		$r = $this->get_one();
 		if($r['star'] != $post['star']) {
 			$star = 'star'.$r['star'];
-			$this->db->query("UPDATE {$this->table_stat} SET `{$star}`=`{$star}`-1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
+			DB::query("UPDATE {$this->table_stat} SET `{$star}`=`{$star}`-1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
 			$star = 'star'.$post['star'];
-			$this->db->query("UPDATE {$this->table_stat} SET `{$star}`=`{$star}`+1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
+			DB::query("UPDATE {$this->table_stat} SET `{$star}`=`{$star}`+1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
 		}
 		$sql = '';
 		foreach($post as $k=>$v) {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -88,8 +87,8 @@ class comment {
 			$r = $this->get_one();
 			if($r) {
 				$star = 'star'.$r['star'];
-				$this->db->query("UPDATE {$this->table_stat} SET comment=comment-1,`{$star}`=`{$star}`-1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
-				$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+				DB::query("UPDATE {$this->table_stat} SET comment=comment-1,`{$star}`=`{$star}`-1 WHERE itemid=$r[item_id] AND moduleid=$r[item_mid]");
+				DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 				if($r['username'] && $MOD['credit_del_comment']) {
 					credit_add($r['username'], -$MOD['credit_del_comment']);
 					credit_record($r['username'], -$MOD['credit_del_comment'], 'system', $L['comment_record_del'], 'ID:'.$r['itemid']);
@@ -113,7 +112,7 @@ class comment {
 					credit_record($item['username'], $MOD['credit_add_comment'], 'system', $L['comment_record_add'], 'ID:'.$itemid);
 				}
 			}
-			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
 		}
 	}
 
@@ -122,13 +121,13 @@ class comment {
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table_ban} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table_ban} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		$lists = array();
-		$result = $this->db->query("SELECT * FROM {$this->table_ban} WHERE $condition ORDER BY bid DESC LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table_ban} WHERE $condition ORDER BY bid DESC LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['edittime'] = timetodate($r['edittime'], 6);
 			$lists[] = $r;
 		}
@@ -150,11 +149,11 @@ class comment {
 	}
 
 	function _add($post) {
-		global $DT_TIME, $_username;
+		global $_username;
 		$post['moduleid'] = intval($post['moduleid']);
 		$post['itemid'] = intval($post['itemid']);
 		if(!$post['moduleid'] || !$post['itemid']) return false;
-		$this->db->query("INSERT INTO {$this->table_ban} (moduleid,itemid,editor,edittime) VALUES('$post[moduleid]','$post[itemid]','$_username','$DT_TIME')");
+		DB::query("INSERT INTO {$this->table_ban} (moduleid,itemid,editor,edittime) VALUES('$post[moduleid]','$post[itemid]','$_username','".DT_TIME."')");
 	}
 
 	function _edit($post) {
@@ -162,12 +161,12 @@ class comment {
 			$v['moduleid'] = intval($v['moduleid']);
 			$v['itemid'] = intval($v['itemid']);
 			if(!$v['moduleid'] || !$v['itemid']) return false;
-			$this->db->query("UPDATE {$this->table_ban} SET moduleid='$v[moduleid]',itemid='$v[itemid]' WHERE bid='$k'");
+			DB::query("UPDATE {$this->table_ban} SET moduleid='$v[moduleid]',itemid='$v[itemid]' WHERE bid='$k'");
 		}
 	}
 
 	function _delete($bid) {
-		$this->db->query("DELETE FROM {$this->table_ban} WHERE bid=$bid");
+		DB::query("DELETE FROM {$this->table_ban} WHERE bid=$bid");
 	}
 
 	function _($e) {

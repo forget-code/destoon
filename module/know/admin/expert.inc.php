@@ -1,6 +1,6 @@
 <?php
 defined('DT_ADMIN') or exit('Access Denied');
-require MD_ROOT.'/expert.class.php';
+require DT_ROOT.'/module/'.$module.'/expert.class.php';
 $do = new expert();
 $menus = array (
     array('添加专家', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),

@@ -13,6 +13,11 @@ $GRP['managers'] = $GRP['manager'] ? explode('|', $GRP['manager']) : array();
 $admin = is_admin($GRP);
 $typeid = isset($typeid) ? intval($typeid) : 0;
 isset($TYPE[$typeid]) or $typeid = 0;
+if($DT_PC) {
+	//
+} else {
+	if($typeid < 1) $typeid = 1;
+}
 $condition = 'status=3 AND gid='.$catid;
 if($typeid) {
 	switch($typeid) {
@@ -38,7 +43,7 @@ if($typeid) {
 		$items = $db->count($table, $condition, $CFG['db_expires']);
 		if($items != $GRP['post']) {
 			$GRP['post'] = $items;
-			$db->query("UPDATE {$table}_group SET post=$items WHERE itemid=$catid");
+			$db->query("UPDATE {$table_group} SET post=$items WHERE itemid=$catid");
 		}
 	} else {
 		$items = $GRP['post'];
@@ -91,14 +96,32 @@ if($items) {
 	}
 	$db->free_result($result);
 }
+$_CAT = array('catid' => $GRP['itemid'], 'catdir' => $GRP['filepath'], 'catname' => $GRP['title']);
+if($DT_PC) {	
+	if($EXT['mobile_enable']) $head_mobile = $MOD['mobile'].listurl($_CAT, $page);
+} else {
+	$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'replytime';
+	if(strpos($DT_URL, 'typeid') === false) {
+		$pages = mobile_pages($items, $page, $pagesize, $MOD['mobile'].listurl($_CAT, '{destoon_page}'));
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+	}
+	$lists = array();
+	foreach($tags as $r) {
+		$r['title'] = str_replace('style="color:', 'style="font-size:16px;color:', $r['title']);
+		$r['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $r['linkurl']);
+		$r['date'] = timetodate($r[$time], 5);
+		$lists[] = $r;
+	}
+	$back_link = $MOD['mobile'].$CAT['linkurl'];
+	$head_name = $GRP['title'].$MOD['seo_name'];
+}
 $showpage = 1;
 $datetype = 5;
 include DT_ROOT.'/include/seo.inc.php';
 $seo_title = ($typeid ? $TYPE[$typeid].$seo_delimiter : '').$GRP['title'].$MOD['seo_name'].$seo_delimiter.$seo_page.$seo_modulename.$seo_delimiter.$seo_sitename;
 $head_keywords = $GRP['title'].$MOD['seo_name'].','.$MOD['name'];
 $head_description = dsubstr(dtrim($GRP['content']), 200);
-if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].mobileurl($moduleid, $catid, 0, $page);
-
-$template = $GRP['template'] ? $GRP['template'] : 'group';
+$template = $GRP['template'] ? $GRP['template'] : ($MOD['template_group'] ? $MOD['template_group'] : 'group');
 include template($template, $module);
 ?>

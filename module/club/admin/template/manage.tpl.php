@@ -3,16 +3,13 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="sbox">
 <form action="?">
-<div class="tt">记录搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellpadding="2" cellspacing="1" class="tb">
-<tr>
-<td>
-&nbsp;<?php echo $fields_select;?>&nbsp;
-<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
+<?php echo $fields_select;?>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
 <select name="typeid">
 <?php
 foreach($MANAGE as $k=>$v) {
@@ -32,14 +29,10 @@ foreach($MANAGE as $k=>$v) {
 回复ID <input type="text" size="5" name="rid" value="<?php echo $rid;?>"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
 <input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&gid=<?php echo $gid;?>');"/>
-</td>
-</tr>
-</table>
 </form>
+</div>
 <form method="post">
-<div class="tt">管理记录</div>
-<div id="content">
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb ls">
 <tr>
 <th>商圈</th>
 <th>帖子/回复</th>
@@ -51,7 +44,7 @@ foreach($MANAGE as $k=>$v) {
 <th width="40">通知</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<tr align="center">
 <td><a href="<?php echo $v['groupurl'];?>" target="_blank"><?php echo $v['groupname'];?></a></td>
 <td align="left">&nbsp;<a href="<?php echo $v['linkurl'];?>" target="_blank"><?php echo $v['title'];?></a></td>
 <td><?php echo $MANAGE[$v['typeid']];?></td>
@@ -63,8 +56,7 @@ foreach($MANAGE as $k=>$v) {
 </tr>
 <?php }?>
 </table>
-</div>
 </form>
-<div class="pages"><?php echo $pages;?></div>
+<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
 <script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

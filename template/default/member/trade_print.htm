@@ -1,9 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset={DT_CHARSET}"/>
+<meta charset="{DT_CHARSET}"/>
 <title>打印订单</title>
 <meta http-equiv="x-ua-compatible" content="ie=7"/>
+<meta name="generator" content="DESTOON B2B - www.destoon.com"/>
 <style type="text/css">
 * {word-break:break-all;font-family:Verdana,Arial;}
 body {margin:0px;font-size:13px;color:#000000;background:#FFFFFF;}
@@ -15,7 +16,6 @@ td{border:#333333 1px solid;}
 </head>
 <body>
 <div class="m">
-<h2 align="center">发货单</h2>
 <table cellpadding="8" cellspacing="0" width="100%">
 <tr>
 <td colspan="2" bgcolor="#FAFAFA" align="center"><strong>收货信息</strong></td>
@@ -33,18 +33,29 @@ td{border:#333333 1px solid;}
 <td>{$td[buyer_mobile]}</td>
 </tr>
 <tr>
-<td align="center">买家电话</td>
-<td>{$td[buyer_phone]}</td>
-</tr>
-<tr>
 <td align="center">会员名称</td>
 <td>{$td[buyer]}</td>
 </tr>
-<tr>
-<td align="center">买家留言</td>
-<td>{if $td[note]}{$td[note]}{else}无{/if}</td>
-</tr>
 </table>
+<br/>
+<br/>
+<table cellpadding="8" cellspacing="0" width="100%">
+<tr bgcolor="#FAFAFA" align="center">
+<td>商品名称</td>
+<td width="60">规格</td>
+<td width="60">数量</td>
+<td width="100">买家留言</td>
+</tr>
+{loop $lists $k $v}
+<tr align="center">
+<td align="left" valign="top">{$v[title]}</td>
+<td>{$v[par]}</td>
+<td>{$v[number]}</td>
+<td>{$v[note]}</td>
+</tr>
+{/loop}
+</table>
+<br/>
 <br/>
 <table cellpadding="8" cellspacing="0" width="100%">
 <tr>
@@ -61,24 +72,6 @@ td{border:#333333 1px solid;}
 <tr>
 <td align="center">卖家名称</td>
 <td>{$td[seller]}</td>
-</tr>
-<tr>
-<td align="center">商品名称</td>
-<td>{$td[title]}</td>
-</tr>
-{if $td[par]}
-<tr>
-<td align="center">规格参数</td>
-<td>{$td[par]}</td>
-</tr>
-{/if}
-<tr>
-<td align="center">购买数量</td>
-<td>{$td[number]}</td>
-</tr>
-<tr>
-<td align="center">商品单价</td>
-<td>{$DT[money_sign]}{$td[price]}</td>
 </tr>
 {if $td[fee_name] && $td[fee]}
 <tr>

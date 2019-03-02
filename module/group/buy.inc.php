@@ -7,20 +7,17 @@ require DT_ROOT.'/include/post.func.php';
 include load('misc.lang');
 include load('member.lang');
 include load('order.lang');
-if($action == 'show') {
-	$forward = isset($auth) ? decrypt($auth, DT_KEY.'TURL') : '';
-	$forward = $MODULE[2]['linkurl'].'group.php?'.($forward ? $forward : 'action=order');
-	$head_title = $L['buy_title'];
-	include template('buy', $module);
-	exit;
-}
-$itemid or dheader($MOD['linkurl']);
+$template = $MOD['template_buy'] ? $MOD['template_buy'] : 'buy';
+$itemid or dheader($DT_PC ? $MOD['linkurl'] : $MOD['mobile']);
 $item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 if($item && $item['status'] > 2) {
 	if($item['process'] == 2) message($L['group_expired']);
 	if($item['username'] == $_username) message($L['buy_self']);
+	$item['mobile'] = $MOD['mobile'].$item['linkurl'];
+	$item['linkurl'] = $MOD['linkurl'].$item['linkurl'];
+	$t = $item;
 } else {
-	message(lang('message->item_not_exists'), $MOD['linkurl']);
+	message(lang('message->item_not_exists'));
 }
 $user = userinfo($_username);
 if($submit) {
@@ -35,12 +32,10 @@ if($submit) {
 		if(strlen($buyer_postcode) < 6) message($L['msg_type_postcode']);
 		$buyer_name = $add['truename'];
 		if(strlen($buyer_name) < 2) message($L['msg_type_truename']);
-		$buyer_phone = $add['telephone'];
 	} else {
 		$buyer_address = dhtmlspecialchars($user['address']);
 		$buyer_postcode = dhtmlspecialchars($user['postcode']);
 		$buyer_name = dhtmlspecialchars($user['truename']);
-		$buyer_phone = dhtmlspecialchars($user['telephone']);
 	}
 	$buyer_mobile = dhtmlspecialchars($add['mobile']);
 	is_mobile($buyer_mobile) or message($L['msg_type_mobile']);
@@ -49,9 +44,15 @@ if($submit) {
 	$amount = $number*$item['price'];
 	$note = dhtmlspecialchars($note);
 	$title = addslashes($item['title']);
-	$db->query("INSERT INTO {$DT_PRE}group_order (gid,buyer,seller,title,thumb,price,number,amount,logistic,addtime,updatetime,note, buyer_postcode,buyer_address,buyer_name,buyer_phone,buyer_mobile,status) VALUES ('$itemid','$_username','$item[username]','$title','$item[thumb]','$item[price]','$number','$amount','$item[logistic]','$DT_TIME','$DT_TIME','$note','$buyer_postcode','$buyer_address','$buyer_name','$buyer_phone','$buyer_mobile', 6)");
+	$db->query("INSERT INTO {$table_order} (gid,buyer,seller,title,thumb,price,number,amount,logistic,addtime,updatetime,note, buyer_postcode,buyer_address,buyer_name,buyer_mobile,status) VALUES ('$itemid','$_username','$item[username]','$title','$item[thumb]','$item[price]','$number','$amount','$item[logistic]','$DT_TIME','$DT_TIME','$note','$buyer_postcode','$buyer_address','$buyer_name','$buyer_mobile', 6)");
 	$oid = $db->insert_id();
-	dheader('?action=show&auth='.encrypt('action=update&step=pay&itemid='.$oid, DT_KEY.'TURL'));
+	dheader('?action=show&itemid='.$itemid.'&auth='.encrypt('mid='.$moduleid.'&action=update&step=pay&itemid='.$oid, DT_KEY.'TURL'));
+}
+$CSS = array('cart');
+$head_title = $L['buy_title'];
+if($action == 'show') {
+	$forward = isset($auth) ? decrypt($auth, DT_KEY.'TURL') : '';
+	$forward = ($DT_PC ? $MODULE[2]['linkurl'] : $MODULE[2]['mobile']).'deal.php?'.($forward ? $forward : 'action=order');
 } else {
 	$_MOD = cache_read('module-2.php');
 	$result = $db->query("SELECT * FROM {$DT_PRE}address WHERE username='$_username' ORDER BY listorder ASC,itemid ASC LIMIT 30");
@@ -62,7 +63,13 @@ if($submit) {
 		$address[] = $r;
 	}
 	$send_types = explode('|', trim($_MOD['send_types']));
-	$head_title = $L['buy_title'];
-	include template('buy', $module);
 }
+if($DT_PC) {
+	if($EXT['mobile_enable']) $head_mobile = str_replace($MOD['linkurl'], $MOD['mobile'], $DT_URL);
+} else {
+	$back_link = $item['mobile'];
+	$head_name = $L['buy_title'];
+	$foot = '';
+}
+include template($template, $module);
 ?>

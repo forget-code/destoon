@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('DT_ADMIN') or exit('Access Denied');
@@ -10,7 +10,7 @@ require DT_ROOT.'/admin/admin.class.php';
 $do = new admin;
 $menus = array (
     array('添加管理员', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
-    array('管理员管理', '?moduleid='.$moduleid.'&file='.$file),
+    array('管理员列表', '?moduleid='.$moduleid.'&file='.$file),
 );
 $this_forward = '?file='.$file;
 switch($action) {

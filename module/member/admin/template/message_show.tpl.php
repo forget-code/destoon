@@ -3,8 +3,7 @@ defined('DT_ADMIN') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<div class="tt">站内信件</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">标题</td>
 <td class="f_b"><?php echo $title;?></td>
@@ -31,6 +30,6 @@ show_menu($menus);
 </tr>
 </tbody>
 </table>
-<div class="sbt"><input type="button" value=" 删 除 " class="btn" onclick="if(confirm('确定要删除吗？此操作将不可撤销')) {Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&itemid=<?php echo $itemid;?>&forward=<?php echo urlencode($forward);?>');}"/>&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
+<div class="sbt"><input type="button" value="返 回" class="btn-g" onclick="history.back(-1);"/>&nbsp;&nbsp;<input type="button" value="删 除" class="btn-r" onclick="if(confirm('确定要删除吗？此操作将不可撤销')) {Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&itemid=<?php echo $itemid;?>&forward=<?php echo urlencode($forward);?>');}"/></div>
 <script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

@@ -23,7 +23,7 @@ switch($action) {
 			exit;
 		}
 		$HSPATH = $MODULE[4]['linkurl'].'/skin/'.$skin.'/';
-		$company = $truename = $telephone = $email = $qq = $msn = $ali = $skype = '';
+		$company = $truename = $telephone = $email = $qq = $wx = $ali = $skype = '';
 		if($_userid) {
 			$user = userinfo($_username);
 			$company = $user['company'];
@@ -31,7 +31,7 @@ switch($action) {
 			$telephone = $user['telephone'] ? $user['telephone'] : $user['mobile'];
 			$email = $user['mail'] ? $user['mail'] : $user['email'];
 			$qq = $user['qq'];
-			$msn = $user['msn'];
+			$wx = $user['wx'];
 			$ali = $user['ali'];
 			$skype = $user['skype'];
 		}
@@ -73,7 +73,7 @@ switch($action) {
 		$company = dhtmlspecialchars(trim($company));
 		$email = dhtmlspecialchars(trim($email));
 		$qq = dhtmlspecialchars(trim($qq));
-		$msn = dhtmlspecialchars(trim($msn));
+		$wx = dhtmlspecialchars(trim($wx));
 		$ali = dhtmlspecialchars(trim($ali));
 		$skype = dhtmlspecialchars(trim($skype));
 		$content = nl2br($content);
@@ -81,9 +81,9 @@ switch($action) {
 		if($truename) $content .= '<br/>'.$L['content_truename'].$truename;
 		if($telephone) $content .= '<br/>'.$L['content_telephone'].$telephone;
 		if(is_email($email)) $content .= '<br/>'.$L['content_email'].$email;
-		if(is_numeric($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
+		if(is_qq($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
+		if(is_wx($wx)) $content .= '<br/>'.$L['content_wx'].' '.im_wx($wx, $_username).' '.$wx;
 		if($ali) $content .= '<br/>'.$L['content_ali'].' '.im_ali($ali).' '.$ali;
-		if(is_email($msn)) $content .= '<br/>'.$L['content_msn'].' '.im_msn($msn).' '.$msn;
 		if($skype) $content .= '<br/>'.$L['content_skype'].' '.im_skype($skype).' '.$skype;
 		if($job != 'guestbook') $content .= '<br/>'.$L['content_from'];
 		if($job == 'guestbook') {

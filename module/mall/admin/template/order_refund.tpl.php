@@ -11,7 +11,7 @@ if(!$id) show_menu($menus);
 <input type="hidden" name="mallid" value="<?php echo $mallid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <div class="tt">商品信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">订单单号</td>
 <td><?php echo $td['itemid'];?> <?php if($DT['trade']) { ?>(<?php echo $DT['trade_nm'];?>订单单号:<a href="https://lab.alipay.com/consume/queryTradeDetail.htm?tradeNo=<?php echo $td['trade_no'];?>" target="_blank" class="t"><?php echo $td['trade_no'];?></a>)<?php } ?></td>
@@ -40,7 +40,7 @@ if(!$id) show_menu($menus);
 </tr>
 </table>
 <div class="tt">快递信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">邮编</td>
 <td><?php echo $td['buyer_postcode'];?></td>
@@ -52,10 +52,6 @@ if(!$id) show_menu($menus);
 <tr>
 <td class="tl">姓名</td>
 <td><?php echo $td['buyer_name'];?></td>
-</tr>
-<tr>
-<td class="tl">电话</td>
-<td><?php echo $td['buyer_phone'];?></td>
 </tr>
 <tr>
 <td class="tl">手机</td>
@@ -75,7 +71,7 @@ if(!$id) show_menu($menus);
 <td class="tl">追踪结果</td>
 <td style="line-height:200%;"><div id="express"><img src="<?php echo DT_SKIN;?>image/loading.gif" align="absmiddle"/> 正在查询...</div>
 <script type="text/javascript">
-$(document).ready(function(){
+$(function(){
 	$('#express').load(AJPath+'?action=express&moduleid=2&auth=<?php echo encrypt('mall|'.$td['send_type'].'|'.$td['send_no'].'|'.$td['send_status'].'|'.$td['itemid'], DT_KEY.'EXPRESS');?>');
 });
 </script>
@@ -89,7 +85,7 @@ $(document).ready(function(){
 </tr>
 </table>
 <div class="tt">价格信息</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">单价</td>
 <td><?php echo $DT['money_sign'];?><?php echo $td['price'];?></td>
@@ -110,7 +106,7 @@ $(document).ready(function(){
 </tr>
 </table>
 <div class="tt">订单状态</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">下单时间</td>
 <td><?php echo $td['adddate'];?></td>

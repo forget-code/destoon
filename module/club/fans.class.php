@@ -2,14 +2,12 @@
 defined('IN_DESTOON') or exit('Access Denied');
 class fans {
 	var $itemid;
-	var $db;
 	var $table;
 	var $errmsg = errmsg;
 
     function __construct() {
-		global $db, $DT_PRE;
-		$this->table = $DT_PRE.'club_fans';
-		$this->db = &$db;
+		global $table_fans;
+		$this->table = $table_fans;
     }
 
     function fans() {
@@ -17,30 +15,30 @@ class fans {
     }
 
 	function get_one() {
-        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'itemid DESC') {
-		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $items, $sum;
+		global $MOD, $TYPE, $pages, $page, $pagesize, $offset, $items, $sum, $table_group;
 		if($page > 1 && $sum) {
 			$items = $sum;
 		} else {
-			$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
 			$items = $r['num'];
 		}
 		$pages = pages($items, $page, $pagesize);
 		if($items < 1) return array();	
 		$lists = $groupids = array();
-		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = DB::fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$groupids[$r['gid']] = $r['gid'];
 			$lists[] = $r;
 		}
 		if($groupids) {
 			$GRPS = array();
-			$result = $this->db->query("SELECT itemid,title,linkurl FROM {$this->db->pre}club_group WHERE itemid IN (".implode(',', $groupids).")");
-			while($r = $this->db->fetch_array($result)) {
+			$result = DB::query("SELECT itemid,title,linkurl FROM {$table_group} WHERE itemid IN (".implode(',', $groupids).")");
+			while($r = DB::fetch_array($result)) {
 				$GRPS[$r['itemid']] = $r;
 			}
 			if($GRPS) {
@@ -57,7 +55,7 @@ class fans {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->recycle($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=0 WHERE itemid=$itemid");
 			return true;
 		}		
 	}
@@ -67,7 +65,7 @@ class fans {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->restore($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=3 WHERE itemid=$itemid");
 			return true;
 		}		
 	}
@@ -78,7 +76,7 @@ class fans {
 				$this->delete($v); 
 			}
 		} else {
-			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 
@@ -88,7 +86,7 @@ class fans {
 				$this->check($v, $status); 
 			}
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=$status WHERE itemid=$itemid");
 		}
 	}
 
@@ -96,14 +94,14 @@ class fans {
 		if(is_array($itemid)) {
 			foreach($itemid as $v) { $this->reject($v); }
 		} else {
-			$this->db->query("UPDATE {$this->table} SET status=1 WHERE itemid=$itemid");
+			DB::query("UPDATE {$this->table} SET status=1 WHERE itemid=$itemid");
 			return true;
 		}
 	}
 
 	function clear($condition = 'status=0') {		
-		$result = $this->db->query("SELECT itemid FROM {$this->table} WHERE $condition");
-		while($r = $this->db->fetch_array($result)) {
+		$result = DB::query("SELECT itemid FROM {$this->table} WHERE $condition");
+		while($r = DB::fetch_array($result)) {
 			$this->delete($r['itemid']);
 		}
 	}

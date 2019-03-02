@@ -67,13 +67,22 @@ switch($action) {
 		if($MOD['credit_buy'] && $MOD['credit_price']) {
 			$C = explode('|', trim($MOD['credit_buy']));
 			$P = explode('|', trim($MOD['credit_price']));
+			$auto = 0;
+			$auth = isset($auth) ? decrypt($auth, DT_KEY.'CG') : '';
+			if($auth && substr($auth, 0, 7) == 'credit|') {
+				$auto = $submit = 1;
+				$type = intval(substr($auth, 7));
+			}
 			if($submit) {
-				is_payword($_username, $password) or message($L['error_payword']);
 				array_key_exists($type, $C) or message($L['credit_msg_buy_amount']);
 				$amount = $P[$type];
 				$credit = $C[$type];
 				if($amount > 0) {
-					$_money >= $amount or message($L['money_not_enough'], 'charge.php?action=pay&reason=credit&amount='.($amount-$_money));
+					$amount <= $_money or message($L['money_not_enough']);
+					if($amount <= $DT['quick_pay']) $auto = 1;
+					if(!$auto) {
+						is_payword($_username, $password) or message($L['error_payword']);
+					}
 					money_add($_username, -$amount);
 					money_record($_username, -$amount, $L['in_site'], 'system', $L['buy'].$DT['credit_name'], $credit.$DT['credit_unit']);
 					if($credit > 0) {
@@ -81,7 +90,7 @@ switch($action) {
 						credit_record($_username, $credit, 'system', $L['buy'].$DT['credit_name'], $amount.$DT['money_unit']);
 					}
 				}
-				dmsg($L['credit_msg_buy_success'], $forward ? $forward : '?action=index');
+				dmsg($L['credit_msg_buy_success'], '?action=index');
 			} else {
 				$select = isset($C[$sum]) ? $sum : 0;
 			}
@@ -95,34 +104,48 @@ switch($action) {
 		$url = $MOD['linkurl'].'invite.php?user='.$_username;
 	break;
 	case 'less':
-		$_credit < 0 or dheader('?action=index');
-		#$head_title = $L['invite_title'];
+		if($_credit < 0) message($L['credit_msg_less'], '?action=index');
+		dheader('?action=index');
 	break;
 	default:
 		$sfields = $L['credit_fields'];
 		$dfields = array('reason', 'amount', 'reason', 'note');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		isset($fromtime) or $fromtime = '';
-		isset($totime) or $totime = '';
+		$fromdate = isset($fromdate) ? $fromdate : '';
+		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
+		$todate = isset($todate) ? $todate : '';
+		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
 		isset($type) or $type = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = "username='$_username'";
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
-		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
+		if($fromtime) $condition .= " AND addtime>=$fromtime";
+		if($totime) $condition .= " AND addtime<=$totime";
 		if($type) $condition .= $type == 1 ? " AND amount>0" : " AND amount<0" ;
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}finance_credit WHERE $condition");
-		$pages = pages($r['num'], $page, $pagesize);		
-		$records = array();
+		$items = $r['num'];
+		$pages = pages($items, $page, $pagesize);
+		$lists = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}finance_credit WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		$income = $expense = 0;
 		while($r = $db->fetch_array($result)) {
 			$r['addtime'] = timetodate($r['addtime'], 5);
 			$r['amount'] > 0 ? $income += $r['amount'] : $expense += $r['amount'];
-			$records[] = $r;
+			$lists[] = $r;
 		}
 		$head_title = $L['credit_title'];
 	break;
+}
+if($DT_PC) {
+	//
+} else {
+	$foot = '';
+	if($action == 'buy' || $action == 'invite') {
+		$back_link = '?action=index';
+	} else {
+		$pages = mobile_pages($items, $page, $pagesize);
+		$back_link = 'index.php';
+	}
 }
 include template('credit', $module);
 ?>

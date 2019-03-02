@@ -10,7 +10,7 @@ if($_SESSION['ne_access_token']) {
 		$success = 1;
 		$arr = json_decode($rec, true);
 		$openid = $arr['userId'];
-		$nickname = isset($arr['username']) ? convert($arr['username'], 'UTF-8', DT_CHARSET) : $arr['userId'];
+		$nickname = isset($arr['username']) ? $arr['username'] : $arr['userId'];
 		$avatar = '';
 		$url = '';
 		$DS = array('ne_access_token');

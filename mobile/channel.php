@@ -1,7 +1,7 @@
 <?php
-require 'common.inc.php';
-$head_title = $L['channel_title'].$DT['seo_delimiter'].$head_title;
+require '../common.inc.php';
+require DT_ROOT.'/include/mobile.inc.php';
+$head_title = $head_name = $L['channel_title'];
 $foot = 'channel';
 include template('channel', 'mobile');
-if(DT_CHARSET != 'UTF-8') toutf8();
 ?>

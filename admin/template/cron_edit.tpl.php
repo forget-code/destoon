@@ -9,8 +9,7 @@ show_menu($menus);
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="post[type]" value="<?php echo $type;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<div class="tt"><?php echo $itemid ? '修改' : '添加';?>任务</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 任务名称</td>
 <td><input name="post[title]" type="text" id="title" size="50" value="<?php echo $title;?>"/><span id="dtitle" class="f_red"></span>
@@ -84,7 +83,7 @@ for($i = 0; $i < 60; $i++) {
 <td><textarea name="post[note]" style="width:300px;height:40px;"><?php echo $note;?></textarea></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
+<div class="sbt"><input type="submit" name="submit" value="<?php echo $itemid ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $itemid ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -95,5 +94,5 @@ function check() {
 	return true;
 }
 </script>
-<script type="text/javascript">Menuon(0);</script>
+<script type="text/javascript">Menuon(<?php echo $itemid ? 1 : 0;?>);</script>
 <?php include tpl('footer');?>

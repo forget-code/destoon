@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_know`;
-CREATE TABLE `destoon_know` (
+DROP TABLE IF EXISTS `destoon_know_10`;
+CREATE TABLE `destoon_know_10` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -18,6 +18,7 @@ CREATE TABLE `destoon_know` (
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
+  `comments` int(10) unsigned NOT NULL default '0',
   `raise` int(10) unsigned NOT NULL default '0',
   `agree` int(10) unsigned NOT NULL default '0',
   `against` int(10) unsigned NOT NULL default '0',
@@ -44,11 +45,11 @@ CREATE TABLE `destoon_know` (
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='知道';
 
-DROP TABLE IF EXISTS `destoon_know_answer`;
-CREATE TABLE `destoon_know_answer` (
+DROP TABLE IF EXISTS `destoon_know_answer_10`;
+CREATE TABLE `destoon_know_answer_10` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `qid` bigint(20) unsigned NOT NULL default '0',
-  `linkurl` varchar(255) NOT NULL default '',
+  `url` varchar(255) NOT NULL,
   `content` mediumtext NOT NULL,
   `vote` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
@@ -64,15 +65,15 @@ CREATE TABLE `destoon_know_answer` (
   KEY `qid` (`qid`)
 ) TYPE=MyISAM COMMENT='知道回答';
 
-DROP TABLE IF EXISTS `destoon_know_data`;
-CREATE TABLE `destoon_know_data` (
+DROP TABLE IF EXISTS `destoon_know_data_10`;
+CREATE TABLE `destoon_know_data_10` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` longtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='知道内容';
 
-DROP TABLE IF EXISTS `destoon_know_expert`;
-CREATE TABLE `destoon_know_expert` (
+DROP TABLE IF EXISTS `destoon_know_expert_10`;
+CREATE TABLE `destoon_know_expert_10` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `title` varchar(100) NOT NULL,
   `style` varchar(50) NOT NULL default '',
@@ -93,8 +94,8 @@ CREATE TABLE `destoon_know_expert` (
   KEY `addtime` (`addtime`)
 ) TYPE=MyISAM COMMENT='知道专家';
 
-DROP TABLE IF EXISTS `destoon_know_vote`;
-CREATE TABLE `destoon_know_vote` (
+DROP TABLE IF EXISTS `destoon_know_vote_10`;
+CREATE TABLE `destoon_know_vote_10` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `qid` bigint(20) unsigned NOT NULL default '0',
   `aid` bigint(20) unsigned NOT NULL default '0',

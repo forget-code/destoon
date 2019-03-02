@@ -3,7 +3,6 @@ defined('IN_DESTOON') or exit('Access Denied');
 if($_groupid != 1) exit;
 if($moduleid < 5) exit;
 if(strlen($path) < 5) exit;
-$path = convert($path, 'UTF-8', DT_CHARSET);
 $table = get_table($moduleid);
 if($table) {
 	$sql = "filepath='$path'";

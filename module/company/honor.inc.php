@@ -6,11 +6,16 @@ if($itemid) {
 	if(!$item || $item['status'] < 3 || $item['username'] != $username) dheader($MENU[$menuid]['linkurl']);
 	extract($item);
 	$image = str_replace('.thumb.'.file_ext($thumb), '', $thumb);
-	$db->query("UPDATE LOW_PRIORITY {$table} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');
+	$content = $DT_PC ? parse_video($content) : video5($content);
+	if(!$DT_BOT) $db->query("UPDATE LOW_PRIORITY {$table} SET hits=hits+1 WHERE itemid=$itemid", 'UNBUFFERED');
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $title.','.$COM['company'];
 	$head_description = dsubstr(strip_tags($content), 200);
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.'&itemid='.$itemid;
+	if($DT_PC) {
+		//
+	} else {
+		$back_link = userurl($username, "file=$file", $domain);
+	}
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -25,7 +30,7 @@ if($itemid) {
 	$offset = ($page-1)*$pagesize;
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition", 'CACHE');
 	$items = $r['num'];
-	$pages = home_pages($items, $pagesize, $demo_url, $page);
+	$pages = $DT_PC ? home_pages($items, $page, $pagesize, $demo_url) : mobile_pages($items, $page, $pagesize, $demo_url);
 	$lists = array();
 	if($items) {
 		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
@@ -41,7 +46,11 @@ if($itemid) {
 		}
 		$db->free_result($result);
 	}
-	if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].'index.php?moduleid=4&username='.$username.'&action='.$file.($page > 1 ? '&page='.$page : '');
+	if($DT_PC) {
+		//
+	} else {
+		if($kw) $back_link = userurl($username, "file=$file", $domain);
+	}
 }
 include template('honor', $template);
 ?>

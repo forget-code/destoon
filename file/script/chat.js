@@ -1,23 +1,25 @@
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 Dd('word').focus();var chat_time=chat_new_msg=0;var chat_word='';var chat_interval;
 function unixtime(){return Math.round(new Date().getTime()/1000);}
 function ec_set(i){if(i==1){Dd('ec1').className='ec';Dd('ec2').className='';Dd('chat_s').title=chat_lang.ec1;}else{Dd('ec1').className='';Dd('ec2').className='ec';Dd('chat_s').title=chat_lang.ec2;}chat_ec=i;set_local('chat_ec', i);Dh('ec');}
 var chat_ec=get_local('chat_ec');chat_ec=chat_ec==1?1:2;ec_set(chat_ec);
-function chat_send(){
-	var l=Dd('word').value.length;
-	if(Dd('word').value == chat_lang.tip || l<1){chat_tip('对话内容不能为空，请输入');Dd('word').focus();return;}
+function chat_send(msg){
+	var d = msg ? msg : Dd('word').value;
+	var l=d.length;
+	if(d == chat_lang.tip || l<1){chat_tip('发送内容不能为空，请输入');Dd('word').focus();return;}
 	if(l>chat_maxlen){chat_tip('最多输入'+chat_maxlen+'字，当前已输入'+l+'字');Dd('word').focus();return;}
 	if(chat_mintime&&(unixtime()-chat_time<chat_mintime)){chat_tip('您的发言过快，请稍后再发');return;}
+	face_hide();
 	chat_time=unixtime();
 	Dd('font_s_id').value=Dd('font_s').value;
 	Dd('font_c_id').value=Dd('font_c').value;
 	Dd('font_b_id').value=Dd('tool_font_b').className=='tool_a' ? 0 : 1;
 	Dd('font_i_id').value=Dd('tool_font_i').className=='tool_a' ? 0 : 1;
 	Dd('font_u_id').value=Dd('tool_font_u').className=='tool_a' ? 0 : 1;
-	Dd('word_id').value=Dd('word').value;	
+	Dd('word_id').value=d;	
 	$.post('chat.php', $('#chat_send').serialize(), function(data) {
 		if(data == 'ok') {
 			$('#word').val('');
@@ -36,27 +38,30 @@ function chat_load(d){
 			chat_last=chat_json.chat_last;
 			chat_msg=chat_json.chat_msg;
 			msglen=chat_msg.length;
+			if(msglen && d) {$('#chat').append('<div class="chat-more"><a href="im.php?action=view&chatid='+chat_id+'" target="_blank"><span>更多记录</span></a></div>');}
 			for(var i=0;i<msglen;i++){
 				msghtm = '';
 				if(chat_msg[i].date) msghtm += '<div class="chat-date"><span>'+chat_msg[i].date+'</span></div>';
 				msghtm += '<table cellpadding="0" cellspacing="0" width="100%">';
 				msghtm += '<tr>';
 				if(chat_msg[i].self == 1) {
-					msghtm += '<td width="40"></td>';
+					msghtm += '<td width="70"></td>';
 					msghtm += '<td valign="top"><div class="chat_msg1">'+chat_msg[i].word+'</div></td>';
 					msghtm += '<td class="chat_arr1"></td>';
 					msghtm += '<td width="60" valign="top" align="center"><a href="'+chat_home1+'" target="_blank"><img src="'+chat_head1+'" width="40" height="40"/></a></td>';
+					msghtm += '<td width="10"></td>';
 				} else {
+					msghtm += '<td width="10"></td>';
 					msghtm += '<td width="60" valign="top" align="center"><a href="'+chat_home0+'" target="_blank"><img src="'+chat_head0+'" width="40" height="40"/></a></td>';
 					msghtm += '<td class="chat_arr0"></td>';
 					msghtm += '<td valign="top"><div class="chat_msg0">'+chat_msg[i].word+'</div></td>';
-					msghtm += '<td width="40"></td>';
+					msghtm += '<td width="70"></td>';
 				}
 				msghtm += '</tr>';
 				msghtm += '</table>';
 				$('#chat').append(msghtm);
 			}			
-			if(msglen) $('#chat').animate({scrollTop:$('#chat')[0].scrollHeight}, 500);
+			if(msglen) $('#chat').animate({scrollTop:$('#chat')[0].scrollHeight+1000}, 500);
 			//if(msglen) Dd('chat').scrollTop=Dd('chat').scrollHeight;
 		}
 	});
@@ -146,13 +151,14 @@ function font_hide(){
 	Dd('tool_font').className='tool_a';
 }
 function font_init(){
+	if(Dd('word').value==chat_lang.tip){$('#word').val('');$('#word').attr('class', '');}
 	var s='';
 	if(Dd('font_s').value){s+=' s'+Dd('font_s').value;}
 	if(Dd('font_c').value){s+=' c'+Dd('font_c').value;}
 	if(Dd('tool_font_b').className=='tool_b'){s+=' fb';}
 	if(Dd('tool_font_i').className=='tool_b'){s+=' fi';}
 	if(Dd('tool_font_u').className=='tool_b'){s+=' fu';}
-	if(s){Dd('word').className=s;}
+	if(s){Dd('word').className=s.substring(1);}
 }
 function face_show(){
 	if(Dd('face').style.display!='none'){
@@ -167,10 +173,17 @@ function face_hide(){
 	Dd('tool_face').className='tool_a';
 }
 function face_into(s){
-	if(Dd('word').value==chat_lang.tip){Dd('word').value='';}
+	if(Dd('word').value==chat_lang.tip){$('#word').val('');$('#word').attr('class', '');}
 	Dd('word').value+=':'+s+')';
-	face_hide();
-	Dd('word').focus();
 }
-chat_interval=setInterval('chat_load()',chat_poll);
-chat_log();
+$(function(){
+	Dd('word').value=chat_lang.tip;
+	chat_interval=setInterval('chat_load()',chat_poll);
+	chat_log();
+	$('#word').bind('input click',function(){
+		if($('#word').val().indexOf(chat_lang.tip)!=-1) {
+			$('#word').val($('#word').val().replace(chat_lang.tip,''));
+			$('#word').attr('class', '');
+		}
+	});
+});

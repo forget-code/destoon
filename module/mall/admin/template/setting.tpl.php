@@ -6,7 +6,6 @@ $menus = array (
     array('SEO优化'),
     array('权限收费'),
     array('定义字段', 'javascript:Dwidget(\'?file=fields&tb='.$table.'\', \'['.$MOD['name'].']定义字段\');'),
-    array('模板管理', 'javascript:Dwidget(\'?file=template&dir='.$module.'\', \'['.$MOD['name'].']模板管理\');'),
 );
 show_menu($menus);
 ?>
@@ -15,8 +14,35 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<div class="tt">基本设置</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
+<tr>
+<td class="tl">首页默认模板</td>
+<td><?php echo tpl_select('index', $module, 'setting[template_index]', '默认模板', $template_index);?></td>
+</tr>
+<tr>
+<td class="tl">列表默认模板</td>
+<td><?php echo tpl_select('list', $module, 'setting[template_list]', '默认模板', $template_list);?></td>
+</tr>
+<tr>
+<td class="tl">内容默认模板</td>
+<td><?php echo tpl_select('show', $module, 'setting[template_show]', '默认模板', $template_show);?></td>
+</tr>
+<tr>
+<td class="tl">搜索默认模板</td>
+<td><?php echo tpl_select('search', $module, 'setting[template_search]', '默认模板', $template_search);?></td>
+</tr>
+<tr>
+<td class="tl">信息发布模板</td>
+<td><?php echo tpl_select('my_'.$module, 'member', 'setting[template_my]', '默认模板', $template_my);?></td>
+</tr>
+<tr>
+<td class="tl">商品对比模板</td>
+<td><?php echo tpl_select('compare', $module, 'setting[template_compare]', '默认模板', $template_compare);?></td>
+</tr>
+<tr>
+<td class="tl">浏览历史模板</td>
+<td><?php echo tpl_select('view', $module, 'setting[template_view]', '默认模板', $template_view);?></td>
+</tr>
 <tr>
 <td class="tl">默认缩略图[宽X高]</td>
 <td>
@@ -139,8 +165,8 @@ X
 </tr>
 
 <tr>
-<td class="tl">购物车容量</td>
-<td><input type="text" size="3" name="setting[max_cart]" value="<?php echo $max_cart;?>"/> <?php tips('超出容量之后，系统自动删除最早加入购物车的商品，为了系统效率，建议控制在50内');?></td>
+<td class="tl">按分类浏览列数</td>
+<td><input type="text" size="3" name="setting[page_subcat]" value="<?php echo $page_subcat;?>"/></td>
 </tr>
 
 <tr>
@@ -165,16 +191,19 @@ X
 </tr>
 
 <tr>
-<td class="tl">按分类浏览列数</td>
-<td><input type="text" size="3" name="setting[page_subcat]" value="<?php echo $page_subcat;?>"/></td>
+<td class="tl">内容点击次数</td>
+<td>
+<input type="radio" name="setting[hits]" value="1"  <?php if($hits) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[hits]" value="0"  <?php if(!$hits) echo 'checked';?>/> 关闭
+<?php tips('关闭后，有助于缓解频繁更新点击次数对数据表造成的压力');?>
+</td>
 </tr>
 
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<div class="tt">SEO优化</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">首页是否生成html</td>
 <td>
@@ -280,12 +309,29 @@ X
 <?php echo seo_title('seo_description_show', array('showtitle', 'showintroduce', 'catname', 'catdescription', 'modulename', 'sitename', 'sitedescription'));?>
 </td>
 </tr>
+<tr>
+<td class="tl">搜索页Title<br/>(网页标题)</td>
+<td><input name="setting[seo_title_search]" type="text" id="seo_title_search" value="<?php echo $seo_title_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_title_search', array('kw', 'areaname', 'catname', 'cattitle', 'modulename', 'sitename', 'sitetitle', 'page', 'delimiter'));?>
+</td>
+</tr>
+<tr>
+<td class="tl">搜索页Keywords<br/>(网页关键词)</td>
+<td><input name="setting[seo_keywords_search]" type="text" id="seo_keywords_search" value="<?php echo $seo_keywords_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_keywords_search', array('kw', 'areaname', 'catname', 'catkeywords', 'modulename', 'sitename', 'sitekeywords'));?>
+</td>
+</tr>
+<tr>
+<td class="tl">搜索页Description<br/>(网页描述)</td>
+<td><input name="setting[seo_description_search]" type="text" id="seo_description_search" value="<?php echo $seo_description_search;?>" style="width:90%;"/><br/> 
+<?php echo seo_title('seo_description_search', array('kw', 'areaname', 'catname', 'catdescription', 'modulename', 'sitename', 'sitedescription'));?>
+</td>
+</tr>
 </table>
 </div>
 
 <div id="Tabs2" style="display:none">
-<div class="tt">权限收费</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">允许浏览模块首页</td>
 <td><?php echo group_checkbox('setting[group_index][]', $group_index);?></td>
@@ -392,9 +438,13 @@ X
 <td class="tl">向发布人返利</td>
 <td><input type="text" size="2" name="setting[fee_back]" value="<?php echo $fee_back;?>"/> % <?php tips('请填写1-100之间的数字，用户支付之后，系统将按此比例向发布人增加对应的'.$DT['money_name'].'或者'.$DT['credit_name']);?></td>
 </tr>
+<tr>
+<td class="tl">向发布人打赏</td>
+<td><input type="text" size="2" name="setting[fee_award]" value="<?php echo $fee_award;?>"/> % <?php tips('请填写1-100之间的数字，用户打赏之后，系统将按此比例向发布人增加对应的赏金，填0代表关闭打赏');?></td>
+</tr>
 </table>
 <div class="tt"><?php echo $DT['credit_name'];?>规则</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">发布信息奖励</td>
 <td>
@@ -426,9 +476,28 @@ X
 </td>
 </tr>
 </table>
+<div class="tt">发布数量</div>
+<table cellspacing="0" class="tb">
+<tr align="center">
+<td width="158">会员组</td>
+<td width="100">总数限制</td>
+<td width="100">免费数量</td>
+<td align="right"><a href="<?php echo DT_PATH;?>api/redirect.php?url=https://www.destoon.com/doc/skill/94.html" target="_blank" class="t">设置说明</a></td>
+</tr>
+<?php foreach($GROUP as $v) {?>
+<tr align="center">
+<td><?php echo $v['groupname'];?></td>
+<?php $k = 'limit_'.$v['groupid'];?>
+<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
+<?php $k = 'free_limit_'.$v['groupid'];?>
+<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
+<td></td>
+</tr>
+<?php }?>
+</table>
 </div>
 <div class="sbt">
-<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -445,9 +514,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-window.onload=function() {
+$(function(){
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-}
+});
 </script>
 <?php include tpl('footer');?>

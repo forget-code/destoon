@@ -1,6 +1,6 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2015 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
 require '../common.inc.php';
@@ -11,7 +11,6 @@ require DT_ROOT.'/include/captcha.class.php';
 $do = new captcha;
 $do->font = DT_ROOT.'/file/font/'.$DT['water_font'];
 if($DT['captcha_cn']) $do->cn = is_file($do->font);
-$do->ip = $DT_IP;
 if($action == 'question') {
 	$id = isset($id) ? trim($id) : 'questionstr';
 	$do->question($id);

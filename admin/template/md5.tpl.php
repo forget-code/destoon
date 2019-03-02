@@ -4,9 +4,7 @@ include tpl('header');
 show_menu($menus);
 ?>
 <?php if($submit) { ?>
-
-<div class="tt">校验结果</div>
-<table cellpadding="2" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <?php if($lists) { ?>
 <tr>
 <th>文件</th>
@@ -16,8 +14,8 @@ show_menu($menus);
 	<?php foreach($lists as $f) { ?>
 	<tr align="center">
 	<td align="left" class="f_fd">&nbsp;<?php echo $f;?></td>
-	<td class="px11"><?php echo dround(filesize(DT_ROOT.'/'.$f)/1024);?> Kb</td>
-	<td class="px11"><?php echo timetodate(filemtime(DT_ROOT.'/'.$f), 6);?></td>
+	<td class="px12"><?php echo dround(filesize(DT_ROOT.'/'.$f)/1024);?> Kb</td>
+	<td class="px12"><?php echo timetodate(filemtime(DT_ROOT.'/'.$f), 6);?></td>
 	</tr>
 	<?php } ?>
 	<tr>
@@ -33,11 +31,11 @@ show_menu($menus);
 <?php } else { ?>
 <form method="post" id="dform">
 <div class="tt">文件校验</div>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">&nbsp;选择目录</td>
 <td>
-<table cellpadding="2" cellspacing="2" width="600">
+<table cellspacing="2" width="600" class="ctb">
 <?php foreach($dirs as $k=>$d) { ?>
 <?php if($k%4==0) {?><tr><?php } ?>
 <td width="150"><input type="checkbox" name="filedir[]" value="<?php echo $d;?>"<?php echo in_array($d, $sys) ? ' checked' : '';?><?php echo in_array($d, $fbs) ? ' disabled' : '';?> id="cdir_<?php echo $d;?>"/><label for="cdir_<?php echo $d;?>">&nbsp;<img src="admin/image/folder.gif" width="16" height="14" alt="" align="absmiddle"/> <?php echo $d;?></label></td>
@@ -67,8 +65,8 @@ show_menu($menus);
 <option value="<?php echo $n;?>"><?php echo $n.' '.dround(filesize($f)/1024, 2);?> K</option>
 <?php } ?>
 </select>
-&nbsp;<input type="submit" name="submit" value="开始校验" class="btn" onclick="this.form.action='?file=<?php echo $file;?>';this.value='校验中..';this.blur();this.className='btn f_gray';"/>
-&nbsp;<input type="submit" name="submit" value="删除镜像" class="btn" onclick="if(Dd('mirror').value==''){alert('请选择需要删除的镜像文件');Dd('mirror').focus();return false;}if(confirm('确定要删除吗？此操作将不可恢复')){this.form.action='?file=<?php echo $file;?>&action=delete';}else{return false;}"/>
+&nbsp;<input type="submit" name="submit" value="开始校验" class="btn-g" onclick="this.form.action='?file=<?php echo $file;?>';this.value='校验中..';this.blur();this.className='btn f_gray';"/>
+&nbsp;<input type="submit" name="submit" value="删除镜像" class="btn-r" onclick="if(Dd('mirror').value==''){alert('请选择需要删除的镜像文件');Dd('mirror').focus();return false;}if(confirm('确定要删除吗？此操作将不可恢复')){this.form.action='?file=<?php echo $file;?>&action=delete';}else{return false;}"/>
 </td>
 </tr>
 </table>
@@ -77,11 +75,11 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="add"/>
 <div class="tt">创建镜像</div>
-<table cellpadding="6" cellspacing="1" class="tb">
+<table cellspacing="0" class="tb">
 <tr>
 <td class="tl">&nbsp;选择目录</td>
 <td>
-<table cellpadding="2" cellspacing="2" width="600">
+<table cellspacing="2" width="600">
 <?php foreach($dirs as $k=>$d) { ?>
 <?php if($k%4==0) {?><tr><?php } ?>
 <td width="150"><input type="checkbox" name="filedir[]" value="<?php echo $d;?>"<?php echo in_array($d, $sys) ? ' checked' : '';?><?php echo in_array($d, $fbs) ? ' disabled' : '';?> id="adir_<?php echo $d;?>"/><label for="adir_<?php echo $d;?>">&nbsp;<img src="admin/image/folder.gif" width="16" height="14" alt="" align="absmiddle"/> <?php echo $d;?></label></td>
@@ -101,7 +99,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td></td>
-<td height="30">&nbsp;<input type="submit" name="submit" value="创建镜像" class="btn" onclick="this.value='创建中..';this.blur();this.className='btn f_gray';"/></td>
+<td height="30">&nbsp;<input type="submit" name="submit" value="创建镜像" class="btn-g" onclick="this.value='创建中..';this.blur();this.className='btn f_gray';"/></td>
 </tr>
 </table>
 </form>

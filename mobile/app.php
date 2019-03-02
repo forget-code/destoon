@@ -1,9 +1,10 @@
 <?php
 /*
-	[Destoon B2B System] Copyright (c) 2008-2016 www.destoon.com
+	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
 	This is NOT a freeware, use is subject to license.txt
 */
-require 'common.inc.php';
+require '../common.inc.php';
+require DT_ROOT.'/include/mobile.inc.php';
 ($DT_MOB['os'] == 'ios' || $DT_MOB['os'] == 'android') or dheader('index.php?reload='.$DT_TIME);
 if($action == 'b2b') {
 	if(get_cookie('mobile') != 'b2b') set_cookie('mobile', 'b2b', $DT_TIME + 30*86400);
@@ -29,8 +30,11 @@ $local = get_cookie('mobile_setting');
 if($local) {
 	$data = $local;
 } else if($_userid) {
-	$data = file_get(DT_ROOT.'/file/user/'.dalloc($_userid).'/'.$_userid.'/mobile.php');
-	if($data) set_cookie('mobile_setting', $data, $DT_TIME + 30*86400);
+	$data = file_get(DT_ROOT.'/file/user/'.dalloc($_userid).'/'.$_userid.'/mobile-setting');
+	if($data) {
+		$data = substr($data, 13);
+		set_cookie('mobile_setting', $data, $DT_TIME + 30*86400);
+	}
 }
 if($data) {
 	$MOB_MOD = array();
@@ -43,9 +47,9 @@ if($data) {
 }
 if(count($MOD_MY) < 2) $MOD_MY = $MOB_MODULE;
 $head_name = $EXT['mobile_sitename'] ? $EXT['mobile_sitename'] : $DT['sitename'];
+$seo_title = $DT['seo_title'];
 $head_keywords = $DT['seo_keywords'];
 $head_description = $DT['seo_description'];
 $foot = 'home';
-include template('index', 'mobile');
-if(DT_CHARSET != 'UTF-8') toutf8();
+include template('index');
 ?>

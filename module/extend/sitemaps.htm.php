@@ -48,7 +48,6 @@ foreach($mods as $mid) {
 $data .= $item;
 $data .= '</urlset>';
 $data = str_replace('><', ">\n<", $data);
-$data = convert($data, DT_CHARSET, 'UTF-8');
 file_put(DT_ROOT.'/sitemaps.xml', $data);
 foreach($mods as $mid) {
 	if(isset($MODULE[$mid]) && !$MODULE[$mid]['islink'] && $MODULE[$mid]['domain']) {
@@ -92,7 +91,6 @@ foreach($mods as $mid) {
 		$data .= $item;
 		$data .= '</urlset>';
 		$data = str_replace('><', ">\n<", $data);
-		$data = convert($data, DT_CHARSET, 'UTF-8');
 		file_put(DT_ROOT.'/'.$MODULE[$mid]['moduledir'].'/sitemaps.xml', $data);
 	}
 }
