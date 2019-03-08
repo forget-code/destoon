@@ -6,10 +6,10 @@
 		<td width="10"> </td>
 		<td align="left">
 			<ul>
-			<li><a href="{$t[linkurl]}" target="_blank"><strong class="px14">{$t[title]}</strong></a></li>
+			<li>{if $t[vip]}<span class="f_r"><img src="{DT_SKIN}image/vip.gif"/> <img src="{DT_SKIN}image/vip_{$t[vip]}.gif"/></span>{/if}<a href="{$t[linkurl]}" target="_blank"><strong class="px14">{$t[title]}</strong></a></li>
 			<li>
-			<span class="f_r">{timetodate($t[edittime], $datetype)}&nbsp;&nbsp;</span>
-			{if $t[vip]}<img src="{DT_SKIN}image/vip_{$t[vip]}.gif" alt="{VIP}" title="{VIP}:{$t[vip]}级" align="absmiddle"/> {/if}<a href="{userurl($t[username])}" target="_blank">{$t[company]}</a>&nbsp;
+			<span class="f_r px11">{timetodate($t[edittime], $datetype)}&nbsp;&nbsp;</span>
+			<a href="{userurl($t[username])}" target="_blank">{$t[company]}</a>&nbsp;
 			<span class="f_gray">
 			{if $t[validated]}[已核实]{else}[未核实]{/if}
 			{if !$t[username]} [未注册]{/if}

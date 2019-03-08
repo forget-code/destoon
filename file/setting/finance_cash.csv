@@ -1,8 +1,6 @@
 itemid,ID,
 username,会员名,
-bank,收款银行,
-banktype,帐号类型,0对私1对公
-branch,开户网点,
+bank,银行,
 account,帐号,
 truename,姓名,
 amount,金额,

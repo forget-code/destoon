@@ -1,29 +1,23 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
+
 /* article && quote*/
-.top-l {width:420px;float:left;margin-right:20px;}
-.top-r {width:420px;float:right;}
-.headline h2 {font-size:24px;padding-left:10px;margin:0 0 10px 0;height:32px;line-height:32px;overflow:hidden;}
-.subline {padding-left:10px;}
-.subline li {height:34px;line-height:34px;overflow:hidden;font-size:16px;}
-.subline .f_r {color:#666666;font-size:12px;}
+.headline {background:#FFFFFF url('image/headline_bg.gif') repeat-x 0 bottom;padding:0 10px 5px 10px;}
+.headline h2 {text-align:center;font-size:16px;margin:0;height:30px;line-height:30px;overflow:hidden;}
+.headline span {color:#FF6600;}
+.headline div {line-height:22px;height:22px;overflow:hidden;}
+.subline li {height:26px;line-height:26px;overflow:hidden;font-size:14px;padding:0 10px 0 10px;}
+.subline span {font-size:11px;color:#666666;}
 /* catlist */
 .childlist {padding:10px 10px 10px 15px;line-height:24px;}
 .childlist li {font-size:14px;height:28px;line-height:28px;background:url('image/li_dot.gif') no-repeat 5px 12px;padding:0 10px 0 12px;overflow:hidden;}
-
-.catlist {padding:16px 0;line-height:32px;}
-.catlist li {font-size:14px;height:32px;line-height:32px;background:url('image/li_dot.gif') no-repeat 6px center;padding:0 12px;overflow:hidden;}
-.catlist i {font-style:normal;float:right;font-size:12px;color:#666666;}
-.catlist .sp {background:#FFFFFF url('image/dot.gif') repeat-x 0 center;}
-
-.price-market {padding:0 32px 16px 32px;}
-.price-market li {height:32px;line-height:32px;overflow:hidden;font-size:14px;}
-.price-add {padding:16px;}
-.price-add table {width:100%;}
-.price-add .tl {width:60px;font-size:14px;}
-
-#products {border:#DDDDDD 1px solid;border-top:none;height:220px;overflow:hidden;}
-#products td {height:21px;border-bottom:#EEEEEE 1px solid;border-right:#EEEEEE 1px solid;}
-.content td {font-size:12px;}
+.catlist {padding:15px 15px 15px 20px;line-height:24px;}
+.catlist_li {font-size:14px;height:28px;line-height:28px;background:url('image/li_dot.gif') no-repeat 5px 12px;padding:0 10px 0 12px;overflow:hidden;}
+.catlist_sp {background:#FFFFFF url('image/dot.gif') repeat-x 0 center;}
+.quote_head {height:25px;line-height:25px;overflow:hidden;background:url('image/quote_head.gif') no-repeat;padding:0 3px 0 0;}
+.quote_head div {width:80px;text-align:center;font-size:14px;}
+.quote_head_i {color:#666666;padding:2px 0 1px 1px;}
+.quote_body {border:#FF7300 1px solid;padding:11px 0 11px 0;}
+.quote_body li {background:url('image/ico_quote.gif') no-repeat 13px 1px;padding:0 15px 0 35px;color:#666666;height:20px;line-height:20px;overflow:hidden;}

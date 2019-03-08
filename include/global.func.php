@@ -1,23 +1,39 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
+function dhtmlspecialchars($string) {
+    return is_array($string) ? array_map('dhtmlspecialchars', $string) : str_replace('&amp;', '&', htmlspecialchars($string, ENT_QUOTES));
+}
+
 function daddslashes($string) {
-	return is_array($string) ? array_map('daddslashes', $string) : addslashes($string);
+	if(!is_array($string)) return addslashes($string);
+	foreach($string as $key => $val) $string[$key] = daddslashes($val);
+	return $string;
 }
 
 function dstripslashes($string) {
-	return is_array($string) ? array_map('dstripslashes', $string) : stripslashes($string);
+	if(!is_array($string)) return stripslashes($string);
+	foreach($string as $key => $val) $string[$key] = dstripslashes($val);
+	return $string;
 }
 
-function dtrim($string) {
-	return str_replace(array(chr(10), chr(13), "\t", ' '), array('', '', '', ''), $string);
+function dsafe($string) {
+	if(is_array($string)) {
+		return array_map('dsafe', $string);
+	} else {
+		if(strlen($string) < 20) return $string;
+		$match = array("/&#([a-z0-9]+)([;]*)/i", "/(j[\s\r\n\t]*a[\s\r\n\t]*v[\s\r\n\t]*a[\s\r\n\t]*s[\s\r\n\t]*c[\s\r\n\t]*r[\s\r\n\t]*i[\s\r\n\t]*p[\s\r\n\t]*t|jscript|js|vbscript|vbs|about|expression|script|frame|link|import)/i", "/on(mouse|exit|error|click|dblclick|key|load|unload|change|move|submit|reset|cut|copy|select|start|stop)/i");
+		$replace = array("", "<d>\\1</d>", "on\n\\1");
+		return preg_replace($match, $replace, $string);
+	}
 }
 
-function dwrite($string) {
-	return str_replace(array(chr(10), chr(13), "'"), array('', '', "\'"), $string);
+function dtrim($string, $js = false) {
+	$string = str_replace(array(chr(10), chr(13)), array('', ''), $string);
+	return $js ? str_replace("'", "\'", $string) : $string;
 }
 
 function dheader($url) {
@@ -43,7 +59,7 @@ function dmsg($dmsg = '', $dforward = '') {
 }
 
 function dalert($dmessage = errmsg, $dforward = '', $extend = '') {
-	global $DT;
+	global $CFG, $DT;
 	exit(include template('alert', 'message'));
 }
 
@@ -57,7 +73,7 @@ function dsubstr($string, $length, $suffix = '', $start = 0) {
 	$string = str_replace(array('&quot;', '&lt;', '&gt;'), array('"', '<', '>'), $string);
 	$length = $length - strlen($suffix);
 	$str = '';
-	if(DT_CHARSET == 'UTF-8') {
+	if(strtolower(DT_CHARSET) == 'utf-8') {
 		$n = $tn = $noc = 0;
 		while($n < $strlen)	{
 			$t = ord($string{$n});
@@ -89,69 +105,57 @@ function dsubstr($string, $length, $suffix = '', $start = 0) {
 	return $str == $string ? $str : $str.$suffix;
 }
 
-function cutstr($str, $mark1 = '', $mark2 = '') {
-	if($mark1) {
-		$p1 = strpos($str, $mark1);
-		if($p1 === false) return '';
-		$str = substr($str, $p1 + strlen($mark1));
+function encrypt($txt, $key = '') {
+	$rnd = md5(microtime());
+	$len = strlen($txt);
+	$ren = strlen($rnd);
+	$ctr = 0;
+	$str = '';
+	for($i = 0; $i < $len; $i++) {
+		$ctr = $ctr == $ren ? 0 : $ctr;
+		$str .= $rnd[$ctr].($txt[$i] ^ $rnd[$ctr++]);
 	}
-	if(!$mark2) return $str;
-	$p2 = strpos($str, $mark2);
-	if($p2 === false) return $str;
-	return substr($str, 0, $p2);
-}
-
-function encrypt($txt, $key = '', $expiry = 0) {
-	strlen($key) > 5 or $key = DT_KEY;
-	$str = $txt.substr($key, 0, 3);
-	return str_replace(array('=', '+', '/', '0x', '0X'), array('-E-', '-P-', '-S-', '-Z-', '-X-'), mycrypt($str, $key, 'ENCODE', $expiry));
+	return str_replace('=', '', base64_encode(kecrypt($str, $key)));
 }
 
 function decrypt($txt, $key = '') {
-	strlen($key) > 5 or $key = DT_KEY;
-	$str = mycrypt(str_replace(array('-E-', '-P-', '-S-', '-Z-', '-X-'), array('=', '+', '/', '0x', '0X'), $txt), $key, 'DECODE');
-	return substr($str, -3) == substr($key, 0, 3) ? substr($str, 0, -3) : '';
+	$txt = kecrypt(base64_decode($txt), $key);
+	$len = strlen($txt);
+	$str = '';
+	for($i = 0; $i < $len; $i++) {
+		$tmp = $txt[$i];
+		$str .= $txt[++$i] ^ $tmp;
+	}
+	return $str;
 }
 
-function mycrypt($string, $key, $operation = 'DECODE', $expiry = 0) {
-	$ckey_length = 4;
+function kecrypt($txt, $key) {
 	$key = md5($key);
-	$keya = md5(substr($key, 0, 16));
-	$keyb = md5(substr($key, 16, 16));
-	$keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length): substr(md5(microtime()), -$ckey_length)) : '';
-	$cryptkey = $keya.md5($keya.$keyc);
-	$key_length = strlen($cryptkey);
-	$string = $operation == 'DECODE' ? base64_decode(substr($string, $ckey_length)) : sprintf('%010d', $expiry ? $expiry + DT_TIME : 0).substr(md5($string.$keyb), 0, 16).$string;
-	$string_length = strlen($string);
-	$result = '';
-	$box = range(0, 255);
-	$rndkey = array();
-	for($i = 0; $i <= 255; $i++) {
-		$rndkey[$i] = ord($cryptkey[$i % $key_length]);
+	$len = strlen($txt);
+	$ken = strlen($key);
+	$ctr = 0;
+	$str = '';
+	for($i = 0; $i < $len; $i++) {
+		$ctr = $ctr == $ken ? 0 : $ctr;
+		$str .= $txt[$i] ^ $key[$ctr++];
 	}
-	for($j = $i = 0; $i < 256; $i++) {
-		$j = ($j + $box[$i] + $rndkey[$i]) % 256;
-		$tmp = $box[$i];
-		$box[$i] = $box[$j];
-		$box[$j] = $tmp;
+	return $str;
+}
+
+function strtohex($str) {
+	$hex = '';
+	for($i = 0; $i < strlen($str); $i++) {
+		$hex .= dechex(ord($str[$i]));
 	}
-	for($a = $j = $i = 0; $i < $string_length; $i++) {
-		$a = ($a + 1) % 256;
-		$j = ($j + $box[$a]) % 256;
-		$tmp = $box[$a];
-		$box[$a] = $box[$j];
-		$box[$j] = $tmp;
-		$result .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
+	return $hex;
+}
+
+function hextostr($hex) {
+	$str = '';
+	for($i = 0; $i < strlen($hex) - 1; $i += 2) {
+		$str .= chr(hexdec($hex[$i].$hex[$i+1]));
 	}
-	if($operation == 'DECODE') {
-		if((substr($result, 0, 10) == 0 || substr($result, 0, 10) - DT_TIME > 0) && substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16)) {
-			return substr($result, 26);
-		} else {
-			return '';
-		}
-	} else {
-		return $keyc.base64_encode($result);
-	}
+	return $str;
 }
 
 function dround($var, $precision = 2, $sprinft = false) {
@@ -164,6 +168,12 @@ function dalloc($i, $n = 5000) {
 	return ceil($i/$n);
 }
 
+function strip_sql($string) {
+	$search = array("/union[\s|\t]/i","/select[\s|\t]/i","/update[\s|\t]/i","/outfile[\s|\t]/i","/ascii/i","/[\s|\t]or[\s|\t]/i","/\/\*/i");
+	$replace = array('union&nbsp;','select&nbsp;','update&nbsp;','outfile&nbsp;','ascii&nbsp;','&nbsp;or&nbsp;', '');
+	return is_array($string) ? array_map('strip_sql', $string) : preg_replace($search, $replace, $string);
+}
+
 function strip_nr($string, $js = false) {
 	$string =  str_replace(array(chr(13), chr(10), "\n", "\r", "\t", '  '),array('', '', '', '', '', ''), $string);
 	if($js) $string = str_replace("'", "\'", $string);
@@ -171,16 +181,15 @@ function strip_nr($string, $js = false) {
 }
 
 function template($template = 'index', $dir = '') {
-	global $CFG, $DT_PC;
-	check_name($template) or exit('BAD TPL NAME');
-	if($dir) check_name($dir) or exit('BAD TPL DIR');
-	$tpl = $DT_PC ? $CFG['template'] : $CFG['template_mobile'];
-	$to = DT_CACHE.'/tpl/'.$tpl.'/'.($dir ? $dir.'/' : '').$template.'.php';
+	global $CFG;
+	$to = $dir ? DT_CACHE.'/tpl/'.$dir.'-'.$template.'.php' : DT_CACHE.'/tpl/'.$template.'.php';
 	$isfileto = is_file($to);
 	if($CFG['template_refresh'] || !$isfileto) {
 		if($dir) $dir = $dir.'/';
-        $from = DT_ROOT.'/template/'.$tpl.'/'.$dir.$template.'.htm';
-		if(!is_file($from)) $from = DT_ROOT.'/template/'.($DT_PC ? 'default' : 'mobile').'/'.$dir.$template.'.htm';
+        $from = DT_ROOT.'/template/'.$CFG['template'].'/'.$dir.$template.'.htm';
+		if($CFG['template'] != 'default' && !is_file($from)) {
+			$from = DT_ROOT.'/template/default/'.$dir.$template.'.htm';
+		}
         if(!$isfileto || filemtime($from) > filemtime($to) || (filesize($to) == 0 && filesize($from) > 0)) {
 			require_once DT_ROOT.'/include/template.func.php';
 			template_compile($from, $to);
@@ -199,14 +208,14 @@ function ob_template($template, $dir = '') {
 }
 
 function message($dmessage = errmsg, $dforward = 'goback', $dtime = 1) {
+	global $CFG, $DT;
 	if(!$dmessage && $dforward && $dforward != 'goback') dheader($dforward);
-	global $DT, $DT_PC;
 	exit(include template('message', 'message'));
 }
 
 function login() {
-	global $_userid, $MODULE, $DT_URL, $DT_PC, $DT;
-	$_userid or dheader(($DT_PC ? $MODULE[2]['linkurl'] : $MODULE[2]['mobile']).$DT['file_login'].'?forward='.rawurlencode($DT_URL));
+	global $_userid, $MODULE, $DT_URL, $DT;
+	$_userid or dheader($MODULE[2]['linkurl'].$DT['file_login'].'?forward='.rawurlencode($DT_URL));
 }
 
 function random($length, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz') {
@@ -219,8 +228,8 @@ function random($length, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghi
 }
 
 function set_cookie($var, $value = '', $time = 0) {
-	global $CFG;
-	$time = $time > 0 ? $time : (empty($value) ? DT_TIME - 3600 : 0);
+	global $CFG, $DT_TIME;
+	$time = $time > 0 ? $time : (empty($value) ? $DT_TIME - 3600 : 0);
 	$port = $_SERVER['SERVER_PORT'] == '443' ? 1 : 0;
 	$var = $CFG['cookie_pre'].$var;
 	return setcookie($var, $value, $time, $CFG['cookie_path'], $CFG['cookie_domain'], $port);
@@ -233,38 +242,39 @@ function get_cookie($var) {
 }
 
 function get_table($moduleid, $data = 0) {
-	global $MODULE;
+	global $DT_PRE, $MODULE;
 	$module = $MODULE[$moduleid]['module'];
-	$M = array('company', 'member');
 	if($data) {
-		return in_array($module, $M) ? DT_PRE.$module.'_data' : DT_PRE.$module.'_data_'.$moduleid;
+		return in_array($module, array('article', 'info')) ? $DT_PRE.$module.'_data_'.$moduleid : $DT_PRE.$module.'_data';
 	} else {
-		return in_array($module, $M) ? DT_PRE.$module : DT_PRE.$module.'_'.$moduleid;
+		return in_array($module, array('article', 'info')) ? $DT_PRE.$module.'_'.$moduleid : $DT_PRE.$module;
 	}
 }
 
 function get_process($fromtime, $totime) {
-	if($fromtime && DT_TIME < $fromtime) return 1;
-	if($totime && DT_TIME > $totime) return 3;
+	global $DT_TIME;
+	if($fromtime && $DT_TIME < $fromtime) return 1;
+	if($totime && $DT_TIME > $totime) return 3;
 	return 2;
 }
 
 function send_message($touser, $title, $content, $typeid = 4, $fromuser = '') {
+	global $db, $DT_TIME, $DT_IP;
 	if($touser == $fromuser) return false;
 	if(check_name($touser) && $title && $content) {
 		$title = addslashes($title);
 		$content = addslashes($content);
-		$r = DB::get_one("SELECT black FROM ".DT_PRE."member_misc WHERE username='$touser'");
+		$r = $db->get_one("SELECT black FROM {$db->pre}member WHERE username='$touser'");
 		if($r) {
 			if($r['black'] && $typeid != 4) {
 				$blacks = explode(' ', $r['black']);
 				$_from = $fromuser ? $fromuser : 'Guest';
 				if(in_array($_from, $blacks)) return false;
 			}
-			DB::query("INSERT INTO ".DT_PRE."message (title,typeid,touser,fromuser,content,addtime,ip,status) VALUES ('$title', $typeid, '$touser','$fromuser','$content','".DT_TIME."','".DT_IP."',3)");			
-			DB::query("UPDATE ".DT_PRE."member SET message=message+1 WHERE username='$touser'");
+			$db->query("INSERT INTO {$db->pre}message (title,typeid,touser,fromuser,content,addtime,ip,status) VALUES ('$title', $typeid, '$touser','$fromuser','$content','$DT_TIME','$DT_IP',3)");			
+			$db->query("UPDATE {$db->pre}member SET message=message+1 WHERE username='$touser'");
 			if($fromuser) {
-				DB::query("INSERT INTO ".DT_PRE."message (title,typeid,content,fromuser,touser,addtime,ip,status) VALUES ('$title','$typeid','$content','$fromuser','$touser','".DT_TIME."','".DT_IP."','2')");
+				$db->query("INSERT INTO {$db->pre}message (title,typeid,content,fromuser,touser,addtime,ip,status) VALUES ('$title','$typeid','$content','$fromuser','$touser','$DT_TIME','$DT_IP','2')");
 			}
 			return true;
 		}
@@ -278,13 +288,14 @@ function send_mail($mail_to, $mail_subject, $mail_body, $mail_from = '', $mail_s
 	$result = dmail(trim($mail_to), $mail_subject, $mail_body, $mail_from, $mail_sign);
 	$success = $result == 'SUCCESS' ? 1 : 0;
 	if($DT['mail_log']) {
+		global $DT_TIME, $db;
 		$status = $success ? 3 : 2;
 		$note = $success ? '' : addslashes($result);
 		$mail_subject = stripslashes($mail_subject);
 		$mail_body = stripslashes($mail_body);
 		$mail_subject = addslashes($mail_subject);
 		$mail_body = addslashes($mail_body);
-		DB::query("INSERT INTO ".DT_PRE."mail_log (email,title,content,addtime,status,note) VALUES ('$mail_to','$mail_subject','$mail_body','".DT_TIME."','$status','$note')");
+		$db->query("INSERT INTO {$db->pre}mail_log (email,title,content,addtime,status,note) VALUES ('$mail_to','$mail_subject','$mail_body','$DT_TIME','$status','$note')");
 	}
 	return $success;
 }
@@ -292,63 +303,45 @@ function send_mail($mail_to, $mail_subject, $mail_body, $mail_from = '', $mail_s
 function strip_sms($message) {
 	global $DT;
 	$message = strip_tags($message);
-	$message = trim($message);
 	$message = preg_replace("/&([a-z]{1,});/", '', $message);
+	$message = str_replace(' ', '', $message);
 	if($DT['sms_sign']) $message .= $DT['sms_sign'];
 	return $message;
 }
 
 function send_sms($mobile, $message, $word = 0, $time = 0) {
-	global $DT, $_username;
-	if(!$DT['sms'] || !DT_CLOUD_UID || !DT_CLOUD_KEY || !is_mobile($mobile) || strlen($message) < 5) return false;
+	global $db, $DT, $DT_TIME, $DT_IP, $_username;
+	if(!$DT['sms'] || !$DT['sms_uid'] || !$DT['sms_key']) return false;
 	$word or $word = word_count($message);
-	$sms_message = $message;
-	$data = 'sms_uid='.DT_CLOUD_UID.'&sms_key='.md5(DT_CLOUD_KEY.'|'.$mobile.'|'.md5($sms_message)).'&sms_charset='.DT_CHARSET.'&sms_mobile='.$mobile.'&sms_message='.rawurlencode($sms_message).'&sms_time='.$time.'&sms_url='.rawurlencode(DT_PATH);
-	$code = dcurl('http://sms.destoon.com/send.php', $data);
-	if($code && strpos($code, 'destoon_sms_code=') !== false) {
-		$code = explode('destoon_sms_code=', $code);
-		$code = $code[1];
+	$sms_message = rawurlencode(convert($message, DT_CHARSET, 'UTF-8'));
+	$data = 'sms_uid='.$DT['sms_uid'].'&sms_key='.$DT['sms_key'].'&sms_charset='.DT_CHARSET.'&sms_mobile='.$mobile.'&sms_message='.$sms_message.'&sms_time='.$time;
+	$header = "POST /send.php HTTP/1.0\r\n";
+	$header .= "Accept: */*\r\n";
+	$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+	$header .= "Content-Length: ".strlen($data)."\r\n\r\n";
+	$DT['sms_host'] or $DT['sms_host'] = 'sms';
+	$fp = fsockopen($DT['sms_host'].'.destoon.com', 8820);
+	$code = '';
+	if($fp) {
+		fputs($fp, $header.$data);
+		while(!feof($fp)) {
+			$code .= fgets($fp, 1024);
+		}
+		fclose($fp);
+		if($code && strpos($code, 'destoon_sms_code=') !== false) {
+			$code = explode('destoon_sms_code=', $code);
+			$code = $code[1];
+		} else {
+			$code = 'Can Not Connect SMS Server';
+		}
 	} else {
 		$code = 'Can Not Connect SMS Server';
 	}
-	DB::query("INSERT INTO ".DT_PRE."sms (mobile,message,word,editor,sendtime,ip,code) VALUES ('$mobile','$message','$word','$_username','".DT_TIME."','".DT_IP."','$code')");
+	$db->query("INSERT INTO {$db->pre}sms (mobile,message,word,editor,sendtime,code) VALUES ('$mobile','$message','$word','$_username','$DT_TIME','$code')");
 	return $code;
 }
 
-function send_weixin($touser, $word) {
-	if(check_name($touser) && strlen($word) > 1) {
-		$user = DB::get_one("SELECT openid,push,visittime FROM ".DT_PRE."weixin_user WHERE username='$touser'");
-		if($user && $user['openid'] && $user['push'] && DT_TIME - $user['visittime'] < 172800) {
-			$openid = $user['openid'];
-			$type = 'text';
-			require_once DT_ROOT.'/api/weixin/init.inc.php';
-			if(!is_object($wx)) {
-				$wx = new weixin;
-				$wx->access_token = $wx->get_token();
-			}
-			$arr = $wx->send($openid, $type, $word);
-			if($arr['errcode'] != 0) return false;
-			$post = array();
-			$post['content'] = $word;
-			$post['type'] = 'push';
-			$post['openid'] = $openid;
-			$post['editor'] = 'system';
-			$post['addtime'] = DT_TIME;
-			$post['misc'] = '';
-			$post = daddslashes($post);
-			$sql = '';
-			foreach($post as $k=>$v) {
-				$sql .= ",$k='$v'";
-			}
-			DB::query("INSERT INTO ".DT_PRE."weixin_chat SET ".substr($sql, 1));
-			return true;
-		}
-	}
-	return false;
-}
-
 function word_count($string) {
-	if(function_exists('mb_strlen')) return mb_strlen($string, DT_CHARSET);
 	$string = convert($string, DT_CHARSET, 'gbk');
 	$length = strlen($string);
 	$count = 0;
@@ -362,7 +355,7 @@ function word_count($string) {
 
 function cache_read($file, $dir = '', $mode = '') {
 	$file = $dir ? DT_CACHE.'/'.$dir.'/'.$file : DT_CACHE.'/'.$file;
-	if(!is_file($file)) return $mode ? '' : array();
+	if(!is_file($file)) return array();
 	return $mode ? file_get($file) : include $file;
 }
 
@@ -404,12 +397,13 @@ function content_table($moduleid, $itemid, $split, $table_data = '') {
 }
 
 function split_table($moduleid, $itemid) {
+	global $DT_PRE;
 	$part = split_id($itemid);
-	return DT_PRE.$moduleid.'_'.$part;
+	return $DT_PRE.$moduleid.'_'.$part;
 }
 
 function split_id($id) {
-	return $id > 0 ? ceil($id/100000) : 1;
+	return $id > 0 ? ceil($id/500000) : 1;
 }
 
 function ip2area($ip) {
@@ -419,24 +413,25 @@ function ip2area($ip) {
 		if($tmp[0] == 10 || $tmp[0] == 127 || ($tmp[0] == 192 && $tmp[1] == 168) || ($tmp[0] == 172 && ($tmp[1] >= 16 && $tmp[1] <= 31))) {
 			$area = 'LAN';
 		} elseif($tmp[0] > 255 || $tmp[1] > 255 || $tmp[2] > 255 || $tmp[3] > 255) {
-			$area = 'Unknown';
+			$area = 'Unkonw';
 		} else {
-			require_once DT_ROOT.'/include/ip.class.php';
-			$do = new ip($ip);
-			$area = $do->area();
+			require_once DT_ROOT.'/include/ip.func.php';
+			$area = convertip($ip);
 		}
 	}
-	return $area ? $area : 'Unknown';
+	$area = convert($area, 'gbk', DT_CHARSET);
+	return $area;
 }
 
 function banip($IP) {
+	global $DT_IP, $DT_TIME;
 	$ban = false;
 	foreach($IP as $v) {
-		if($v['totime'] && $v['totime'] < DT_TIME) continue;
-		if($v['ip'] == DT_IP) { $ban = true; break; }
-		if(preg_match("/^".str_replace('*', '[0-9]{1,3}', $v['ip'])."$/", DT_IP)) { $ban = true; break; }
+		if($v['totime'] && $v['totime'] < $DT_TIME) continue;
+		if($v['ip'] == $DT_IP) { $ban = true; break; }
+		if(preg_match("/^".str_replace('*', '[0-9]{1,3}', $v['ip'])."$/", $DT_IP)) { $ban = true; break; }
 	}
-	if($ban) message(lang('include->msg_ip_ban', array(DT_IP)));
+	if($ban) message(lang('include->msg_ip_ban', array($DT_IP)));
 }
 
 function banword($WORD, $string, $extend = true) {
@@ -458,18 +453,20 @@ function banword($WORD, $string, $extend = true) {
 function get_env($type) {
 	switch($type) {
 		case 'ip':
-			if(DT_CDN) {
-				if(isset($_SERVER['X-REAL-IP']) && is_ip($_SERVER['X-REAL-IP'])) return $_SERVER['X-REAL-IP'];
-				if(isset($_SERVER['HTTP_CF_CONNECTING_IP']) && is_ip($_SERVER['HTTP_CF_CONNECTING_IP'])) return $_SERVER['HTTP_CF_CONNECTING_IP'];
-			}
-			if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-				if(is_ip($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
-				$ip = trim(end(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])));
+			isset($_SERVER['HTTP_X_FORWARDED_FOR']) or $_SERVER['HTTP_X_FORWARDED_FOR'] = '';
+			isset($_SERVER['REMOTE_ADDR']) or $_SERVER['REMOTE_ADDR'] = '';
+			isset($_SERVER['HTTP_CLIENT_IP']) or $_SERVER['HTTP_CLIENT_IP'] = '';
+			if($_SERVER['HTTP_X_FORWARDED_FOR'] && $_SERVER['REMOTE_ADDR']) {
+				$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+				if(strpos($ip, ',') !== false) {
+					$tmp = explode(',', $ip);
+					$ip = trim(end($tmp));
+				}
 				if(is_ip($ip)) return $ip;
 			}
-			if(isset($_SERVER['REMOTE_ADDR']) && is_ip($_SERVER['REMOTE_ADDR'])) return $_SERVER['REMOTE_ADDR'];
-			if(isset($_SERVER['HTTP_CLIENT_IP']) && is_ip($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
-			return '0.0.0.0';
+			if(is_ip($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
+			if(is_ip($_SERVER['REMOTE_ADDR'])) return $_SERVER['REMOTE_ADDR'];
+			return 'unknown';
 		break;
 		case 'self':
 			return isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : $_SERVER['ORIG_PATH_INFO']);
@@ -484,17 +481,10 @@ function get_env($type) {
 			return $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
 		break;
 		case 'port':
-			return ($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443') ? '' : ':'.$_SERVER['SERVER_PORT'];
-		break;
-		case 'host':
-			return preg_match("/^[a-z0-9_\-\.]{4,}$/i", $_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+			return $_SERVER['SERVER_PORT'] == '80' ? '' : ':'.$_SERVER['SERVER_PORT'];
 		break;
 		case 'url':
-			if(isset($_SERVER['HTTP_X_REWRITE_URL']) && $_SERVER['HTTP_X_REWRITE_URL']) {
-				$uri = $_SERVER['HTTP_X_REWRITE_URL'];
-			} else if(isset($_SERVER['HTTP_X_ORIGINAL_URL']) && $_SERVER['HTTP_X_ORIGINAL_URL']) {
-				$uri = $_SERVER['HTTP_X_ORIGINAL_URL'];
-			} else if(isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']) {
+			if(isset($_SERVER['REQUEST_URI'])) {
 				$uri = $_SERVER['REQUEST_URI'];
 			} else {
 				$uri = $_SERVER['PHP_SELF'];
@@ -505,48 +495,7 @@ function get_env($type) {
 				}
 			}
 			$uri = dhtmlspecialchars($uri);
-			if(strpos($uri, '.php?') !== false && strpos($uri, '.html') !== false) $uri = str_replace('.php?', '-htm-', $uri);
 			return get_env('scheme').$_SERVER['HTTP_HOST'].(strpos($_SERVER['HTTP_HOST'], ':') === false ? get_env('port') : '').$uri;
-		break;
-		case 'mobile':
-			$ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-			$ck = get_cookie('mobile');
-			$os = $browser = '';
-			if(strpos($ua, 'android') !== false) {
-				$os = 'android';
-				if($ck == 'app') {
-					$browser = 'app';
-				} else if($ck == 'b2b') {
-					$browser = 'b2b';
-				} else {
-					if(strpos($ua, 'micromessenger/') !== false) {
-						$browser = 'weixin';
-					} else if(strpos($ua, 'qq/') !== false) {
-						$browser = 'qq';
-					}
-				}
-			} else if(strpos($ua, 'iphone') !== false || strpos($ua, 'ipod') !== false) {
-				$os = 'ios';
-				if($ck == 'app') {
-					$browser = 'app';
-				} else if($ck == 'b2b') {
-					$browser = 'b2b';
-				} else if($ck == 'screen') {
-					$browser = 'screen';
-				} else {
-					if(strpos($ua, 'micromessenger/') !== false) {
-						$browser = 'weixin';
-					} else if(strpos($ua, 'qq/') !== false) {
-						$browser = 'qq';
-					} else if(strpos($ua, 'safari') !== false) {
-						$browser = 'safari';
-					}
-				}
-			} else if(strpos($ua, 'adr') !== false && strpos($ua, 'ucbrowser') !== false) {
-				$os = 'android';
-				$browser = 'uc';
-			}
-			return array('os' => $os, 'browser' => $browser);
 		break;
 	}
 }
@@ -562,16 +511,7 @@ function convert($str, $from = 'utf-8', $to = 'gb2312') {
 	$to = str_replace('utf8', 'utf-8', $to);
 	if($from == $to) return $str;
 	$tmp = array();
-	if(function_exists('mb_convert_encoding')) {
-		if(is_array($str)) {
-			foreach($str as $key => $val) {
-				$tmp[$key] = mb_convert_encoding($val, $to, $from);
-			}
-			return $tmp;
-		} else {
-			return mb_convert_encoding($str, $to, $from);
-		}
-	} else if(function_exists('iconv')) {
+	if(function_exists('iconv')) {
 		if(is_array($str)) {
 			foreach($str as $key => $val) {
 				$tmp[$key] = iconv($from, $to."//IGNORE", $val);
@@ -580,9 +520,18 @@ function convert($str, $from = 'utf-8', $to = 'gb2312') {
 		} else {
 			return iconv($from, $to."//IGNORE", $str);
 		}
+	} else if(function_exists('mb_convert_encoding')) {
+		if(is_array($str)) {
+			foreach($str as $key => $val) {
+				$tmp[$key] = mb_convert_encoding($val, $to, $from);
+			}
+			return $tmp;
+		} else {
+			return mb_convert_encoding($str, $to, $from);
+		}	
 	} else {
 		require_once DT_ROOT.'/include/convert.func.php';
-		return dconvert($str, $from, $to);
+		return dconvert($str, $to, $from);
 	}
 }
 
@@ -591,8 +540,9 @@ function get_type($item, $cache = 0) {
 	if($cache) {
 		$types = cache_read('type-'.$item.'.php');
 	} else {
-		$result = DB::query("SELECT * FROM ".DT_PRE."type WHERE item='$item' ORDER BY listorder ASC,typeid DESC ");
-		while($r = DB::fetch_array($result)) {
+		global $db;
+		$result = $db->query("SELECT * FROM {$db->pre}type WHERE item='$item' ORDER BY listorder ASC,typeid DESC ");
+		while($r = $db->fetch_array($result)) {
 			$types[$r['typeid']] = $r;
 		}
 	}
@@ -600,54 +550,45 @@ function get_type($item, $cache = 0) {
 }
 
 function get_cat($catid) {
-	if(!is_numeric($catid)) return array();
+	global $db;
 	$catid = intval($catid);
-	return $catid ? DB::get_one("SELECT * FROM ".DT_PRE."category WHERE catid=$catid") : array();
+	return $catid ? $db->get_one("SELECT * FROM {$db->pre}category WHERE catid=$catid") : array();
 }
 
-function cat_pos($CAT, $str = ' &raquo; ', $target = '', $deep = 0, $start = 0) {
-	global $MODULE;
+function cat_pos($CAT, $str = ' &raquo; ', $target = '') {
+	global $MODULE, $db;
 	if(!$CAT) return '';
 	$arrparentids = $CAT['arrparentid'].','.$CAT['catid'];
 	$arrparentid = explode(',', $arrparentids);
 	$pos = '';
 	$target = $target ? ' target="_blank"' : '';	
 	$CATEGORY = array();
-	$result = DB::query("SELECT catid,moduleid,catname,linkurl FROM ".DT_PRE."category WHERE catid IN ($arrparentids)", 'CACHE');
-	while($r = DB::fetch_array($result)) {
+	$result = $db->query("SELECT catid,moduleid,catname,linkurl FROM {$db->pre}category WHERE catid IN ($arrparentids)");
+	while($r = $db->fetch_array($result)) {
 		$CATEGORY[$r['catid']] = $r;
 	}
-	if($deep) $i = 1;
-	$j = 0;
 	foreach($arrparentid as $catid) {
 		if(!$catid || !isset($CATEGORY[$catid])) continue;
-		if($j++ < $start) continue;
-		if($deep) {
-			if($i > $deep) continue;
-			$i++;
-		}
 		$pos .= '<a href="'.$MODULE[$CATEGORY[$catid]['moduleid']]['linkurl'].$CATEGORY[$catid]['linkurl'].'"'.$target.'>'.$CATEGORY[$catid]['catname'].'</a>'.$str;
 	}
 	$_len = strlen($str);
-	if($str && substr($pos, -$_len, $_len) === $str) $pos = substr($pos, 0, strlen($pos) - $_len);
+	if($str && substr($pos, -$_len, $_len) === $str) $pos = substr($pos, 0, strlen($pos)-$_len);
 	return $pos;
 }
 
-function cat_url($catid, $pc = 1) {
-	global $MODULE;
-	$catid = intval($catid);
-	$r = DB::get_one("SELECT moduleid,linkurl FROM ".DT_PRE."category WHERE catid=$catid");
-	return $r ? ($pc ? $MODULE[$r['moduleid']]['linkurl'] : $MODULE[$r['moduleid']]['mobile']).$r['linkurl'] : '';
+function cat_url($catid) {
+	global $MODULE, $db;
+	$r = $db->get_one("SELECT moduleid,linkurl FROM {$db->pre}category WHERE catid=$catid");
+	return $r ? $MODULE[$r['moduleid']]['linkurl'].$r['linkurl'] : '';
 }
 
 function get_area($areaid) {
-	if(!is_numeric($areaid)) return array();
+	global $db;
 	$areaid = intval($areaid);
-	return $areaid ? DB::get_one("SELECT * FROM ".DT_PRE."area WHERE areaid=$areaid") : array();
+	return $db->get_one("SELECT * FROM {$db->pre}area WHERE areaid=$areaid");
 }
 
-function area_pos($areaid, $str = ' &raquo; ', $deep = 0, $start = 0) {
-	$areaid = intval($areaid);
+function area_pos($areaid, $str = ' &raquo; ', $deep = 0) {
 	if($areaid) {
 		global $AREA;
 	} else {
@@ -659,10 +600,8 @@ function area_pos($areaid, $str = ' &raquo; ', $deep = 0, $start = 0) {
 	$arrparentid[] = $areaid;
 	$pos = '';
 	if($deep) $i = 1;
-	$j = 0;
 	foreach($arrparentid as $areaid) {
 		if(!$areaid || !isset($AREA[$areaid])) continue;
-		if($j++ < $start) continue;
 		if($deep) {
 			if($i > $deep) continue;
 			$i++;
@@ -675,29 +614,31 @@ function area_pos($areaid, $str = ' &raquo; ', $deep = 0, $start = 0) {
 }
 
 function get_maincat($catid, $moduleid, $level = -1) {
-	$catid = intval($catid);
+	global $db;
 	$condition = $catid ? "parentid=$catid" : "moduleid=$moduleid AND parentid=0";
 	if($level >= 0) $condition .= " AND level=$level";
 	$cat = array();
-	$result = DB::query("SELECT catid,catname,child,style,linkurl,item FROM ".DT_PRE."category WHERE $condition ORDER BY listorder,catid ASC", 'CACHE');
-	while($r = DB::fetch_array($result)) {
+	$result = $db->query("SELECT catid,catname,child,style,linkurl,item FROM {$db->pre}category WHERE $condition ORDER BY listorder,catid ASC", 'CACHE');
+	while($r = $db->fetch_array($result)) {
 		$cat[] = $r;
 	}
 	return $cat;
 }
 
 function get_mainarea($areaid) {
+	global $db;
 	$areaid = intval($areaid);
 	$are = array();
-	$result = DB::query("SELECT areaid,areaname FROM ".DT_PRE."area WHERE parentid=$areaid ORDER BY listorder,areaid ASC", 'CACHE');
-	while($r = DB::fetch_array($result)) {
+	$result = $db->query("SELECT areaid,areaname FROM {$db->pre}area WHERE parentid=$areaid ORDER BY listorder,areaid ASC", 'CACHE');
+	while($r = $db->fetch_array($result)) {
 		$are[] = $r;
 	}
 	return $are;
 }
 
 function get_user($value, $key = 'username', $from = 'userid') {
-	$r = DB::get_one("SELECT `$from` FROM ".DT_PRE."member WHERE `$key`='$value'");
+	global $db;
+	$r = $db->get_one("SELECT `$from` FROM {$db->pre}member WHERE `$key`='$value'");
 	return $r[$from];
 }
 
@@ -720,11 +661,12 @@ function set_style($string, $style = '', $tag = 'span') {
 }
 
 function crypt_action($action) {
-	return md5(md5($action.DT_KEY.DT_IP));
+	global $DT_IP;
+	return md5(md5($action.DT_KEY.$DT_IP));
 }
 
 function captcha($captcha, $enable = 1, $return = false) {
-	global $DT, $session;
+	global $DT_IP, $DT, $session;
 	if($enable) {
 		if($DT['captcha_cn']) {
 			if(strlen($captcha) < 4) {
@@ -742,7 +684,7 @@ function captcha($captcha, $enable = 1, $return = false) {
 			$msg = lang('include->captcha_expired');
 			return $return ? $msg : message($msg);
 		}
-		if(decrypt($_SESSION['captchastr'], DT_KEY.'CPC') != strtoupper($captcha)) {
+		if($_SESSION['captchastr'] != md5(md5(strtoupper($captcha).DT_KEY.$DT_IP))) {
 			$msg = lang('include->captcha_error');
 			return $return ? $msg : message($msg);
 		}
@@ -753,7 +695,7 @@ function captcha($captcha, $enable = 1, $return = false) {
 }
 
 function question($answer, $enable = 1, $return = false) {
-	global $session;
+	global $DT_IP, $session;
 	if($enable) {
 		if(!$answer) {
 			$msg = lang('include->answer_missed');
@@ -765,7 +707,7 @@ function question($answer, $enable = 1, $return = false) {
 			$msg = lang('include->question_expired');
 			return $return ? $msg : message($msg);
 		}
-		if(decrypt($_SESSION['answerstr'], DT_KEY.'ANS') != $answer) {
+		if($_SESSION['answerstr'] != md5(md5($answer.DT_KEY.$DT_IP))) {
 			$msg = lang('include->answer_error');
 			return $return ? $msg : message($msg);
 		}
@@ -775,17 +717,17 @@ function question($answer, $enable = 1, $return = false) {
 	}
 }
 
-function pages($total, $page = 1, $perpage = 20, $demo = '', $step = 3) {
+function pages($total, $page = 1, $perpage = 20, $demo = '', $step = 2) {
 	global $DT_URL, $DT, $L;
 	if($total <= $perpage) return '';
 	$items = $total;
 	$total = ceil($total/$perpage);
 	if($page < 1 || $page > $total) $page = 1;
 	if($demo) {
-		$demo_url = str_replace('%7Bdestoon_page%7D', '{destoon_page}', $demo);
+		$demo_url = $demo;
 		$home_url = str_replace('{destoon_page}', '1', $demo_url);
 	} else {
-		if(defined('DT_REWRITE') && $DT['rewrite'] && $_SERVER["SCRIPT_NAME"] && strpos($DT_URL, '?') === false) {
+		if(defined('DT_REWRITE') && $DT['rewrite'] && $_SERVER["SCRIPT_NAME"]) {
 			$demo_url = $_SERVER["SCRIPT_NAME"];
 			$demo_url = str_replace('//', '/', $demo_url);//Fix Nginx
 			$mark = false;
@@ -825,11 +767,10 @@ function pages($total, $page = 1, $perpage = 20, $demo = '', $step = 3) {
 			$demo_url = $home_url = preg_replace("/(.*)([&?]page=[0-9]*)(.*)/i", "\\1\\3", $DT_URL);
 			$s = strpos($demo_url, '?') === false ? '?' : '&';
 			$demo_url = $demo_url.$s.'page={des'.'toon_page}';
-			if(defined('DT_ADMIN') && strpos($demo_url, 'sum=') === false) $demo_url = str_replace('page=', 'sum='.$items.'&page=', $demo_url);
 		}
 	}
 	$pages = '';
-	include DT_ROOT.'/api/pages.'.((!$DT['pages_mode'] && $page < 100) ? 'default' : 'sample').'.php';
+	include DT_ROOT.'/api/pages.'.($DT['pages_mode'] ? 'sample' : 'default').'.php';
 	return $pages;
 }
 
@@ -842,20 +783,41 @@ function listpages($CAT, $total, $page = 1, $perpage = 20, $step = 2) {
 	$home_url = $MOD['linkurl'].$CAT['linkurl'];
 	$demo_url = $MOD['linkurl'].listurl($CAT, '{destoon_page}');
 	$pages = '';
-	include DT_ROOT.'/api/pages.'.((!$DT['pages_mode'] && $page < 100) ? 'default' : 'sample').'.php';
+	include DT_ROOT.'/api/pages.'.($DT['pages_mode'] ? 'sample' : 'default').'.php';
 	return $pages;
 }
 
-function linkurl($linkurl) {
-	return strpos($linkurl, '://') === false ? DT_PATH.$linkurl : $linkurl;
+function showpages($item, $total, $page = 1) {
+	global $MOD, $L;
+	$pages = '';
+	$home_url = $MOD['linkurl'].itemurl($item);
+	$demo_url = $MOD['linkurl'].itemurl($item, '{destoon_page}');
+	$_page = $page <= 1 ? $total : ($page - 1);
+	$url = $_page == 1 ? $home_url : str_replace('{destoon_page}', $_page, $demo_url);
+	$pages .= '<input type="hidden" id="des'.'toon_previous" value="'.$url.'"/><a href="'.$url.'" title="'.$L['prev_page'].'">&nbsp;&#171;&nbsp;</a> ';
+	for($_page = 1; $_page <= $total; $_page++) {
+		$url = $_page == 1 ? $home_url : str_replace('{destoon_page}', $_page, $demo_url);
+		$pages .= $page == $_page ? '<strong>&nbsp;'.$_page.'&nbsp;</strong> ' : ' <a href="'.$url.'">&nbsp;'.$_page.'&nbsp;</a>  ';
+	}
+	$_page = $page >= $total ? 1 : $page + 1;
+	$url = $_page == 1 ? $home_url : str_replace('{destoon_page}', $_page, $demo_url);
+	$pages .= '<a href="'.$url.'" title="'.$L['next_page'].'">&nbsp;&#187;&nbsp;</a> <input type="hidden" id="des'.'toon_next" value="'.$url.'"/>';
+	return $pages;
 }
 
-function imgurl($url = '', $width = '') {
-	if($url) {
-		return strpos($url, '://') === false ? DT_PATH.'file/upload/'.$url : $url;
+function linkurl($linkurl, $absurl = 1) {
+	global $CFG;
+	if($absurl) {
+		if(strpos($linkurl, '://') !== false) return $linkurl;
+		return strpos($linkurl, $CFG['path']) === 0 ? $CFG['url'].substr($linkurl, strlen($CFG['path'])) : $CFG['url'].$linkurl;
 	} else {
-		return DT_SKIN.'image/nopic'.$width.'.gif';
+		if(strpos($linkurl, '://') !== false) return strpos($linkurl, $CFG['url']) === 0 ? $CFG['path'].substr($linkurl, strlen($CFG['url'])) : $linkurl;
+		return strpos($linkurl, $CFG['path']) === 0 ? $linkurl : $CFG['path'].$linkurl;
 	}
+}
+
+function imgurl($imgurl = '', $absurl = 1) {
+	return $imgurl ? $imgurl : DT_SKIN.'image/nopic.gif';
 }
 
 function userurl($username, $qstring = '', $domain = '') {
@@ -865,8 +827,7 @@ function userurl($username, $qstring = '', $domain = '') {
 	if($CFG['com_domain']) $subdomain = substr($CFG['com_domain'], 0, 1) == '.' ? 1 : 2;
 	if($username) {
 		if($subdomain || $domain) {
-			$scheme = $DT['com_https'] ? 'https://' : 'http://';
-			$URL = $domain ? $scheme.$domain.'/' : ($subdomain == 1 ? $scheme.($DT['com_www'] ? 'www.' : '').$username.$CFG['com_domain'].'/' : $scheme.$CFG['com_domain'].'/'.$username.'/');
+			$URL = $domain ? 'http://'.$domain.'/' : ($subdomain == 1 ? 'http://'.($DT['com_www'] ? 'www.' : '').$username.$CFG['com_domain'].'/' : 'http://'.$CFG['com_domain'].'/'.$username.'/');
 			if($qstring) {
 				parse_str($qstring, $q);
 				if(isset($q['file'])) {
@@ -911,63 +872,19 @@ function userurl($username, $qstring = '', $domain = '') {
 			if($qstring) $URL = $URL.'&'.$qstring;
 		}
 	} else {
-		$URL = $MODULE[4]['linkurl'].'guest.php';
+		$URL = linkurl($MODULE[4]['linkurl'], 1).'guest.php';
 	}
 	return $URL;
 }
 
-function useravatar($var, $size = '', $isusername = 1, $real = 0) {
-	in_array($size, array('large', 'small')) or $size = 'middle';
-	if($real) {
-		$ext = 'x48.jpg';
-		if($size == 'large') $ext = '.jpg';
-		if($size == 'small') $ext = 'x20.jpg';
-		$file = DT_ROOT.'/api/avatar/default'.$ext;
-		$md5 = md5($var);
-		if($isusername) {
-			$img = DT_ROOT.'/file/avatar/'.substr($md5, 0, 2).'/'.substr($md5, 2, 2).'/_'.$var.$ext;
-			if(is_file($img) && check_name($var)) $file = $img;
-		} else {
-			$img = DT_ROOT.'/file/avatar/'.substr($md5, 0, 2).'/'.substr($md5, 2, 2).'/'.$var.$ext;
-			if(is_file($img)) $file = $img;
-		}
-		if($real == 1) {
-			$url = str_replace(DT_ROOT.'/', DT_PATH, $file);
-			if(strpos($url, '/default') === false) {
-				$remote = file_get(DT_ROOT.'/file/avatar/remote.html');
-				if(strlen($remote) > 10) $url = str_replace(DT_ROOT.'/file/', $remote, $file);
-			}
-			return $url;
-		}
-		return strpos($file, '/api/') === false ? $file : '';
-	} else {
-		$name = $isusername ? 'username' : 'userid';
-		return DT_PATH.'api/avatar/show.php?'.$name.'='.$var.'&size='.$size;
-	}
+function userinfo($username, $cache = '', $fields = '*') {
+	global $db;
+	return $db->get_one("SELECT $fields FROM {$db->pre}member m, {$db->pre}company c WHERE m.userid=c.userid AND m.username='$username'", $cache);
 }
 
-function userinfo($username, $cache = 1) {
-	global $dc, $CFG;
-	if(!check_name($username)) return array();
-	$user = array();
-	if($cache && $CFG['db_expires']) {
-		$user = $dc->get('user-'.$username);
-		if($user) return $user;
-	}
-	$r1 = DB::get_one("SELECT * FROM ".DT_PRE."member WHERE username='$username'");
-	if($r1) {
-		$r2 = DB::get_one("SELECT * FROM ".DT_PRE."member_misc WHERE username='$username'");
-		$r3 = DB::get_one("SELECT * FROM ".DT_PRE."company WHERE username='$username'");
-		$user = array_merge($r1, $r2, $r3);
-	}
-	if($cache && $CFG['db_expires'] && $user) $dc->set('user-'.$username, $user, $CFG['db_expires']);
-	return $user;
-}
-
-function userclean($username) {
-	global $dc, $CFG;
-	$user = array();
-	if($CFG['db_expires']) $dc->rm('user-'.$username);
+function memberinfo($username, $cache = '', $fields = '*') {
+	global $db;
+	return $db->get_one("SELECT $fields FROM {$db->pre}member WHERE username='$username'", $cache);
 }
 
 function listurl($CAT, $page = 0) {
@@ -991,7 +908,6 @@ function listurl($CAT, $page = 0) {
 
 function itemurl($item, $page = 0) {
 	global $DT, $MOD, $L;
-	if(isset($item['islink']) && $item['islink']) return $item['linkurl'];
 	if($MOD['show_html'] && $item['filepath']) {
 		if($page === 0) return $item['filepath'];
 		$ext = file_ext($item['filepath']);
@@ -1014,16 +930,9 @@ function itemurl($item, $page = 0) {
 	$url = $urls[$ext]['item'][$urlid];
 	$url = $page ? $url['page'] : $url['index'];
 	if(strpos($url, 'cat') !== false && $catid) {
-		if(isset($item['gid'])) {
-			$catid = $item['gid'];
-			$cate = get_group($catid);
-			$catdir = $cate['filepath'];
-			$catname = $cate['title'];
-		} else {
-			$cate = get_cat($catid);
-			$catdir = $cate['catdir'];
-			$catname = $cate['catname'];
-		}
+		$cate = get_cat($catid);
+		$catdir = $cate['catdir'];
+		$catname = $cate['catname'];
 	}
     eval("\$itemurl = \"$url\";");
 	if(substr($itemurl, 0, 1) == '/') $itemurl = substr($itemurl, 1);
@@ -1031,8 +940,8 @@ function itemurl($item, $page = 0) {
 }
 
 function rewrite($url, $encode = 0) {
-	if(!RE_WRITE) return $url;
-	if(RE_WRITE == 1 && strpos($url, 'search.php') !== false) return $url;
+	global $DT, $CFG;
+	if(!$DT['rewrite']) return $url;
 	if(strpos($url, '.php?') === false || strpos($url, '=') === false) return $url;
 	$url = str_replace(array('+', '-'), array('%20', '%20'), $url);
 	$url = str_replace(array('.php?', '&', '='), array('-htm-', '-', '-'), $url).'.html';
@@ -1040,49 +949,27 @@ function rewrite($url, $encode = 0) {
 }
 
 function timetodate($time = 0, $type = 6) {
-	if(!$time) $time = DT_TIME;
+	if(!$time) {global $DT_TIME; $time = $DT_TIME;}
 	$types = array('Y-m-d', 'Y', 'm-d', 'Y-m-d', 'm-d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s');
 	if(isset($types[$type])) $type = $types[$type];
-	$date = '';
-	if($time > 2147212800) {		
-		if(class_exists('DateTime')) {
-			$D = new DateTime('@'.($time - 3600 * intval(str_replace('Etc/GMT', '', $GLOBALS['CFG']['timezone']))));
-			$date = $D->format($type);
-		}
-	}
-	return $date ? $date : date($type, $time);
+	return date($type, $time);
 }
 
-function datetotime($date) {
-	$time = strtotime($date);
-	if($time === false) {
-		if(class_exists('DateTime')) {
-			$D = new DateTime($date);
-			$time = $D->format('U');
-		}
-	}
-	return $time;
-}
-
-function log_write($message, $type = 'php', $force = 0) {
-	global $_username, $log_id;
-	if(!DT_DEBUG && !$force) return;
-	if($log_id) {
-		$log_id++;
-	} else {
-		$log_id = 1;
-	}
+function log_write($message, $type = 'php') {
+	global $DT_IP, $DT_TIME, $_username;
+	if(!DT_DEBUG) return;
+	$DT_IP or $DT_IP = get_env('ip');
+	$DT_TIME or $DT_TIME = time();
 	$user = $_username ? $_username : 'guest';
-	check_name($type) or $type = 'php';
-	$log = "<?php exit;?>\n<$type>\n";
-	$log .= "\t<time>".timetodate()."</time>\n";
-	$log .= "\t<ip>".DT_IP."</ip>\n";
+	$log = "<$type>\n";
+	$log .= "\t<time>".date('Y-m-d H:i:s', $DT_TIME)."</time>\n";
+	$log .= "\t<ip>".$DT_IP."</ip>\n";
 	$log .= "\t<user>".$user."</user>\n";
-	$log .= "\t<php>".$_SERVER['SCRIPT_NAME']."</php>\n";
+	$log .= "\t<file>".$_SERVER['SCRIPT_NAME']."</file>\n";
 	$log .= "\t<querystring>".str_replace('&', '&amp;', $_SERVER['QUERY_STRING'])."</querystring>\n";
-	$log .= "\t<message>".(is_array($message) ? var_export($message, true) : $message)."</message>\n";
+	$log .= "\t<message>".$message."\t</message>\n";
 	$log .= "</$type>";
-	file_put(DT_ROOT.'/file/log/'.timetodate(0, 'Ym/d').'/'.$type.'-'.timetodate(0, 'Y.m.d H.i.s').'-'.$log_id.'.php', $log);
+	file_put(DT_ROOT.'/file/log/'.date('Ym', $DT_TIME).'/'.$type.'-'.date('Y.m.d H.i.s', $DT_TIME).'-'.strtolower(random(10)).'.xml', $log);
 }
 
 function load($file) {
@@ -1090,7 +977,7 @@ function load($file) {
 	if($ext == 'css') {
 		echo '<link rel="stylesheet" type="text/css" href="'.DT_SKIN.$file.'" />';
 	} else if($ext == 'js') {
-		echo '<script type="text/javascript" src="'.DT_STATIC.'file/script/'.$file.'"></script>';
+		echo '<script type="text/javascript" src="'.DT_PATH.'file/script/'.$file.'"></script>';
 	} else if($ext == 'htm') {
 		$file = str_replace('ad_m', 'ad_t6_m', $file);
 		if(is_file(DT_CACHE.'/htm/'.$file)) {
@@ -1103,8 +990,6 @@ function load($file) {
 	} else if($ext == 'lang') {
 		$file = str_replace('.lang', '.inc.php', $file);
 		return DT_ROOT.'/lang/'.DT_LANG.'/'.$file;
-	} else if($ext == 'inc' || $ext == 'func' || $ext == 'class') {
-		return DT_ROOT.'/include/'.$file.'.php';
 	}
 }
 
@@ -1132,7 +1017,6 @@ function ad($id, $cid = 0, $kw = '', $tid = 0) {
 
 function lang($str, $arr = array()) {
 	if(strpos($str, '->') !== false) {
-		global $DT;
 		$t = explode('->', $str);
 		include load($t[0].'.lang');
 		$str = $L[$t[1]];
@@ -1171,46 +1055,27 @@ function check_referer() {
 		$U = parse_url(DT_PATH);
 		if(strpos($R['host'], str_replace('www.', '.', $U['host'])) !== false) return true;
 		return false;
+	} else {
+		return true;
 	}
-	return true;
 }
 
 function is_robot() {
-	return preg_match("/(spider|bot|crawl|slurp|lycos|robozilla)/i", $_SERVER['HTTP_USER_AGENT']);
+	if(strpos($_SERVER['HTTP_USER_AGENT'], '://') === false && preg_match("/(MSIE|Netscape|Opera|Konqueror|Mozilla)/i", $_SERVER['HTTP_USER_AGENT'])) {
+		return false;
+	} else if(preg_match("/(Spider|Bot|Crawl|Slurp|lycos|robozilla)/i", $_SERVER['HTTP_USER_AGENT'])) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function is_ip($ip) {
 	return preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $ip);
 }
 
-function is_mobile($mobile) {
-	return preg_match("/^1[3|4|5|6|7|8|9]{1}[0-9]{9}$/", $mobile);
-}
-
 function is_md5($password) {
-	return preg_match("/^[a-f0-9]{32}$/", $password);
-}
-
-function is_openid($openid) {
-	return preg_match("/^[0-9a-zA-Z\-_]{10,}$/", $openid);
-}
-
-function is_touch() {
-	$ck = get_cookie('mobile');
-	if($ck == 'pc') return 0;
-	if($ck == 'touch' || $ck == 'screen') return 1;
-	return preg_match("/(iPhone|iPad|iPod|Android)/i", $_SERVER['HTTP_USER_AGENT']) ? 1 : 0;
-}
-
-function is_founder($userid) {
-	global $CFG;
-	$userid = intval($userid);
-	if($userid < 1) return false;
-	if(strpos($CFG['founderid'], ',') === false) {
-		return $userid == $CFG['founderid'] ? true : false;
-	} else {
-		return strpos(','.$CFG['founderid'].',', ','.$userid.',') === false ? false : true;
-	}
+	return preg_match("/^[a-z0-9]{32}$/", $password);
 }
 
 function debug() {
@@ -1221,39 +1086,15 @@ function debug() {
     if(function_exists('memory_get_usage')) echo ', Memory '.round(memory_get_usage()/1024/1024, 2).' M';
 }
 
-function dhttp($status, $exit = 1) {
-	switch($status) {
-		case '301': @header("HTTP/1.1 301 Moved Permanently"); break;
-		case '403': @header("HTTP/1.1 403 Forbidden"); break;
-		case '404': @header("HTTP/1.1 404 Not Found"); break;
-		case '503': @header("HTTP/1.1 503 Service Unavailable"); break;
-	}
-	if($exit) exit;
+//For 3.x
+function extendurl($func) {
+	global $MODULE, $EXT;
+	$key = $func.'_url';
+	return $EXT[$key] ? $EXT[$key] : $MODULE[1]['linkurl'].$func.'/';
 }
 
-function dcurl($url, $par = '') {
-	if(function_exists('curl_init')) {
-		$cur = curl_init($url);
-		if($par) {
-			curl_setopt($cur, CURLOPT_POST, 1);
-			curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
-		}
-		curl_setopt($cur, CURLOPT_REFERER, DT_PATH);
-		curl_setopt($cur, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-		curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($cur, CURLOPT_HEADER, 0);
-		curl_setopt($cur, CURLOPT_TIMEOUT, 30);
-		curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
-		$rec = curl_exec($cur);
-		curl_close($cur);
-		return $rec;
-	}
-	return file_get($par ? $url.'?'.$par : $url);
-}
-
-function d301($url) {
-	dhttp(301, 0);
-	dheader($url);
+function extend_setting($key = '') {
+	global $EXT;
+	return $key ? $EXT[$key] : $EXT;
 }
 ?>

@@ -21,15 +21,12 @@ if($DT_QST) {
 	$sx->SetFilter('status', array(3));
 	if($catid) $sx->SetFilter('catid', explode(',', $CAT['arrchildid']));
 	if($areaid) $sx->SetFilter('areaid', explode(',', $ARE['arrchildid']));
-	$pagesize = $MOD['pagesize'];
-	$offset = ($page-1)*$pagesize;
 	$sx->SetLimits($offset, $pagesize);
-	$_kw = $kw;
+	$_kw = convert($kw, DT_CHARSET, 'utf-8');
 	$r = $sx->Query($_kw, $MOD['sphinx_name']);
-	$time = $r['time'];
 	$items = $r['total_found'];
-	$total = $r['total'];
-	$pages = pages($items > $total ? $total : $items, $page, $pagesize);
+	$time = $r['time'];
+	$pages = pages($items, $page, $pagesize);
 	foreach($r['matches'] as $k=>$v) {
 		$ids[$v['id']] = $v['id'];
 	}		
@@ -39,7 +36,6 @@ if($DT_QST) {
 		while($r = $db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
-			if($lazy && isset($r['thumb']) && $r['thumb']) $r['thumb'] = DT_SKIN.'image/lazy.gif" original="'.$r['thumb'];
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
 			if($kw) $r['title'] = str_replace($replacef, $replacet, $r['title']);
@@ -58,6 +54,5 @@ $showpage = 1;
 $datetype = 5;
 $seo_file = 'search';
 include DT_ROOT.'/include/seo.inc.php';
-if($EXT['mobile_enable']) $head_mobile = $EXT['mobile_url'].($kw ? 'index.php?moduleid='.$moduleid.'&kw='.encrypt($kw, DT_KEY.'KW') : 'search.php?action=mod'.$moduleid);
-include template($MOD['template_search'] ? $MOD['template_search'] : 'search', $module);
+include template('search', $module);
 ?>

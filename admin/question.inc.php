@@ -1,16 +1,16 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array(
     array('问题验证', '?file='.$file),
 );
 $do = new question;
 if($submit) {
 	$do->update($post);
-	dmsg('更新成功', '?file='.$file);
+	dmsg('更新成功', '?file='.$file.'&item='.$item);
 } else {
 	$condition = "1";
 	if($kw) $condition .= " AND (question LIKE '%$keyword%' OR answer LIKE '%$keyword%')";
@@ -19,22 +19,21 @@ if($submit) {
 }
 
 class question {
+	var $db;
 	var $table;
 
-	function __construct() {
-		$this->table = DT_PRE.'question';
-	}
-
 	function question() {
-		$this->__construct();
+		global $db, $DT_PRE;
+		$this->table = $DT_PRE.'question';
+		$this->db = &$db;
 	}
 
 	function get_list($condition) {
 		global $pages, $page, $pagesize, $offset, $pagesize;
-		$pages = pages(DB::count($this->table, $condition), $page, $pagesize);
+		$pages = pages($this->db->count($this->table, $condition), $page, $pagesize);
 		$lists = array();
-		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY qid DESC LIMIT $offset,$pagesize");
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY qid DESC LIMIT $offset,$pagesize");
+		while($r = $this->db->fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -61,7 +60,7 @@ class question {
 			$q = trim($q);
 			if($q) {
 				$a = isset($A[$k]) ? trim($A[$k]) : '';
-				if($q && $a) DB::query("INSERT INTO {$this->table} (question,answer) VALUES('$q','$a')");
+				if($q && $a) $this->db->query("INSERT INTO {$this->table} (question,answer) VALUES('$q','$a')");
 			}
 		}
 	}
@@ -69,12 +68,12 @@ class question {
 	function edit($post) {
 		foreach($post as $k=>$v) {
 			if(!$v['question'] || !$v['answer']) continue;
-			DB::query("UPDATE {$this->table} SET question='$v[question]',answer='$v[answer]' WHERE qid='$k'");
+			$this->db->query("UPDATE {$this->table} SET question='$v[question]',answer='$v[answer]' WHERE qid='$k'");
 		}
 	}
 
 	function delete($qid) {
-		DB::query("DELETE FROM {$this->table} WHERE qid=$qid");
+		$this->db->query("DELETE FROM {$this->table} WHERE qid=$qid");
 	}
 }
 ?>

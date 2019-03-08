@@ -1,8 +1,6 @@
-# Robots For DESTOON B2B
+# Robots For Destoon
 User-agent: *
 Disallow: /api/
-Disallow: /install/
 Disallow: /member/
 Disallow: /skin/
 Disallow: /template/
-Disallow: /upgrade/

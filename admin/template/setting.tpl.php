@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('基本设置'),
@@ -9,7 +9,6 @@ $menus = array (
     array('图片处理'),
     array('邮件发送'),
     array('页面细节'),
-    array('云服务'),
 );
 show_menu($menus);
 ?>
@@ -17,18 +16,19 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<table cellspacing="0" class="tb">
+<div class="tt">基本设置</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">网站名称</td>
 <td><input name="setting[sitename]" type="text" value="<?php echo $sitename;?>" size="40"/></td>
 </tr>
 <tr>
 <td class="tl">网站地址</td>
-<td><input name="config[url]" type="text" value="<?php echo $url;?>" size="40"/><?php tips('请添写完整URL地址,例如https://www.destoon.com/<br/>注意以 / 结尾');?></td>
+<td><input name="config[url]" type="text" value="<?php echo $url;?>" size="40"/><?php tips('请添写完整URL地址,例如http://www.destoon.com/<br/>注意以 / 结尾');?></td>
 </tr>
 <tr>
 <td class="tl">网站LOGO</td>
-<td><input name="setting[logo]" type="text" value="<?php echo $logo;?>" id="logo" size="58"/> <span onclick="Dthumb(1,180,60, Dd('logo').value, 0, 'logo');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('logo').value){Dd('showlogo').src=Dd('logo').value;}" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('logo').value='';Dd('showlogo').src='<?php echo DT_SKIN;?>image/logo.gif';" class="jt">[删除]</span><br/>
+<td><input name="setting[logo]" type="text" value="<?php echo $logo;?>" id="logo" size="60"/> <span onclick="Dthumb(1,180,60, Dd('logo').value, 0, 'logo');" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="if(Dd('logo').value){Dd('showlogo').src=Dd('logo').value;}" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('logo').value='';Dd('showlogo').src='<?php echo DT_SKIN;?>image/logo.gif';" class="jt">[删除]</span><br/>
 <a href="<?php echo DT_PATH;?>" target="_blank"><img src="<?php echo $logo ? $logo : DT_SKIN.'image/logo.gif';?>" style="margin:2px;" id="showlogo"/></a></td>
 </tr>
 <tr>
@@ -109,46 +109,12 @@ tips('位于./skin/目录,一个目录即为一套风格');
 $select = '';
 $dirs = list_dir('template');
 foreach($dirs as $v) {
-	if(is_dir(DT_ROOT.'/template/'.$v['dir'].'/mobile/')) continue;
 	$selected = ($CFG['template'] && $v['dir'] == $CFG['template']) ? 'selected' : '';
 	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
 }
 $select = '<select name="config[template]">'.$select.'</select>';
 echo $select;
 tips('位于./template/目录,一个目录即为一套模板');
-?>
-</td> 
-</tr>
-<tr>
-<td class="tl">手机默认模板</td>
-<td>
-<?php
-$select = '';
-$dirs = list_dir('template');
-foreach($dirs as $v) {
-	if(!is_dir(DT_ROOT.'/template/'.$v['dir'].'/mobile/')) continue;
-	$selected = ($CFG['template_mobile'] && $v['dir'] == $CFG['template_mobile']) ? 'selected' : '';
-	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
-}
-$select = '<select name="config[template_mobile]">'.$select.'</select>';
-echo $select;
-tips('位于./template/目录,一个目录即为一套模板');
-?>
-</td> 
-</tr>
-<tr>
-<td class="tl">网页编辑器</td>
-<td>
-<?php
-$select = '';
-$dirs = list_dir($MODULE[2]['moduledir'].'/editor');
-foreach($dirs as $v) {
-	$selected = ($CFG['editor'] && $v['dir'] == $CFG['editor']) ? 'selected' : '';
-	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."</option>";
-}
-$select = '<select name="config[editor]">'.$select.'</select>';
-echo $select;
-tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套模板');
 ?>
 </td> 
 </tr>
@@ -165,24 +131,12 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td><input name="setting[money_unit]" type="text" value="<?php echo $money_unit;?>" size="10"/></td>
 </tr>
 <tr>
-<td class="tl">真实货币符号</td>
-<td><input name="setting[money_sign]" type="text" value="<?php echo $money_sign;?>" size="10"/></td>
-</tr>
-<tr>
 <td class="tl">虚拟积分名称</td>
 <td><input name="setting[credit_name]" type="text" value="<?php echo $credit_name;?>" size="10"/></td>
 </tr>
 <tr>
 <td class="tl">虚拟积分单位</td>
 <td><input name="setting[credit_unit]" type="text" value="<?php echo $credit_unit;?>" size="10"/></td>
-</tr>
-<tr>
-<td class="tl">小额免密支付</td>
-<td><input name="setting[quick_pay]" type="text" value="<?php echo $quick_pay;?>" size="10"/><?php tips('请填写数字，小于此额度的支付无需用户输入支付密码');?></td>
-</tr>
-<tr>
-<td class="tl">购物车最大容量</td>
-<td><input name="setting[max_cart]" type="text" value="<?php echo $max_cart;?>" size="10"/><?php tips('请填写数字，如果未启用商城功能，请设置为0');?></td>
 </tr>
 <tr>
 <td class="tl">后台左侧栏宽度</td>
@@ -203,17 +157,17 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </td>
 </tr>
 <tr>
-<td class="tl">即时通讯微信</td>
-<td>
-<input type="radio" name="setting[im_wx]" value="1"  <?php if($im_wx){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[im_wx]" value="0"  <?php if(!$im_wx){ ?>checked <?php } ?>/> 关闭
-</td>
-</tr>
-<tr>
 <td class="tl">即时通讯阿里旺旺</td>
 <td>
 <input type="radio" name="setting[im_ali]" value="1"  <?php if($im_ali){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
 <input type="radio" name="setting[im_ali]" value="0"  <?php if(!$im_ali){ ?>checked <?php } ?>/> 关闭
+</td>
+</tr>
+<tr>
+<td class="tl">即时通讯MSN</td>
+<td>
+<input type="radio" name="setting[im_msn]" value="1"  <?php if($im_msn){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[im_msn]" value="0"  <?php if(!$im_msn){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
 <tr>
@@ -223,11 +177,56 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[im_skype]" value="0"  <?php if(!$im_skype){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
+<?php include DT_ROOT.'/api/trade/setting.inc.php';?>
+<tr>
+<td class="tl">手机短信</td>
+<td>
+<input type="radio" name="setting[sms]" value="1"  <?php if($sms){ ?>checked <?php } ?> onclick="Ds('dsms');"/> 开启&nbsp;&nbsp;
+<input type="radio" name="setting[sms]" value="0"  <?php if(!$sms){ ?>checked <?php } ?> onclick="Dh('dsms');"/> 关闭&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="<?php echo DT_SKIN;?>image/mobile.gif" align="absmiddle"/> <a href="?file=destoon&action=sms" target="_blank" class="t">[申请帐号<?php if($sms && $sms_uid && $sms_key) { ?> 可用短信<strong class="f_red"><script type="text/javascript" src="http://www.destoon.com/sms.php?uid=<?php echo $sms_uid;?>&key=<?php echo $sms_key;?>"></script></strong>条<?php } ?>]</a>
+</td>
+</tr>
+<tbody id="dsms" style="display:<?php if(!$sms) echo 'none';?>">
+<tr>
+<td class="tl">短信接口线路</td>
+<td>
+<select name="setting[sms_host]">
+<option value="sms"<?php if($sms_host == 'sms') echo ' selected';?>>线路1(国内)</option>
+<option value="smsm"<?php if($sms_host == 'smsm') echo ' selected';?>>线路2(国外)</option>
+</select><?php tips('建议优先选择线路1(国内)，速度更快，如果短信发送提示Can Not Connect SMS Server，可以尝试选择线路2(国外)');?>
+</td> 
+</tr>
+<tr>
+<td class="tl">短信接口帐号</td>
+<td><input name="setting[sms_uid]" type="text" value="<?php echo $sms_uid;?>" size="30"/></td> 
+</tr>
+<tr>
+<td class="tl">短信接口密钥</td>
+<td><input name="setting[sms_key]" type="text" id="sms_key" size="30" value="<?php echo $sms_key;?>" onfocus="if(this.value.indexOf('**')!=-1)this.value='';"/></td>
+</tr>
+<tr>
+<td class="tl">短信内容签名</td>
+<td><input name="setting[sms_sign]" type="text" value="<?php echo $sms_sign;?>" size="30"/> <?php tips('将显示在短信内容结尾，以便会员识别，请尽量简短<br/>例如 [某某网]');?></td> 
+</tr>
+<tr>
+<td class="tl">短信单价</td>
+<td><input name="setting[sms_fee]" type="text" value="<?php echo $sms_fee;?>" size="5"/> 元/条 <?php tips('此项针对会员收费');?></td> 
+</tr>
+<tr>
+<td class="tl">短信长度</td>
+<td><input name="setting[sms_len]" type="text" value="<?php echo $sms_len;?>" size="5"/> 字/条</td> 
+</tr>
+<tr>
+<td class="tl">成功标识</td>
+<td><input name="setting[sms_ok]" type="text" value="<?php echo $sms_ok;?>" size="10"/> <?php tips('短信发送成功标识字符，系统根据此字符确定是否扣除会员短信余额');?></td> 
+</tr>
+</tbody>
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">SEO优化</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">标题分隔符</td>
 <td><input name="setting[seo_delimiter]" type="text" value="<?php echo $seo_delimiter;?>" size="10"/></td>
@@ -298,26 +297,13 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </td>
 </tr>
 <tr>
-<td class="tl">公司二级域名https</td>
-<td>
-<input type="radio" name="setting[com_https]" value="1"  <?php if($com_https){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[com_https]" value="0"  <?php if(!$com_https){ ?>checked <?php } ?>/> 关闭
-</td>
-</tr>
-<tr>
-<td class="tl">会员顶级域名伪静态</td>
+<td class="tl">会员顶级域名Rewrite</td>
 <td>
 <input type="radio" name="config[com_rewrite]" value="1"  <?php if($com_rewrite){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="config[com_rewrite]" value="0"  <?php if(!$com_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('部分服务器可能无法开启会员绑定的顶级域名伪静态，如果无法开启，可在此关闭，以免出现打不开页面的情况，此项仅针对会员顶级域名，不影响其他页面伪静态');?>
+<input type="radio" name="config[com_rewrite]" value="0"  <?php if(!$com_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('部分服务器可能无法开启会员绑定的顶级域名Rewrite，如果无法开启，可在此关闭，以免出现打不开页面的情况，此项仅针对会员顶级域名，不影响其他页面Rewrite');?>
 </td>
 </tr>
-<tr>
-<td class="tl">搜索页伪静态</td>
-<td>
-<input type="radio" name="setting[search_rewrite]" value="1"  <?php if($search_rewrite){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[search_rewrite]" value="0"  <?php if(!$search_rewrite){ ?>checked <?php } ?>/> 关闭 <?php tips('搜索结果地址伪静态，此项会增加服务器负载');?>
-</td>
-</tr>
+
 <tr>
 <td class="tl">服务器中文路径编码</td>
 <td>
@@ -326,12 +312,12 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[pcharset]" value="utf-8"  <?php if($pcharset == 'utf-8'){ ?>checked <?php } ?>/> UTF-8 <?php tips('当生成包含中文文件名的文件出现乱码或者下载带有中文名文件提示找不到文件时，可尝试设置此项');?>
 </td>
 </tr>
+
 <tr>
 <td class="tl">404错误日志</td>
 <td>
 <input type="radio" name="setting[log_404]" value="1"  <?php if($log_404){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;
-<input type="radio" name="setting[log_404]" value="0"  <?php if(!$log_404){ ?>checked <?php } ?>/> 关闭&nbsp;&nbsp;
-<a href="javascript:Dwidget('?file=404', '404错误日志');" class="t">[查看日志]</a>
+<input type="radio" name="setting[log_404]" value="0"  <?php if(!$log_404){ ?>checked <?php } ?>/> 关闭
 <?php tips('开启404日志有利于分析站内死链接和用户或搜索引擎蜘蛛的错误记录<br/>同时需要设置站点的404页面至网站根目录404.php');?>
 </td>
 </tr>
@@ -339,7 +325,8 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </div>
 
 <div id="Tabs2" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">服务器优化</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">首页自动更新频率</td>
 <td>
@@ -359,6 +346,10 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 </td>
 </tr>
 <tr>
+<td class="tl">TAG(标签)缓存更新周期</td>
+<td><input type="text" name="config[tag_expires]" value="<?php echo $tag_expires;?>" size="5"/> 秒<?php tips('此项可明显减轻标签数据调用对服务器的压力');?></td>
+</tr>
+<tr>
 <td class="tl">SQL查询缓存更新周期</td>
 <td><input type="text" name="config[db_expires]" value="<?php echo $db_expires;?>" size="5"/> 秒<?php tips('此项可明显减轻数据库查询对服务器的压力<br/>但是会在一定程度上增加缓存目录的体积');?></td>
 </tr>
@@ -371,22 +362,42 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td><input type="text" name="setting[cache_hits]" value="<?php echo $cache_hits;?>" size="5"/> 秒<?php tips('此项可明显减轻数据库服务压力，但是会造成浏览次数的延迟显示');?></td>
 </tr>
 <tr>
+<td class="tl">公司首页缓存更新周期</td>
+<td><input type="text" name="setting[cache_home]" value="<?php echo $cache_home;?>" size="5"/> 秒<?php tips('此项可明显加快公司首页打开速度，但是会造成会员主页延迟更新和在一定程度上增加缓存目录的体积');?></td>
+</tr>
+<tr>
 <td class="tl">数据缓存方式</td>
 <td>
-<select name="config[cache]" onchange="if(this.options[this.selectedIndex].innerHTML.indexOf('不')!=-1){alert('系统不支持 '+this.value);$('#ccf').val('<?php echo $cache;?>');}" id="ccf">
+<select name="config[cache]" onchange="if(this.options[this.selectedIndex].innerHTML.indexOf('不')!=-1){alert('系统不支持 '+this.value);select_op('ccf', '<?php echo $cache;?>')}" id="ccf">
 <option value="file"<?php echo $cache == 'file' ? ' selected' : '';?>>文件 (支持)</option>
-<option value="eaccelerator"<?php echo $cache == 'eaccelerator' ? ' selected' : '';?>>eAccelerator (<?php echo function_exists('eaccelerator_get') ? '支持' : '不支持'?>)</option>
 <option value="memcache"<?php echo $cache == 'memcache' ? ' selected' : '';?>>Memcache (<?php echo class_exists('Memcache') ? '支持' : '不支持'?>)</option>
-<option value="redis"<?php echo $cache == 'redis' ? ' selected' : '';?>>Redis (<?php echo class_exists('Redis') ? '支持' : '不支持'?>)</option>
 <option value="xcache"<?php echo $cache == 'xcache' ? ' selected' : '';?>>Xcache (<?php echo function_exists('xcache_get') ? '支持' : '不支持'?>)</option>
-<option value="wincache"<?php echo $cache == 'wincache' ? ' selected' : '';?>>WinCache (<?php echo function_exists('wincache_ucache_get') ? '支持' : '不支持'?>)</option>
+<option value="eaccelerator"<?php echo $cache == 'eaccelerator' ? ' selected' : '';?>>eAccelerator (<?php echo function_exists('eaccelerator_get') ? '支持' : '不支持'?>)</option>
 <option value="shmop"<?php echo $cache == 'shmop' ? ' selected' : '';?>>shmop (<?php echo (function_exists('shmop_open') && function_exists('ftok')) ? '支持' : '不支持'?>)</option>
 <option value="apc"<?php echo $cache == 'apc' ? ' selected' : '';?>>apc (<?php echo function_exists('apc_fetch') ? '支持' : '不支持'?>)</option>
 </select>
-<?php tips('除了文件缓存，其他缓存方式需要服务器端支持，具体请查看phpinfo信息。<br/>请在确认服务器环境支持的情况下开启，否则可能导致未知的错误');?>&nbsp;&nbsp;
-<a href="javascript:Dwidget('?file=html&action=cacheclear', '清空缓存');" class="t">[清空缓存]</a>&nbsp;&nbsp;
-<a href="javascript:Diframe('?file=<?php echo $file;?>&action=cache', 0, 0 , 1);" class="t">[缓存测试]</a>
+<?php tips('除了文件缓存，其他缓存方式需要服务器端支持，具体请查看phpinfo信息。<br/>请在确认服务器环境支持的情况下开启，否则可能导致未知的错误<br/>如果需要开启Memcache缓存，请先配置file/config/memcache.inc.php连接参数');?>&nbsp;&nbsp;
+<a href="?action=phpinfo" target="_blank" class="t">[查看phpinfo]</a>&nbsp;&nbsp;
+<a href="?action=cacheclear" target="_blank" class="t">[清空缓存]</a>
 </td>
+</tr>
+<tr>
+<td class="tl">数据库/连接方式</td>
+<td>
+<select name="config[database]">
+<option value="mysql"<?php echo $database == 'mysql' ? ' selected' : '';?>>mysql</option>
+<option value="mysqli"<?php echo $database == 'mysqli' ? ' selected' : '';?>>mysqli</option>
+<option value="mysqlrw"<?php echo $database == 'mysqlrw' ? ' selected' : '';?>>mysqlrw</option>
+<option value="mysqlirw"<?php echo $database == 'mysqlirw' ? ' selected' : '';?>>mysqlirw</option>
+</select>
+<?php tips('mysqli是PHP对mysql新特性的一个扩展支持，如果已加载此扩展，请选择mysqli，具体请查看phpinfo信息<br/>mysqlrw/mysqlirw指多台mysql服务器实现读写分离，开启之前需要配置file/config/mysqlrw.inc.php只读数据库连接参数');?>
+</td>
+</tr>
+<tr>
+<td class="tl">去除模板换行标记</td>
+<td>
+<input type="radio" name="config[template_trim]" value="1" <?php if($template_trim){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="config[template_trim]" value="0" <?php if(!$template_trim){ ?>checked <?php } ?>/> 关闭 <?php tips('去除换行等多余标记，在一定程度上可以压缩网页体积<br/>开启此项可能导致自定义的js(例如广告代码)等错误，需要注意排查js的注释及结尾的分号');?></td>
 </tr>
 <tr>
 <td class="tl">模板缓存自动更新</td>
@@ -400,12 +411,6 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[gzip_enable]" value="1" <?php if($gzip_enable){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[gzip_enable]" value="0" <?php if(!$gzip_enable){ ?>checked <?php } ?>/> 关闭 <?php tips(function_exists('ob_gzhandler') ? '当前服务器支持Gzip，建议开启' : '当前服务器不支持Gzip，请关闭');?>
 </td>
-</tr>
-<tr>
-<td class="tl">图片延时加载</td>
-<td>
-<input type="radio" name="setting[lazy]" value="1" <?php if($lazy){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[lazy]" value="0" <?php if(!$lazy){ ?>checked <?php } ?>/> 关闭 <?php tips('页面图片仅在浏览器的当前窗口时再加载，可明显降低访问量很大的站点的服务器负担');?></td>
 </tr>
 <tr>
 <td class="tl">分页显示方式</td>
@@ -445,8 +450,7 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td class="tl">搜索关键词自动记录</td>
 <td>
 <input type="radio" name="setting[search_kw]" value="1" <?php if($search_kw){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[search_kw]" value="0" <?php if(!$search_kw){ ?>checked <?php } ?>/> 关闭&nbsp;&nbsp;
-<a href="javascript:Dwidget('?file=keyword', '搜索关键词记录');" class="t">[查看记录]</a></td>
+<input type="radio" name="setting[search_kw]" value="0" <?php if(!$search_kw){ ?>checked <?php } ?>/> 关闭</td>
 </tr>
 <tr>
 <td class="tl">人工审核关键词记录</td>
@@ -459,7 +463,7 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <td><input type="text" size="3" name="setting[min_kw]" value="<?php echo $min_kw;?>"/>
 至
 <input type="text" size="3" name="setting[max_kw]" value="<?php echo $max_kw;?>"/>
-字符<?php tips('一个汉字的长度为3个字符，建议设置为3-30个字符之间');?></td>
+字符<?php tips('一个汉字的长度为2个字符，建议设置为3-30个字符之间');?></td>
 </tr>
 <tr>
 <td class="tl">两次搜索时间间隔</td>
@@ -483,15 +487,6 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <tr>
 <td class="tl">搜索分类返回结果数限制</td>
 <td><input type="text" size="3" name="setting[schcate_limit]" value="<?php echo $schcate_limit;?>"/> 条<?php tips('填0为禁用分类搜索');?></td>
-</tr>
-<tr>
-<td class="tl">信息内容长度限制</td>
-<td><input type="text" size="5" name="setting[max_len]" value="<?php echo $max_len;?>"/> 字符<?php tips('一个汉字占3个字符，填0为不限，建议设置，以免内容过长');?></td>
-</tr>
-<tr>
-<td class="tl">静态文件分离部署地址</td>
-<td><input name="config[static]" type="text" value="<?php echo $static;?>" size="40"/>&nbsp;&nbsp;
-<a href="javascript:Dwidget('?file=<?php echo $file;?>&action=static', '静态文件分离部署', 486, 200);" class="t">[使用说明]</a></td>
 </tr>
 <tr>
 <td class="tl">远程FTP文件上传</td>
@@ -535,20 +530,13 @@ tips('位于./'.$MODULE[2]['moduledir'].'/editor/目录,一个目录即为一套
 <input type="radio" name="setting[ftp_pasv]" value="0"  <?php if(!$ftp_pasv){ ?>checked <?php } ?>/> 否<?php tips('一般情况下非被动模式即可，如果存在上传失败问题，可尝试打开此设置');?>
 </td>
 </tr>
-<tr>
-<td class="tl">保留源文件</td>
-<td>
-<input type="radio" name="setting[ftp_save]" value="1"  <?php if($ftp_save){ ?>checked <?php } ?> id="ftp_del"/> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[ftp_save]" value="0"  <?php if(!$ftp_save){ ?>checked <?php } ?>/> 否<?php tips('如果选择是，上传到本服务器上的文件在上传到FTP服务器后，不自动删除，相当于在本服务器多了一份备份，文件保存于file/upload目录');?>
-</td>
-</tr>
 <tr> 
 <td class="tl">远程存储目录</td>
-<td><input name="setting[ftp_path]" id="ftp_path" type="text" size="30" value="<?php echo $ftp_path;?>"/><?php tips('例如 / 或者 /www/<br/>具体以实际情况为准');?></td>
+<td><input name="setting[ftp_path]" id="ftp_path" type="text" size="60" value="<?php echo $ftp_path;?>"/><?php tips('例如 /wwwroot/img/ 或者 /httpdocs/img/<br/>具体以实际情况为准');?></td>
 </tr>
 <tr>
 <td class="tl">远程访问URL</td>
-<td><input name="setting[remote_url]" id="ftp_remote_url" type="text" value="<?php echo $remote_url;?>" size="60"/><?php tips('例如 http://static.destoon.com/，注意以 / 结尾，建议设置为域名根目录且不能包含file/upload');?></td>
+<td><input name="setting[remote_url]" type="text" value="<?php echo $remote_url;?>" size="60"/><?php tips('例如 http://static.destoon.com/，注意以 / 结尾');?></td>
 </tr>
 <tr> 
 <td class="tl">测试FTP连接</td>
@@ -561,12 +549,7 @@ function TestFTP() {
 		Dalert('FTP主机不能为空');
 		Dd('ftp_host').focus();
 		return false;
-	}
-	if(Dd('ftp_remote_url').value.indexOf('file/upload') != -1) {
-		Dalert('远程访问URL不能包含file/upload');
-		Dd('ftp_remote_url').focus();
-		return false;
-	}
+	}	
 	var fssl = Dd('ftp_ssl').checked ? 1 : 0;
 	var fpasv = Dd('ftp_pasv').checked ? 1 : 0;
 	var url = '?file=setting&action=ftp&ftp_host='+Dd('ftp_host').value+'&ftp_port='+Dd('ftp_port').value+'&ftp_user='+Dd('ftp_user').value+'&ftp_pass='+Dd('ftp_pass').value+'&ftp_path='+Dd('ftp_path').value+'&ftp_ssl='+fssl+'&ftp_pasv='+fpasv;
@@ -575,18 +558,15 @@ function TestFTP() {
 </script>
 </div>
 <div id="Tabs3" style="display:none">
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">允许登录后台的地区</td>
-<td><input name="setting[admin_area]" type="text" value="<?php echo $admin_area;?>" size="60"/><?php tips('设置工作人员常用的登录地区，多个地区用|分隔<br/>例如“北京|上海|广州”，非常用地区的IP将无法登录后台');?></td>
-</tr>
+<div class="tt">安全中心</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">允许登录后台的IP</td>
-<td><input name="setting[admin_ip]" type="text" value="<?php echo $admin_ip;?>" size="60"/><?php tips('请谨慎设置，以免发生不可登录后台的情况<br/>IP段用*代替数字，例如192.168.*.*<br/>多个IP地址或者IP段用|分隔，例如192.168.1.2|10.0.*.*');?></td>
+<td><input name="setting[admin_ip]" type="text" value="<?php echo $admin_ip;?>" size="60"/><?php tips('请谨慎设置，以免发生不可登录后台的情况<br/>IP段用*代替数字，例如192.168.*.*<br/>多个IP地址或者IP段用|分割，例如192.168.1.2|10.0.*.*');?></td>
 </tr>
 <tr>
 <td class="tl">允许登录后台的时段</td>
-<td><input name="setting[admin_hour]" type="text" value="<?php echo $admin_hour;?>" size="60"/><?php tips('留空表示不限制，建议设置为工作人员下班时间。多个时间段请用|分隔，单时间段用-分隔，时间请使用24小时制<br/>例如：8:30-18:00 表示时间段上午8:30至下午18:00<br/>22:30-2:05|5:00-13:15表示晚上22:30至次日凌晨2:05和凌晨5:00至下午13:15两个时间段<br/>网站创始人帐号不受此限制');?></td>
+<td><input name="setting[admin_hour]" type="text" value="<?php echo $admin_hour;?>" size="60"/><?php tips('留空表示不限制，建议设置为工作人员下班时间。多个时间段请用|分割，单时间段用-分割，时间请使用24小时制<br/>例如：8:30-18:00 表示时间段上午8:30至下午18:00<br/>22:30-2:05|5:00-13:15表示晚上22:30至次日凌晨2:05和凌晨5:00至下午13:15两个时间段<br/>网站创始人帐号不受此限制');?></td>
 </tr>
 <tr>
 <td class="tl">允许登录后台的日期</td>
@@ -639,7 +619,7 @@ function TestFTP() {
 <td>
 <input type="radio" name="setting[admin_online]" value="1"  <?php if($admin_online){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[admin_online]" value="0"  <?php if(!$admin_online){ ?>checked <?php } ?>/> 关闭&nbsp;&nbsp;
-<a href="javascript:Dwidget('?moduleid=2&file=online&action=admin', '后台在线记录');" class="t">[点击查看]</a>
+<a href="?moduleid=2&file=online&action=admin" class="t">[点击查看]</a>
 </td>
 </tr>
 <tr>
@@ -701,12 +681,28 @@ function TestFTP() {
 </td>
 </tr>
 <tr>
+<td class="tl">后台验证方式</td>
+<td>
+<select name="setting[authadmin]">
+<option value="session" <?php if($authadmin == 'session') echo 'selected';?>>Session</option>
+<option value="cookie" <?php if($authadmin == 'cookie') echo 'selected';?>>Cookie</option>
+</select>
+<?php tips('Session验证可能出现后台自动退出的情况，如果自动退出的情况频繁出现影响使用，请使用cookie验证，cookie验证仅在关闭浏览器时自动退出后台');?>
+</td>
+</tr>
+<tr>
+<td class="tl">网站安全密钥</td>
+<td><input name="config[authkey]" id="authkey" type="text" value="<?php echo $authkey;?>" size="30"/> <a href="javascript:Dd('authkey').value=RandStr();void(0);" class="t">[随机]</a> <?php tips('可用英文大小写字母、数字的组合，不可使用特殊符号，建议定期修改');?></td>
+</tr>
+
+<tr>
 <td class="tl">验证数据来源</td>
 <td>
 <input type="radio" name="setting[check_referer]" value="1"  <?php if($check_referer){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[check_referer]" value="0"  <?php if(!$check_referer){ ?>checked <?php } ?>/> 关闭
 </td>
 </tr>
+
 <tr>
 <td class="tl">信任域名</td>
 <td><input name="setting[safe_domain]" type="text" value="<?php echo $safe_domain;?>" size="60"/><?php tips('不填写则默认为当前域名<br/>多个域名请用|分开 例如destoon.com|destoon.cn');?></td>
@@ -728,18 +724,12 @@ function TestFTP() {
 </td>
 </tr>
 <tr>
-<td class="tl">CDN加速</td>
-<td>
-<select name="config[cdn]">
-<option value="0"<?php echo $cdn == 0 ? ' selected' : '';?>>未使用</option>
-<option value="1"<?php echo $cdn == 1 ? ' selected' : '';?>>已使用</option>
-</select>&nbsp;
-<?php tips('如果域名解析开启过CND加速，需要选择已使用，否则可能会导致IP获取错误，具体请在系统体检里检查');?>
-</td>
-</tr>
-<tr>
 <td class="tl">Cookie作用域</td>
 <td><input name="config[cookie_domain]" type="text" value="<?php echo $cookie_domain;?>" size="20"/><?php tips('例如要保证顶级域名destoon.com所有二级域名均可正常登录注销，则填写.destoon.com(注意顶级域名前加.)');?></td>
+</tr>
+<tr>
+<td class="tl">Cookie前缀</td>
+<td><input name="config[cookie_pre]" type="text" value="<?php echo $cookie_pre;?>" size="20"/></td>
 </tr>
 <tr>
 <td class="tl">用户注册文件名</td>
@@ -757,7 +747,43 @@ function TestFTP() {
 </div>
 
 <div id="Tabs4" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">图片水印</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">水印图片</td>
+<td><input name="setting[water_mark]" type="text" value="<?php echo $water_mark;?>" size="40"/><br/>
+<img src="file/image/<?php echo $water_mark;?>"/></td>
+</tr>
+<tr>
+<td class="tl">水印透明度</td>
+<td><input name="setting[water_transition]" type="text" value="<?php echo $water_transition;?>" size="5"><?php tips('如果水印图为gif格式，请设置范围为 1~100 的整数,数值越小水印图片越透明。PNG 类型水印本身具有真彩透明效果，无须此设置');?></td>
+</tr>
+<tr>
+<td class="tl">JPEG 水印质量</td>
+<td><input name="setting[water_jpeg_quality]" type="text" value="<?php echo $water_jpeg_quality;?>" size="5"><?php tips('范围为 0~100 的整数,数值越大结果图片效果越好,但尺寸也越大');?></td>
+</tr>
+</table>
+<div class="tt">文字水印</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">水印文字</td>
+<td><input name="setting[water_text]" type="text" id="water_text" value="<?php echo $water_text;?>" size="30" style="color:<?php echo $water_fontcolor;?>;font-size:<?php echo $water_fontsize;?>px;"></td>
+</tr>
+<tr>
+<td class="tl">中文字体</td>
+<td><input name="setting[water_font]" type="text" value="<?php echo $water_font;?>" size="30"> <?php if($water_font && !is_file(DT_ROOT."/file/font/".$water_font)){ ?><span class="f_red">字体不存在,请上传字体到./file/font/目录</span><?php } ?></td>
+</tr>
+<tr>
+<td class="tl">文字大小</td>
+<td><input name="setting[water_fontsize]" type="text" value="<?php echo $water_fontsize;?>" size="8" style="font-size:<?php echo $water_fontsize;?>px;" onblur="this.style.fontSize=this.value+'px';Dd('water_text').style.fontSize=this.value+'px';"> px</td>
+</tr>
+<tr>
+<td class="tl">文字颜色</td>
+<td><input name="setting[water_fontcolor]" type="text" value="<?php echo $water_fontcolor;?>" size="8" style="color:<?php echo $water_fontcolor;?>" onblur="this.style.color=this.value;Dd('water_text').style.color=this.value;"></td>
+</tr>
+</table>
+<div class="tt">图片处理</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">水印类型</td>
 <td>
@@ -780,26 +806,26 @@ function TestFTP() {
 <tr>
 <td class="tl">水印位置</td>
 <td>
-	<table cellspacing="1" cellpadding="5" width="150" bgcolor="#DDDDDD" class="ctb">
-	<tr align="center" bgcolor="#FFFFFF">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="1" <?php if($water_pos==1){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="2" <?php if($water_pos==2){ ?>checked <?php } ?>/></td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="3" <?php if($water_pos==3){ ?>checked <?php } ?>/> </td>
+	<table cellspacing="1" cellpadding="5" width="150" bgcolor="#DDDDDD">
+	<tr align="center" bgcolor="#F1F2F3">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="1" <?php if($water_pos==1){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="2" <?php if($water_pos==2){ ?>checked <?php } ?>/></td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="3" <?php if($water_pos==3){ ?>checked <?php } ?>/> </td>
 	</tr>
 
-	<tr align="center" bgcolor="#FFFFFF">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="4" <?php if($water_pos==4){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="5" <?php if($water_pos==5){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="6" <?php if($water_pos==6){ ?>checked <?php } ?>/> </td>
+	<tr align="center"  bgcolor="#F1F2F3">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="4" <?php if($water_pos==4){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="5" <?php if($water_pos==5){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="6" <?php if($water_pos==6){ ?>checked <?php } ?>/> </td>
 	</tr>
 
-	<tr align="center" bgcolor="#FFFFFF">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="7" <?php if($water_pos==7){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="8" <?php if($water_pos==8){ ?>checked <?php } ?>/> </td>
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'"> <input type="radio" name="setting[water_pos]" value="9" <?php if($water_pos==9){ ?>checked <?php } ?>/> </td>
+	<tr align="center" bgcolor="#F1F2F3">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="7" <?php if($water_pos==7){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="8" <?php if($water_pos==8){ ?>checked <?php } ?>/> </td>
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'"> <input type="radio" name="setting[water_pos]" value="9" <?php if($water_pos==9){ ?>checked <?php } ?>/> </td>
 	</tr>
-	<tr align="center" bgcolor="#FFFFFF">
-	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#FFFFFF'" colspan="3">随机 <input type="radio" name="setting[water_pos]" value="0" <?php if($water_pos==0){ ?>checked <?php } ?>/></td>
+	<tr align="center" bgcolor="#F1F2F3">
+	<td onmouseover="this.style.backgroundColor='#FEB685'" onmouseout="this.style.backgroundColor='#F1F2F3'" colspan="3">随机 <input type="radio" name="setting[water_pos]" value="0" <?php if($water_pos==0){ ?>checked <?php } ?>/></td>
 	</tr>
 	</table>
 </tr>
@@ -809,14 +835,6 @@ function TestFTP() {
 <input type="radio" name="setting[bmp_jpg]" value="1"  <?php if($bmp_jpg==1){ ?>checked <?php } ?> /> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[bmp_jpg]" value="0"  <?php if($bmp_jpg==0){ ?>checked <?php } ?> /> 关闭
 <?php tips('BMP格式图片体积较大，且不能生成缩略图，建议开启');?>
-</td>
-</tr>
-<tr>
-<td class="tl">GIF图片保留动画</td>
-<td>
-<input type="radio" name="setting[gif_ani]" value="1"  <?php if($gif_ani==1){ ?>checked <?php } ?> /> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[gif_ani]" value="0"  <?php if($gif_ani==0){ ?>checked <?php } ?> /> 关闭
-<?php tips('开启之后，系统对有动画效果的GIF图片不添加水印或缩略');?>
 </td>
 </tr>
 <tr>
@@ -859,48 +877,19 @@ function TestFTP() {
 <?php tips('由于显示器宽度有限，超过此宽度的图片将被等比调整为此宽度以节省存储空间');?>
 </td>
 </tr>
-<tr>
-<td class="tl">水印图片</td>
-<td><input name="setting[water_mark]" type="text" value="<?php echo $water_mark;?>" size="40"/><br/>
-<img src="file/image/<?php echo $water_mark;?>"/></td>
-</tr>
-<tr>
-<td class="tl">水印透明度</td>
-<td><input name="setting[water_transition]" type="text" value="<?php echo $water_transition;?>" size="5"><?php tips('如果水印图为gif格式，请设置范围为 1~100 的整数,数值越小水印图片越透明。PNG 类型水印本身具有真彩透明效果，无须此设置');?></td>
-</tr>
-<tr>
-<td class="tl">JPEG 水印质量</td>
-<td><input name="setting[water_jpeg_quality]" type="text" value="<?php echo $water_jpeg_quality;?>" size="5"><?php tips('范围为 0~100 的整数,数值越大结果图片效果越好,但尺寸也越大');?></td>
-</tr>
-<tr>
-<td class="tl">水印文字</td>
-<td><input name="setting[water_text]" type="text" id="water_text" value="<?php echo $water_text;?>" size="30" style="color:<?php echo $water_fontcolor;?>;font-size:<?php echo $water_fontsize;?>px;"></td>
-</tr>
-<tr>
-<td class="tl">中文字体</td>
-<td><input name="setting[water_font]" type="text" value="<?php echo $water_font;?>" size="30"> <?php if($water_font && !is_file(DT_ROOT."/file/font/".$water_font)){ ?><span class="f_red">字体不存在,请上传字体到./file/font/目录</span><?php } ?></td>
-</tr>
-<tr>
-<td class="tl">文字大小</td>
-<td><input name="setting[water_fontsize]" type="text" value="<?php echo $water_fontsize;?>" size="8" style="font-size:<?php echo $water_fontsize;?>px;" onblur="this.style.fontSize=this.value+'px';Dd('water_text').style.fontSize=this.value+'px';"> px</td>
-</tr>
-<tr>
-<td class="tl">文字颜色</td>
-<td><input name="setting[water_fontcolor]" type="text" value="<?php echo $water_fontcolor;?>" size="8" style="color:<?php echo $water_fontcolor;?>" onblur="this.style.color=this.value;Dd('water_text').style.color=this.value;"></td>
-</tr>
 </table>
 </div>
 
 <div id="Tabs5" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">邮件发送</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">发送方式</td>
 <td>
 <input type="radio" name="setting[mail_type]" value="close" <?php if($mail_type=="close"){ ?>checked <?php } ?> id="mailtype_close"/> <label for="mailtype_close">关闭邮件发送</label><br/>
 <input type="radio" name="setting[mail_type]" value="smtp" <?php if($mail_type=="smtp"){ ?>checked <?php } ?> onclick="Ds('dsmtp');Ds('demail');Dd('l_rn').checked=true;" id="mailtype_smtp"/> <label for="mailtype_smtp">通过SMTP SOCKET 连接 SMTP 服务器发送(支持ESMTP验证)</label><br/>
 <input type="radio" name="setting[mail_type]" value="mail"  <?php if($mail_type=="mail"){ ?>checked <?php } ?> onclick="Dh('dsmtp');Dh('demail');Dd('l_n').checked=true;" id="mailtype_mail"/> <label for="mailtype_mail">通过PHP mail 函数发送(通常为Unix/Linux 主机)</label><br/>
-<input type="radio" name="setting[mail_type]" value="psmtp"  <?php if($mail_type=="psmtp"){ ?>checked <?php } ?> onclick="Ds('dsmtp');Dh('demail');Dd('l_rn').checked=true;" id="mailtype_psmtp"/> <label for="mailtype_psmtp">通过PHP mail 函数SMTP发送(通常为WIN主机)</label><br/>
-<input type="radio" name="setting[mail_type]" value="sc"  <?php if($mail_type=="sc"){ ?>checked <?php } ?> onclick="Dh('dsmtp');Ds('demail');Dd('l_n').checked=true;" id="mailtype_sc"/> <label for="mailtype_sc">通过 <a href="<?php echo DT_PATH;?>api/redirect.php?url=http://sendcloud.sohu.com/" target="_blank" class="t">SendCloud</a> 发送<?php tips('SendCloud邮件发送可以保证更高的送达率，详情可以进入官方网站了解<br/>邮箱帐号请填写申请到的API_USER，邮箱密码请填写申请到的API_KEY');?></label>
+<input type="radio" name="setting[mail_type]" value="psmtp"  <?php if($mail_type=="psmtp"){ ?>checked <?php } ?> onclick="Ds('dsmtp');Dh('demail');Dd('l_rn').checked=true;" id="mailtype_psmtp"/> <label for="mailtype_psmtp">通过PHP mail 函数SMTP发送(通常为WIN主机)</label>
 </td>
 </tr>
 <tr>
@@ -938,9 +927,9 @@ function TestFTP() {
 </tbody>
 <tr> 
 <td class="tl">邮件签名</td>
-<td><textarea name="setting[mail_sign]" id="mail_sign" cols="60" rows="4"><?php echo $mail_sign;?></textarea><br/>支持HTML语法 <a href="###" class="t" onclick="Dalert(Dd('mail_sign').value, 500);">[预览签名]</a></td>
+<td><textarea name="setting[mail_sign]" id="mail_sign" cols="60" rows="4"><?php echo $mail_sign;?></textarea><?php tips('支持HTML语法');?></td>
 </tr>
-<tr>
+<tr> 
 <td class="tl">发件人邮箱</td>
 <td><input name="setting[mail_sender]" id="mail_sender" type="text" size="40" value="<?php echo $mail_sender;?>"/><?php tips('系统发送的信件将以此邮箱名义发送');?></td>
 </tr>
@@ -962,11 +951,10 @@ function TestFTP() {
 <tr> 
 <td class="tl">自动转发未读站内信</td>
 <td>
-<input type="radio" name="setting[message_email]" value="1"  <?php if($message_email) echo 'checked';?> onclick="Ds('dmessage');"/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[message_email]" value="0"  <?php if(!$message_email) echo 'checked';?> onclick="Dh('dmessage');"/> 关闭
+<input type="radio" name="setting[message_email]" value="1"  <?php if($message_email) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[message_email]" value="0"  <?php if(!$message_email) echo 'checked';?>/> 关闭
 </td>
 </tr>
-<tbody id="dmessage" style="display:<?php if(!$message_email) echo 'none';?>">
 <tr> 
 <td class="tl">自动转发会员组</td>
 <td><?php echo group_checkbox('setting[message_group][]', $message_group, '1,2,3,4');?></td>
@@ -989,83 +977,121 @@ foreach($NAME as $k=>$v) {
 ?>
 </td>
 </tr>
-<tr> 
-<td class="tl">同时推送给微信</td>
-<td>
-<input type="radio" name="setting[message_weixin]" value="1"  <?php if($message_weixin) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[message_weixin]" value="0"  <?php if(!$message_weixin) echo 'checked';?>/> 关闭<?php tips('仅在开启了微信公众号，且会员绑定了微信，且会员在48小时内打开过公众号才能推送成功');?>
-</td>
-</tr>
-</tbody>
 </table>
 </div>
 
 <div id="Tabs6" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">页面细节</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+
 <tr>
-<td class="tl">首页推荐商品数量</td>
+<td class="tl">首页行业分类大类</td>
+<td><input type="text" name="setting[page_bigcat]" value="<?php echo $page_bigcat;?>" size="60"/><?php tips('例如填写工业品|消费品|原材料|商业服务，然后把供应的一级分类级别设置为1即可归入工业品，设置为2归入消费品，设置为3归入原材料，设置为4归入商业服务，依次类推');?></td>
+</tr>
+
+<tr>
+<td class="tl">首页商品数量</td>
 <td><input type="text" name="setting[page_mall]" value="<?php echo $page_mall;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐供应数量</td>
-<td><input type="text" name="setting[page_sell]" value="<?php echo $page_sell;?>" size="5"/></td>
+<td class="tl">首页显示行业类别</td>
+<td><input type="radio" name="setting[page_catalog]" value="1"  <?php if($page_catalog){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[page_catalog]" value="0"  <?php if(!$page_catalog){ ?>checked <?php } ?>/> 否</td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐招商数量</td>
-<td><input type="text" name="setting[page_info]" value="<?php echo $page_info;?>" size="5"/></td>
+<td class="tl">首页显示字母索引</td>
+<td><input type="radio" name="setting[page_letter]" value="1"  <?php if($page_letter){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[page_letter]" value="0"  <?php if(!$page_letter){ ?>checked <?php } ?>/> 否</td>
 </tr>
+
+
 <tr>
-<td class="tl">首页推荐团购数量</td>
-<td><input type="text" name="setting[page_group]" value="<?php echo $page_group;?>" size="5"/></td>
+<td class="tl">首页品牌展示数量</td>
+<td><input type="text" name="setting[page_brand]" value="<?php echo $page_brand;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页图片资讯数量</td>
-<td><input type="text" name="setting[page_newst]" value="<?php echo $page_newst;?>" size="5"/></td>
+<td class="tl">首页行业展会数量</td>
+<td><input type="text" name="setting[page_exhibit]" value="<?php echo $page_exhibit;?>" size="5"/></td>
 </tr>
+
+<tr>
+<td class="tl">首页图片中心数量</td>
+<td><input type="text" name="setting[page_photo]" value="<?php echo $page_photo;?>" size="5"/></td>
+</tr>
+
+<tr>
+<td class="tl">首页视频推荐数量</td>
+<td><input type="text" name="setting[page_video]" value="<?php echo $page_video;?>" size="5"/></td>
+</tr>
+
+<tr>
+<td class="tl">首页显示会员登录</td>
+<td><input type="radio" name="setting[page_login]" value="1"  <?php if($page_login){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[page_login]" value="0"  <?php if(!$page_login){ ?>checked <?php } ?>/> 否</td>
+</tr>
+
 <tr>
 <td class="tl">首页显示头条资讯</td>
 <td><input type="radio" name="setting[page_newsh]" value="1"  <?php if($page_newsh){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[page_newsh]" value="0"  <?php if(!$page_newsh){ ?>checked <?php } ?>/> 否</td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐资讯数量</td>
-<td><input type="text" name="setting[page_news]" value="<?php echo $page_news;?>" size="5"/> X 2</td>
+<td class="tl">首页最新资讯数量</td>
+<td><input type="text" name="setting[page_news]" value="<?php echo $page_news;?>" size="5"/></td>
 </tr>
+
 <tr>
 <td class="tl">首页推荐专题数量</td>
 <td><input type="text" name="setting[page_special]" value="<?php echo $page_special;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐视频数量</td>
-<td><input type="text" name="setting[page_video]" value="<?php echo $page_video;?>" size="5"/></td>
+<td class="tl">首页推荐团购数量</td>
+<td><input type="text" name="setting[page_group]" value="<?php echo $page_group;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐图库数量</td>
-<td><input type="text" name="setting[page_photo]" value="<?php echo $page_photo;?>" size="5"/></td>
+<td class="tl">首页最新企业数量</td>
+<td><input type="text" name="setting[page_com]" value="<?php echo $page_com;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页品牌展示数量</td>
-<td><input type="text" name="setting[page_brand]" value="<?php echo $page_brand;?>" size="5"/></td>
+<td class="tl">首页企业新闻数量</td>
+<td><input type="text" name="setting[page_comnews]" value="<?php echo $page_comnews;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页行业展会数量</td>
-<td><input type="text" name="setting[page_exhibit]" value="<?php echo $page_exhibit;?>" size="5"/></td>
+<td class="tl">首页行情报价数量</td>
+<td><input type="text" name="setting[page_quote]" value="<?php echo $page_quote;?>" size="5"/></td>
 </tr>
+
 <tr>
-<td class="tl">首页推荐招聘数量</td>
+<td class="tl">首页招商代理数量</td>
+<td><input type="text" name="setting[page_info]" value="<?php echo $page_info;?>" size="5"/></td>
+</tr>
+
+
+<tr>
+<td class="tl">首页招聘求职数量</td>
 <td><input type="text" name="setting[page_job]" value="<?php echo $page_job;?>" size="5"/></td>
 </tr>
+
 <tr>
 <td class="tl">首页行业知道数量</td>
 <td><input type="text" name="setting[page_know]" value="<?php echo $page_know;?>" size="5"/></td>
 </tr>
+
 <tr>
 <td class="tl">首页资料下载数量</td>
 <td><input type="text" name="setting[page_down]" value="<?php echo $page_down;?>" size="5"/></td>
 </tr>
 <tr>
-<td class="tl">首页推荐商圈数量</td>
-<td><input type="text" name="setting[page_club]" value="<?php echo $page_club;?>" size="5"/></td>
+<td class="tl">首页投票调查数量</td>
+<td><input type="text" name="setting[page_vote]" value="<?php echo $page_vote;?>" size="5"/></td>
 </tr>
 <tr>
 <td class="tl">首页图片链接数量</td>
@@ -1074,65 +1100,6 @@ foreach($NAME as $k=>$v) {
 <tr>
 <td class="tl">首页文字链接数量</td>
 <td><input type="text" name="setting[page_text]" value="<?php echo $page_text;?>" size="5"/></td>
-</tr>
-</table>
-</div>
-
-<div id="Tabs7" style="display:none">
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">服务帐号</td>
-<td><input name="config[cloud_uid]" type="text" id="cloud_uid" value="<?php echo $cloud_uid;?>" size="30"/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="?file=cloud&action=key" target="_blank" class="t">[申请帐号]</a></td> 
-</tr>
-<tr>
-<td class="tl">服务密钥</td>
-<td><input name="config[cloud_key]" type="text" id="cloud_key" value="<?php echo $cloud_key;?>" size="30" onfocus="if(this.value.indexOf('**')!=-1)this.value='';"/></td>
-</tr>
-<tr>
-<td class="tl">提示信息</td>
-<td class="f_red">以下云服务需要先填写正确的帐号和密钥方可开启成功</td>
-</tr>
-<tr>
-<td class="tl">手机短信</td>
-<td>
-<input type="radio" name="setting[sms]" value="1"  <?php if($sms){ ?>checked <?php } ?> onclick="Ds('dsms');"/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[sms]" value="0"  <?php if(!$sms){ ?>checked <?php } ?> onclick="Dh('dsms');"/> 关闭
-</td>
-</tr>
-<tbody id="dsms" style="display:<?php if(!$sms) echo 'none';?>">
-<?php if($sms && DT_CLOUD_UID && DT_CLOUD_KEY) { ?>
-<tr>
-<td class="tl">短信余额</td>
-<td><span class="f_red" id="sms_balance"></span> 条&nbsp;&nbsp;&nbsp;&nbsp;<a href="?file=cloud&action=smsbuy" target="_blank" class="t">[在线购买]</a></td> 
-</tr>
-<?php } ?>
-<tr>
-<td class="tl">短信单价</td>
-<td><input name="setting[sms_fee]" type="text" value="<?php echo $sms_fee;?>" size="5"/> <?php echo $DT['money_unit'];?>/条 <?php tips('此项针对会员收费');?></td> 
-</tr>
-<tr>
-<td class="tl">每日上限</td>
-<td><input name="setting[sms_max]" type="text" value="<?php echo $sms_max;?>" size="5"/> 条 <?php tips('特指会员注册、找回密码、手机验证等需要发送验证码场景，同一手机号码或会员每日最大发送数量，填0为不限制，建议填5左右的数字，以免恶意发送');?></td> 
-</tr>
-<tr style="display:none;">
-<td class="tl">短信长度</td>
-<td><input name="setting[sms_len]" type="text" value="<?php echo $sms_len;?>" size="5"/> 字/条</td> 
-</tr>
-<tr style="display:none;">
-<td class="tl">成功标识</td>
-<td><input name="setting[sms_ok]" type="text" value="<?php echo $sms_ok;?>" size="10"/> <?php tips('短信发送成功标识字符，系统根据此字符确定是否扣除会员短信余额');?></td> 
-</tr>
-<tr>
-<td class="tl">短信内容签名</td>
-<td><input name="setting[sms_sign]" type="text" value="<?php echo $sms_sign;?>" size="30"/> <?php tips('将显示在短信内容结尾，以便会员识别，请尽量简短，正确的格式为【签名】，例如 【某某网】。包含签名的短信会被运营商认为是更正规的短信，从而进入更快的发送通道');?></td> 
-</tr>
-</tbody>
-<tr>
-<td class="tl">快递追踪</td>
-<td>
-<input type="radio" name="setting[cloud_express]" value="1"  <?php if($cloud_express){ ?>checked <?php } ?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[cloud_express]" value="0"  <?php if(!$cloud_express){ ?>checked <?php } ?>/> 关闭
-</td>
 </tr>
 </table>
 </div>
@@ -1154,7 +1121,6 @@ function TestMail() {
 	if(Dd('mailtype_mail').checked) mail_type = 'mail';
 	if(Dd('mailtype_smtp').checked) mail_type = 'smtp';
 	if(Dd('mailtype_psmtp').checked) mail_type = 'psmtp';
-	if(Dd('mailtype_sc').checked) mail_type = 'sc';
 	var mail_delimiter = Dd('l_rn').checked ? 1 : (Dd('l_n').checked ? 2 : 3);
 	var smtp_auth = Dd('smtp_auth').checked ? 1 : 0;
 	url += '&mail_type='+mail_type+'&mail_delimiter='+mail_delimiter+'&smtp_host='+Dd('smtp_host').value+'&smtp_auth='+smtp_auth+'&smtp_user='+Dd('smtp_user').value+'&smtp_pass='+Dd('smtp_pass').value+'&smtp_port='+Dd('smtp_port').value+'&mail_sender='+Dd('mail_sender').value+'&testemail='+Dd('testemail').value+'&mail_name='+Dd('mail_name').value;
@@ -1163,7 +1129,7 @@ function TestMail() {
 }
 </script>
 <div class="sbt">
-<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -1180,13 +1146,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-$(function(){
+window.onload=function() {
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-	if(window.screen.width < 1280) {
-		$('.menu div').hide();
-	}
-});
+}
 </script>
-<script type="text/javascript" src="https://www.destoon.com/sms.php?action=get&uid=<?php echo DT_CLOUD_UID;?>&key=<?php echo md5(DT_CLOUD_KEY.'|'.DT_CLOUD_UID);?>"></script>
 <?php include tpl('footer');?>

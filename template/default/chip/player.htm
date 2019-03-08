@@ -1,7 +1,7 @@
-{if $video_p == 1}
+{if $video_p == -1}
 <object type="application/x-shockwave-flash" data="{DT_PATH}file/flash/vcastr3.swf" width="{$video_w}" height="{$video_h}" id="vcastr3">
-<!--<embed></embed>-->
 <param name="movie" value="{DT_PATH}file/flash/vcastr3.swf"/>
+<param name="wmode" value="transparent"/>
 <param name="allowFullScreen" value="true"/>
 <param name="FlashVars" value="xml=
 	<vcastr>
@@ -35,7 +35,7 @@
 		<plugIns>
 			<logoPlugIn>
 				<url>{DT_PATH}file/flash/vcastr3_logo.swf</url>
-				<logoClipUrl>{DT_STATIC}file/image/{$MOD[flvlogo]}</logoClipUrl>
+				<logoClipUrl>{DT_PATH}file/image/{$MOD[flvlogo]}</logoClipUrl>
 				<logoClipAlpha>0.7</logoClipAlpha>
 				<logoClipLink>{if $MOD[flvlink]}{$MOD[flvlink]}{else}{DT_PATH}{/if}</logoClipLink>
 				<clipMargin>{$MOD[flvmargin]}</clipMargin>
@@ -44,14 +44,10 @@
 		{/if}
 	</vcastr>"/>
 </object>
-{elseif $video_p == 2}
+{elseif $video_p == 1}
 <embed src="{$video_s}" width="{$video_w}" height="{$video_h}" type="application/x-mplayer2" autostart="{$video_a}" controls="imagewindow,controlpanel,statusbar"></embed>
-{elseif $video_p == 3}
+{elseif $video_p == 2}
 <embed src="{$video_s}" width="{$video_w}" height="{$video_h}" type="audio/x-pn-realaudio-extend" autostart="{$video_a}"></embed>
-{elseif $video_p == 4}
-<iframe width="{$video_w}" height="{$video_h}"  frameborder="0" scrolling="no" src="{$video_s}"></iframe>
-{elseif $video_p == 5}
-<embed src="{$video_s}" width="{$video_w}" height="{$video_h}" allownetworking="all" allowscriptaccess="always" quality="high" bgcolor="#000" wmode="window" allowfullscreen="true" allowFullScreenInteractive="true" type="application/x-shockwave-flash"></embed>
 {else}
-<embed src="{$video_s}" width="{$video_w}" height="{$video_h}" type="application/x-shockwave-flash" extendspage="http://get.adobe.com/flashplayer/" autostart="{$video_a}" quality="high" allowfullscreen="true" allowscriptaccess="never"></embed>
+<embed src="{$video_s}" width="{$video_w}" height="{$video_h}" type="application/x-shockwave-flash" extendspage="http://get.adobe.com/flashplayer/" wmode="transparent" autostart="{$video_a}" quality="high" allowfullscreen="true"></embed>
 {/if}

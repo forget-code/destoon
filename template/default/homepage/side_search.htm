@@ -6,9 +6,16 @@
 <input type="text" name="kw" value="{if $kw}{$kw}{else}输入关键词{/if}" size="25" id="kw" class="inp" onfocus="if(this.value=='输入关键词')this.value='';"/>
 <div style="padding:10px 0 0 0;">
 <select name="file">
-{loop $MENU $k $v}
-{if in_array($menu_file[$k], array('sell', 'buy', 'news', 'credit', 'job', 'photo', 'info', 'brand', 'video', 'mall'))}<option value="{$menu_file[$k]}"{if $file==$menu_file[$k]} selected{/if}>{$v[name]}</option>{/if}
-{/loop}
+{if $menu_show[1]}<option value="sell"{if $file=='sell'} selected{/if}>{$menu_name[1]}</option>{/if}
+{if $menu_show[2]}<option value="buy"{if $file=='buy'} selected{/if}>{$menu_name[2]}</option>{/if}
+{if $menu_show[3]}<option value="news"{if $file=='news'} selected{/if}>{$menu_name[3]}</option>{/if}
+{if $menu_show[4]}<option value="credit"{if $file=='credit'} selected{/if}>{$menu_name[4]}</option>{/if}
+{if $menu_show[5]}<option value="job"{if $file=='job'} selected{/if}>{$menu_name[5]}</option>{/if}
+{if $menu_show[7]}<option value="photo"{if $file=='photo'} selected{/if}>{$menu_name[7]}</option>{/if}
+{if $menu_show[8]}<option value="info"{if $file=='info'} selected{/if}>{$menu_name[8]}</option>{/if}
+{if $menu_show[9]}<option value="brand"{if $file=='brand'} selected{/if}>{$menu_name[9]}</option>{/if}
+{if $menu_show[10]}<option value="video"{if $file=='video'} selected{/if}>{$menu_name[10]}</option>{/if}
+{if $menu_show[12]}<option value="mall"{if $file=='mall'} selected{/if}>{$menu_name[12]}</option>{/if}
 </select>&nbsp;
 <input type="submit" value=" 搜 索 " class="sbm"/>
 </div>

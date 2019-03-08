@@ -6,7 +6,7 @@ defined('IN_DESTOON') or exit('Access Denied');
  * @Author rui.xin
  */
  
-include DT_ROOT.'/api/pay/'.$bank.'/yeepayCommon.php';	
+include DT_ROOT.'/api/pay/yeepay/yeepayCommon.php';	
 	
 #	只有支付成功时易宝支付才会通知商户.
 ##支付成功回调有两次，都会通知到在线支付请求参数中的p8_Url上：浏览器重定向;服务器点对点通讯.
@@ -29,12 +29,12 @@ if($bRet){
 			if($r6_Order != $charge_orderid) {
 				$charge_status = 2;
 				$charge_errcode = '订单号不匹配';
-				#$note = $charge_errcode.'S:'.$charge_orderid.'R:'.$r6_Order;
-				#log_write($note, 'ryeepay');
+				$note = $charge_errcode.'S:'.$charge_orderid.'R:'.$r6_Order;
+				log_write($note, 'ryeepay');
 			} else if($r3_Amt != $charge_money) {
 				$charge_status = 2;
 				$charge_errcode = '充值金额不匹配';
-				$note = $charge_errcode.'S:'.$charge_money.'R:'.$r3_Amt;
+				$note = charge_errcode.'S:'.$charge_money.'R:'.$r3_Amt;
 				log_write($note, 'ryeepay');
 			} else {
 				$charge_status = 1;

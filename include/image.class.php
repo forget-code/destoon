@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -25,7 +25,7 @@ class image {
     var $t_y = 0;
 	var $make = true;
 
-	function __construct($g_img) {
+	function image($g_img) {
 		global $DT;
 		$this->g_img = $g_img;
 		$info = getimagesize($this->g_img);
@@ -45,13 +45,6 @@ class image {
 		}
 		$this->g_w = $info[0];
 		$this->g_h = $info[1];
-		if($this->g_type == 1 || $this->g_type == 3) {
-			$tmp_im = imagecreatetruecolor($this->g_w, $this->g_h);
-			imagefill($tmp_im, 0, 0, imagecolorallocate($tmp_im, 255, 255, 255));
-			imagecopyresampled($tmp_im, $this->img, 0, 0, 0, 0, $this->g_w, $this->g_h, $this->g_w, $this->g_h);
-			$this->img = $tmp_im;
-			unset($tmp_im);
-		}
         $this->pos = $DT['water_pos'] ? $DT['water_pos'] : 0;
 		$this->w_img = DT_ROOT.'/file/image/'.($DT['water_mark'] ? $DT['water_mark'] : 'watermark.png');
 		$this->transition = $DT['water_transition'] ? $DT['water_transition'] : 65;
@@ -61,10 +54,6 @@ class image {
 		$this->text_font = DT_ROOT.'/file/font/'.($DT['water_font'] ? $DT['water_font'] : 'simhei.ttf');
 		$this->text_color = $DT['water_fontcolor'] ? $DT['water_fontcolor'] : '#000000';
 		$this->water_margin = $DT['water_margin'] ? $DT['water_margin'] : 10;
-	}
-
-	function image($g_img) {
-		$this->__construct($g_img);
 	}
 
     function waterimage($save_name = '') {
@@ -89,8 +78,8 @@ class image {
 			imagecopymerge($this->img, $w_img, $w_im_x, $w_im_y, 0, 0, $w_w, $w_h, $this->transition);
 		} else {
 			$b_img = imagecreatetruecolor($this->g_w, $this->g_h);
-			imagecopy($b_img, $this->img, 0, 0, 0, 0, $this->g_w, $this->g_h);
-			imagecopy($b_img, $w_img, $w_im_x, $w_im_y, 0, 0, $w_w, $w_h);
+			imageCopy($b_img, $this->img, 0, 0, 0, 0, $this->g_w, $this->g_h);
+			imageCopy($b_img, $w_img, $w_im_x, $w_im_y, 0, 0, $w_w, $w_h);
 			$this->img = $b_img;
 		}
 		imagedestroy($w_img);
@@ -106,6 +95,7 @@ class image {
 			if($this->g_w < $min_wh || $this->g_h < $min_wh) $this->make = false;
 		}
 		if(!$this->make) return false;
+		$this->text = convert($this->text, DT_CHARSET, 'UTF-8');
 		$this->save_name = $save_name ? $save_name : $this->g_img;
 		$temp_text = $this->get_pos('text');
 		$text_x = $temp_text['dest_x'];
@@ -284,8 +274,8 @@ class image {
                 $p_y = $this->g_h - $p_h - $this->water_margin;
                 break;
             default:
-                $p_x = mt_rand($this->water_margin, ($this->g_w - $p_w - $this->water_margin)); 
-                $p_y = mt_rand($this->water_margin, ($this->g_h - $p_h - $this->water_margin)); 
+                $p_x = rand($this->water_margin, ($this->g_w - $p_w - $this->water_margin)); 
+                $p_y = rand($this->water_margin, ($this->g_h - $p_h - $this->water_margin)); 
                 break;     
         }
 		return array('dest_x'=>$p_x, 'dest_y'=>$p_y);

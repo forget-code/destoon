@@ -8,14 +8,21 @@ $par = 'grant_type=authorization_code'
 	 . '&client_secret='.QQ_SECRET
 	 . '&code='.$_REQUEST['code']
 	 . '&redirect_uri='.urlencode(QQ_CALLBACK);
-$rec = dcurl(QQ_TOKEN_URL, $par);
+$cur = curl_init(QQ_TOKEN_URL);
+curl_setopt($cur, CURLOPT_POST, 1);
+curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
+curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt($cur, CURLOPT_HEADER, 0);
+curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
+$rec = curl_exec($cur);
+curl_close($cur);
 if(strpos($rec, 'access_token') !== false) {
 	parse_str($rec, $arr);
 	$_SESSION['qq_access_token'] = $arr['access_token'];
-	$_SESSION['qq_access_time'] = $arr['expires_in'];
-	if($OAUTH[$site]['sync']) set_cookie('qq_token', $arr['access_token'], $DT_TIME + $arr['expires_in']);
-	dheader('index.php?time='.$DT_TIME);
+	dheader('./');
 } else {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);
 }
+?>
 ?>

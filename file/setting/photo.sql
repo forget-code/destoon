@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_photo_12`;
-CREATE TABLE `destoon_photo_12` (
+DROP TABLE IF EXISTS `destoon_photo`;
+CREATE TABLE `destoon_photo` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -12,7 +12,6 @@ CREATE TABLE `destoon_photo_12` (
   `pptword` varchar(255) NOT NULL default '',
   `items` int(10) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
-  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
   `addtime` int(10) unsigned NOT NULL default '0',
@@ -34,15 +33,15 @@ CREATE TABLE `destoon_photo_12` (
   KEY `username` (`username`)
 ) TYPE=MyISAM COMMENT='图库';
 
-DROP TABLE IF EXISTS `destoon_photo_data_12`;
-CREATE TABLE `destoon_photo_data_12` (
+DROP TABLE IF EXISTS `destoon_photo_data`;
+CREATE TABLE `destoon_photo_data` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` longtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='图库内容';
 
-DROP TABLE IF EXISTS `destoon_photo_item_12`;
-CREATE TABLE `destoon_photo_item_12` (
+DROP TABLE IF EXISTS `destoon_photo_item`;
+CREATE TABLE `destoon_photo_item` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `item` bigint(20) unsigned NOT NULL default '0',
   `introduce` text NOT NULL,

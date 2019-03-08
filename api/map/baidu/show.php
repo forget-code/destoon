@@ -27,7 +27,7 @@ body{height:100%;margin:0px;padding:0px}
 <script type="text/javascript">
 var map = new BMap.Map("container");
 var point = new BMap.Point(<?php echo $map;?>);
-map.centerAndZoom(point, 16);
+map.centerAndZoom(point, 12);
 map.addControl(new BMap.NavigationControl());
 map.addControl(new BMap.ScaleControl());
 map.addOverlay(new BMap.Marker(point));

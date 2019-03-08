@@ -1,13 +1,12 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
-$mid or $mid = 4;
+defined('IN_DESTOON') or exit('Access Denied');
+$mid = isset($mid) ? intval($mid) : 1;
 $CATEGORY = cache_read('category-'.$mid.'.php');
 $MOD = cache_read('module-'.$mid.'.php');
-$NUM = count($CATEGORY);
 $catid = isset($catid) ? intval($catid) : 0;
 $do = new category($mid, $catid);
 $parentid = isset($parentid) ? intval($parentid) : 0;
@@ -16,9 +15,11 @@ $menus = array (
     array('添加分类', '?file='.$file.'&action=add&mid='.$mid.'&parentid='.$parentid),
     array('管理分类', '?file='.$file.'&mid='.$mid),
     array('分类复制', '?file='.$file.'&action=copy&mid='.$mid),
-    array('更新缓存', '?file='.$file.'&action=caches&mid='.$mid),
+    array('批量索引', '?file='.$file.'&action=letters&mid='.$mid),
+    array('更新地址', '?file='.$file.'&action=url&mid='.$mid),
+    array('更新统计', '?file='.$file.'&action=count&mid='.$mid),
+    array('更新缓存', '?file='.$file.'&action=cache&mid='.$mid),
 );
-if(strpos($forward, 'category') === false) $forward = '?file='.$file.'&mid='.$mid.'&parentid='.$parentid.'&kw='.urlencode($kw);
 switch($action) {
 	case 'add':
 		if($submit) {
@@ -67,7 +68,7 @@ switch($action) {
 				$CATEGORY[$catid] = $db->get_one("SELECT * FROM {$table} WHERE catid=$catid");
 				update_category($CATEGORY[$catid]);
 			}
-			$NUM > 500 ? $do->cache() : $do->repair();
+			$do->cache();
 			dmsg('添加成功', '?file='.$file.'&mid='.$mid.'&parentid='.$category['parentid']);
 		} else {
 			include tpl('category_add');
@@ -81,7 +82,7 @@ switch($action) {
 			$do->edit($category);
 			$category['catid'] = $catid;
 			update_category($category);
-			$NUM > 500 ? $do->cache() : $do->repair();
+			$do->cache();
 			dmsg('修改成功', '?file='.$file.'&mid='.$mid.'&parentid='.$category['parentid']);
 		} else {
 			extract($db->get_one("SELECT * FROM {$table} WHERE catid=$catid"));
@@ -133,13 +134,9 @@ switch($action) {
 			include tpl('category_copy');
 		}
 	break;
-	case 'caches':
-		msg('开始更新统计', "?file=$file&mid=$mid&action=count");
-	break;
 	case 'count':
 		require DT_ROOT.'/include/module.func.php';
-		$tb = get_table($mid);
-		if($MODULE[$mid]['module'] == 'club') $tb = $DT_PRE.'club_group_'.$mid;
+		$tb =get_table($mid);
 		if(!isset($num)) {
 			$num = 50;
 		}
@@ -171,15 +168,45 @@ switch($action) {
 				$catid = $fid + $num;
 			}
 		} else {
-			msg('统计更新成功', "?file=$file&mid=$mid&action=url");
+			$do->cache();
+			dmsg('更新成功', "?mid=$mid&file=$file");
 		}
-		msg('ID从'.$fid.'至'.($catid-1).'更新成功'.progress($sid, $fid, $tid), "?file=$file&mid=$mid&action=$action&sid=$sid&fid=$catid&tid=$tid&num=$num");
+		msg('ID从'.$fid.'至'.($catid-1).'更新成功'.progress($sid, $fid, $tid), "?mid=$mid&file=$file&action=$action&sid=$sid&fid=$catid&tid=$tid&num=$num");
+	break;
+	case 'ckdir':
+		if($do->get_catdir($catdir)) {
+			dialog('目录名可以使用');
+		} else {
+			dialog('目录名不合法或者已经被使用');
+		}
 	break;
 	case 'url':	
 		foreach($CATEGORY as $c) {
-			update_category($c);
+			update_category($c); 
 		}
-		msg('地址更新成功', "?file=$file&mid=$mid&action=letters");
+		$do->cache();
+		dmsg('更新成功', "?mid=$mid&file=$file");
+	break;
+	case 'cache':
+		$do->repair();
+		dmsg('更新成功', "?mid=$mid&file=$file");
+	break;
+	case 'delete':
+		if($catid) $catids = $catid;
+		$catids or msg();
+		$do->delete($catids);
+		$do->cache();
+		dmsg('删除成功', $forward);
+	break;
+	case 'update':
+		if(!$category || !is_array($category)) msg();
+		$do->update($category);
+		foreach($category as $catid=>$v) {
+			$CATEGORY[$catid] = $db->get_one("SELECT * FROM {$table} WHERE catid=$catid");
+			update_category($CATEGORY[$catid]);
+		}		
+		$do->cache();
+		dmsg('更新成功', $forward);
 	break;
 	case 'letters':
 		$update = false;
@@ -193,53 +220,25 @@ switch($action) {
 				}
 			}
 		}
-		msg('索引修复成功', "?file=$file&mid=$mid&action=cache");
-	break;
-	case 'cache':
-		$do->repair();
-		dmsg('缓存更新成功', '?file='.$file.'&mid='.$mid);
-	break;
-	case 'delete':
-		if($catid) $catids = $catid;
-		$catids or msg('请选择分类');
-		$do->delete($catids);
-		$NUM > 500 ? $do->cache() : $do->repair();
-		dmsg('删除成功', $forward);
-	break;
-	case 'update':
-		if(!$category || !is_array($category)) msg();
-		$do->update($category);
-		foreach($category as $catid=>$v) {
-			$CATEGORY[$catid] = $db->get_one("SELECT * FROM {$table} WHERE catid=$catid");
-			update_category($CATEGORY[$catid]);
-		}		
-		$NUM > 500 ? $do->cache() : $do->repair();
-		dmsg('更新成功', '?file='.$file.'&mid='.$mid.'&parentid='.$parentid);
+		if($update) $do->repair();
+		dmsg('建立成功', $forward);
 	break;
 	case 'letter':
 		isset($catname) or $catname = '';
 		if(!$catname || strpos($catname, "\n") !== false) exit('');
+		if(strtoupper(DT_CHARSET) != 'UTF-8') $catname = convert($catname, 'UTF-8', DT_CHARSET);
 		exit($do->get_letter($catname, false));
-	break;
-	case 'ckdir':
-		if($do->get_catdir($catdir)) {
-			dialog('目录名可以使用');
-		} else {
-			dialog('目录名不合法或者已经被使用');
-		}
 	break;
 	default:
 		$total = 0;
 		$DTCAT = array();
-		$condition = "moduleid=$mid";
-		$condition .= $keyword ? " AND catname LIKE '%$keyword%'" : " AND parentid=$parentid";
-		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY listorder,catid");
+		$result = $db->query("SELECT * FROM {$table} WHERE moduleid=$mid AND parentid=$parentid ORDER BY listorder,catid");
 		while($r = $db->fetch_array($result)) {
 			$r['childs'] = substr_count($r['arrchildid'], ',');
 			$total += $r['item'];
 			$DTCAT[$r['catid']] = $r;
 		}
-		if(!$DTCAT && !$parentid && !$keyword) msg('暂无分类,请先添加',  '?file='.$file.'&mid='.$mid.'&action=add&parentid='.$parentid);
+		if(!$DTCAT && !$parentid) msg('暂无分类,请先添加',  '?file='.$file.'&mid='.$mid.'&action=add&parentid='.$parentid);
 		include tpl('category');
 	break;
 }
@@ -248,19 +247,17 @@ class category {
 	var $moduleid;
 	var $catid;
 	var $category = array();
-	var $table;	
+	var $db;
+	var $table;
 
-	function __construct($moduleid = 1, $catid = 0) {
-		global $CATEGORY;
+	function category($moduleid = 1, $catid = 0) {
+		global $db, $DT_PRE, $CATEGORY;
 		$this->moduleid = $moduleid;
 		$this->catid = $catid;
 		if(!isset($CATEGORY)) $CATEGORY = cache_read('category-'.$this->moduleid.'.php');
 		$this->category = $CATEGORY;
-		$this->table = DT_PRE.'category';
-	}
-
-	function category($moduleid = 1, $catid = 0) {
-		$this->__construct($moduleid, $catid);
+		$this->table = $DT_PRE.'category';
+		$this->db = &$db;
 	}
 
 	function add($category)	{
@@ -275,8 +272,8 @@ class category {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");		
-		$this->catid = DB::insert_id();
+		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");		
+		$this->catid = $this->db->insert_id();
 		if($category['parentid']) {
 			$category['catid'] = $this->catid;
 			$this->category[$this->catid] = $category;
@@ -285,7 +282,7 @@ class category {
 			$arrparentid = 0;
 		}
 		$catdir = $category['catdir'] ? $category['catdir'] : $this->catid;
-		DB::query("UPDATE {$this->table} SET listorder=$this->catid,catdir='$catdir',arrparentid='$arrparentid' WHERE catid=$this->catid");
+		$this->db->query("UPDATE {$this->table} SET listorder=$this->catid,catdir='$catdir',arrparentid='$arrparentid' WHERE catid=$this->catid");
 		return true;
 	}
 
@@ -307,7 +304,7 @@ class category {
 			$sql .= ",$k='$v'";
 		}
 		$sql = substr($sql, 1);
-		DB::query("UPDATE {$this->table} SET $sql WHERE catid=$this->catid");
+		$this->db->query("UPDATE {$this->table} SET $sql WHERE catid=$this->catid");
 		return true;
 	}
 
@@ -319,10 +316,10 @@ class category {
 		} else {
 			$catid = $catids;
 			if(isset($this->category[$catid])) {
-				DB::query("DELETE FROM {$this->table} WHERE catid=$catid");
+				$this->db->query("DELETE FROM {$this->table} WHERE catid=$catid");
 				$arrchildid = $this->category[$catid]['arrchildid'] ? $this->category[$catid]['arrchildid'] : $catid;
-				DB::query("DELETE FROM {$this->table} WHERE catid IN ($arrchildid)");			
-				if($this->moduleid > 4) DB::query("UPDATE ".get_table($this->moduleid)." SET status=0 WHERE catid IN (".$arrchildid.")");
+				$this->db->query("DELETE FROM {$this->table} WHERE catid IN ($arrchildid)");			
+				if($this->moduleid > 4) $this->db->query("UPDATE ".get_table($this->moduleid)." SET status=0 WHERE catid IN (".$arrchildid.")");
 			}
 		}
 		return true;
@@ -340,15 +337,15 @@ class category {
 			$v['letter'] = preg_match("/^[a-z0-9]{1}+$/i", $v['letter']) ? strtolower($v['letter']) : '';
 			$v['catdir'] = $this->get_catdir($v['catdir'], $k);
 			if(!$v['catdir']) $v['catdir'] = $k;
-			DB::query("UPDATE {$this->table} SET catname='$v[catname]',parentid='$v[parentid]',listorder='$v[listorder]',style='$v[style]',level='$v[level]',letter='$v[letter]',catdir='$v[catdir]' WHERE catid=$k ");
+			$this->db->query("UPDATE {$this->table} SET catname='$v[catname]',parentid='$v[parentid]',listorder='$v[listorder]',style='$v[style]',level='$v[level]',letter='$v[letter]',catdir='$v[catdir]' WHERE catid=$k ");
 		}
 		return true;
 	}
 
 	function repair() {
-		$query = DB::query("SELECT * FROM {$this->table} WHERE moduleid='$this->moduleid' ORDER BY listorder,catid");
+		$query = $this->db->query("SELECT * FROM {$this->table} WHERE moduleid='$this->moduleid' ORDER BY listorder,catid");
 		$CATEGORY = array();
-		while($r = DB::fetch_array($query)) {
+		while($r = $this->db->fetch_array($query)) {
 			$CATEGORY[$r['catid']] = $r;
 		}
 		$childs = array();
@@ -360,7 +357,7 @@ class category {
 				$CATEGORY[$catid]['linkurl'] = listurl($category);
 				$sql .= ",linkurl='$category[linkurl]'";
 			}
-			DB::query("UPDATE {$this->table} SET $sql WHERE catid=$catid");
+			$this->db->query("UPDATE {$this->table} SET $sql WHERE catid=$catid");
 			if($arrparentid) {
 				$arr = explode(',', $arrparentid);
 				foreach($arr as $a) {
@@ -374,11 +371,11 @@ class category {
 			if(isset($childs[$catid])) {
 				$CATEGORY[$catid]['arrchildid'] = $arrchildid = $catid.$childs[$catid];
 				$CATEGORY[$catid]['child'] = 1;
-				DB::query("UPDATE {$this->table} SET arrchildid='$arrchildid',child=1 WHERE catid='$catid'");
+				$this->db->query("UPDATE {$this->table} SET arrchildid='$arrchildid',child=1 WHERE catid='$catid'");
 			} else {
 				$CATEGORY[$catid]['arrchildid'] = $catid;
 				$CATEGORY[$catid]['child'] = 0;
-				DB::query("UPDATE {$this->table} SET arrchildid='$catid',child=0 WHERE catid='$catid'");
+				$this->db->query("UPDATE {$this->table} SET arrchildid='$catid',child=0 WHERE catid='$catid'");
 			}
 		}
 		$this->cache($CATEGORY);
@@ -415,7 +412,7 @@ class category {
 		if(preg_match("/^[0-9a-z_\-\/]+$/i", $catdir)) {
 			$condition = "catdir='$catdir' AND moduleid='$this->moduleid'";
 			if($catid) $condition .= " AND catid!=$catid";
-			$r = DB::get_one("SELECT catid FROM {$this->table} WHERE $condition");
+			$r = $this->db->get_one("SELECT catid FROM {$this->table} WHERE $condition");
 			if($r) {
 				return '';
 			} else {

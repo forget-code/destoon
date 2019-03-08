@@ -1,9 +1,9 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('地区添加', '?file='.$file.'&action=add'),
     array('地区管理', '?file='.$file),
@@ -51,7 +51,7 @@ switch($action) {
 	break;
 	case 'cache':
 		$do->repair();
-		dmsg('更新成功', $forward);
+		dmsg('更新成功', $this_forward);
 	break;
 	case 'delete':
 		if($areaid) $areaids = $areaid;
@@ -66,8 +66,7 @@ switch($action) {
 	break;
 	default:
 		$DAREA = array();
-		$condition = $keyword ? "areaname LIKE '%$keyword%'" : "parentid=$parentid";
-		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY listorder,areaid");
+		$result = $db->query("SELECT * FROM {$table} WHERE parentid=$parentid ORDER BY listorder,areaid");
 		while($r = $db->fetch_array($result)) {
 			$r['childs'] = substr_count($r['arrchildid'], ',');
 			$DAREA[$r['areaid']] = $r;
@@ -79,17 +78,15 @@ switch($action) {
 class area {
 	var $areaid;
 	var $area = array();
+	var $db;
 	var $table;
 
-	function __construct($areaid = 0)	{
-		global $AREA;
+	function area($areaid = 0)	{
+		global $db, $DT_PRE, $AREA;
 		$this->areaid = $areaid;
 		$this->area = $AREA;
-		$this->table = DT_PRE.'area';
-	}
-
-	function area($areaid = 0)	{
-		$this->__construct($areaid);
+		$this->table = $DT_PRE.'area';
+		$this->db = &$db;
 	}
 
 	function add($area)	{
@@ -100,8 +97,8 @@ class area {
 			$sql2 .= $s."'".$value."'";
 			$s = ',';
 		}
-		DB::query("INSERT INTO {$this->table} ($sql1) VALUES($sql2)");		
-		$this->areaid = DB::insert_id();
+		$this->db->query("INSERT INTO {$this->table} ($sql1) VALUES($sql2)");		
+		$this->areaid = $this->db->insert_id();
 		if($area['parentid']) {
 			$area['areaid'] = $this->areaid;
 			$this->area[$this->areaid] = $area;
@@ -109,7 +106,7 @@ class area {
 		} else {
 			$arrparentid = 0;
 		}
-		DB::query("UPDATE {$this->table} SET arrchildid='$this->areaid',listorder=$this->areaid,arrparentid='$arrparentid' WHERE areaid=$this->areaid");
+		$this->db->query("UPDATE {$this->table} SET arrchildid='$this->areaid',listorder=$this->areaid,arrparentid='$arrparentid' WHERE areaid=$this->areaid");
 		return true;
 	}
 
@@ -118,14 +115,14 @@ class area {
 			foreach($areaids as $areaid) {
 				if(isset($this->area[$areaid])) {
 					$arrchildid = $this->area[$areaid]['arrchildid'];
-					DB::query("DELETE FROM {$this->table} WHERE areaid IN ($arrchildid)");
+					$this->db->query("DELETE FROM {$this->table} WHERE areaid IN ($arrchildid)");
 				}
 			}
 		} else {
 			$areaid = $areaids;
 			if(isset($this->area[$areaid])) {
 				$arrchildid = $this->area[$areaid]['arrchildid'];
-				DB::query("DELETE FROM {$this->table} WHERE areaid IN ($arrchildid)");
+				$this->db->query("DELETE FROM {$this->table} WHERE areaid IN ($arrchildid)");
 			}
 		}
 		$this->repair();
@@ -140,22 +137,22 @@ class area {
 			if($k == $v['parentid']) continue;
 			if($v['parentid'] > 0 && !isset($this->area[$v['parentid']])) continue;
 			$v['listorder'] = intval($v['listorder']);
-			DB::query("UPDATE {$this->table} SET areaname='$v[areaname]',parentid='$v[parentid]',listorder='$v[listorder]' WHERE areaid=$k");
+			$this->db->query("UPDATE {$this->table} SET areaname='$v[areaname]',parentid='$v[parentid]',listorder='$v[listorder]' WHERE areaid=$k");
 		}
 		cache_area();
 		return true;
 	}
 
 	function repair() {		
-		$query = DB::query("SELECT * FROM {$this->table} ORDER BY listorder,areaid");
+		$query = $this->db->query("SELECT * FROM {$this->table} ORDER BY listorder,areaid");
 		$AREA = array();
-		while($r = DB::fetch_array($query)) {
+		while($r = $this->db->fetch_array($query)) {
 			$AREA[$r['areaid']] = $r;
 		}
 		$childs = array();
 		foreach($AREA as $areaid => $area) {
 			$arrparentid = $this->get_arrparentid($areaid, $AREA);
-			DB::query("UPDATE {$this->table} SET arrparentid='$arrparentid' WHERE areaid=$areaid");
+			$this->db->query("UPDATE {$this->table} SET arrparentid='$arrparentid' WHERE areaid=$areaid");
 			if($arrparentid) {
 				$arr = explode(',', $arrparentid);
 				foreach($arr as $a) {
@@ -168,9 +165,9 @@ class area {
 		foreach($AREA as $areaid => $area) {
 			if(isset($childs[$areaid])) {
 				$arrchildid = $areaid.$childs[$areaid];
-				DB::query("UPDATE {$this->table} SET arrchildid='$arrchildid',child=1 WHERE areaid='$areaid'");
+				$this->db->query("UPDATE {$this->table} SET arrchildid='$arrchildid',child=1 WHERE areaid='$areaid'");
 			} else {
-				DB::query("UPDATE {$this->table} SET arrchildid='$areaid',child=0 WHERE areaid='$areaid'");
+				$this->db->query("UPDATE {$this->table} SET arrchildid='$areaid',child=0 WHERE areaid='$areaid'");
 			}
 		}
 		cache_area();

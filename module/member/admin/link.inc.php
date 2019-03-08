@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/link.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/link.class.php';
 $do = new dlink();
 $menus = array (
     array('添加链接', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -56,12 +56,11 @@ switch($action) {
 	break;
 	case 'check':
 		if($itemid) {
-			//$status = $status == 3 ? 3 : 2;
-			$status = 3;
+			$status = $status == 3 ? 3 : 2;
 			$do->check($itemid, $status);
 			dmsg($status == 3 ? '审核成功' : '取消成功', $forward);
 		} else {
-			$lists = $do->get_list("username<>'' AND status=2".$condition, $dorder[$order]);
+			$lists = $do->get_list("username!='' AND status=2".$condition, $dorder[$order]);
 			$menuid = 2;
 			include tpl('link', $module);
 		}
@@ -72,7 +71,7 @@ switch($action) {
 		dmsg('删除成功', $forward);
 	break;
 	default:
-		$lists = $do->get_list("username<>'' AND status=3".$condition, $dorder[$order]);
+		$lists = $do->get_list("username!='' AND status=3".$condition, $dorder[$order]);
 		$menuid = 1;
 		include tpl('link', $module);
 	break;

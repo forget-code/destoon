@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/page.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/page.class.php';
 $do = new page();
 $menus = array (
     array('添加单页', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -15,10 +15,13 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$dfields = array('title', 'title', 'username');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '修改时间降序', '修改时间升序', '浏览次数降序', '浏览次数升序');
 	$dorder  = array('addtime DESC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC', 'hits DESC', 'hits ASC');
+
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
+
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
+
 	$condition = '';
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 }
@@ -61,6 +64,30 @@ switch($action) {
 			include tpl('page_edit', $module);
 		}
 	break;
+	case 'push':
+		$MODULE[$aid]['module'] == 'article' or msg('请选择文章模型');
+		if($submit) {
+			$catid or msg('请选择分类');
+			$tb = get_table($aid);
+			$tb_data = get_table($aid, 1);
+			$result = $db->query("SELECT * FROM {$DT_PRE}page WHERE itemid IN ($ids)");
+			$i = 0;
+			while($r = $db->fetch_array($result)) {
+				$r = daddslashes($r);
+				$t = $db->get_one("SELECT itemid FROM {$tb} WHERE linkurl='$r[linkurl]'");
+				if($t) continue;
+				$db->query("INSERT {$tb} (catid,title,linkurl,islink,addtime,username,edittime,editor,status) VALUES ('$catid', '$r[title]', '$r[linkurl]', '1', '$r[addtime]', '$r[username]', '$DT_TIME', '$_username','3')");
+				$itemid = $db->insert_id();
+				$db->query("INSERT {$tb_data} (itemid) VALUES ('$itemid')");
+				$i++;
+			}
+			dmsg('推送成功'.$i.'条单页', "?moduleid=$moduleid&file=$file");
+		} else {
+			$itemid or msg('请选择单页');
+			$ids = implode(',', $itemid);
+			include tpl('page_push', $module);
+		}
+	break;		
 	case 'update':
 		if(!isset($num)) {
 			$num = 500;
@@ -90,6 +117,28 @@ switch($action) {
 		}
 		msg('ID从'.$fid.'至'.($itemid-1).'更新成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num");
 	break;
+	case 'recycle':
+		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
+		include tpl('page_recycle', $module);
+	break;
+	case 'check':
+		if($itemid && !$psize) {
+			$do->check($itemid);
+			dmsg('审核成功', $forward);
+		} else {
+			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
+			include tpl('page_check', $module);
+		}
+	break;
+	case 'reject':
+		if($itemid && !$psize) {
+			$do->reject($itemid);
+			dmsg('拒绝成功', $forward);
+		} else {
+			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
+			include tpl('page_reject', $module);
+		}
+	break;
 	case 'delete':
 		$itemid or msg('请选择单页');
 		isset($recycle) ? $do->recycle($itemid) : $do->delete($itemid);
@@ -104,34 +153,8 @@ switch($action) {
 		$do->clear();
 		dmsg('清空成功', $forward);
 	break;
-	case 'recycle':
-		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
-		$menuid = 4;
-		include tpl('page', $module);
-	break;
-	case 'reject':
-		if($itemid && !$psize) {
-			$do->reject($itemid);
-			dmsg('拒绝成功', $forward);
-		} else {
-			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
-			$menuid = 3;
-			include tpl('page', $module);
-		}
-	break;
-	case 'check':
-		if($itemid && !$psize) {
-			$do->check($itemid);
-			dmsg('审核成功', $forward);
-		} else {
-			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
-			$menuid = 2;
-			include tpl('page', $module);
-		}
-	break;
 	default:
 		$lists = $do->get_list('status=3'.$condition, $dorder[$order]);
-		$menuid = 1;
 		include tpl('page', $module);
 	break;
 }

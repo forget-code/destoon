@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menu = array(
 	array("添加招聘", "?moduleid=$moduleid&action=add"),
 	array("招聘列表", "?moduleid=$moduleid"),

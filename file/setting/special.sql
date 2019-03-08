@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_special_11`;
-CREATE TABLE `destoon_special_11` (
+DROP TABLE IF EXISTS `destoon_special`;
+CREATE TABLE `destoon_special` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `areaid` int(10) unsigned NOT NULL default '0',
@@ -12,7 +12,6 @@ CREATE TABLE `destoon_special_11` (
   `pptword` varchar(255) NOT NULL default '',
   `items` int(10) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
-  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `banner` varchar(255) NOT NULL default '',
   `cfg_photo` smallint(4) unsigned NOT NULL default '0',
@@ -27,7 +26,6 @@ CREATE TABLE `destoon_special_11` (
   `edittime` int(10) unsigned NOT NULL default '0',
   `ip` varchar(50) NOT NULL default '',
   `template` varchar(30) NOT NULL default '0',
-  `template_type` varchar(30) NOT NULL,
   `status` tinyint(1) NOT NULL default '0',
   `islink` tinyint(1) unsigned NOT NULL default '0',
   `linkurl` varchar(255) NOT NULL default '',
@@ -39,15 +37,15 @@ CREATE TABLE `destoon_special_11` (
   KEY `catid` (`catid`)
 ) TYPE=MyISAM COMMENT='专题';
 
-DROP TABLE IF EXISTS `destoon_special_data_11`;
-CREATE TABLE `destoon_special_data_11` (
+DROP TABLE IF EXISTS `destoon_special_data`;
+CREATE TABLE `destoon_special_data` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` longtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='专题内容';
 
-DROP TABLE IF EXISTS `destoon_special_item_11`;
-CREATE TABLE `destoon_special_item_11` (
+DROP TABLE IF EXISTS `destoon_special_item`;
+CREATE TABLE `destoon_special_item` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `specialid` bigint(20) unsigned NOT NULL default '0',
   `typeid` bigint(20) unsigned NOT NULL default '0',

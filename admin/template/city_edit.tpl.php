@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,7 +7,8 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">分站添加</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所在地区</td>
 <td class="tr"><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?> <span id="dareaid" class="f_red"></span></td>
@@ -22,7 +23,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> IP地址名称</td>
-<td><input name="post[iparea]" type="text" size="60" value="<?php echo $iparea;?>"/><?php tips('一般为常见城市名称，多个地名用|分隔。例如开通的是广东分站，可以填写广州|深圳|佛山等，系统将根据这些名称按IP地址自动跳转分站');?></td>
+<td><input name="post[iparea]" type="text" size="60" value="<?php echo $iparea;?>"/><?php tips('一般为常见城市名称，多个地名用|分割。例如开通的是广东分站，可以填写广州|深圳|佛山等，系统将根据这些名称按IP地址自动跳转分站');?></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 字母索引</td>
@@ -50,7 +51,9 @@ show_menu($menus);
 <td><textarea name="post[seo_description]" cols="60" rows="3" id="seo_description"><?php echo $seo_description;?></textarea></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $areaid ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $areaid ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+
+
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -65,5 +68,5 @@ function check() {
 	return true;
 }
 </script>
-<script type="text/javascript">Menuon(<?php echo $areaid ? 1 : 0;?>);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

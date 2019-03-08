@@ -1,14 +1,10 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-if($DT_BOT) dhttp(403);
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 switch($action) {
 	case 'search':
 		if(check_name($homepage) && in_array($file, array('sell', 'buy', 'news', 'credit', 'job', 'price', 'photo', 'info', 'brand', 'video', 'mall')) && $kw) {
-			$user = userinfo($homepage);
-			$domain = $user['domain'];
-			if($domain) $DT['rewrite'] = intval($CFG['com_rewrite']);
-			dheader(userurl($homepage, 'file='.$file.'&kw='.urlencode($kw), $domain));
+			dheader(userurl($homepage, 'file='.$file.'&kw='.urlencode($kw)));
 		}
 	break;
 	case 'message':
@@ -23,7 +19,7 @@ switch($action) {
 			exit;
 		}
 		$HSPATH = $MODULE[4]['linkurl'].'/skin/'.$skin.'/';
-		$company = $truename = $telephone = $email = $qq = $wx = $ali = $skype = '';
+		$company = $truename = $telephone = $email = $qq = $msn = $ali = $skype = '';
 		if($_userid) {
 			$user = userinfo($_username);
 			$company = $user['company'];
@@ -31,7 +27,7 @@ switch($action) {
 			$telephone = $user['telephone'] ? $user['telephone'] : $user['mobile'];
 			$email = $user['mail'] ? $user['mail'] : $user['email'];
 			$qq = $user['qq'];
-			$wx = $user['wx'];
+			$msn = $user['msn'];
 			$ali = $user['ali'];
 			$skype = $user['skype'];
 		}
@@ -42,7 +38,7 @@ switch($action) {
 		in_array($job, array('inquiry', 'order', 'guestbook', 'price')) or exit;
 		require DT_ROOT.'/include/post.func.php';
 		include load('misc.lang');
-		$today = $today_endtime - 86400;
+		$today = strtotime(timetodate($DT_TIME, 3).' 00:00:00');
 		$sql = $_userid ? "fromuser='$_username'" : "ip='$DT_IP'";
 		if($job == 'inquiry') {
 			if($MG['inquiry_limit']) {
@@ -62,28 +58,28 @@ switch($action) {
 		}
 		$msg = captcha($captcha, 1, true);
 		if($msg) dalert($msg);
-		$title = dhtmlspecialchars(trim($title));
+		$title = htmlspecialchars(trim($title));
 		if(!$title) dalert($L['msg_type_title']);
-		$content = dhtmlspecialchars(trim($content));
+		$content = htmlspecialchars(trim($content));
 		if(!$content) dalert($L['msg_type_content']);
-		$truename = dhtmlspecialchars(trim($truename));
+		$truename = htmlspecialchars(trim($truename));
 		if(!$truename)  dalert($L['msg_type_truename']);
-		$telephone = dhtmlspecialchars(trim($telephone));
+		$telephone = htmlspecialchars(trim($telephone));
 		if(!$telephone) message($L['msg_type_telephone']);
-		$company = dhtmlspecialchars(trim($company));
-		$email = dhtmlspecialchars(trim($email));
-		$qq = dhtmlspecialchars(trim($qq));
-		$wx = dhtmlspecialchars(trim($wx));
-		$ali = dhtmlspecialchars(trim($ali));
-		$skype = dhtmlspecialchars(trim($skype));
+		$company = htmlspecialchars(trim($company));
+		$email = htmlspecialchars(trim($email));
+		$qq = htmlspecialchars(trim($qq));
+		$msn = htmlspecialchars(trim($msn));
+		$ali = htmlspecialchars(trim($ali));
+		$skype = htmlspecialchars(trim($skype));
 		$content = nl2br($content);
 		if($company) $content .= '<br/>'.$L['content_company'].$company;
 		if($truename) $content .= '<br/>'.$L['content_truename'].$truename;
 		if($telephone) $content .= '<br/>'.$L['content_telephone'].$telephone;
 		if(is_email($email)) $content .= '<br/>'.$L['content_email'].$email;
-		if(is_qq($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
-		if(is_wx($wx)) $content .= '<br/>'.$L['content_wx'].' '.im_wx($wx, $_username).' '.$wx;
+		if(is_numeric($qq)) $content .= '<br/>'.$L['content_qq'].' '.im_qq($qq).' '.$qq;
 		if($ali) $content .= '<br/>'.$L['content_ali'].' '.im_ali($ali).' '.$ali;
+		if(is_email($msn)) $content .= '<br/>'.$L['content_msn'].' '.im_msn($msn).' '.$msn;
 		if($skype) $content .= '<br/>'.$L['content_skype'].' '.im_skype($skype).' '.$skype;
 		if($job != 'guestbook') $content .= '<br/>'.$L['content_from'];
 		if($job == 'guestbook') {
@@ -102,20 +98,20 @@ switch($action) {
 	case 'next':
 		$itemid or dheader($MOD['linkurl']);
 		check_name($username) or dheader($MOD['linkurl']);
-		$user = userinfo($username);
-		$domain = $user['domain'];
+		$t = $db->get_one("SELECT domain FROM {$DT_PRE}company WHERE username='$username'");
+		$domain = $t ? $t['domain'] : '';
 		if($domain) $DT['rewrite'] = intval($CFG['com_rewrite']);
-		$r = $db->get_one("SELECT itemid FROM {$DT_PRE}sell_5 WHERE username='$username' AND itemid>$itemid AND status=3 ORDER BY itemid ASC");
+		$r = $db->get_one("SELECT itemid FROM {$DT_PRE}sell WHERE username='$username' AND itemid>$itemid");
 		if($r) dheader(userurl($username, 'file=sell&itemid='.$r['itemid'], $domain));
 		dheader(userurl($username, 'file=sell', $domain));
 	break;
 	case 'prev':
 		$itemid or dheader($MOD['linkurl']);
 		check_name($username) or dheader($MOD['linkurl']);
-		$user = userinfo($username);
-		$domain = $user['domain'];
+		$t = $db->get_one("SELECT domain FROM {$DT_PRE}company WHERE username='$username'");
+		$domain = $t ? $t['domain'] : '';
 		if($domain) $DT['rewrite'] = intval($CFG['com_rewrite']);
-		$r = $db->get_one("SELECT itemid FROM {$DT_PRE}sell_5 WHERE username='$username' AND itemid<$itemid AND status=3 ORDER BY itemid DESC");
+		$r = $db->get_one("SELECT itemid FROM {$DT_PRE}sell WHERE username='$username' AND itemid<$itemid ORDER BY itemid DESC");
 		if($r) dheader(userurl($username, 'file=sell&itemid='.$r['itemid'], $domain));
 		dheader(userurl($username, 'file=sell', $domain));
 	break;

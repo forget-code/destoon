@@ -1,14 +1,14 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
+    array('标签向导', '?file='.$file),
     array('重建缓存', '?file='.$file.'&action=cache'),
     array('模板管理', '?file=template'),
-    array('风格管理', '?file=skin'),
-    array('标签向导', '?file='.$file),
+    array('风格管理', '?file=template'),
 );
 switch($action) {
 	case 'cache':
@@ -16,7 +16,7 @@ switch($action) {
 		dmsg('更新成功', '?file='.$file);
 	break;
 	case 'find':
-		$mid or $mid = '';
+		$mid = isset($mid) ? intval($mid) : '';
 		$tb = isset($tb) ? trim($tb) : '';
 		if(isset($MODULE[$mid]) && $mid > 3) {
 			$table = get_table($mid);
@@ -29,7 +29,6 @@ switch($action) {
 	break;
 	case 'dict':
 		(isset($table) && $table) or exit;
-		$table = strip_sql($table, 0);
 		if(strpos($table, $DT_PRE) === false) {
 			$rtable = $table;
 		} else {
@@ -78,32 +77,13 @@ switch($action) {
 		if($tag_html_s) $tag_html_s = stripslashes($tag_html_s); 
 		if($tag_html_e) $tag_html_e = stripslashes($tag_html_e); 
 		if($tag_code) $tag_code = stripslashes($tag_code); 
+		if($tag_js) $tag_js = stripslashes($tag_js); 
 		$code_eval = $code_call = $code_html = '';
 		if($tag_css) $code_eval .= '<style type="text/css">'."\n".''.$tag_css.''."\n".'</style>'."\n";
 		if($tag_html_s) $code_eval .= $tag_html_s."\n";
 		$code_call = $code_eval;
 		$code_call .= $tag_code."\n";
-		$tag_code = str_replace('<!--{', '', $tag_code);
-		$tag_code = str_replace('}-->', '', $tag_code);
-		if(strpos($tag_code, '",') !== false) {
-			$tag_code = str_replace(', '.$tag_expires.')', ', -1)', $tag_code);
-		} else {
-			$tag_code = str_replace('")', '", -1)', $tag_code);
-		}
-		$tag_code .= ';';
-		$tag_pass = 1;
-		if(substr($tag_code, 0, 5) != 'tag("') $tag_pass = 0;
-		if(substr($tag_code, -7) != '", -1);') $tag_pass = 0;
-		$tag_safe = substr($tag_code, 5, -7);
-		foreach(array('(', '`', ',', ';') as $v) {
-			if(strpos($tag_safe, $v) !== false) {
-				$tag_pass = 0;
-				break;
-			}
-		}
-		$tag_pass or msg('标签内容包含不安全写法，禁止在线预览');
-		$tag_md5 = md5($tag_safe);
-		$tag_js = '<script type="text/javascript" charset="'.DT_CHARSET.'" src="'.DT_PATH.'api/js.php?auth='.encrypt($tag_safe).'&key=0'.$tag_md5.'&'.$tag_safe.'"></script>';
+		$tag_code = str_replace(array('<!--{', '}-->', $tag_expires ? ', '.$tag_expires.')' : ')'), array('', '', ', -1)'), $tag_code).';';//Do Not Cache
 		ob_start();
 		eval($tag_code);
 		$contents = ob_get_contents();
@@ -113,13 +93,6 @@ switch($action) {
 			$code_eval .= $tag_html_e;
 			$code_call .= $tag_html_e;
 		}
-		$t = str_replace('",', '&debug=1",', $tag_code);
-		ob_start();
-		eval($t);
-		$td = ob_get_contents();
-		ob_clean();
-		$t = explode('<br/>', $td);
-		$tag_debug = "参数:".$t[0]."\n语句:".$t[1];
 		$head_title = '标签预览';
 		include tpl('tag_preview');
 	break;
@@ -139,7 +112,7 @@ switch($action) {
 				$table_select .= '<option value="'.$table.'">'.($s['Comment'] ? $s['Comment'] : $table).'</option>';         
 			}
 		}
-		$mid or $mid = '';
+		$mid = isset($mid) ? intval($mid) : '';
 		include tpl('tag');
 	break;
 }

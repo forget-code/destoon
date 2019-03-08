@@ -16,9 +16,8 @@ if(isset($_REQUEST['code'])) {
 }
 if($token) {
 	$_SESSION['token'] = $token;
-	setcookie('weibojs_'.$o->client_id, http_build_query($token));
-	if($OAUTH[$site]['sync']) set_cookie('sina_token', $token['access_token'], $DT_TIME + $token['expires_in']);
-	dheader('index.php?time='.$DT_TIME);
+	set_cookie( 'weibojs_'.$o->client_id, http_build_query($token));
+	dheader('./');
 } else {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);
 }

@@ -1,19 +1,25 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<form action="?" target="_blank" id="check_title">
+<input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
+<input type="hidden" name="file" value="<?php echo $file;?>"/>
+<input type="hidden" name="kw" value="" id="kw"/>
+</form>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 问题分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?>
- <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
+<br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> <?php echo $MOD['name'];?>标题</td>
@@ -30,6 +36,7 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
+<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -38,7 +45,7 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 问题说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -89,7 +96,7 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <?php if($DT['city']) { ?>
 <tr>
@@ -117,7 +124,7 @@ var property_admin = 1;
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php if($action == 'add') { ?>
@@ -126,10 +133,10 @@ var property_admin = 1;
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>
@@ -150,7 +157,16 @@ function check() {
 		return false;
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	<?php echo $CP ? property_js() : '';?>
+	if(Dd('property_require') != null) {
+		var ptrs = Dd('property_require').getElementsByTagName('option');
+		for(var i = 0; i < ptrs.length; i++) {		
+			f = 'property-'+ptrs[i].value;
+			if(Dd(f).value == 0 || Dd(f).value == '') {
+				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 </script>

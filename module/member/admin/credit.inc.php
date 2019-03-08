@@ -1,19 +1,12 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-isset($username) or $username = '';
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
-    array($DT['credit_name'].'奖惩', '?moduleid='.$moduleid.'&file='.$file.'&username='.$username.'&action=add'),
-    array($DT['credit_name'].'流水', '?moduleid='.$moduleid.'&file='.$file.'&username='.$username),
-    array('记录清理', '?moduleid='.$moduleid.'&file='.$file.'&action=clear', 'onclick="if(!confirm(\'为了系统安全,系统仅删除90天之前的记录\n此操作不可撤销，请谨慎操作\')) return false"'),
+    array($DT['credit_name'].'奖惩', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
+    array($DT['credit_name'].'记录', '?moduleid='.$moduleid.'&file='.$file),
 );
 $BANKS = explode('|', trim($MOD['pay_banks']));
 $table = $DT_PRE.'finance_credit';
 switch($action) {
-	case 'clear':
-		$time = $today_endtime - 90*86400;
-		$db->query("DELETE FROM {$table} WHERE addtime<$time");
-		dmsg('清理成功', $forward);
-	break;
 	case 'add':
 		if($submit) {
 			$username or msg('请填写会员名');
@@ -42,9 +35,10 @@ switch($action) {
 				credit_add($username, $amount);
 				credit_record($username, $amount, $_username, $reason, $note);
 			}
-			if($error) msg('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
+			if($error) message('操作成功 '.$success.' 位会员，发生以下错误：'.$error);
 			dmsg('操作成功', '?moduleid='.$moduleid.'&file='.$file);
 		} else {
+			isset($username) or $username = '';
 			if(isset($userid)) {
 				if($userid) {
 					$userids = is_array($userid) ? implode(',', $userid) : $userid;					
@@ -69,11 +63,11 @@ switch($action) {
 		$sorder  = array('排序方式', '金额降序', '金额升序', '时间降序', '时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'addtime DESC', 'addtime ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
-		(isset($username) && check_name($username)) or $username = '';
-		$fromdate = isset($fromdate) ? $fromdate : '';
-		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
-		$todate = isset($todate) ? $todate : '';
-		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
+		isset($username) or $username = '';
+		isset($fromtime) or $fromtime = '';
+		isset($totime) or $totime = '';
+		isset($dfromtime) or $dfromtime = '';
+		isset($dtotime) or $dtotime = '';
 		isset($type) or $type = 0;
 		isset($mtype) or $mtype = 'amount';
 		isset($minamount) or $minamount = '';
@@ -84,20 +78,15 @@ switch($action) {
 		$order_select = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($fromtime) $condition .= " AND addtime>=$fromtime";
-		if($totime) $condition .= " AND addtime<=$totime";
+		if($fromtime) $condition .= " AND addtime>".(strtotime($fromtime.' 00:00:00'));
+		if($totime) $condition .= " AND addtime<".(strtotime($totime.' 23:59:59'));
 		if($type) $condition .= $type == 1 ? " AND amount>0" : " AND amount<0";
 		if($username) $condition .= " AND username='$username'";
 		if($itemid) $condition .= " AND itemid=$itemid";
 		if($minamount != '') $condition .= " AND $mtype>=$minamount";
 		if($maxamount != '') $condition .= " AND $mtype<=$maxamount";
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$records = array();
 		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY $dorder[$order] LIMIT $offset,$pagesize");
 		$income = $expense = 0;

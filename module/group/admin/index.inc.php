@@ -1,13 +1,13 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
-$do = new $module($moduleid);
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/group.class.php';
+$do = new group($moduleid);
 $menus = array (
     array('添加'.$MOD['name'], '?moduleid='.$moduleid.'&action=add'),
     array($MOD['name'].'列表', '?moduleid='.$moduleid),
     array('审核'.$MOD['name'], '?moduleid='.$moduleid.'&action=check'),
-    array('已过期', '?moduleid='.$moduleid.'&action=expire'),
-    array('未通过', '?moduleid='.$moduleid.'&action=reject'),
+    array('过期'.$MOD['name'], '?moduleid='.$moduleid.'&action=expire'),
+    array('未通过'.$MOD['name'], '?moduleid='.$moduleid.'&action=reject'),
     array('回收站', '?moduleid='.$moduleid.'&action=recycle'),
     array('移动分类', '?moduleid='.$moduleid.'&action=move'),
 );
@@ -24,10 +24,10 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊', '标题', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', '编辑', 'IP', '文件路径', '内容模板');
-	$dfields = array('keyword', 'title', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'editor', 'ip', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '订单数量降序', '订单数量升序', '销售量降序', '销售量升序', '团购价降序', '团购价升序', '市场价降序', '市场价升序', '节省费用降序', '节省费用升序', '享受折扣降序', '享受折扣升序', '最多人数降序', '最多人数升序', '最低人数降序', '最低人数升序', '浏览人次降序', '浏览人次升序', '评论数量降序', '评论数量升序', '更新时间降序', '更新时间升序', VIP.'级别降序', VIP.'级别升序', '添加时间降序', '添加时间升序', '结束时间降序', '结束时间升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'orders DESC', 'orders ASC', 'sales DESC', 'sales ASC', 'price DESC', 'price ASC', 'marketprice DESC', 'marketprice ASC', 'savemoney DESC', 'savemoney ASC', 'discount DESC', 'discount ASC', 'amount DESC', 'amount ASC', 'minamount DESC', 'minamount ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'edittime DESC', 'edittime ASC', 'vip DESC', 'vip ASC', 'addtime DESC', 'addtime ASC', 'endtime DESC', 'endtime ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊','标题', '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', 'IP');
+	$dfields = array('keyword','title', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'ip');
+	$sorder  = array('结果排序方式', '订单数量降序', '订单数量升序', '销售量降序', '销售量升序', '团购价降序', '团购价升序', '市场价降序', '市场价升序', '节省费用降序', '节省费用升序', '享受折扣降序', '享受折扣升序', '最多人数降序', '最多人数升序', '最低人数降序', '最低人数升序', '浏览人次降序', '浏览人次升序', '更新时间降序', '更新时间升序', VIP.'级别降序', VIP.'级别升序', '添加时间降序', '添加时间升序', '结束时间降序', '结束时间升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'orders DESC', 'orders ASC', 'sales DESC', 'sales ASC', 'price DESC', 'price ASC', 'marketprice DESC', 'marketprice ASC', 'savemoney DESC', 'savemoney ASC', 'discount DESC', 'discount ASC', 'amount DESC', 'amount ASC', 'minamount DESC', 'minamount ASC', 'hits DESC', 'hits ASC', 'edittime DESC', 'edittime ASC', 'vip DESC', 'vip ASC', 'addtime DESC', 'addtime ASC', 'endtime DESC', 'endtime ASC', 'itemid DESC', 'itemid ASC');
 	$_process = array(
 	'<span style="color:#008000;">[成团中]</span>',
 	'<span style="color:#0000FF;">[团购中]</span>',
@@ -39,9 +39,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	isset($order) && isset($dorder[$order]) or $order = 0;
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime', 'endtime')) or $datetype = 'addtime';
-	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
+	$fromdate = isset($fromdate) && preg_match("/^([0-9]{8})$/", $fromdate) ? $fromdate : '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	(isset($todate) && is_date($todate)) or $todate = '';
+	$todate = isset($todate) && preg_match("/^([0-9]{8})$/", $todate) ? $todate : '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 	
 	$minprice = isset($minprice) ? dround($minprice) : '';
@@ -69,7 +69,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$itemid or $itemid = '';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level, 'all');
+	$level_select = level_select('level', '级别', $level);
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -79,7 +79,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 
-	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
+	if($level) $condition .= " AND level=$level";
 	if($minprice)  $condition .= " AND price>=$minprice";
 	if($maxprice)  $condition .= " AND price<=$maxprice";
 	if($minmarketprice)  $condition .= " AND marketprice>=$minmarketprice";
@@ -107,7 +107,6 @@ switch($action) {
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
 				dmsg('添加成功', '?moduleid='.$moduleid.'&action='.$action);
 			} else {
 				msg($do->errmsg);
@@ -123,6 +122,7 @@ switch($action) {
 			$username = $_username;
 			$item = array();
 			$menuid = 0;
+			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -138,9 +138,9 @@ switch($action) {
 			if($do->pass($post)) {
 				if($FD) fields_check($post_fields);
 				if($CP) property_check($post_ppt);
+				$do->edit($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				$do->edit($post);
 				dmsg('修改成功', $forward);
 			} else {
 				msg($do->errmsg);
@@ -152,6 +152,7 @@ switch($action) {
 			$totime = $totime ? timetodate($totime, 3) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
+			$tname = '修改'.$MOD['name'];
 			include tpl($action, $module);
 		}
 	break;
@@ -167,7 +168,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 6;
-			include tpl($action);
+			include tpl($action, $module);
 		}
 	break;
 	case 'update':
@@ -182,7 +183,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('生成成功', $forward);
+		dmsg('更新成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择商品');

@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 require 'common.inc.php';
@@ -8,30 +8,25 @@ $username = $domain = '';
 if(isset($homepage) && check_name($homepage)) {
 	$username = $homepage;
 } else if(!$cityid) {
-	$host = get_env('host');
+	$host = $_SERVER['HTTP_HOST'];
 	if(substr($host, 0, 4) == 'www.') {
 		$whost = $host;
 		$host = substr($host, 4);
 	} else {
 		$whost = $host;
 	}
-	if($host && strpos(DT_PATH, $host) === false) {
-		if(substr($host, -strlen($CFG['com_domain'])) == $CFG['com_domain']) {
-			$www = substr($host, 0, -strlen($CFG['com_domain']));
-			if(check_name($www)) {
-				$username = $homepage = $www;
-			} else {
-				include load('company.lang');
-				$head_title = $L['not_company'];
-				if($DT_BOT) dhttp(404, $DT_BOT);
-				include template('com-notfound', 'message');
-				exit;
-			}
+	if(strpos(DT_PATH, $host) === false) {
+		$www = str_replace($CFG['com_domain'], '', $host);
+		if(check_name($www)) {
+			$username = $homepage = $www;
 		} else {
 			if($whost == $host) {//301 xxx.com to www.xxx.com
 				$w3 = 'www.'.$host;
 				$c = $db->get_one("SELECT userid FROM {$DT_PRE}company WHERE domain='$w3'");
-				if($c) d301('http://'.$w3);
+				if($c) {
+					@header("HTTP/1.1 301 Moved Permanently");
+					dheader('http://'.$w3);
+				}
 			}
 			$c = $db->get_one("SELECT username,domain FROM {$DT_PRE}company WHERE domain='$whost'".($host == $whost ? '' : " OR domain='$host'"), 'CACHE');
 			if($c) {
@@ -55,20 +50,19 @@ if($username) {
 		foreach($safe_domain as $v) {
 			if(strpos($DT_URL, $v) !== false) { $pass_domain = true; break; }
 		}
-		$pass_domain or dhttp(404);
+		$pass_domain or exit(header("HTTP/1.1 404 Not Found"));
 	}
 	if($DT['index_html']) {
 		$html_file = $CFG['com_dir'] ? DT_ROOT.'/'.$DT['index'].'.'.$DT['file_ext'] : DT_CACHE.'/index.inc.html';
-		if(!is_file($html_file)) tohtml('index');		
-		if(is_file($html_file)) exit(include($html_file));
+		if(!is_file($html_file)) tohtml('index');
+		include($html_file);
+		exit;
 	}
+	$destoon_task = '';
 	$AREA or $AREA = cache_read('area.php');
-	if($EXT['mobile_enable']) $head_mobile = DT_MOB;
-	$index = 1;
 	$seo_title = $DT['seo_title'];
 	$head_keywords = $DT['seo_keywords'];
 	$head_description = $DT['seo_description'];
-	$CSS = array('index');
 	if($city_template) {
 		include template($city_template, 'city');
 	} else {		

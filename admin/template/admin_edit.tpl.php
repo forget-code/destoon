@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -8,7 +8,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="userid" value="<?php echo $userid;?>"/>
 <input type="hidden" name="username" value="<?php echo $user['username'];?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">修改管理员</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 会员名</td>
 <td><a href="javascript:_user('<?php echo $user['username'];?>');" class="t">[<?php echo $user['username'];?>]</a> <span id="dusername" class="f_red"></span></td>
@@ -32,7 +33,7 @@ show_menu($menus);
 <td><input type="text" size="20" name="role" id="role" value="<?php echo $user['role'];?>"/> <span class="f_gray">可以为角色名称，例如编辑、美工、某分站编辑等，也可以为该管理员的备注</span></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn-g"></div>
+<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn"></div>
 </form>
 <script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

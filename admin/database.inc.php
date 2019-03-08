@@ -1,13 +1,13 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/include/sql.func.php';
 $menus = array (
-    array('数据备份', '?file='.$file),
-    array('数据恢复', '?file='.$file.'&action=import'),
+    array('数据库备份', '?file='.$file),
+    array('数据库恢复', '?file='.$file.'&action=import'),
     array('字符替换', '?file='.$file.'&action=replace'),
     array('执行SQL', '?file='.$file.'&action=execute'),
     array('显示进程', '?file='.$file.'&action=process'),
@@ -17,26 +17,33 @@ $menus = array (
 $this_forward = '?file='.$file;
 $D = DT_ROOT.'/file/backup/';
 isset($dir) or $dir = '';
-isset($table) or $table = '';
-if($table) $table = strip_sql($table, 0);
 switch($action) {
 	case 'repair':
-		$DT['close'] or msg('为了数据安全，此操作必须在网站设置里关闭网站');
-		$table or msg('Table为空');
-		$db->query("REPAIR TABLE `$table`");
+		if(!$tables) msg();
+		if(is_array($tables)) {
+			foreach($tables as $table) {
+				$db->query("REPAIR TABLE `$table`");
+			}
+		} else {
+			$db->query("REPAIR TABLE `$tables`");
+		}
 		dmsg('修复成功', $this_forward);
 	break;
 	case 'optimize':
-		$DT['close'] or msg('为了数据安全，此操作必须在网站设置里关闭网站');
-		$table or msg('Table为空');
-		$db->query("OPTIMIZE TABLE `$table`");
+		if(!$tables) msg();
+		if(is_array($tables)) {
+			foreach($tables as $table) {
+				$db->query("OPTIMIZE TABLE `$table`");
+			}
+		} else {
+			$db->query("OPTIMIZE TABLE `$tables`");
+		}
 		dmsg('优化成功', $this_forward);
 	break;
 	case 'drop':
 		if(!$tables) msg();
 		if(is_array($tables)) {
 			foreach($tables as $table) {
-				$table = strip_sql($table, 0);
 				if(strpos($table, $DT_PRE) === false) $db->query("DROP TABLE `$table`");
 			}
 		}
@@ -49,7 +56,7 @@ switch($action) {
 				msg('SQL语句为空');
 			} else {
 				$sql = stripslashes($sql);
-				$sql = strip_sql($sql, 0);
+				if(preg_match("/DROP(.*)(TABLE|DATABASE)/i", $sql)) msg('系统禁止DROP语句');				
 				sql_execute($sql);
 				dmsg('执行成功', '?file='.$file.'&action=execute');
 			}
@@ -59,23 +66,16 @@ switch($action) {
 	break;
 	case 'process':
 		$lists = array();
-		$result = $db->query("SHOW FULL PROCESSLIST");
+		$result = $db->query("SHOW PROCESSLIST");
 		while($r = $db->fetch_array($result)) {
 			$lists[] = $r;
 		}
 		include tpl('database_process');
 	break;
 	case 'kill':
+		$id = isset($id) ? intval($id) : 0;
 		$db->halt = 0;
-		if($itemid) {
-			if(is_array($itemid)) {
-				foreach($itemid as $id) {
-					$db->query("KILL $id");
-				}
-			} else {
-				$db->query("KILL $itemid");
-			}
-		}
+		if($id) $db->query("KILL $id");
 		dmsg('结束成功', '?file='.$file.'&action=process');
 	break;
 	case 'comments':
@@ -86,7 +86,7 @@ switch($action) {
 			$db->query($sql);
 		}
 		foreach($MODULE as $k=>$v) {
-			if(in_array($v['module'], array('article', 'brand', 'buy', 'down', 'info', 'photo', 'sell', 'video'))) {
+			if(in_array($v['module'], array('article', 'info'))) {
 				$sql = "ALTER TABLE `".$DT_PRE.$v['module']."_".$v['moduleid']."` COMMENT='".$v['name']."'";
 				$db->query($sql);
 				$sql = "ALTER TABLE `".$DT_PRE.$v['module']."_data_".$v['moduleid']."` COMMENT='".$v['name']."内容'";
@@ -100,7 +100,7 @@ switch($action) {
 		if($submit) {
 			$name = trim($name);
 			$db->query("ALTER TABLE `{$table}` COMMENT='{$name}'");
-			dmsg('修改成功', '?file='.$file.'&action='.$action.'&table='.$table.'&note='.urlencode($name));
+			dmsg('修改成功', '?file='.$file);
 		} else {
 			include tpl('database_comment');
 		}
@@ -133,18 +133,55 @@ switch($action) {
 	break;
 	case 'move':
 		if($submit) {
-			($fmid > 0 && $tmid > 0 && $fmid != $tmid) or msg('来源模块或目标模块设置错误');
-			$catid or msg('请选择新分类');
 			$condition = str_replace('and', 'AND', trim($condition));
 			$condition = strpos($condition, 'AND') === false ? "itemid IN ($condition)" : substr($condition, 3);
-			$condition = stripslashes($condition);
-			$condition or msg('请填写转移条件');
+			if($type == 1) {
+				$ftb = $DT_PRE.'sell';
+				$ftb_data = $DT_PRE.'sell_data';
+				$fmid = 5;
+				$ttb = $DT_PRE.'buy';
+				$ttb_data = $DT_PRE.'buy_data';
+				$tmid = 6;
+			} else if($type == 2) {
+				$ftb = $DT_PRE.'buy';
+				$ftb_data = $DT_PRE.'buy_data';
+				$fmid = 6;
+				$ttb = $DT_PRE.'sell';
+				$ttb_data = $DT_PRE.'sell_data';
+				$tmid = 5;
+			} else if($type == 5) {
+				$ftb = $DT_PRE.'sell';
+				$ftb_data = $DT_PRE.'sell_data';
+				$fmid = 5;
+				$ttb = $DT_PRE.'mall';
+				$ttb_data = $DT_PRE.'mall_data';
+				$tmid = 16;
+			} else if($type == 6) {
+				$ftb = $DT_PRE.'mall';
+				$ftb_data = $DT_PRE.'mall_data';
+				$fmid = 16;
+				$ttb = $DT_PRE.'sell';
+				$ttb_data = $DT_PRE.'sell_data';
+				$tmid = 5;
+			} else if($type == 3) {
+				$ftb = $DT_PRE.'article_'.$afid;
+				$ftb_data = $DT_PRE.'article_data_'.$afid;
+				$fmid = $afid;
+				$ttb = $DT_PRE.'article_'.$atid;
+				$ttb_data = $DT_PRE.'article_data_'.$atid;
+				$tmid = $atid;
+			} else if($type == 4) {
+				$ftb = $DT_PRE.'info_'.$ifid;
+				$ftb_data = $DT_PRE.'info_data_'.$ifid;
+				$fmid = $ifid;
+				$ttb = $DT_PRE.'info_'.$itid;
+				$ttb_data = $DT_PRE.'info_data_'.$itid;
+				$tmid = $itid;
+			} else {
+				message('请选择转移类型');
+			}
 			$i = 0;
 			$fs = array();
-			$ftb = get_table($fmid);
-			$ftb_data = get_table($fmid, 1);
-			$ttb = get_table($tmid);
-			$ttb_data = get_table($tmid, 1);
 			$result = $db->query("SHOW COLUMNS FROM `$ttb`");
 			while($r = $db->fetch_array($result)) {
 				$fs[] = $r['Field'];
@@ -156,8 +193,8 @@ switch($action) {
 				$r['catid'] = $catid;
 				$r = daddslashes($r);
 				if(is_file(DT_CACHE.'/'.$fmid.'.part')) $ftb_data = split_table($fmid, $fid);
-				$t = $db->get_one("SELECT content FROM {$ftb_data} WHERE itemid=$fid");
-				$content = daddslashes($t['content']);			
+				$d = $db->get_one("SELECT content FROM {$ftb_data} WHERE itemid=$fid");
+				$content = daddslashes($d['content']);			
 				$sqlk = $sqlv = '';
 				foreach($r as $k=>$v) {
 					if($fs && !in_array($k, $fs)) continue;
@@ -168,7 +205,7 @@ switch($action) {
 				$db->query("INSERT INTO {$ttb} ($sqlk) VALUES ($sqlv)");
 				$tid = $db->insert_id();
 				if(is_file(DT_CACHE.'/'.$tmid.'.part')) $ttb_data = split_table($tmid, $tid);
-				$db->query("INSERT INTO {$ttb_data} (itemid,content)  VALUES ('$tid','$content')");
+				$db->query("INSERT INTO {$ttb_data} (itemid,content)  VALUES ('$tid', '$content')");
 				$linkurl = str_replace($fid, $tid, $r['linkurl']);
 				$db->query("UPDATE {$ttb} SET linkurl='$linkurl' WHERE itemid=$tid");
 				if($delete) {
@@ -179,7 +216,7 @@ switch($action) {
 				}
 				$i++;
 			}
-			msg('成功转移 '.$i.' 条数据', '?file='.$file.'&action='.$action, 2);
+			message('成功转移 '.$i.' 条数据', '?file='.$file.'&action='.$action, 2);
 		} else {
 			include tpl('database_move');
 		}
@@ -306,7 +343,7 @@ switch($action) {
 				$filename = $D.$filename.'.sql';
 				if(is_file($filename)) {
 					$sql = file_get($filename);
-					if(substr($sql, 0, 11) == '# DESTOON V') {
+					if(substr($sql, 0, 11) == '# Destoon V') {
 						$v = substr($sql, 11, 3);
 						if(DT_VERSION != $v) msg('由于数据结构存在差异，备份数据不可以跨版本导入<br/>备份版本：V'.$v.'<br/>当前系统：V'.DT_VERSION);
 					}
@@ -375,8 +412,6 @@ switch($action) {
 				$random = timetodate($DT_TIME, 'Y-m-d H.i.s').' '.strtolower(random(10));
 				$tsize = 0;
 				foreach($tables as $k=>$v) {
-					$v = strip_sql($v, 0);
-					$tables[$k] = $v;
 					$tsize += $sizes[$v];
 				}
 				$tid = ceil($tsize*1024/$sizelimit);
@@ -403,7 +438,7 @@ switch($action) {
 				$startfrom = 0;
 			}
 			if(trim($sqldump)) {
-				$sqldump = "# DESTOON V".DT_VERSION." R".DT_RELEASE." https://www.destoon.com\n# ".timetodate($DT_TIME, 6)."\n# --------------------------------------------------------\n\n\n".$sqldump;
+				$sqldump = "# Destoon V".DT_VERSION." R".DT_RELEASE." http://www.destoon.com\n# ".timetodate($DT_TIME, 6)."\n# --------------------------------------------------------\n\n\n".$sqldump;
 				$tableid = $i;
 				$filename = $random.'/'.$fileid.'.sql';
 				file_put($D.$filename, $sqldump);
@@ -416,21 +451,13 @@ switch($action) {
 			   msg('数据库备份成功', '?file='.$file.'&action=import');
 			}
 		} else {
-			$dtables = $tables = $C = $T = $S = array();
+			$dtables = $tables = $C = array();
 			$i = $j = $dtotalsize = $totalsize = 0;
 			$result = $db->query("SHOW TABLES FROM `".$CFG['db_name']."`");
-			while($r = $db->fetch_row($result)) {
-				if(!$r[0]) continue;
-				$T[$r[0]] = $r[0];
-			}
-			uksort($T, 'strnatcasecmp');
-			$result = $db->query("SHOW TABLE STATUS FROM `".$CFG['db_name']."`");
-			while($r = $db->fetch_array($result)) {
-				$S[$r['Name']] = $r;
-			}
-			foreach($T as $t) {
-				$r = $S[$t];
-				if(preg_match('/^'.$DT_PRE.'/', $t)) {
+			while($rr = $db->fetch_row($result)) {
+				if(!$rr[0]) continue;
+				$r = $db->get_one("SHOW TABLE STATUS FROM `".$CFG['db_name']."` LIKE '".$rr[0]."'");
+				if(preg_match('/^'.$DT_PRE.'/', $rr[0])) {
 					$dtables[$i]['name'] = $r['Name'];
 					$dtables[$i]['rows'] = $r['Rows'];
 					$dtables[$i]['size'] = round($r['Data_length']/1024/1024, 2);

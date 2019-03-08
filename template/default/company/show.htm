@@ -15,7 +15,7 @@
 		<ul>
 			<li class="f_b t_c" style="padding:3px 0 5px 0;font-size:16px;"><a href="{$member[linkurl]}" target="_blank">{$member[company]}</a></li>
 			{if $member[vip]}
-			<li class="f_orange" style="padding:5px 0 0 12px;"><img src="{DT_SKIN}image/vip_{$member[vip]}.gif" alt="{VIP}" title="{VIP}:{$member[vip]}级"/> [第{vip_year($member[fromtime])}年] 指数:{$member[vip]}</li>
+			<li class="f_orange" style="padding:5px 0 0 12px;"><img src="{DT_SKIN}image/vip.gif"/> <img src="{DT_SKIN}image/vip_{$member[vip]}.gif"/> [第{vip_year($member[fromtime])}年] 指数:{$member[vip]}</li>
 			{/if}
 			{if $member[validated] || $member[vcompany] || $member[vtruename] || $member[vbank] || $member[vmobile] || $member[vemail]}
 			<li class="f_green" style="padding-top:6px;padding-bottom:6px;">
@@ -24,15 +24,15 @@
 			{if $member[vbank]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_bank.gif" width="16" height="16" align="absmiddle" title="通过银行帐号认证"/>{/if}
 			{if $member[vmobile]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_mobile.gif" width="16" height="16" align="absmiddle" title="通过手机认证"/>{/if}
 			{if $member[vemail]}&nbsp;<img src="{$MODULE[2][linkurl]}image/v_email.gif" width="16" height="16" align="absmiddle" title="通过邮件认证"/>{/if}
-			{if $member[validated]}&nbsp;<img src="{DT_STATIC}file/image/check-ok.png" align="absmiddle"/> 企业资料通过{$member[validator]}认证{/if}
+			{if $member[validated]}&nbsp;<img src="{DT_SKIN}image/check_right.gif" align="absmiddle"/> 企业资料通过{$member[validator]}认证{/if}
 			</li>
 			{/if}
 			<li style="padding-top:6px;padding-bottom:6px;">
 			<span>联系人</span>{$member[truename]}({gender($member[gender])})&nbsp;{$member[career]}&nbsp;
 			{if $member[username] && $DT[im_web]}{im_web($member[username])}&nbsp;{/if}
 			{if $member[qq] && $DT[im_qq]}{im_qq($member[qq])}&nbsp;{/if}
-			{if $member[wx] && $DT[im_wx]}{im_wx($member[wx], $member[username])}&nbsp;{/if}
 			{if $member[ali] && $DT[im_ali]}{im_ali($member[ali])}&nbsp;{/if}
+			{if $member[msn] && $DT[im_msn]}{im_msn($member[msn])}&nbsp;{/if}
 			{if $member[skype] && $DT[im_skype]}{im_skype($member[skype])}&nbsp;{/if}
 			</li>
 			<li><span>会员</span> <a href="{$MODULE[2][linkurl]}friend.php?action=add&username={$username}">[加为商友]</a> <a href="{$MODULE[2][linkurl]}message.php?action=send&touser={$username}">[发送信件]</a></li>

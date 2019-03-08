@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/message.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/message.class.php';
 $menus = array (
     array('发送信件', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
     array('会员信件', '?moduleid='.$moduleid.'&file='.$file),
@@ -23,21 +23,6 @@ switch($action) {
 			}
 		} else {
 			isset($touser) or $touser = '';
-			$tousers = '';
-			if(isset($userid)) {
-				if($userid) {
-					$userids = is_array($userid) ? implode(',', $userid) : $userid;					
-					$result = $db->query("SELECT username FROM {$DT_PRE}member WHERE userid IN ($userids)");
-					while($r = $db->fetch_array($result)) {
-						if($r['username']) $tousers .= $r['username']."\n";
-					}
-				}
-			}
-			if($touser) {
-				if(strpos($touser, ',') !== false) $touser = explode(',', $touser);
-				$tousers .= is_array($touser) ? implode("\n", $touser) : $touser."\n";
-			}
-			if($tousers) $touser = str_replace("\n", ' ', trim($tousers));
 			include tpl('message_send', $module);
 		}
 	break;
@@ -79,7 +64,7 @@ switch($action) {
 			while($r = $db->fetch_array($result)) {
 				$m = $db->get_one("SELECT email FROM {$DT_PRE}member WHERE username='$r[touser]' AND groupid>4");
 				if(!$m) continue;
-				$linkurl = $MODULE[2]['linkurl'].'message.php?action=show&itemid='.$r['itemid'];
+				$linkurl = linkurl($MODULE[2]['linkurl'], 2).'message.php?action=show&itemid='.$r['itemid'];
 				$r['fromuser'] or $r['fromuser'] = '系统信使';
 				$r['content'] = $r['fromuser'].' 于 '.timetodate($r['addtime'], 5).' 向您发送一封站内信，内容如下：<br/><br/>'.$r['content'].'<br/><br/>原始地址：<a href="'.$linkurl.'" target="_blank">'.$linkurl.'</a><br/><br/>此邮件通过 <a href="'.DT_PATH.'" target="_blank">'.$DT['sitename'].'</a> 邮件系统发出<br/><br/>如果您不希望收到类似邮件，请经常登录网站查收站内信件或将未读信件标记为已读<br/><br/>';
 				send_mail($m['email'], $r['title'], $r['content']);
@@ -100,14 +85,14 @@ switch($action) {
 			include tpl('message_mail', $module);
 		}
 	break;
-	case 'system_delete':
-		$itemid or msg();
+	case '_delete':
+		if(!$itemid) msg();
 		$do->_delete($itemid);
 		dmsg('删除成功', $this_forward);
 	break;
 	case 'system':
 		$messages = array();
-		$result = $db->query("SELECT * FROM {$DT_PRE}message WHERE groupids<>'' ORDER BY itemid DESC");
+		$result = $db->query("SELECT * FROM {$DT_PRE}message WHERE groupids!='' ORDER BY itemid DESC");
 		while($r = $db->fetch_array($result)) {
 			$r['addtime'] = timetodate($r['addtime'], 5);
 			$r['group'] = '<select>';

@@ -36,23 +36,22 @@ foreach($main_order as $k=>$v) {
 $HMAIN = $_HMAIN;
 $seo_title = isset($HOME['seo_title']) && $HOME['seo_title'] ? $HOME['seo_title'] : '';
 $head_title = '';
-if($DT_PC) {
-	//
+if($CACHE_HOME) {
+	defined('TOHTML') or define('TOHTML', true);
+	ob_start();
+	include template('index', $template);
+	$data = ob_get_contents();
+	ob_clean();
+	file_put($CACHE_HOME, '<?php exit;?>'.$data);
+	echo $data;
 } else {
-	$background = (isset($HOME['background']) && $HOME['background']) ? $HOME['background'] : '';
-	$logo = (isset($HOME['logo']) && $HOME['logo']) ? $HOME['logo'] : ($COM['thumb'] ? $COM['thumb'] : 'static/img/home-logo.png');
-	$M = array();
-	foreach($MENU as $v) {
-		if(in_array($v['file'], array('introduce', 'news', 'credit', 'contact'))) continue;
-		$M[] = $v;
+	include template('index', $template);
+	if(isset($update) && $db->cache_ids && ($username == $_username || $_groupid == 1 || $domain)) {
+		foreach($db->cache_ids as $v) {
+			$dc->rm($v);
+		}
+		file_del(DT_CACHE.'/php/'.substr($username, 0, 2).'/'.$username.'.php');
+		dheader($COM['linkurl']);
 	}
-	$head_name = $L['com_home'];
-}
-include template('index', $template);
-if(isset($update) && $db->cache_ids && ($username == $_username || $_groupid == 1 || $domain)) {
-	foreach($db->cache_ids as $v) {
-		$dc->rm($v);
-	}
-	dheader($COM['linkurl']);
 }
 ?>

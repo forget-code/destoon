@@ -1,27 +1,26 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class dtype {
 	var $item;
+	var $db;
 	var $table;
 	var $cache = 0;
 
-	function __construct() {
-		$this->table = DT_PRE.'type';
-	}
-
 	function dtype() {
-		$this->__construct();
+		global $db;
+		$this->db = &$db;
+		$this->table = $this->db->pre.'type';
 	}
 
 	function get_list() {
 		$lists = array();
-		$result = DB::query("SELECT * FROM {$this->table} WHERE item='$this->item' ORDER BY listorder ASC,typeid DESC ");
-		while($r = DB::fetch_array($result)) {
-			$lists[$r['typeid']] = $r;
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE item='$this->item' ORDER BY listorder ASC,typeid DESC ");
+		while($r = $this->db->fetch_array($result)) {
+			$lists[] = $r;
 		}
 		return $lists;
 	}
@@ -41,43 +40,22 @@ class dtype {
 	}
 
 	function add($post) {
-		global $TYPE;
-		$post['typename'] = dhtmlspecialchars(trim(strip_tags($post['typename'])));
-		if(strlen($post['typename']) < 2) return false;
+		if(!$post['typename']) return false;
 		$post['listorder'] = intval($post['listorder']);
-		$post['parentid'] = intval($post['parentid']);
-		if($post['parentid'] && !isset($TYPE[$post['parentid']])) $post['parentid'] = 0;
-		$post['style'] = dhtmlspecialchars($post['style']);
-		DB::query("INSERT INTO {$this->table} (listorder,typename,style,parentid,item,cache) VALUES('$post[listorder]','$post[typename]','$post[style]','$post[parentid]','$this->item','$this->cache')");
+		$this->db->query("INSERT INTO {$this->table} (listorder,typename,style,item,cache) VALUES('$post[listorder]','$post[typename]','$post[style]','$this->item','$this->cache')");
 	}
 
 	function edit($post) {
-		global $TYPE;
 		foreach($post as $k=>$v) {
-			$v['typename'] = dhtmlspecialchars(trim(strip_tags($v['typename'])));
-			if(strlen($v['typename']) < 2) continue;
+			if(!$v['typename']) continue;
 			$v['listorder'] = intval($v['listorder']);
-			$v['parentid'] = intval($v['parentid']);
-			if($v['parentid'] == $k) continue;
-			if($v['parentid'] && !isset($TYPE[$v['parentid']])) continue;
-			$v['style'] = dhtmlspecialchars($v['style']);
-			$k = intval($k);
-			DB::query("UPDATE {$this->table} SET listorder='$v[listorder]',typename='$v[typename]',style='$v[style]',parentid='$v[parentid]' WHERE typeid='$k' AND item='$this->item'");
+			$this->db->query("UPDATE {$this->table} SET listorder='$v[listorder]',typename='$v[typename]',style='$v[style]' WHERE typeid='$k' AND item='$this->item'");
 		}
 	}
 
 	function delete($typeid) {
-		$typeid = intval($typeid);
-		DB::query("DELETE FROM {$this->table} WHERE typeid=$typeid AND item='$this->item'");
+		$this->db->query("DELETE FROM {$this->table} WHERE typeid=$typeid AND item='$this->item'");
 		if($this->cache) cache_type($this->item);
-	}
-
-	function parent_option($TYPE) {
-		$s = '';
-		foreach($TYPE as $v) {
-			if($v['parentid'] == 0) $s .= '<option value="'.$v['typeid'].'">'.$v['typename'].'</option>';
-		}
-		return $s;
 	}
 }
 ?>

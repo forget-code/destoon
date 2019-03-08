@@ -1,111 +1,56 @@
 {template 'header'}
-<script type="text/javascript">var module_id= {$moduleid},item_id={$itemid},content_id='content',img_max_width={$MOD[max_width]};</script>
-<div class="m">	
-	<div class="nav"><div><img src="{DT_SKIN}image/ico-like.png" class="share" title="加入收藏" onclick="SendFav({$moduleid}, {$itemid});"/><img src="{DT_SKIN}image/ico-share.png" class="share" title="分享好友" onclick="Dshare({$moduleid}, {$itemid});"/></div><a href="{$MODULE[1][linkurl]}">首页</a> <i>&gt;</i> <a href="{$MOD[linkurl]}">{$MOD[name]}</a> <i>&gt;</i> {cat_pos($CAT, ' <i>&gt;</i> ')} <i>&gt;</i> {$title}</div>
-</div>
-
 <div class="m">
-	<table cellpadding="0" cellspacing="0" width="100%">
-	<tr>
-	<td bgcolor="#000000" align="center"><div id="player">{template 'content', 'chip'}</div></td>
-	<td bgcolor="#333333" width="348" valign="top">
-	<div class="play-list">
-		{php $num = 2;}
-		{if $album}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and album='$album' and addtime>$addtime&order=addtime asc&pagesize=$num&template=null");}-->
-		{elseif $username}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and username='$username' and addtime>$addtime&order=addtime asc&pagesize=$num&template=null");}-->
-		{else}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and addtime>$addtime&catid=$catid&order=addtime asc&pagesize=$num&template=null");}-->
-		{/if}
-		{if $tags}
-		{loop array_reverse($tags) $i $t}
-		<div title="{$t[alt]}">
-			<a href="{$t[linkurl]}">
-			<img src="{$t[thumb]}" width="100" height="75" alt=""/>
-			<ul>
-			<li><p>{$t[alt]}</p></li>
-			<li><span>{$t[hits]}次播放</span></li>
-			</ul>
-			</a>
+<div class="m_l f_l">
+	<div class="left_box">		
+		<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; {cat_pos($CAT, ' &raquo; ')} &raquo; </div>
+		<h1 class="title">{$title}</h1>
+		<div class="info">
+		上传日期：{$adddate}
+		&nbsp;&nbsp;播放次数：<span id="hits">{$hits}</span>	
 		</div>
-		{/loop}
+		<div id="player">{template 'content', 'chip'}</div>
+		{if $content}
+		<div class="left_head">{$MOD[name]}介绍</div>
+		{if $CP}{template 'property', 'chip'}{/if}
+		<div class="content" id="content">{$content}</div>
+		<div class="b10">&nbsp;</div>
 		{/if}
-		<div title="{$title}" style="background:#0072C6;">
-			<a href="{$linkurl}">
-			<img src="{$thumb}" width="100" height="75" alt=""/>
-			<ul>
-			<li><p>{$title}</p></li>
-			<li><span>{$hits}次播放</span></li>
-			</ul>
-			</a>
-		</div>
-		{php $num = $num + $num - count($tags);}
-		{if $album}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and album='$album' and addtime<$addtime&order=addtime desc&pagesize=$num&template=null");}-->
-		{elseif $username}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and username='$username' and addtime<$addtime&order=addtime desc&pagesize=$num&template=null");}-->
-		{else}
-		<!--{php $tags=tag("moduleid=$moduleid&condition=status=3 and addtime<$addtime&catid=$catid&order=addtime desc&pagesize=$num&template=null");}-->
-		{/if}
-		{if $tags}
-		{loop $tags $i $t}
-		<div title="{$t[alt]}">
-			<a href="{$t[linkurl]}">
-			<img src="{$t[thumb]}" width="100" height="75" alt=""/>
-			<ul>
-			<li><p>{$t[alt]}</p></li>
-			<li><span>{$t[hits]}次播放</span></li>
-			</ul>
-			</a>
-		</div>
-		{/loop}
-		{/if}
-	</div>
-	</td>
-	</tr>
-	</table>
-</div>
-
-<div class="m">
-	<div class="info">
-	<span class="f_r">	
-	{if $keytags}
-	标签：
-	{loop $keytags $t}
-	<a href="{$MOD[linkurl]}{rewrite('search.php?kw='.urlencode($t))}" target="_blank" class="b">{$t}</a> &nbsp;&nbsp;
-	{/loop}
-	{/if}
-	{if $album}
-	专辑：
-	<a href="{$MOD[linkurl]}{rewrite('search.php?kw='.urlencode($album))}" target="_blank" class="b">{$album}</a>
-	{/if}
-	</span>
-	日期：{$adddate}&nbsp;&nbsp;&nbsp;&nbsp;
-	{if $MOD[hits]}播放：<span id="hits">{$hits}</span>&nbsp;&nbsp;&nbsp;&nbsp;{/if}
-	{if $could_comment}<a href="{$EXT[comment_url]}{rewrite('index.php?mid='.$moduleid.'&itemid='.$itemid)}">评论：{$comments}</a>&nbsp;&nbsp;&nbsp;&nbsp;{/if}
+		<form method="post" action="{$MODULE[2][linkurl]}sendmail.php" name="sendmail" id="sendmail" target="_blank">
+		<input type="hidden" name="itemid" value="{$itemid}"/> 
+		<input type="hidden" name="title" value="{$title}"/>
+		<input type="hidden" name="linkurl" value="{$linkurl}"/>
+		</form>
+		<center>
+		[ <a href="{$MOD[linkurl]}search.php">{$MOD[name]}搜索</a> ]&nbsp;
+		[ <script type="text/javascript">addFav('加入收藏');</script> ]&nbsp;
+		[ <a href="javascript:Dd('sendmail').submit();void(0);">告诉好友</a> ]&nbsp;
+		[ <a href="javascript:Print();">打印本文</a> ]&nbsp;
+		[ <a href="javascript:window.close()">关闭窗口</a> ]
+		</center>
+		<br/>
+		{template 'comment', 'chip'}
 	</div>
 </div>
-
-<div class="m o_h">		
-	{if $CP}{template 'property_show', 'chip'}{/if}
-	{if $content}<div class="content" id="content">{$content}</div>{/if}
-	{if $MOD[fee_award]}<div class="award"><div onclick="Go('{$MODULE[2][linkurl]}award.php?mid={$moduleid}&itemid={$itemid}');">打赏</div></div>{/if}
-	<div class="head-txt"><span><a href="{$MOD[linkurl]}{$CAT[linkurl]}">更多<i>&gt;</i></a></span><strong>推荐{$MOD[name]}</strong></div>
-	<div class="list-img list0"><!--{tag("moduleid=$moduleid&condition=status=3 and level>0&catid=$catid&areaid=$cityid&order=".$MOD[order]."&width=180&height=135&datetype=3&lazy=$lazy&template=list-video")}--></div>
-	{if $MOD[page_comment]}{template 'comment', 'chip'}{/if}
+<div class="m_n f_l">&nbsp;</div>
+	<div class="m_r f_l">
+		{if $tag}
+		<div class="box_head_1"><div><span class="f_r"><a href="{$MOD[linkurl]}{rewrite('search.php?kw='.urlencode($tag))}">更多..</a></span><strong>相关{$MOD[name]}</strong></div></div>
+		<div class="box_body li_video">
+		<!--{tag("moduleid=$moduleid&condition=status=3 and tag='$tag' and addtime>$addtime&areaid=$cityid&pagesize=5&order=addtime desc", -2)}-->
+		<!--{tag("moduleid=$moduleid&condition=status=3 and tag='$tag' and addtime<$addtime&areaid=$cityid&pagesize=5&order=addtime desc", -2)}-->
+		</div>
+		<div class="b10"></div>
+		{/if}
+		<div class="box_head_1"><div><strong>推荐{$MOD[name]}</strong></div></div>
+		<div class="box_body thumb">
+		<!--{tag("moduleid=$moduleid&condition=status=3 and level>0&catid=$catid&areaid=$cityid&pagesize=6&order=addtime desc&length=20&width=120&height=90&cols=2&template=list-video", -2)}-->
+		</div>
+		<div class="b10 c_b"> </div>
+		<div class="box_head_1"><div><strong>点播排行</strong></div></div>
+		<div class="box_body">
+		<div class="rank_list"><!--{tag("moduleid=$moduleid&condition=status=3 and addtime>$today_endtime-60*86400&catid=$catid&areaid=$cityid&order=hits desc&pagesize=10", -2)}--></div>
+		</div>
+	</div>
 </div>
-{if $content}<script type="text/javascript" src="{DT_STATIC}file/script/content.js"></script>{/if}
-{if $video_i}
-<script type="text/javascript" src="{DT_STATIC}file/script/player.js"></script>
-<script type="text/javascript">
-$(function(){
-	if(UA.match(/(iphone|ipad|ipod|android|mac os)/i)) {
-		if(Dd('player').innerHTML.indexOf('embed') != -1) {
-			Dd('player').innerHTML = '<div class="player">'+player('{$video_s}', {$video_w}, {$video_h}, {$video_a})+'</div>';
-		}
-	}
-});
-</script>
-{/if}
+{template 'zoom', 'chip'}
 {template 'footer'}

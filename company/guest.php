@@ -1,5 +1,6 @@
 <?php
-$moduleid = 4;
+define('DT_REWRITE', true);
+require 'config.inc.php';
 require '../common.inc.php';
 require DT_ROOT.'/module/'.$module.'/guest.inc.php';
 ?>

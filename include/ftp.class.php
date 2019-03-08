@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -9,7 +9,7 @@ class dftp {
 	var $root;
 	var $connected = 0;
 
-	function __construct($ftphost, $ftpuser, $ftppass, $ftpport = 21, $root = '/', $pasv = 0, $ssl = 0) {
+	function dftp($ftphost, $ftpuser, $ftppass, $ftpport = 21, $root = '/', $pasv = 0, $ssl = 0) {
 		if($ssl && function_exists('ftp_ssl_connect')) {
 			$this->fp = @ftp_ssl_connect($ftphost, $ftpport);
 		} else if(function_exists('ftp_connect')) {
@@ -20,10 +20,6 @@ class dftp {
 		$this->connected = @ftp_login($this->fp, $ftpuser, $ftppass);
 		@ftp_pasv($this->fp, $pasv);
 		$this->root = dir_path($root);
-	}
-
-	function dftp($ftphost, $ftpuser, $ftppass, $ftpport = 21, $root = '/', $pasv = 0, $ssl = 0) {
-		$this->__construct($ftphost, $ftpuser, $ftppass, $ftpport, $root, $pasv, $ssl);
 	}
 
 	function dftp_chdir($dir = '') {

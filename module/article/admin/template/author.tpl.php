@@ -1,18 +1,25 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 ?>
-<div class="sbox">
 <form action="?">
+<div class="tt">作者搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<input type="text" size="40" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td>
+&nbsp;
+<input type="text" size="60" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="window.location='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>';"/>&nbsp;
+<input type="button" value="关 闭" class="btn" onclick="parent.cDialog();"/>
+</td>
+</tr>
+</table>
 </form>
-</div>
 <div class="tt">作者列表</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="3" cellspacing="1" class="tb">
 <?php 
 foreach($lists as $k=>$v) {
 	if($k%5==0) { echo '<tr>';}

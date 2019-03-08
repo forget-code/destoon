@@ -4,6 +4,5 @@ $names = array (
   'list' => '列表页',
   'search' => '搜索页',
   'show' => '内容页',
-  'sign' => '报名页',
 );
 ?>

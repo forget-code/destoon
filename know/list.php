@@ -1,6 +1,6 @@
 <?php
 define('DT_REWRITE', true);
-$moduleid = 10;
+require 'config.inc.php';
 require '../common.inc.php';
 require DT_ROOT.'/module/'.$module.'/list.inc.php';
 ?>

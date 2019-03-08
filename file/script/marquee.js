@@ -1,12 +1,12 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 function dmarquee(lineheight, speed, delay, id) {	
 	this.t; this.p = false; this.o = Dd(id); this.h = this.o.innerHTML; if(this.h.length < 10) return;
 	this.o.innerHTML = '<div id="'+id+'_tmp"><div>'+this.h+'</div></div>';
 	var h1 = Number(Dd(id).style.height.replace('px', '')); var h2 = Dd(id+'_tmp').scrollHeight;
-	if(lineheight == -1) return;
+	if(lineheight == -1) {alert(h2); return;}
 	if(h2*2 <= h1) { this.o.innerHTML = this.h; return; } else if(h2 >= h1) { this.o.innerHTML = this.h + this.h; } else { this.o.innerHTML = this.h + this.h + this.h;	}
 	this.o.scrollTop = 0; var _this = this;
 	this.o.onmouseover = function() {_this.p = true;} 

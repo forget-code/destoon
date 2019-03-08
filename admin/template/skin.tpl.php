@@ -1,17 +1,18 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<table cellspacing="0" class="tb ls">
+<div class="tt">风格文件管理</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>文件名</th>
 <th width="180">文件大小</th>
 <th width="180">修改时间</th>
-<th width="120">操作</th>
+<th width="150">操作</th>
 </tr>
 <?php foreach($skins as $k=>$v) {?>
-<tr>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';">
 
 <td>&nbsp;<a href="<?php echo $skin_path.$v['filename'];?>" title="查看" target="_blank"><img src="admin/image/css.gif" width="16" height="16" alt="" align="absmiddle"/></a> <a href="?file=<?php echo $file;?>&action=edit&fileid=<?php echo $v['fileid'];?>" title="修改"><?php echo $v['filename'];?></a></td>
 
@@ -30,7 +31,7 @@ show_menu($menus);
 </table>
 <?php if($baks) { ?>
 <div class="tt">风格备份管理</div>
-<table cellspacing="0" class="tb ls">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>文件名</th>
 <th width="180">文件大小</th>
@@ -38,7 +39,7 @@ show_menu($menus);
 <th width="150">操作</th>
 </tr>
 <?php foreach($baks as $k=>$v) {?>
-<tr>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';">
 
 <td>&nbsp;<img src="admin/image/unknow.gif" width="16" height="16" alt="" align="absmiddle"/> <a href="<?php echo $skin_path.$v['filename'];?>" title="查看" target="_blank"><?php echo $v['filename'];?></a></td>
 
@@ -55,17 +56,5 @@ show_menu($menus);
 <?php }?>
 </table>
 <?php }?>
-<div class="btns">
-<?php
-$select = '';
-$dirs = list_dir('skin');
-foreach($dirs as $v) {
-	$selected = ($skin && $v['dir'] == $skin) ? 'selected' : '';
-	$select .= "<option value='".$v['dir']."' ".$selected.">".$v['name']."(".$v['dir'].")</option>";
-}
-$select = '<select onchange="if(this.value) Go(\'?file='.$file.'&action=change&to=\'+this.value);"><option value="">切换风格</option>'.$select.'</select>';
-echo $select;
-?>
-</div>
-<script type="text/javascript">Menuon(2);</script>
+<script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

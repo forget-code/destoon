@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menu = array(
 	array('排名推广', '?moduleid=3&file=spread'),
 	array('广告管理', '?moduleid=3&file=ad'),
@@ -11,7 +11,7 @@ $menu = array(
 	array('积分换礼', '?moduleid=3&file=gift'),
 	array('投票管理', '?moduleid=3&file=vote'),
 	array('票选管理', '?moduleid=3&file=poll'),
-	array('表单管理', '?moduleid=3&file=form'),
+	array('更新数据', '?moduleid=3&file=html'),
 	array('模块设置', '?moduleid=3&file=setting'),
 );
 ?>

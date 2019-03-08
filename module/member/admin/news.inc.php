@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/news.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/news.class.php';
 $do = new news();
 $menus = array (
     array('添加新闻', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -19,7 +19,6 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
-	$thumb = isset($thumb) ? intval($thumb) : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
@@ -28,7 +27,6 @@ if(in_array($action, array('', 'check', 'reject', 'recycle'))) {
 	$condition = '';
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($level) $condition .= " AND level=$level";
-	if($thumb) $condition .= " AND thumb<>''";
 }
 switch($action) {
 	case 'add':
@@ -122,6 +120,28 @@ switch($action) {
 		}
 		msg('ID从'.$fid.'至'.($itemid-1).'更新成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num");
 	break;
+	case 'recycle':
+		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
+		include tpl('news_recycle', $module);
+	break;
+	case 'check':
+		if($itemid && !$psize) {
+			$do->check($itemid);
+			dmsg('审核成功', $forward);
+		} else {
+			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
+			include tpl('news_check', $module);
+		}
+	break;
+	case 'reject':
+		if($itemid && !$psize) {
+			$do->reject($itemid);
+			dmsg('拒绝成功', $forward);
+		} else {
+			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
+			include tpl('news_reject', $module);
+		}
+	break;
 	case 'delete':
 		$itemid or msg('请选择新闻');
 		isset($recycle) ? $do->recycle($itemid) : $do->delete($itemid);
@@ -142,34 +162,8 @@ switch($action) {
 		$do->level($itemid, $level);
 		dmsg('级别设置成功', $forward);
 	break;
-	case 'recycle':
-		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
-		$menuid = 4;
-		include tpl('news', $module);
-	break;
-	case 'reject':
-		if($itemid && !$psize) {
-			$do->reject($itemid);
-			dmsg('拒绝成功', $forward);
-		} else {
-			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
-			$menuid = 3;
-			include tpl('news', $module);
-		}
-	break;
-	case 'check':
-		if($itemid && !$psize) {
-			$do->check($itemid);
-			dmsg('审核成功', $forward);
-		} else {
-			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
-			$menuid = 2;
-			include tpl('news', $module);
-		}
-	break;
 	default:
 		$lists = $do->get_list('status=3'.$condition, $dorder[$order]);
-		$menuid = 1;
 		include tpl('news', $module);
 	break;
 }

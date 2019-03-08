@@ -1,9 +1,9 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('模块设置'),
-    array('更新数据', '?moduleid=3&file=html'),
+    array('模板管理', '?file=template&dir='.$module),
 );
 show_menu($menus);
 ?>
@@ -11,86 +11,24 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
-<input type="hidden" name="setting[oauth]" value="<?php echo $oauth;?>"/>
-<input type="hidden" name="setting[weixin]" value="<?php echo $weixin;?>"/>
 <div id="Tabs0" style="display:">
-<div class="tt">通用设置</div>
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">列表页地址规则</td>
-<td>
-<select name="setting[list_url]">
-<option value="0"<?php if($list_url == 0) echo ' selected';?>>例 (动态) list.php?catid=1&amp;page=2</option>
-<option value="1"<?php if($list_url == 1) echo ' selected';?>>例 (伪静态) list-1-2.html</option> 
-<option value="2"<?php if($list_url == 2) echo ' selected';?>>例 (伪静态) list/1/</option>
-</select>
-</td>
-</tr>
-<tr>
-<td class="tl">内容页地址规则</td>
-<td>
-<select name="setting[show_url]">
-<option value="0"<?php if($show_url == 0) echo ' selected';?>>例 (动态) show.php?itemid=1&amp;page=2</option>
-<option value="1"<?php if($show_url == 1) echo ' selected';?>>例 (伪静态) show-1-2.html</option> 
-<option value="2"<?php if($show_url == 2) echo ' selected';?>>例 (伪静态) show/1/</option>
-</select>
-</td>
-</tr>
-</table>
-<a name="mobile"></a>
-<div class="tt">手机版设置</div>
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">手机版功能</td>
-<td>
-<input type="radio" name="setting[mobile_enable]" value="1"  <?php if($mobile_enable) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[mobile_enable]" value="0"  <?php if(!$mobile_enable) echo 'checked';?>/> 关闭
-</td>
-</tr>
-<tr> 
-<td class="tl">手机版绑定域名</td>
-<td><input name="setting[mobile_domain]" type="text" size="30" value="<?php echo $mobile_domain;?>"/><?php tips('例如 http://m.destoon.com/<br/>请将此域名绑定至网站mobile目录');?></td>
-</tr>
-<tr> 
-<td class="tl">手机版网站简称</td>
-<td><input name="setting[mobile_sitename]" type="text" size="10" value="<?php echo $mobile_sitename;?>"/><?php tips('建议控制在5个汉字以内，留空默认显示网站名称');?></td>
-</tr>
-<tr> 
-<td class="tl">手机版首页幻灯广告位ID</td>
-<td><input name="setting[mobile_pid]" type="text" size="5" value="<?php echo $mobile_pid;?>" id="mobile_pid"/> <a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=ad'+(Dd('mobile_pid').value>0 ? '&action=list&pid='+Dd('mobile_pid').value : ''), '幻灯广告');" class="t">[广告管理]</a> <?php tips('请建立一个幻灯广告位，并填写广告位ID，填0表示不显示幻灯广告');?></td>
-</tr>
-<tr>
-<td class="tl">手机访问自动跳转</td>
-<td>
-<input type="radio" name="setting[mobile_goto]" value="1"  <?php if($mobile_goto) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[mobile_goto]" value="0"  <?php if(!$mobile_goto) echo 'checked';?>/> 关闭
-</td>
-</tr><tr>
-<td class="tl">手机版页面动画效果</td>
-<td>
-<input type="radio" name="setting[mobile_ajax]" value="1"  <?php if($mobile_ajax) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[mobile_ajax]" value="0"  <?php if(!$mobile_ajax) echo 'checked';?>/> 关闭<?php tips('开启之后页面有类似APP的滚动切换效果，但是会导致百度等第三方联盟广告无法显示');?>
-</td>
-</tr>
-<tr> 
-<td class="tl">苹果APP下载地址</td>
-<td><input name="setting[mobile_ios]" type="text" size="60" value="<?php echo $mobile_ios;?>"/></td>
-</tr>
-<tr> 
-<td class="tl">安卓APP下载地址</td>
-<td><input name="setting[mobile_adr]" type="text" size="60" value="<?php echo $mobile_adr;?>"/></td>
-</tr>
-</table>
-<a name="spread"></a>
 <div class="tt">排名推广</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr> 
 <td class="tl">排名推广绑定域名</td>
 <td><input name="setting[spread_domain]"  type="text" size="30" value="<?php echo $spread_domain;?>"/><?php tips('例如 http://spread.destoon.com/<br/>请将此域名绑定至网站spread目录');?></td>
 </tr>
 <tr> 
-<td class="tl">排名默认起价</td>
-<td><input name="setting[spread_price]"  type="text" size="5" value="<?php echo $spread_price;?>"/></td>
+<td class="tl">供应排名起价</td>
+<td><input name="setting[spread_sell_price]"  type="text" size="5" value="<?php echo $spread_sell_price;?>"/></td>
+</tr>
+<tr> 
+<td class="tl">求购排名起价</td>
+<td><input name="setting[spread_buy_price]"  type="text" size="5" value="<?php echo $spread_buy_price;?>"/></td>
+</tr>
+<tr>
+<td class="tl">公司排名起价</td>
+<td><input name="setting[spread_company_price]"  type="text" size="5" value="<?php echo $spread_company_price;?>"/></td>
 </tr>
 <tr>
 <td class="tl">加价幅度</td>
@@ -115,7 +53,7 @@ show_menu($menus);
 <td class="tl">历史排名列表</td>
 <td>
 <input type="radio" name="setting[spread_list]" value="1"  <?php if($spread_list) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[spread_list]" value="0"  <?php if(!$spread_list) echo 'checked';?>/> 关闭 <?php tips('如果选择关闭，只显示最新的第一页推广记录，并且不显示分页');?>
+<input type="radio" name="setting[spread_list]" value="0"  <?php if(!$spread_list) echo 'checked';?>/> 关闭
 </td>
 </tr>
 <tr>
@@ -126,10 +64,8 @@ show_menu($menus);
 </td>
 </tr>
 </table>
-
-<a name="ad"></a>
 <div class="tt">广告设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">广告功能</td>
 <td>
@@ -163,10 +99,8 @@ show_menu($menus);
 </td>
 </tr>
 </table>
-
-<a name="announce"></a>
 <div class="tt">公告设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">公告功能</td>
 <td>
@@ -178,11 +112,16 @@ show_menu($menus);
 <td class="tl">公告绑定域名</td>
 <td><input name="setting[announce_domain]"  type="text" size="30" value="<?php echo $announce_domain;?>"/><?php tips('例如 http://announce.destoon.com/<br/>请将此域名绑定至网站announce目录');?></td>
 </tr>
+<tr>
+<td class="tl">公告是否生成HTML</td>
+<td>
+<input type="radio" name="setting[announce_html]" value="1"  <?php if($announce_html) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[announce_html]" value="0"  <?php if(!$announce_html) echo 'checked';?>/> 关闭
+</td>
+</tr>
 </table>
-
-<a name="link"></a>
 <div class="tt">友情链接</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">友情链接功能</td>
 <td>
@@ -210,42 +149,21 @@ show_menu($menus);
 
 <a name="comment"></a>
 <div class="tt">评论设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr> 
 <td class="tl">评论绑定域名</td>
 <td><input name="setting[comment_domain]"  type="text" size="30" value="<?php echo $comment_domain;?>"/><?php tips('例如 http://comment.destoon.com/<br/>请将此域名绑定至网站comment目录');?></td>
 </tr>
-<tr>
-<td class="tl">允许评论的模块</td>
-<td><?php echo module_checkbox('setting[comment_module][]', $comment_module, '1,2,3');?></td>
-</tr>
-<tr>
-<td class="tl">第三方评论系统</td>
-<td>
-<select name="setting[comment_api]" id="comment_api" onchange="if(this.value){Ds('comment_api_1');Dh('comment_api_0');}else{Dh('comment_api_1');Ds('comment_api_0');}">
-<option value=""<?php if($comment_api == '') echo ' selected';?>>不使用</option>
-<option value="changyan"<?php if($comment_api == 'changyan') echo ' selected';?>>畅言 - changyan.kuaizhan.com</option>
-<option value="duoshuo"<?php if($comment_api == 'duoshuo') echo ' selected';?>>多说 - duoshuo.com</option>
-</select>
-</td>
-</tr>
-<tbody id="comment_api_1" style="display:<?php echo $comment_api ? '' : 'none';?>">
-<tr>
-<td class="tl">APP ID</td>
-<td><input name="setting[comment_api_id]"  type="text" size="50" value="<?php echo $comment_api_id;?>"/><?php tips('畅言:填写代码里的appid<br/>多说:填写代码中的short_name');?></td>
-</tr>
-<tr>
-<td class="tl">APP KEY</td>
-<td><input name="setting[comment_api_key]"  type="text" size="50" value="<?php echo $comment_api_key;?>"/><?php tips('畅言:填写代码里的conf，prod_开头<br/>多说:留空不填');?></td>
-</tr>
-</tbody>
-<tbody id="comment_api_0" style="display:<?php echo $comment_api ? 'none' : '';?>">
 <tr>
 <td class="tl">内容页显示评论列表</td>
 <td>
 <input type="radio" name="setting[comment_show]" value="1"  <?php if($comment_show == 1) echo 'checked';?>> 开启&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[comment_show]" value="0"  <?php if($comment_show == 0) echo 'checked';?>> 关闭
 </td>
+</tr>
+<tr>
+<td class="tl">允许评论的模块</td>
+<td><?php echo module_checkbox('setting[comment_module][]', $comment_module, '1,2,3');?></td>
 </tr>
 <tr>
 <td class="tl">允许评论的会员组</td>
@@ -332,13 +250,11 @@ show_menu($menus);
 <input type="text" size="10" name="setting[comment_am]" value="<?php echo $comment_am;?>"/>
 </td>
 </tr>
-</tbody>
 </table>
 </div>
 
-<a name="guestbook"></a>
 <div class="tt">留言设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">留言功能</td>
 <td>
@@ -363,9 +279,9 @@ show_menu($menus);
 </tr>
 </table>
 
-<a name="gift"></a>
+
 <div class="tt">积分换礼设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">积分换礼功能</td>
 <td>
@@ -373,19 +289,14 @@ show_menu($menus);
 <input type="radio" name="setting[gift_enable]" value="0"  <?php if(!$gift_enable) echo 'checked';?>/> 关闭
 </td>
 </tr>
-<tr>
-<td class="tl">两次兑换时间间隔</td>
-<td><input type="text" size="5" name="setting[gift_time]" value="<?php echo $gift_time;?>"/> 秒</td>
-</tr>
 <tr> 
 <td class="tl">积分换礼绑定域名</td>
 <td><input name="setting[gift_domain]"  type="text" size="30" value="<?php echo $gift_domain;?>"/><?php tips('例如 http://gift.destoon.com/<br/>请将此域名绑定至网站gift目录');?></td>
 </tr>
 </table>
 
-<a name="vote"></a>
 <div class="tt">投票设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">投票功能</td>
 <td>
@@ -397,11 +308,14 @@ show_menu($menus);
 <td class="tl">投票绑定域名</td>
 <td><input name="setting[vote_domain]"  type="text" size="30" value="<?php echo $vote_domain;?>"/><?php tips('例如 http://vote.destoon.com/<br/>请将此域名绑定至网站vote目录');?></td>
 </tr>
+<tr>
+<td class="tl">允许参与投票的会员组</td>
+<td><?php echo group_checkbox('setting[vote_group][]', $vote_group);?></td>
+</tr>
 </table>
 
-<a name="poll"></a>
 <div class="tt">票选设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">票选功能</td>
 <td>
@@ -413,27 +327,66 @@ show_menu($menus);
 <td class="tl">票选绑定域名</td>
 <td><input name="setting[poll_domain]"  type="text" size="30" value="<?php echo $poll_domain;?>"/><?php tips('例如 http://poll.destoon.com/<br/>请将此域名绑定至网站poll目录');?></td>
 </tr>
+<tr>
+<td class="tl">允许参与票选的会员组</td>
+<td><?php echo group_checkbox('setting[poll_group][]', $poll_group);?></td>
+</tr>
 </table>
 
-<a name="form"></a>
-<div class="tt">表单设置</div>
-<table cellspacing="0" class="tb">
+<div class="tt dsn">问卷设置</div>
+<table cellpadding="2" cellspacing="1" class="tb dsn">
 <tr>
-<td class="tl">表单功能</td>
+<td class="tl">问卷功能</td>
 <td>
-<input type="radio" name="setting[form_enable]" value="1"  <?php if($form_enable) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[form_enable]" value="0"  <?php if(!$form_enable) echo 'checked';?>/> 关闭
+<input type="radio" name="setting[survey_enable]" value="1"  <?php if($survey_enable) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[survey_enable]" value="0"  <?php if(!$survey_enable) echo 'checked';?>/> 关闭
 </td>
 </tr>
 <tr> 
-<td class="tl">表单绑定域名</td>
-<td><input name="setting[form_domain]"  type="text" size="30" value="<?php echo $form_domain;?>"/><?php tips('例如 http://form.destoon.com/<br/>请将此域名绑定至网站form目录');?></td>
+<td class="tl">问卷绑定域名</td>
+<td><input name="setting[survey_domain]"  type="text" size="30" value="<?php echo $survey_domain;?>"/><?php tips('例如 http://survey.destoon.com/<br/>请将此域名绑定至网站survey目录');?></td>
+</tr>
+<tr>
+<td class="tl">允许参与问卷的会员组</td>
+<td><?php echo group_checkbox('setting[survey_group][]', $survey_group);?></td>
+</tr>
+<tr>
+<td class="tl">允许查看结果的会员组</td>
+<td><?php echo group_checkbox('setting[survey_result][]', $survey_result);?></td>
 </tr>
 </table>
 
-<a name="archiver"></a>
+<div class="tt">手机版设置</div>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td class="tl">手机版功能</td>
+<td>
+<input type="radio" name="setting[wap_enable]" value="1"  <?php if($wap_enable) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[wap_enable]" value="0"  <?php if(!$wap_enable) echo 'checked';?>/> 关闭
+</td>
+</tr>
+<tr> 
+<td class="tl">手机版绑定域名</td>
+<td><input name="setting[wap_domain]"  type="text" size="30" value="<?php echo $wap_domain;?>"/><?php tips('例如 http://wap.destoon.com/<br/>请将此域名绑定至网站wap目录');?></td>
+</tr>
+<tr>
+<td class="tl">手机版字符集</td>
+<td>
+<input type="radio" name="setting[wap_charset]" value="utf-8"  <?php if($wap_charset == 'utf-8'){ ?>checked <?php } ?>/> UTF-8
+<input type="radio" name="setting[wap_charset]" value="unicode"  <?php if($wap_charset == 'unicode'){ ?>checked <?php } ?>/> UNICODE<?php tips('表达同样内容的前提下，UTF-8 编码尺寸较小，但遇有乱码等情况可能导致页面无法浏览；UNICODE 编码尺寸大很多，但对乱码等有良好的容错性');?>
+</td>
+</tr>
+<tr> 
+<td class="tl">手机版列表页显示信息数</td>
+<td><input name="setting[wap_pagesize]"  type="text" size="10" value="<?php echo $wap_pagesize;?>"/></td>
+</tr>
+<tr> 
+<td class="tl">手机版内容页最大长度</td>
+<td><input name="setting[wap_maxlength]"  type="text" size="10" value="<?php echo $wap_maxlength;?>"/></td>
+</tr>
+</table>
 <div class="tt">无图版设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">无图版功能</td>
 <td>
@@ -441,15 +394,20 @@ show_menu($menus);
 <input type="radio" name="setting[archiver_enable]" value="0"  <?php if(!$archiver_enable) echo 'checked';?>/> 关闭
 </td>
 </tr>
+<tr>
+<td class="tl">仅搜索引擎访问</td>
+<td>
+<input type="radio" name="setting[archiver_robot]" value="1"  <?php if($archiver_robot) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[archiver_robot]" value="0"  <?php if(!$archiver_robot) echo 'checked';?>/> 关闭<?php tips('选择开启时，此功能仅搜索引擎和网站管理员可以访问');?>
+</td>
+</tr>
 <tr> 
 <td class="tl">无图版绑定域名</td>
 <td><input name="setting[archiver_domain]"  type="text" size="30" value="<?php echo $archiver_domain;?>"/><?php tips('例如 http://archiver.destoon.com/<br/>请将此域名绑定至网站archiver目录');?></td>
 </tr>
 </table>
-
-<a name="feed"></a>
 <div class="tt">RSS设置</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">RSS功能</td>
 <td>
@@ -467,10 +425,9 @@ show_menu($menus);
 <td><input name="setting[feed_pagesize]"  type="text" size="10" value="<?php echo $feed_pagesize;?>"/></td>
 </tr>
 </table>
-
 <a name="sitemaps"></a>
 <div class="tt">Sitemaps</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">生成Sitemaps</td>
 <td>
@@ -492,7 +449,7 @@ show_menu($menus);
 </select>
 &nbsp;
 <select name="setting[sitemaps_priority]">
-<option value="1.0"<?php echo $sitemaps_priority == '1.0' ? ' selected' : ''?>>1.0</option>
+<option value="1"<?php echo $sitemaps_priority == '1' ? ' selected' : ''?>>1</option>
 <option value="0.9"<?php echo $sitemaps_priority == '0.9' ? ' selected' : ''?>>0.9</option>
 <option value="0.8"<?php echo $sitemaps_priority == '0.8' ? ' selected' : ''?>>0.8</option>
 <option value="0.7"<?php echo $sitemaps_priority == '0.7' ? ' selected' : ''?>>0.7</option>
@@ -538,14 +495,14 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">详细了解Sitemaps?</td>
-<td><a href="<?php echo DT_PATH;?>api/redirect.php?url=http://www.google.com/support/webmasters/bin/topic.py?topic=8476" target="_blank">http://www.google.com/support/webmasters/bin/topic.py?topic=8476</a></td>
+<td><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=http://www.google.com/support/webmasters/bin/topic.py?topic=8476" target="_blank">http://www.google.com/support/webmasters/bin/topic.py?topic=8476</a></td>
 </tr>
 </table>
 </div>
 
 <a name="baidunews"></a>
 <div class="tt">百度新闻(Baidu News) - 互联网新闻开放协议</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">生成百度新闻</td>
 <td>
@@ -575,20 +532,31 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">详细了解百度新闻?</td>
-<td><a href="<?php echo DT_PATH;?>api/redirect.php?url=http://news.baidu.com/newsop.html" target="_blank">http://news.baidu.com/newsop.html</a></td>
+<td><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=http://news.baidu.com/newsop.html" target="_blank">http://news.baidu.com/newsop.html</a></td>
 </tr>
 </table>
 </div>
 <div class="sbt">
-<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
 <script type="text/javascript">
 var tab = <?php echo $tab;?>;
-var scr = '<?php echo $action;?>'
-$(function(){
+var all = <?php echo $all;?>;
+function TabAll() {
+	var i = 0;
+	while(1) {
+		if(Dd('Tabs'+i) == null) break;
+		Dd('Tabs'+i).style.display = all ? (i == tab ? '' : 'none') : '';
+		i++;
+	}
+	Dd('ShowAll').value = all ? '展 开' : '合 并';
+	all = all ? 0 : 1;
+}
+window.onload=function() {
 	if(tab) Tab(tab);
-	if(scr) $('html,body').animate({scrollTop:$("[name='"+scr+"']").offset().top}, 500);
-});
+	if(all) {all = 0; TabAll();}
+}
 </script>
 <?php include tpl('footer');?>

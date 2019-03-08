@@ -1,8 +1,8 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $MCFG['module'] = 'member';
 $MCFG['name'] = '会员';
-$MCFG['author'] = 'DESTOON';
+$MCFG['author'] = 'Destoon.COM';
 $MCFG['homepage'] = 'www.destoon.com';
 $MCFG['copy'] = false;
 $MCFG['uninstall'] = false;
@@ -17,7 +17,6 @@ $RT['file']['oauth'] = '一键登录';
 $RT['file']['grade'] = '会员升级';
 $RT['file']['record'] = '资金流水';
 $RT['file']['credit'] = '积分奖惩';
-$RT['file']['sms'] = '短信增减';
 $RT['file']['charge'] = '充值记录';
 $RT['file']['cash'] = '提现记录';
 $RT['file']['pay'] = '信息支付';
@@ -25,15 +24,15 @@ $RT['file']['card'] = '充值卡管理';
 $RT['file']['promo'] = '优惠码管理';
 $RT['file']['ask'] = '客服中心';
 $RT['file']['validate'] = '资料认证';
-$RT['file']['sendsms'] = '手机短信';
 $RT['file']['sendmail'] = '电子邮件';
+$RT['file']['sms'] = '手机短信';
 $RT['file']['alert'] = '贸易提醒';
 $RT['file']['mail'] = '邮件订阅';
 $RT['file']['message'] = '站内信件';
 $RT['file']['favorite'] = '商机收藏';
 $RT['file']['friend'] = '会员商友';
 $RT['file']['address'] = '收货地址';
-$RT['file']['honor'] = '荣誉资质';
+$RT['file']['credit'] = '荣誉资质';
 $RT['file']['news'] = '公司新闻';
 $RT['file']['page'] = '公司单页';
 $RT['file']['link'] = '友情链接';
@@ -50,21 +49,17 @@ $RT['action']['group']['add'] = '会员组添加';
 $RT['action']['group']['edit'] = '会员组修改';
 $RT['action']['group']['delete'] = '会员组删除';
 
-$RT['action']['record']['add'] = '资金增减';
-$RT['action']['record']['delete'] = '删除记录';
-
-$RT['action']['credit']['add'] = '积分奖惩';
-$RT['action']['credit']['delete'] = '删除记录';
-
-$RT['action']['sms']['add'] = '短信增减';
-$RT['action']['sms']['delete'] = '删除记录';
+$RT['action']['record']['add'] = '流水添加';
+$RT['action']['record']['export'] = '流水导出';
 
 $RT['action']['charge']['check'] = '审核记录';
 $RT['action']['charge']['recycle'] = '作废记录';
 $RT['action']['charge']['delete'] = '删除记录';
+$RT['action']['charge']['export'] = '导出记录';
 
 $RT['action']['cash']['show'] = '查看申请';
 $RT['action']['cash']['edit'] = '受理申请';
+$RT['action']['cash']['export'] = '导出记录';
 
 $RT['action']['pay']['delete'] = '删除记录';
 
@@ -74,16 +69,18 @@ $RT['action']['ask']['delete'] = '删除问题';
 $RT['action']['validate']['check'] = '通过认证';
 $RT['action']['validate']['delete'] = '删除记录';
 
-$RT['action']['sms']['record'] = '发送记录';
-$RT['action']['sms']['delete_record'] = '删除记录';
-$RT['action']['sms']['list'] = '号码列表';
-$RT['action']['sms']['make'] = '获取列表';
-$RT['action']['sms']['delete'] = '删除列表';
-
 $RT['action']['sendmail']['list'] = '邮件列表';
 $RT['action']['sendmail']['make'] = '获取列表';
 $RT['action']['sendmail']['download'] = '下载列表';
 $RT['action']['sendmail']['delete'] = '删除列表';
+
+$RT['action']['sms']['send'] = '发送记录';
+$RT['action']['sms']['add'] = '短信增加';
+$RT['action']['sms']['record'] = '短信记录';
+$RT['action']['sms']['delete'] = '删除邮件';
+$RT['action']['sms']['list'] = '号码列表';
+$RT['action']['sms']['make'] = '获取列表';
+$RT['action']['sms']['delete'] = '删除列表';
 
 $RT['action']['alert']['add'] = '添加提醒';
 $RT['action']['alert']['edit'] = '修改提醒';
@@ -110,15 +107,15 @@ $RT['action']['favorite']['delete'] = '删除收藏';
 $RT['action']['friend']['edit'] = '修改商友';
 $RT['action']['friend']['delete'] = '删除商友';
 
-$RT['action']['honor']['add'] = '添加证书';
-$RT['action']['honor']['edit'] = '修改证书';
-$RT['action']['honor']['delete'] = '删除证书';
-$RT['action']['honor']['check'] = '审核证书';
-$RT['action']['honor']['expire'] = '过期证书';
-$RT['action']['honor']['reject'] = '未通过证书';
-$RT['action']['honor']['recycle'] = '回收站';
-$RT['action']['honor']['clear'] = '清空回收站';
-$RT['action']['honor']['update'] = '更新地址';
+$RT['action']['credit']['add'] = '添加证书';
+$RT['action']['credit']['edit'] = '修改证书';
+$RT['action']['credit']['delete'] = '删除证书';
+$RT['action']['credit']['check'] = '审核证书';
+$RT['action']['credit']['expire'] = '过期证书';
+$RT['action']['credit']['reject'] = '未通过证书';
+$RT['action']['credit']['recycle'] = '回收站';
+$RT['action']['credit']['clear'] = '清空回收站';
+$RT['action']['credit']['update'] = '更新地址';
 
 $RT['action']['news']['add'] = '添加新闻';
 $RT['action']['news']['edit'] = '修改新闻';

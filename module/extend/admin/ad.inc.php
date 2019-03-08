@@ -1,24 +1,17 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $TYPE = $L['ad_type'];
-$AREA or $AREA = cache_read('area.php');
-require DT_ROOT.'/module/'.$module.'/ad.class.php';
+$AREA or $AREA = cache_read($AREA);
+require MD_ROOT.'/ad.class.php';
 isset($pid) or $pid = 0;
 isset($aid) or $aid = 0;
 $menus = array (
     array('添加广告位', '?moduleid='.$moduleid.'&file='.$file.'&action=add_place'),
-    array('广告位管理', '?moduleid='.$moduleid.'&file='.$file),	
-    array('广告管理', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list\', \'广告管理\');'),
-    array('广告审核', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file='.$file.'&action=list&job=check\', \'广告审核\');'),
+    array('广告位管理', '?moduleid='.$moduleid.'&file='.$file),
+    array('广告管理', '?moduleid='.$moduleid.'&file='.$file.'&action=list'),
+    array('广告审核', '?moduleid='.$moduleid.'&file='.$file.'&action=list&job=check'),
     array('更新广告', '?moduleid='.$moduleid.'&file='.$file.'&action=html'),
-    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
-$menusad = array (
-    array('添加广告', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=add'),
-    array('广告管理', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=list'),
-    array('广告审核', '?moduleid='.$moduleid.'&file='.$file.'&pid='.$pid.'&action=list&job=check'),
-);
-if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 $do = new ad();
 $do->pid = $pid;
 $do->aid = $aid;
@@ -28,7 +21,7 @@ $this_forward = '?moduleid='.$moduleid.'&file='.$file.'&action=list&pid='.$pid.'
 $this_place_forward = '?moduleid='.$moduleid.'&file='.$file.'&page='.$page;
 switch($action) {
 	case 'add':
-		$pid or msg('未指定广告位');
+		$pid or msg();
 		if($submit) {
 			if($do->is_ad($ad)) {
 				$do->add($ad);
@@ -37,7 +30,7 @@ switch($action) {
 					$MOD['linkurl'] = $MODULE[$ad['key_moduleid']]['linkurl'];
 				}
 				tohtml('ad', $module);
-				dmsg('添加成功', $forward ? $forward : $this_forward);
+				dmsg('添加成功', $this_forward);
 			} else {
 				msg($do->errmsg);
 			}
@@ -83,16 +76,16 @@ switch($action) {
 		dmsg('排序成功', $forward);
 	break;
 	case 'list':
+		$job = isset($job) ? $job : '';
 		$P = $do->get_place();
-		$sfields = array('按条件', '广告名称', '广告介绍', '广告代码', '关键词', '文字链接名称', '文字链接地址', '文字链接提示', '图片地址', '图片链接地址', '图片链接提示', 'Flash地址', 'Flash链接地址', '会员名', '备注');
-		$dfields = array('title', 'title', 'introduce', 'code', 'key_word', 'text_name', 'text_url', 'text_title', 'image_src', 'image_url', 'image_alt', 'flash_src', 'flash_url', 'username', 'note');
+		$sfields = array('按条件', '广告名称', '广告介绍', '会员名');
+		$dfields = array('title', 'title', 'introduce', 'username');
 		$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '开始时间降序', '开始时间升序', '结束时间降序', '结束时间升序', '浏览次数降序', '浏览次数升序');
 		$dorder  = array('pid DESC,listorder ASC,addtime ASC', 'addtime DESC', 'addtime ASC', 'fromtime DESC', 'fromtime ASC', 'totime DESC', 'totime ASC', 'hits DESC', 'hits ASC');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		isset($typeid) or $typeid = 0;
 		$areaid = isset($areaid) ? intval($areaid) : 0;
-		if($job == 'check' && $order == 0) $order = 1;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$order_select  = dselect($sorder, 'order', '', $order);
 		$condition = $job == 'check' ? "status=2" : "status=3";
@@ -108,7 +101,7 @@ switch($action) {
 		if($submit) {
 			if($do->is_place($place)) {
 				$do->add_place($place);
-				dmsg('广告位添加成功，请添加广告', '?moduleid='.$moduleid.'&file='.$file.'&id='.$do->itemid.'&tm='.($DT_TIME+5));
+				dmsg('添加成功', $forward);
 			} else {
 				msg($do->errmsg);
 			}
@@ -134,20 +127,16 @@ switch($action) {
 		}
 	break;
 	case 'view':
-		$url = $EXT['ad_url'];
-		$mob = $EXT['ad_mob'];
 		$destoon_task = '';
 		$filename = '';
 		$ad_moduleid = 0;
 		if($pid) {
 			$p = $do->get_one_place();
 			$head_title = '广告位 ['.$p['name'].'] 预览';
-			$title = $p['name'];
 			$typeid = $p['typeid'];
 		} else if($aid) {
 			$a = $do->get_one();
 			$head_title = '广告 ['.$a['title'].'] 预览';
-			$title = $a['title'];
 			$pid = $a['pid'];
 			$typeid = $a['typeid'];
 			if($typeid > 5) {
@@ -156,7 +145,7 @@ switch($action) {
 				$ad_kw = $a['key_word'];
 			}
 		}
-		include template('ad', $module);
+		include template('ad_view', $module);
 	break;
 	case 'runcode':
 		$destoon_task = '';
@@ -166,11 +155,11 @@ switch($action) {
 	case 'delete_place':
 		$pids or msg('请选择广告位');
 		$do->delete_place($pids);
-		dmsg('删除成功', $forward ? $forward : $this_place_forward);
+		dmsg('删除成功', $this_place_forward);
 	break;
 	case 'order_place':
 		$do->order_place($listorder);
-		dmsg('排序成功', $forward ? $forward : $this_place_forward);
+		dmsg('排序成功', $this_place_forward);
 	break;
 	case 'html':
 		$all = (isset($all) && $all) ? 1 : 0;
@@ -189,7 +178,7 @@ switch($action) {
 				$data = '<!--'.$totime.'-->'.$r['code'];
 				file_put(DT_CACHE.'/htm/'.$filename, $data);
 				if($r['typeid'] > 1 && $r['typeid'] < 6) {
-					$data = 'document.write(\''.dwrite($r['code']).'\');';
+					$data = 'document.write(\''.dtrim($r['code'], true).'\');';
 					file_put(DT_ROOT.'/file/script/A'.$r['pid'].'.js', $data);
 				}
 			}

@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -42,9 +42,7 @@ switch($seo_file) {
 		if($MOD['description_index']) eval("\$head_description = \"$MOD[description_index]\";");
 	break;
 	case 'list':
-		if($CAT['seo_title']) {
-			$seo_title = $CAT['seo_title'];
-		} else if($MOD['title_list']) {
+		if($MOD['title_list']) {
 			eval("\$seo_title = \"$MOD[title_list]\";");
 		} else {
 			$seo_title = $seo_cattitle.$seo_page.$seo_modulename.$seo_delimiter.$seo_sitename;

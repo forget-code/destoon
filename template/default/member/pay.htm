@@ -1,92 +1,76 @@
 {template 'header'}
-<div class="m m1">
-	<div class="m1l">
-		<form method="post" action="pay.php" id="pay_form" onsubmit="return pay_check();">
-		<input type="hidden" name="mid" value="{$mid}"/>
-		<input type="hidden" name="itemid" value="{$itemid}"/>
-		<input type="hidden" name="submit" value="1"/>
-		<table cellpadding="16" cellspacing="0" class="tf">
-		<tr>
-		<td class="tl">支付对象</td>
-		<td><a href="{$forward}" class="b px14">{$title}</a></td>
-		</tr>
-		{if $fee == $member_fee}
-		<tr>
-		<td class="tl">应付总额</td>
-		<td><span class="f_price px16">{$fee}</span> {$DT[money_unit]}</td>
-		</tr>
-		{else}
-		<tr>
-		<td class="tl">应付价</td>
-		<td><span class="f_price px16">{$fee}</span> {$DT[money_unit]}</td>
-		</tr>
-		<tr>
-		<td class="tl">会员价</td>
-		<td><span class="f_price px16">{$member_fee}</span> {$DT[money_unit]}</td>
-		</tr>
-		{/if}
-		<tr id="mymoney" style="display:none;">
-		<td class="tl">账户余额</td>
-		<td><span class="f_blue">{$_money}</span> {$DT[money_unit]}</td>
-		</tr>
-		<tr id="payword" style="display:none;">
-		<td class="tl"><span class="f_red">*</span> 支付密码</td>
-		<td>{template 'password', 'chip'}&nbsp;<span id="dpassword" class="f_red"></span></td>
-		</tr>
-		<tr id="paytype" style="display:none;">
-		<td class="tl"><span class="f_red">*</span> 支付方式</td>
-		<td>
-			<table cellspacing="5" cellpadding="5">
-			{php $PAYLIST = get_paylist();}
-			<input type="hidden" name="bank" id="bank" value="{$PAYLIST[0][bank]}"/>
-			{loop $PAYLIST $k $v}
-			<tr onclick="$('#bank').val($('#paytype :checked').val());">
-			<td><input type="radio" name="bank" value="{$v[bank]}" id="bank-{$v[bank]}"{if $k==0} checked{/if}/></td>
-			<td><label for="bank-{$v[bank]}" class="c_p"><img src="{DT_PATH}api/pay/{$v[bank]}/logo.gif" alt=""/></label></td>
-			<td>{if $v[percent]>0}手续费 {$v[percent]}%{/if}</td>
-			</tr>
-			{/loop}
-			</table>
-		</td>
-		</tr>
-		<tr>
-		<td class="tl"> </td>
-		<td><input type="submit" name="submit" value="立即支付" class="btn-green"/></td>
-		</tr>
-		</table>
-		</form>
-	</div>
-	<div class="m1r side">
+<div class="m">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	<td valign="top" class="left_menu">
 		<ul>
-		<li class="side_on"><a href="{$forward}">信息支付</a></li>
-		<li class="side_li"><a href="record.php?action=pay" target="_blank">支付记录</a></li>
+		<li class="left_menu_li"><a href="{$MODULE[1][linkurl]}">网站首页</a></li>
+		<li class="left_menu_on"><a href="pay.php">站内支付</a></li>
+		<li class="left_menu_li"><a href="charge.php?action=pay">在线充值</a></li>
+		<li class="left_menu_li"><a href="record.php">支付记录</a></li>
 		</ul>
-	</div>
-	<div class="c_b"></div>
+	</td>
+	<td valign="top">
+		<div class="left_box">	
+			<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="">商务中心</a> &raquo; <a href="pay.php">站内支付</a></div>
+			<div style="padding:25px;font-size:14px;">
+			<form method="post" action="pay.php" id="dform" onsubmit="return check();">
+			<input type="hidden" name="mid" value="{$mid}"/>
+			<input type="hidden" name="itemid" value="{$itemid}"/>
+			<input type="hidden" name="fee" value="{$fee}"/>
+			<input type="hidden" name="sign" value="{$sign}"/>
+			<input type="hidden" name="title" value="{$title}"/>
+			<input type="hidden" name="currency" value="{$currency}"/>
+			<input type="hidden" name="forward" value="{$forward}"/>
+			<input type="hidden" name="submit" value="1"/>
+			<table cellpadding="10" cellspacing="1" width="100%">
+			<tr>
+			<td>支付对象</td>
+			<td><a href="{$forward}" class="f_b">{$title}</a></td>
+			</tr>
+			<tr>
+			<td>总价</td>
+			<td><strong class="px16 f_b f_red">{$fee}</strong> {$DT[money_unit]}</td>
+			</tr>
+			<tr bgcolor="#F1F7FC">
+			<td>会员价</td>
+			<td><strong class="px16 f_b f_orange">{$member_fee}</strong> {$DT[money_unit]}&nbsp;&nbsp;<span class="px12 f_gray">(帐户余额:{$_money}{$DT[money_unit]})</span>&nbsp;&nbsp;<a href="charge.php?action=pay&amount={$amount}" class="px12">帐户充值</a></td>
+			</tr>
+			<tr>
+			<td>支付密码 <span class="f_red">*</span></td>
+			<td>{template 'password', 'chip'} <span id="dpassword" class="f_red"></span></td>
+			</tr>
+			<tr>
+			<td> </td>
+			<td>
+				<input type="image" src="{DT_SKIN}image/btn_pay.gif"/>
+				&nbsp;
+				<a href="charge.php?action=pay&amount={$amount}"><img src="{DT_SKIN}image/btn_charge.gif" width="100" height="30" alt="帐户充值"/></a>
+			</td>
+			</tr>
+			</table>
+			</form>
+			</div>
+			<script type="text/javascript">
+			function check() {
+				if({$fee} > {$_money}) {
+					if(confirm('帐户余额不足，是否现在充值？')) window.location='charge.php?action=pay&amount={$amount}';
+					return false;
+				}
+				var l;
+				var f;
+				f = 'password';
+				l = Dd(f).value.length;
+				if(l < 6) {
+					Dmsg('请输入支付密码', f);
+					return false;
+				}
+			}
+			</script>
+		
+		</div>
+	</td>
+	</tr>
+	</table>
 </div>
-<script type="text/javascript">
-var money = {$member_fee};
-function pay_check() {
-	if(money > {$_money}) {
-		Go('charge.php?action=pay&reason=pay|{$mid}|{$itemid}&amount='+money+'&bank='+$('#bank').val());
-		return false;
-	}
-	if(money > {$DT[quick_pay]}){
-		if(Dd('password').value.length < 6) {
-			Dmsg('请填写支付密码', 'password');
-			return false;
-		}
-	}
-	return true;
-}
-window.setInterval(
-	function() {
-		if(money > {$_money} || {$_money} < 0.01) {
-			$('#mymoney').hide();$('#paytype').show();$('#payword').hide();
-		} else {
-			$('#mymoney').show();$('#paytype').hide();if(money > {$DT[quick_pay]}){$('#payword').show();}
-		}
-	}, 
-500);
-</script>
 {template 'footer'}

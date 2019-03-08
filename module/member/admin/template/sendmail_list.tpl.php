@@ -1,9 +1,10 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<table cellspacing="0" class="tb ls">
+<div class="tt">邮件列表</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>文件</th>
 <th>文件大小(Kb)</th>
@@ -22,14 +23,21 @@ show_menu($menus);
 </tr>
 <?php }?>
 </table>
-<div class="sbox">
+<table cellpadding="2" cellspacing="1" width="100%" bgcolor="#F1F2F3">
+<tr>
+<td height="50">
 <form method="post" action="?" enctype="multipart/form-data">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="upload"/>
-<input name="uploadfile" type="file"/>
-<input type="submit" name="submit" value="上 传" class="btn-g"/>&nbsp;
+<td title="上传成功后文件将自动在文件列表中显示">
+<input name="uploadfile" type="file" size="25"/>
+<input type="submit" name="submit" value=" 上 传 " class="btn"/>&nbsp;
 </form>
-</div>
-<script type="text/javascript">Menuon(3);</script>
+</td>
+</tr>
+</table>
+<br/>
+<br/>
+<script type="text/javascript">Menuon(2);</script>
 <?php include tpl('footer');?>

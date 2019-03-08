@@ -1,9 +1,9 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $release = isset($release) ? intval($release) : 0;
 $release or msg();
 $release_dir = DT_ROOT.'/file/update/'.$release;
@@ -11,8 +11,8 @@ switch($action) {
 	case 'download':
 		$PHP_URL = @get_cfg_var("allow_url_fopen");
 		if(!$PHP_URL) msg('当前服务器不支持URL打开文件，请修改php.ini中allow_url_fopen = on');
-		$url = 'http://www.destoon.com/update.php?product=b2b&release='.$release.'&version='.DT_VERSION.'&charset='.DT_CHARSET.'&lang='.DT_LANG.'&domain='.(DT_DOMAIN ? DT_DOMAIN : DT_PATH);
-		$code = dcurl($url);
+		$url = 'http://www.destoon.com/update.php?product=b2b&release='.$release.'&charset='.DT_CHARSET;
+		$code = @file_get_contents($url);
 		if($code) {
 			if(substr($code, 0, 8) == 'StatusOk') {
 				$code = substr($code, 8);
@@ -50,10 +50,7 @@ switch($action) {
 			$file_a = str_replace('file/update/'.$release.'/source/destoon/', '', $v);
 			$file_b = str_replace('source/destoon/', 'backup/', $v);
 			if(is_file($file_a)) file_copy($file_a, $file_b);
-		}
-		foreach($files as $v) {
-			$file_a = str_replace('file/update/'.$release.'/source/destoon/', '', $v);
-			file_copy($v, $file_a) or msg('因文件权限不可写，系统无法覆盖'.str_replace(DT_ROOT.'/', '', $file_a).'<br/>请通过FTP工具移动file/update/'.$release.'/source/destoon/目录内所有文件覆盖到站点根目录(Windows独立服务器可以直接复制->粘贴)<br/>Linux独立服务器执行\cp -rf '.DT_ROOT.'/file/update/'.$release.'/source/destoon/* '.DT_ROOT.'/');
+			file_copy($v, $file_a) or msg('无法覆盖'.str_replace(DT_ROOT.'/', '', $file_a).'<br/>请设置此文件及上级目录属性为可写，然后刷新此页');
 		}
 		msg('文件更新成功，开始运行更新..', '?file='.$file.'&action=cmd&release='.$release);
 	break;
@@ -62,19 +59,19 @@ switch($action) {
 		msg('更新运行成功', '?file='.$file.'&action=finish&release='.$release);
 	break;
 	case 'finish':
-		msg('系统更新成功 当前版本V'.DT_VERSION.' R'.DT_RELEASE, '?file=cloud&action=update', 2);
+		msg('系统更新成功 当前版本V'.DT_VERSION.' R'.DT_RELEASE, '?file=destoon&action=update', 2);
 	break;
 	case 'undo':
-		is_file($release_dir.'/backup/version.inc.php') or msg('此版本备份文件不存在，无法还原', '?file=cloud&action=update', 2);
+		is_file($release_dir.'/backup/version.inc.php') or msg('此版本备份文件不存在，无法还原', '?file=destoon&action=update', 2);
 		@include $release_dir.'/source/cmd.inc.php';
 		$files = file_list($release_dir.'/backup');
 		foreach($files as $v) {
 			file_copy($v, str_replace('file/update/'.$release.'/backup/', '', $v));
 		}
-		msg('系统还原成功', '?file=cloud&action=update', 2);
+		msg('系统还原成功', '?file=destoon&action=update', 2);
 	break;
 	default:
-		$release > DT_RELEASE or msg('当前版本不需要运行此更新', '?file=cloud&action=update', 2);
+		$release > DT_RELEASE or msg('当前版本不需要运行此更新', '?file=destoon&action=update', 2);
 		msg('在线更新已经启动，开始下载更新..', '?file='.$file.'&action=download&release='.$release, 2);
 	break;
 }

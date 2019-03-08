@@ -1,41 +1,50 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<table cellspacing="0" class="tb">
+<div class="tt">申请详单</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">会员名</td>
-<td><a href="javascript:_user('<?php echo $item['username'];?>');" class="t"><?php echo $item['username'];?></a></td>
+<td><?php echo $item['username'];?> <a href="javascript:_user('<?php echo $item['username'];?>');" class="t">[主页]</a></td>
 </tr>
 <tr>
-<td class="tl">实付金额</td>
-<td class="f_red"><?php echo $item['amount'];?></td>
+<td class="tl">提现金额</td>
+<td class="f_red"><strong><?php echo $item['amount'];?></strong></td>
 </tr>
 <tr>
 <td class="tl">手续费</td>
-<td class="f_blue"><?php echo $item['fee'];?></td>
+<td class="f_blue"><strong><?php echo $item['fee'];?></strong></td>
 </tr>
 <tr class="on">
-<td class="tl">开户银行</td>
+<td class="tl">收款方式</td>
 <td><?php echo $item['bank'];?></td>
-</tr>
-<tr>
-<td class="tl">帐户类型</td>
-<td><?php echo $item['banktype'] ? '对公' : '对私';?></td>
-</tr>
-<tr>
-<td class="tl">开户网点</td>
-<td><?php echo $item['branch'];?></td>
-</tr>
-<tr>
-<td class="tl">收款户名</td>
-<td><?php echo $item['truename'];?></td>
 </tr>
 <tr>
 <td class="tl">收款帐号</td>
 <td><?php echo $item['account'];?></td>
 </tr>
+<tr>
+<td class="tl">收款人</td>
+<td><?php echo $item['truename'];?></td>
+</tr>
+<tr>
+<td class="tl">手机</td>
+<td><?php echo $member['mobile'];?></td>
+</tr>
+<?php if($member['qq']) { ?>
+<tr>
+<td class="tl">QQ</td>
+<td><a href="tencent://message/?uin=<?php echo $member['qq'];?>&Site=<?php echo $DT['sitename'];?>&Menu=yes"><img src="http://wpa.qq.com/pa?p=1:<?php echo $member['qq'];?>:17" width="25" height="17" title="点击QQ交谈/留言" alt=""/></a> <?php echo $member['qq'];?></td>
+</tr>
+<?php } ?>
+<?php if($member['msn']) { ?>
+<tr>
+<td class="tl">MSN</td>
+<td><a href="msnim:chat?contact=<?php echo $member['msn'];?>"><img src="<?php echo DT_SKIN;?>image/msnchat.gif" width="25" height="17" title="点击MSN交谈/留言" alt=""/></a> <?php echo $member['msn'];?></td>
+</tr>
+<?php } ?>
 <tr>
 <td class="tl">申请时间</td>
 <td><?php echo $item['addtime'];?></td>
@@ -61,6 +70,6 @@ show_menu($menus);
 <td><?php echo $item['edittime'];?></td>
 </tr>
 </table>
-<div class="sbt"><input type="button" value=" 返 回 " class="btn-g" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
-<script type="text/javascript">Menuon(0);</script>
+<div class="sbt"><input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
+<script type="text/javascript">Menuon(2);</script>
 <?php include tpl('footer');?>

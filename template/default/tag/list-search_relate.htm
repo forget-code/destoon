@@ -1,9 +1,11 @@
 {if $tags}
-<div class="head-sub"><strong>您是不是在找?</strong></div>
-<div class="list-txt">
+<div class="sch_find">
+您是不是在找?
+</div>
+<div class="sch_relate">
 <ul>
 {loop $tags $i $t}
-<li><span class="f_r">约{$t[items]}条</span><a href="{$MODULE[$moduleid][linkurl]}{rewrite('search.php?kw='.urlencode($t[word]))}"{if $target} target="{$target}"{/if}>{$t[word]}</a></li>
+<li><span class="f_r">&nbsp;&nbsp;约<span class="f_orange">{$t[items]}</span>条</span><a href="{$MODULE[$moduleid][linkurl]}{rewrite('search.php?kw='.urlencode($t['word']))}"{if $target} target="{$target}"{/if}>{$t[word]}</a></li>
 {/loop}
 </ul>
 </div>

@@ -1,5 +1,6 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
+
+
 class ResponseHandler  {
 	
 	/** 密钥 */

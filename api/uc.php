@@ -1,8 +1,6 @@
 <?php
-$_SERVER['REQUEST_URI'] = '';
 $moduleid = 2;
 require '../common.inc.php';
-if($DT_BOT) dhttp(403);
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 $MOD['passport'] == 'uc' or exit('Access Denied');
 define("UC_DBHOST", $MOD['uc_dbhost']) ;
@@ -23,9 +21,8 @@ define('API_UPDATECREDIT', 1);
 define('API_GETCREDITSETTINGS', 1);
 define('API_UPDATECREDITSETTINGS', 1);
 require_once DT_ROOT.'/api/ucenter/client.php';
-$code = strip_sql($code, 0);
 parse_str(uc_authcode($code, 'DECODE', UC_KEY), $uc_arr);
-#log_write($uc_arr, 'uc', 1);
+//cache_write('uc'.date('Y-m-d-H-i-s', $DT_TIME).'.php', $uc_arr);
 if($DT_TIME - intval($uc_arr['time']) > 3600) exit('Authracation Has Expiried');
 if(empty($uc_arr)) exit('Invalid Request');
 $action = $uc_arr['action'];
@@ -40,11 +37,11 @@ switch($action) {
 		if(!$user || $user['groupid'] == 2 || $user['groupid'] == 4) exit('-1');
 		if($_username == $user['username']) exit('1');
 		$cookietime = $DT_TIME + ($cookietime ? $cookietime : 86400*7);
-		$destoon_auth = encrypt($user['userid'].'|'.$user['password'], DT_KEY.'USER');
-		ob_clean();
+		$destoon_auth = encrypt($user['userid']."\t".$user['username']."\t".$user['groupid']."\t".$user['password']."\t".$user['admin'], md5(DT_KEY.$_SERVER['HTTP_USER_AGENT']));
+		ob_clean() ;
 		header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
 		set_cookie('auth', $destoon_auth, $cookietime);
-		$db->query("UPDATE {$DT_PRE}member SET loginip='$DT_IP',logintime=$DT_TIME,logintimes=logintimes+1 WHERE userid=$user[userid]");
+		$db->query("UPDATE {$DT_PRE}member SET loginip='$DT_IP',logintime=$DT_TIME,logintimes=logintimes+1 WHERE userid=$userid");
 		exit('1');
 	break;
 	case 'synlogout':

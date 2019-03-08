@@ -1,57 +1,52 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <form method="post">
-<input type="hidden" name="forward" value="<?php echo $DT_URL;?>"/>
-<input type="hidden" name="tb" value="<?php echo $tb;?>"/>
-<input type="hidden" name="action" value="update"/>
-<table cellspacing="0" class="tb ls">
+<div class="tt">管理字段 [<?php echo $tb;?>]</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<th width="40">删除</th>
+<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>排序</th>
 <th>字段</th>
 <th>字段名称</th>
-<th>显示</th>
-<th>前台</th>
 <th>字段属性</th>
 <th>表单类型</th>
-<th width="40">调用</th>
-<th width="40">操作</th>
+<th>表单name</th>
+<th>表单调用</th>
+<th>标签调用</th>
+<th>内容调用</th>
+<th>显示</th>
+<th>前台</th>
+<th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr align="center">
-<td><input name="post[<?php echo $v['itemid'];?>][delete]" type="checkbox" value="1"/></td>
-<td><input name="post[<?php echo $v['itemid'];?>][listorder]" type="text" size="2" value="<?php echo $v['listorder'];?>"/></td>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
+<td><input name="listorder[<?php echo $v['itemid'];?>]" type="text" size="2" value="<?php echo $v['listorder'];?>"/></td>
 <td><?php echo $v['name'];?></td>
-<td><input name="post[<?php echo $v['itemid'];?>][title]" type="text" size="10" value="<?php echo $v['title'];?>"/></td>
-<td><select name="post[<?php echo $v['itemid'];?>][display]"><option value="1"<?php echo $v['display'] ? ' selected' : '';?>>是</option><option value="0"<?php echo $v['display'] ? '' : ' selected';?>>否</option></select></td>
-<td><select name="post[<?php echo $v['itemid'];?>][front]"><option value="1"<?php echo $v['front'] ? ' selected' : '';?>>是</option><option value="0"<?php echo $v['front'] ? '' : ' selected';?>>否</option></select></td>
+<td><?php echo $v['title'];?></td>
 <td><?php echo $v['type'];?><?php echo $v['length'] ? '('.$v['length'].')' : '';?></td>
 <td><?php echo $v['html'];?></td>
-<td><a href="javascript:Dcall('<?php echo $v['itemid'];?>', '<?php echo $v['name'];?>');" class="t">查看</a></td>
+<td>post_fields[<?php echo $v['name'];?>]</td>
+<td>{fields_show(<?php echo $v['itemid'];?>)}</td>
+<td>{$t[<?php echo $v['name'];?>]}</td>
+<td>{$<?php echo $v['name'];?>}</td>
+<td><?php echo $v['display'] ? '是' : '否';?></td>
+<td><?php echo $v['front'] ? '是' : '否';?></td>
 <td>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&tb=<?php echo $tb;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a></td>
-</tr>
-<?php }?>
-<tr>
-<td align="center"><input type="checkbox" onclick="checkall(this.form);" title="全选/反选"/></td>
-<td colspan="12"><input type="submit" name="submit" value="更 新" onclick="if($(':checkbox:checked').length && !confirm('提示：您选择删除'+$(':checkbox:checked').length+'个字段，确定要删除吗？此操作将不可撤销')) return false;" class="btn-g"/>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&tb=<?php echo $tb;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&tb=<?php echo $tb;?>&action=delete&itemid=<?php echo $v['itemid'];?>" onclick="return _delete();"><img src="admin/image/delete.png" width="16" height="16" title="删除" alt=""/></a>
 </td>
 </tr>
+<?php }?>
 </table>
+<div class="btns">
+<input type="submit" value="更新排序" class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&tb=<?php echo $tb;?>&action=order';"/>
+</div>
 </form>
-<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
-<script type="text/javascript">
-function Dcall(id, name) {
-	var tips = '';
-	tips += '表单名称：post_fields['+name+']<br/>';
-	tips += '表单调用：{fields_show('+id+')}<br/>';
-	tips += '标签调用：{$t['+name+']}<br/>';
-	tips += '内容调用：{$'+name+'}<br/>';
-	Dalert(tips);
-}
-Menuon(1);
-</script>
+<div class="pages"><?php echo $pages;?></div>
+<br/>
+<script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

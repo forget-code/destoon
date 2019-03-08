@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,12 +7,12 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>公告</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 公告分类</td>
-<td><span id="type_box"><?php echo type_select('announce', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='announce',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $file;?>', '公告分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
+<td><?php echo type_select('announce', 1, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?> <a href="?file=type&item=<?php echo $file;?>" class="t">[管理分类]</a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 公告标题</td>
@@ -30,18 +30,24 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 公告内容</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
+</td>
+</tr>
+<tr>
+<td class="tl" height="30"><span class="f_hid">*</span> 内容选项</td>
+<td><input type="checkbox" name="post[save_remotepic]" value="1"/> 下载内容远程图片
+<input type="checkbox" name="post[clear_link]" value="1"/> 清除内容链接
 </td>
 </tr>
 <?php if($DT['city']) { ?>
-<tr style="display:<?php echo $_areaids ? 'none' : '';?>;">
+<tr>
 <td class="tl"><span class="f_hid">*</span> 地区(分站)</td>
 <td><?php echo ajax_area_select('post[areaid]', '请选择', $areaid);?></td>
 </tr>
 <?php } ?>
 <tr title="请保持时间格式">
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 内容模板</td>
@@ -49,7 +55,7 @@ show_menu($menus);
 </tr>
 </tbody>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

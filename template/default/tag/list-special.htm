@@ -1,10 +1,13 @@
+<table width="100%">
 {loop $tags $i $t}
-<div>
-<a href="{$t[linkurl]}"{if $target} target="{$target}"{/if}><img src="{$t[thumb]}" width="{$width}" height="{$height}" alt=""/></a>
+{if $i%$cols==0}<tr align="center">{/if}
+<td width="{$percent}" valign="top"><a href="{$t[linkurl]}" target="_blank"><img src="{$t[thumb]}" width="{$width}" height="{$height}" alt="{$t[alt]}"/></a>
 <ul>
-<li><a href="{$t[linkurl]}" title="{$t[alt]}"{if $target} target="{$target}"{/if}>{$t[title]}</a></li>
-<li>{if $datetype}<i>{timetodate($t[addtime], $datetype)}</i>{/if}<em>{$t[hits]}次关注</em></li>
+<li><a href="{$t[linkurl]}" target="_blank">{$t[title]}</a></li>
+{if $datetype}<li class="px11 f_gray">{timetodate($t[addtime], $datetype)}</li>{/if}
 </ul>
-</div>
+</td>
+{if $i%$cols==($cols-1)}</tr>{/if}
 {/loop}
-{if $showpage && $pages}</div><div class="pages">{$pages}{else}<span class="c_b"></span>{/if}
+</table>
+{if $showpage && $pages}<div class="pages">{$pages}</div>{/if}

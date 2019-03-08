@@ -1,12 +1,13 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">添加管理员</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员名</td>
 <td>
@@ -48,7 +49,7 @@ foreach($MODULE as $m) {
 <td><input type="text" size="20" name="role" id="role"/> <span class="f_gray">可以为角色名称，例如编辑、美工、某分站编辑等，也可以为该管理员的备注</span></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="下一步" class="btn-g"></div>
+<div class="sbt"><input type="submit" name="submit" value="下一步" class="btn"></div>
 </form>
 <script type="text/javascript">
 function check() {

@@ -1,11 +1,11 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $TYPE = get_type('mail', 1);
 $menus = array (
     array('添加邮件', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('邮件管理', '?moduleid='.$moduleid.'&file='.$file),
     array('订阅列表', '?moduleid='.$moduleid.'&file='.$file.'&action=list'),
-    array('订阅分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'订阅分类\');'),
+    array('订阅分类', '?file=type&item=mail'),
 );
 switch($action) {
 	case 'add':
@@ -13,7 +13,6 @@ switch($action) {
 			$typeid or msg('请选择邮件分类');
 			$title or msg('请填写邮件标题');
 			$content or msg('请填写邮件内容');
-			$content = addslashes(save_remote(save_local(stripslashes($content))));
 			$db->query("INSERT INTO {$DT_PRE}mail (title,typeid,content,addtime,editor,edittime) VALUES ('$title','$typeid','$content','$DT_TIME','$_username','$DT_TIME')");
 			dmsg('添加成功', $forward);
 		} else {
@@ -26,7 +25,6 @@ switch($action) {
 			$typeid or msg('请选择邮件分类');
 			$title or msg('请填写邮件标题');
 			$content or msg('请填写邮件内容');
-			$content = addslashes(save_remote(save_local(stripslashes($content))));
 			$db->query("UPDATE {$DT_PRE}mail SET title='$title',typeid='$typeid',content='$content',editor='$_username',edittime='$DT_TIME' WHERE itemid=$itemid");
 			dmsg('修改成功', $forward);
 		} else {
@@ -56,18 +54,13 @@ switch($action) {
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
 		isset($order) && isset($dorder[$order]) or $order = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
-		$type_select   = type_select($TYPE, 1, 'typeid', '请选择分类', $typeid);
+		$type_select   = type_select('mail', 1, 'typeid', '请选择分类', $typeid);
 		$order_select  = dselect($sorder, 'order', '', $order);
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($typeid > 0) $condition .= " AND typeids LIKE '%,$typeid,%'";
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}mail_list WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);	
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}mail_list WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$lists = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}mail_list WHERE $condition ORDER BY $dorder[$order] LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
@@ -113,17 +106,12 @@ switch($action) {
 	break;
 	default:
 		$typeid = isset($typeid) ? ($typeid === '' ? -1 : intval($typeid)) : -1;
-		$type_select = type_select($TYPE, 1, 'typeid', '请选择分类', $typeid);
+		$type_select = type_select('mail', 1, 'typeid', '请选择分类', $typeid);
 		$condition = '1';
 		if($keyword) $condition .= " AND title LIKE '%$keyword%'";
 		if($typeid > 0) $condition .= " AND typeid=$typeid";
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}mail WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);	
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}mail WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$mails = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}mail WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {

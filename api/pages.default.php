@@ -3,7 +3,7 @@ defined('IN_DESTOON') or exit('Access Denied');
 $_page = $page <= 1 ? $total : ($page - 1);
 $demo_url = str_replace(array('%7B', '%7D'), array('{', '}'), $demo_url);
 $url = $_page == 1 ? $home_url : str_replace('{destoon_page}', $_page, $demo_url);
-$pages .= '<input type="hidden" id="des'.'toon_previous" value="'.$url.'"/><a href="'.$url.'">&nbsp;&#171;'.$L['prev_page'].'&nbsp;</a> ';
+$pages .= '<input type="hidden" id="des'.'toon_previous" value="'.$url.'"/><a href="'.$url.'" title="'.$L['prev_page'].'">&nbsp;&#171;&nbsp;</a> ';
 if($total >= 1) {
 	$_page = 1;
 	$url = $home_url;
@@ -49,6 +49,6 @@ if($total >= 3) {
 }
 $_page = $page >= $total ? 1 : $page + 1;
 $url = $_page == 1 ? $home_url : str_replace('{destoon_page}', $_page, $demo_url);
-$pages .= '<a href="'.$url.'">&nbsp;'.$L['next_page'].'&#187;&nbsp;</a> <input type="hidden" id="des'.'toon_next" value="'.$url.'"/>&nbsp;'.lang($L['info_page'], array($items, $total)).'&nbsp;';
+$pages .= '<a href="'.$url.'" title="'.$L['next_page'].'">&nbsp;&#187;&nbsp;</a> <input type="hidden" id="des'.'toon_next" value="'.$url.'"/>&nbsp;'.lang($L['info_page'], array($items, $total)).'&nbsp;';
 $pages .= '<input type="text" class="pages_inp" id="destoon_pageno" value="'.$page.'" onkeydown="if(event.keyCode==13 && this.value) {window.location.href=\''.$demo_url.'\'.replace(/\\{destoon_page\\}/, this.value);return false;}"> <input type="button" class="pages_btn" value="GO" onclick="if(Dd(\'destoon_pageno\').value>0)window.location.href=\''.$demo_url.'\'.replace(/\\{destoon_page\\}/, Dd(\'destoon_pageno\').value);"/>';
 ?>

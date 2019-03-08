@@ -1,5 +1,5 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 var L = new Array();
@@ -13,7 +13,6 @@ L['upload_file']			= '上传文件';
 L['upload_img']				= '上传图片';
 L['allow']					= '限制为:';
 L['preview_img']			= '图片预览';
-L['choose_img']				= '选择图片';
 L['width']					= '宽度';
 L['height']					= '高度';
 L['up_local']				= '本地图片';
@@ -29,11 +28,6 @@ L['related_found']			= '为您找到以下相关分类，请选择：';
 L['related_not_found']		= '未找到相关分类，请调整名称';
 L['type_valid_filepath']	= '请输入正确的文件路径';
 L['wysiwyg_mode']			= '请切换到设计模式';
-L['dialog_close']			= '关闭[快捷键Esc]';
-L['tpl_add']				= '新建模板';
-L['tpl_edit']				= '修改模板';
-L['op_reason']				= '操作原因';
-L['op_reason_null']			= '请填写操作原因';
 
 /* calendar.js */
 L['Sun']					= '日';
@@ -50,9 +44,11 @@ L['next_month']				= '下一月';
 
 /* common.js */
 L['str_delete']				= '删除';
+L['str_captcha']			= '点击显示';
 
 /* draft.js */
-L['fck_zoom']				= '点击增加高度 右击缩小高度';
+L['zoom_out']				= '缩小高度';
+L['zoom_in']				= '增加高度';
 L['data_recovery']			= '数据恢复';
 L['save_draft']				= '暂存草稿';
 L['if_cover_data']			= '发现 {V0} 保存的数据，是否覆盖当前数据？';
@@ -86,13 +82,9 @@ L['last_page']				= '已至最后一页';
 /* page.js */
 L['popular_search_terms']	= '热门搜索：';
 L['search_tips_close']		= '关闭';
-L['chrome_fav_tip']			= '请按快捷键Ctrl+D收藏本页，谢谢';
 
-/* player.js */
-L['iso_tips_video']			= '暂不支持此视频，请在电脑上观看';
-
-/*weibo.js*/
-L['sync_sina'] = '同步到新浪微博';
-L['sync_qq'] = '同步到腾讯微博';
-L['sync_login_sina'] = '您还没有登录新浪微博或者登录已经失效，是否现在登录?';
-L['sync_login_qq'] = '您还没有QQ登录或者QQ登录已经失效，是否现在登录?';
+/* profile.js */
+L['max_mode']				= '最多可选{V0}种经营模式';
+L['max_cate']				= '最多可添加{V0}个分类';
+L['choose_category']		= '请选择分类';
+L['category_chosen']		= '已添加过此分类';

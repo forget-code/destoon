@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,7 +7,7 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="runcode"/>
-<input type="hidden" name="codes" id="codes" value=""/>
+<input type="hidden" name="codes" value=""/>
 </form>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
@@ -15,9 +15,10 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="pid" value="<?php echo $pid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">修改广告位</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td class="tl"><span class="f_hid">*</span> 广告位ID</td>
+<td class="tl">广告位ID</td>
 <td><input name="place[pid]" type="text" size="5" value="<?php echo $pid;?>"/> <a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>" target="_blank" class="t">[查看]</a>
 <br/><span class="f_gray">[注意]修改广告位ID可以恢复误删除的广告位。但如果填写的ID存在，可能导致一个SQL错误</span>
 </td>
@@ -27,11 +28,11 @@ show_menu($menus);
 <td><input name="place[name]" id="name" type="text" size="30" value="<?php echo $name;?>"/> <?php echo dstyle('place[style]', $style);?> <span id="dname" class="f_red"></span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 广告位示意图</td>
+<td class="tl">广告位示意图</td>
 <td><input name="place[thumb]" id="thumb" type="text" size="60" value="<?php echo $thumb;?>"/>&nbsp;&nbsp;<span onclick="Dthumb(<?php echo $moduleid;?>,0,0, Dd('thumb').value,true);" class="jt">[上传]</span>&nbsp;&nbsp;<span onclick="_preview(Dd('thumb').value);" class="jt">[预览]</span>&nbsp;&nbsp;<span onclick="Dd('thumb').value='';" class="jt">[删除]</span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 广告位介绍</td>
+<td class="tl">广告位介绍</td>
 <td><input name="place[introduce]" type="text" size="60" value="<?php echo $introduce;?>"/></td>
 </tr>
 <tr>
@@ -58,12 +59,12 @@ show_menu($menus);
 <td><input name="place[price]" type="text" size="5" value="<?php echo $price;?>"/> <?php echo $unit;?>/月 <span class="f_gray">[0或不填表示待议]</span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 默认广告代码</td>
+<td class="tl">默认广告代码</td>
 <td><textarea name="place[code]" id="code" style="width:98%;height:50px;overflow:visible;font-family:Fixedsys,verdana;"><?php echo $code;?></textarea><br/>
 <input type="button" value=" 运行代码 " class="btn" onclick="runcode();"/><span class="f_gray">&nbsp;当广告位下无广告时，显示此代码，支持html、css、js 如果广告位采用js调用，此处不建议使用js代码</span><span id="dcode" class="f_red"></span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 网站前台显示</td>
+<td class="tl">网站前台显示</td>
 <td>
 <input type="radio" name="place[open]" value="1" <?php if($open) echo 'checked';?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="place[open]" value="0" <?php if(!$open) echo 'checked';?>/> 否
@@ -71,11 +72,11 @@ show_menu($menus);
 </td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 广告代码模板</td>
-<td><?php echo tpl_select('ad', 'chip', 'place[template]', '默认模板', $template, 'id="template"');?></td>
+<td class="tl">广告代码模板</td>
+<td><?php echo tpl_select('ad_code', $module, 'place[template]', '默认模板', $template, 'id="template"');?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="修 改" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="返 回" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

@@ -1,22 +1,18 @@
-DROP TABLE IF EXISTS `destoon_sell_5`;
-CREATE TABLE `destoon_sell_5` (
+DROP TABLE IF EXISTS `destoon_sell`;
+CREATE TABLE `destoon_sell` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `mycatid` bigint(20) unsigned NOT NULL default '0',
   `typeid` smallint(2) unsigned NOT NULL default '0',
-  `areaid` int(10) unsigned NOT NULL default '0',
+  `areaid` smallint(6) unsigned NOT NULL default '0',
   `level` tinyint(1) unsigned NOT NULL default '0',
   `elite` tinyint(1) NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
   `fee` float NOT NULL default '0',
   `introduce` varchar(255) NOT NULL default '',
-  `n1` varchar(100) NOT NULL,
-  `n2` varchar(100) NOT NULL,
-  `n3` varchar(100) NOT NULL,
-  `v1` varchar(100) NOT NULL,
-  `v2` varchar(100) NOT NULL,
-  `v3` varchar(100) NOT NULL,
+  `model` varchar(100) NOT NULL default '',
+  `standard` varchar(100) NOT NULL default '',
   `brand` varchar(100) NOT NULL default '',
   `unit` varchar(10) NOT NULL default '',
   `price` decimal(10,2) unsigned NOT NULL default '0.00',
@@ -27,11 +23,9 @@ CREATE TABLE `destoon_sell_5` (
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
-  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `thumb1` varchar(255) NOT NULL default '',
   `thumb2` varchar(255) NOT NULL default '',
-  `thumbs` text NOT NULL,
   `username` varchar(30) NOT NULL default '',
   `groupid` smallint(4) unsigned NOT NULL default '0',
   `company` varchar(100) NOT NULL default '',
@@ -42,8 +36,8 @@ CREATE TABLE `destoon_sell_5` (
   `mobile` varchar(50) NOT NULL default '',
   `address` varchar(255) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
+  `msn` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
-  `wx` varchar(50) NOT NULL default '',
   `ali` varchar(30) NOT NULL default '',
   `skype` varchar(30) NOT NULL default '',
   `totime` int(10) unsigned NOT NULL default '0',
@@ -67,19 +61,19 @@ CREATE TABLE `destoon_sell_5` (
   KEY `areaid` (`areaid`)
 ) TYPE=MyISAM COMMENT='供应';
 
-DROP TABLE IF EXISTS `destoon_sell_data_5`;
-CREATE TABLE `destoon_sell_data_5` (
+DROP TABLE IF EXISTS `destoon_sell_data`;
+CREATE TABLE `destoon_sell_data` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` mediumtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='供应内容';
 
-DROP TABLE IF EXISTS `destoon_sell_search_5`;
-CREATE TABLE `destoon_sell_search_5` (
+DROP TABLE IF EXISTS `destoon_sell_search`;
+CREATE TABLE `destoon_sell_search` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
-  `areaid` int(10) unsigned NOT NULL default '0',
-  `content` mediumtext NOT NULL,
+  `areaid` smallint(6) unsigned NOT NULL default '0',
+  `content` text NOT NULL,
   `status` tinyint(1) NOT NULL default '0',
   `sorttime` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`itemid`),

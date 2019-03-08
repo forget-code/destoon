@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,14 +9,15 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息标题</td>
 <td><input name="post[title]" type="text" id="title" size="60" value="<?php echo $title;?>"/> <?php echo level_select('post[level]', '级别', $level);?> <?php echo dstyle('post[style]', $style);?> <br/><span id="dtitle" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业/职位</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?> <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?><br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <?php if($CP) { ?>
 <script type="text/javascript">
@@ -25,6 +26,7 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
+<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -112,21 +114,21 @@ foreach($EDUCATION as $k=>$v) {
 <tr>
 <td class="tl"><span class="f_red">*</span> 职位描述</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 过期时间</td>
-<td><?php echo dcalendar('post[totime]', $totime, '-', 1);?>&nbsp;
+<td><?php echo dcalendar('post[totime]', $totime);?>&nbsp;
 <select onchange="Dd('posttotime').value=this.value;">
 <option value="">快捷选择</option>
 <option value="">长期有效</option>
-<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?> 23:59:59">3天</option>
-<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?> 23:59:59">一周</option>
-<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?> 23:59:59">半月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?> 23:59:59">一月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?> 23:59:59">半年</option>
-<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?> 23:59:59">一年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?>">3天</option>
+<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?>">一周</option>
+<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?>">半月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?>">一月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?>">半年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?>">一年</option>
 </select>&nbsp;
 <span id="dposttotime" class="f_red"></span> 不选表示长期有效</td>
 </tr>
@@ -146,7 +148,7 @@ foreach($EDUCATION as $k=>$v) {
 <tbody id="d_guest" style="display:<?php echo $username ? 'none' : '';?>">
 <tr>
 <td class="tl"><span class="f_red">*</span> 公司名称</td>
-<td class="tr"><input name="post[company]" type="text" id="company" size="50" value="<?php echo $company;?>" /> 个人请填姓名 例如：张三<br/><span id="dcompany" class="f_red"></span> </td>
+<td class="tr"><input name="post[company]" type="text" id="company" size="50" value="<?php echo $company;?>" /> 个人请填姓名<br/><span id="dcompany" class="f_red"></span> </td>
 </tr>
 </tbody>
 <tr>
@@ -174,30 +176,30 @@ foreach($EDUCATION as $k=>$v) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 联系地址</td>
-<td><input name="post[address]" id="address" type="text" size="60" value="<?php echo $address;?>"/></td>
+<td><input name="post[address]" type="text" size="60" value="<?php echo $address;?>"/></td>
 </tr>
 <?php if($DT['im_qq']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> QQ</td>
-<td class="tr"><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
-</tr>
-<?php } ?>
-<?php if($DT['im_wx']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 微信</td>
-<td class="tr"><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+<td class="tr"><input name="post[qq]" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_ali']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
-<td class="tr"><input name="post[ali]" id="ali" type="text" size="30" value="<?php echo $ali;?>"/></td>
+<td class="tr"><input name="post[ali]" type="text" size="30" value="<?php echo $ali;?>"/></td>
+</tr>
+<?php } ?>
+<?php if($DT['im_msn']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> MSN</td>
+<td class="tr"><input name="post[msn]" type="text" size="30" value="<?php echo $msn;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_skype']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> Skype</td>
-<td class="tr"><input name="post[skype]" id="skype" type="text" size="30" value="<?php echo $skype;?>"/></td>
+<td class="tr"><input name="post[skype]" type="text" size="30" value="<?php echo $skype;?>"/></td>
 </tr>
 <?php } ?>
 <tr>
@@ -216,13 +218,13 @@ foreach($EDUCATION as $k=>$v) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
 <td><input name="post[hits]" type="text" size="10" value="<?php echo $hits;?>"/></td>
 </tr>
-<tr style="display:none;">
+<tr>
 <td class="tl"><span class="f_hid">*</span> 内容收费</td>
 <td><input name="post[fee]" type="text" size="5" value="<?php echo $fee;?>"/><?php tips('不填或填0表示继承模块设置价格，-1表示不收费<br/>大于0的数字表示具体收费价格');?>
 </td>
@@ -238,20 +240,19 @@ foreach($EDUCATION as $k=>$v) {
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
-<?php load('guest.js'); ?>
 <?php if($action == 'add') { ?>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>
@@ -313,7 +314,16 @@ function check() {
 		}
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	<?php echo $CP ? property_js() : '';?>
+	if(Dd('property_require') != null) {
+		var ptrs = Dd('property_require').getElementsByTagName('option');
+		for(var i = 0; i < ptrs.length; i++) {		
+			f = 'property-'+ptrs[i].value;
+			if(Dd(f).value == 0 || Dd(f).value == '') {
+				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 </script>

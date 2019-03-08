@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/honor.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/honor.class.php';
 $do = new honor();
 $menus = array (
     array('添加证书', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -66,6 +66,44 @@ switch($action) {
 			include tpl('honor_edit', $module);
 		}
 	break;
+	case 'recycle':
+		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
+		include tpl('honor_recycle', $module);
+	break;
+	case 'expire':
+		if(isset($refresh)) {
+			if(isset($delete)) {
+				$days = isset($days) ? intval($days) : 0;
+				$days or msg('请填写天数');
+				$do->clear("status=4 AND totime>0 AND totime<$DT_TIME-$days*24*3600");
+				dmsg('删除成功', $forward);
+			} else {
+				$do->expire();
+				dmsg('刷新成功', $forward);
+			}
+		} else {
+			$lists = $do->get_list('status=4'.$condition);
+			include tpl('honor_expire', $module);
+		}
+	break;
+	case 'check':
+		if($itemid && !$psize) {
+			$do->check($itemid);
+			dmsg('审核成功', $forward);
+		} else {
+			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
+			include tpl('honor_check', $module);
+		}
+	break;
+	case 'reject':
+		if($itemid && !$psize) {
+			$do->reject($itemid);
+			dmsg('拒绝成功', $forward);
+		} else {
+			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
+			include tpl('honor_reject', $module);
+		}
+	break;
 	case 'delete':
 		$itemid or msg('请选择证书');
 		isset($recycle) ? $do->recycle($itemid) : $do->delete($itemid);
@@ -80,51 +118,8 @@ switch($action) {
 		$do->clear();
 		dmsg('清空成功', $forward);
 	break;
-	case 'recycle':
-		$lists = $do->get_list('status=0'.$condition, $dorder[$order]);
-		$menuid = 5;
-		include tpl('honor', $module);
-	break;
-	case 'reject':
-		if($itemid && !$psize) {
-			$do->reject($itemid);
-			dmsg('拒绝成功', $forward);
-		} else {
-			$lists = $do->get_list('status=1'.$condition, $dorder[$order]);
-			$menuid = 4;
-			include tpl('honor', $module);
-		}
-	break;
-	case 'expire':
-		if(isset($refresh)) {
-			if(isset($delete)) {
-				$days = isset($days) ? intval($days) : 0;
-				$days or msg('请填写天数');
-				$do->clear("status=4 AND totime>0 AND totime<$DT_TIME-$days*86400");
-				dmsg('删除成功', $forward);
-			} else {
-				$do->expire();
-				dmsg('刷新成功', $forward);
-			}
-		} else {
-			$lists = $do->get_list('status=4'.$condition);
-			$menuid = 3;
-			include tpl('honor', $module);
-		}
-	break;
-	case 'check':
-		if($itemid && !$psize) {
-			$do->check($itemid);
-			dmsg('审核成功', $forward);
-		} else {
-			$lists = $do->get_list('status=2'.$condition, $dorder[$order]);
-			$menuid = 2;
-			include tpl('honor', $module);
-		}
-	break;
 	default:
 		$lists = $do->get_list('status=3'.$condition, $dorder[$order]);
-		$menuid = 1;
 		include tpl('honor', $module);
 	break;
 }

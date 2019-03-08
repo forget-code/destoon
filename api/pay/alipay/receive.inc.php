@@ -1,7 +1,7 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
-require DT_ROOT.'/api/pay/'.$bank.'/notify.class.php';
-require DT_ROOT.'/api/pay/'.$bank.'/config.inc.php';
+require DT_ROOT."/api/pay/alipay/notify.class.php";
+require DT_ROOT."/api/pay/alipay/config.inc.php";
 /*
 	*功能：付完款后跳转的页面
 	*版本：2.0

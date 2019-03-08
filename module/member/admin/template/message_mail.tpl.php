@@ -1,16 +1,17 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="tt">站内信件转发</div>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="send" value="1"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td class="tl"><span class="f_hid">*</span> 温馨提示</td>
+<td class="tl">提示</td>
 <td>可以通过此功能将会员的未读站内信发送至其注册邮箱</td>
 </tr>
 <tr>
@@ -31,7 +32,7 @@ show_menu($menus);
 <?php } ?>
 </tbody>
 </table>
-<div class="sbt"><input type="submit" name="submit" value=" 开始发送 " class="btn-g" onclick="if(!confirm('确定发送超过 '+Dd('hour').value+' 小时未读的站内信至会员信箱吗？')) return false;"></div>
+<div class="sbt"><input type="submit" name="submit" value=" 开始发送 " class="btn" onclick="if(!confirm('确定发送超过 '+Dd('hour').value+' 小时未读的站内信至会员信箱吗？')) return false;"></div>
 </form>
 <script type="text/javascript">Menuon(3);</script>
 <?php include tpl('footer');?>

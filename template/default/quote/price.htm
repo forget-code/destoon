@@ -1,245 +1,116 @@
 {template 'header'}
 <div class="m">
-	<div class="nav">
-		<a href="{$MODULE[1][linkurl]}">首页</a> <i>&gt;</i> <a href="{$MOD[linkurl]}">{$MOD[name]}</a> <i>&gt;</i> <a href="{$MOD[linkurl]}product.php">产品报价</a>
-	</div>
-	<div class="b20 bd-t"></div>
-	<h1 class="title">{$P[title]}</h1>
-	<div class="info t_c">
-	{if $P[n1] && $P[v1]}{$P[n1]}：{$P[v1]}&nbsp;&nbsp;&nbsp;&nbsp;{/if}
-	{if $P[n2] && $P[v2]}{$P[n2]}：{$P[v2]}&nbsp;&nbsp;&nbsp;&nbsp;{/if}
-	{if $P[n3] && $P[v3]}{$P[n3]}：{$P[v3]}&nbsp;&nbsp;&nbsp;&nbsp;{/if}
-	最新报价：{timetodate($P[edittime], 5)}&nbsp;&nbsp;&nbsp;&nbsp;
-	报价次数：<span>{$P[item]}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-	浏览次数：<span id="hits">{$P[hits]}</span>	
-	</div>
-	<table cellpadding="0" cellspacing="0" width="100%">
-	<tr>
-	<td id="chartbox">
-		{if $chart_data}
-		{load('swfobject.js')}
-		<script type="text/javascript" src="{DT_PATH}api/amcharts/amcharts.js"></script>
-		<script type="text/javascript" src="{DT_PATH}api/amcharts/amfallback.js"></script>
-		<div id="chartdiv" style="width:700px;height:400px;background:#FFFFFF;"></div>
-		<script type="text/javascript">
-		var flashVars =
-		{
-			path: "{DT_PATH}api/amcharts/flash/",
-			chart_data: "{$chart_data}",
-			chart_settings: "<settings><hide_bullets_count>18</hide_bullets_count><data_type>csv</data_type><plot_area><margins><left>50</left><right>40</right><top>55</top><bottom>30</bottom></margins></plot_area><grid><x><alpha>10</alpha><approx_count>8</approx_count></x><y_left><alpha>10</alpha></y_left></grid><axes><x><width>1</width><color>0D8ECF</color></x><y_left><width>1</width><color>0D8ECF</color></y_left></axes><indicator><color>0D8ECF</color><x_balloon_text_color>FFFFFF</x_balloon_text_color><line_alpha>50</line_alpha><selection_color>0D8ECF</selection_color><selection_alpha>20</selection_alpha></indicator><zoom_out_button><text_color_hover>FF0F00</text_color_hover></zoom_out_button><help><button><color>FCD202</color><text_color>000000</text_color><text_color_hover>FF0F00</text_color_hover></button><balloon><color>FCD202</color><text_color>000000</text_color></balloon></help><graphs><graph gid='0'><title>{$chart_name}</title><color>0D8ECF</color><color_hover>F08F00</color_hover><line_width>2</line_width><bullet>round</bullet></graph>{$chart_graph}</graphs><labels><label lid='0'><text><![CDATA[<b>{$chart_title}</b>]]></text><y>15</y><text_size>13</text_size><align>center</align></label></labels></settings>"
-		};
-		if(swfobject.hasFlashPlayerVersion("8")) {
-			swfobject.embedSWF("{DT_PATH}api/amcharts/flash/amline.swf", "chartdiv", "100%", "400", "8.0.0", "{DT_PATH}api/amcharts/flash/expressInstall.swf", flashVars);
-		} else {
-			var amFallback = new AmCharts.AmFallback();
-			amFallback.chartSettings = flashVars.chart_settings;
-			amFallback.pathToImages = "{DT_PATH}api/amcharts/images/";
-			amFallback.chartData = flashVars.chart_data;
-			amFallback.type = "line";
-			amFallback.write("chartdiv");
-		}
-		</script>
-		{else}
-		<br/><br/><br/><center class="px16">数据不足，无法生成报表</center><br/><br/><br/>
-		{/if}
-	</td>
-	{if $MARKET || $could_add}
-	<td width="300" valign="top" style="border-left:#DDDDDD 1px solid;">
-		{if $could_add}
-		<div class="price-add">
-		<iframe src="" name="send" id="send" style="display:none;"></iframe>
-		<form method="post" action="{$MOD[linkurl]}price.php" id="dform" target="send" onsubmit="return check();">
-		<input type="hidden" name="itemid" value="{$itemid}"/>
-		<table cellpadding="10" cellspacing="0">
-		{if $MARKET}
-		<tr>
-		<td class="tl">市场</td>
-		<td>
-			<select name="post[market]">
-			{loop $MARKET $k $v}
-			<option value="{$k}"{if $k==$market} selected{/if}>{$v}</option>
-			{/loop}
-			</select>
-		</td>
-		</tr>
-		{/if}
-		<tr>
-		<td class="tl">价格 <span class="f_red">*</span></td>
-		<td><input name="post[price]" type="text" size="10" id="price"/> /{$P[unit]}</td>
-		</tr>
-		<tr>
-		<td class="tl">地区 <span class="f_red">*</span></td>
-		<td>{ajax_area_select('post[areaid]', '请选择', $areaid)}</td>
-		</tr>
-		{if !$_userid}
-		<tr>
-		<td class="tl">公司 <span class="f_red">*</span></td>
-		<td><input name="post[company]" type="text" id="company" size="20"/></td>
-		</tr>
-		<tr>
-		<td class="tl">电话</td>
-		<td><input name="post[telephone]" id="telephone" type="text" size="20"/></td>
-		</tr>
-		{if $DT[im_qq]}
-		<tr>
-		<td class="tl">QQ</td>
-		<td><input name="post[qq]" id="qq" type="text" size="20"/></td>
-		</tr>
-		{/if}
-		{if $DT[im_wx]}
-		<tr>
-		<td class="tl">微信</td>
-		<td><input name="post[wx]" id="wx" type="text" size="20"/></td>
-		</tr>
-		{/if}
-		{/if}
-		<tr>
-		<td class="tl">备注</td>
-		<td><input name="post[note]" type="text" size="20" id="note"/></td>
-		</tr>
-		{if $need_captcha}
-		<tr>
-		<td class="tl">验证码 <span class="f_red">*</span></td>
-		<td>{template 'captcha', 'chip'}<span id="dcaptcha" class="f_red"></span></td>
-		</tr>
-		{/if}
-		<tr>
-		<td class="tl">&nbsp;</td>
-		<td><input type="submit" name="submit" value="我要报价" class="btn-green"/></td>
-		</tr>
-		</table>
-		</form>
-		</div>
-		{load('guest.js')}
-		<script type="text/javascript">
-		function check() {
-			var l;
-			var f;
-			f = 'price';
-			l = parseFloat(Dd(f).value);
-			if(isNaN(l)) {
-				alert('请填写价格');
-				Dd(f).focus();
-				return false;
-			}
-		{if $P[minprice]}
-			if(l < {$P[minprice]}) {
-				alert('报价不能低于{$P[minprice]}');
-				Dd(f).focus();
-				return false;
-			}
-		{/if}
-		{if $P[maxprice]}
-			if(l > {$P[maxprice]}) {
-				alert('报价不能高于{$P[maxprice]}');
-				Dd(f).focus();
-				return false;
-			}
-		{/if}
-			f = 'areaid_1';
-			if(Dd(f).value == 0) {
-				alert('请选择所在地区');
-				return false;
-			}
-		{if !$_userid}
-			f = 'company';
-			l = Dd(f).value.length;
-			if(l < 2) {
-				alert('请填写公司名称');
-				Dd(f).focus();
-				return false;
-			}
-		{/if}
-			f = 'note';
-			l = Dd(f).value.length;
-			if(l > 20) {
-				alert('备注不能超过20个字');
-				Dd(f).focus();
-				return false;
-			}
-		{if $need_captcha}
-			f = 'captcha';
-			if($('#c'+f).html().indexOf('ok.png') == -1) {
-				alert('请填写正确的验证码');
-				Dd(f).focus();
-				return false;
-			}
-		{/if}
-			return true;
-		}
-		</script>
-		{/if}
-		{if $MARKET}
-		<div class="price-market">
-		<form action="{$MOD[linkurl]}price.php">
-		<input type="hidden" name="itemid" value="{$itemid}"/>
-		<ul>
-		<li>&nbsp;<strong>市场比价：</strong></li>
-		{loop $MARKET $k $v}
-		{if $k}<li><input type="checkbox" name="ms[]" value="{$k}"{if in_array($k,$ms)} checked{/if} onclick="this.form.submit();"/> {$v}</li>{/if}
-		{/loop}
-		</ul>
-		</form>
-		</div>
-		{/if}
-	</td>
-	{/if}
-	</tr>
-	</table>
-</div>
+<div class="m_l_1 f_l">
+	<div class="left_box">		
+		<div class="pos">当前位置: <a href="{$MODULE[1][linkurl]}">首页</a> &raquo; <a href="{$MOD[linkurl]}">{$MOD[name]}</a> &raquo; <a href="{$MOD[linkurl]}price.php">价格</a></div>
 
-<div class="m bd-t">
-	<a name="record"></a>
-	<form action="{$MOD[linkurl]}price.php" id="fsearch">
-	<input type="hidden" name="itemid" value="{$itemid}"/>
-	<table cellpadding="6" cellspacing="6">
-	<tr>
-	<td>&nbsp;
-	公司：<input type="text" size="20" name="kw" value="{$kw}"/>&nbsp;
-	报价日期：{dcalendar('fromdate', $fromdate, '')} 至 {dcalendar('todate', $todate, '')}&nbsp;
-	{ajax_area_select('areaid', '不限地区', $areaid)}&nbsp;
-	{if $MARKET}
-	<select name="market">
-	{loop $MARKET $k $v}
-	<option value="{$k}"{if $k==$market} selected{/if}>{$v}</option>
-	{/loop}
-	</select>&nbsp;
-	{/if}
-	</td>
-	<td><input type="submit" value="搜 索" class="btn"/></td>
-	<td><input type="button" value="重 搜" class="btn" onclick="Go('{$MOD[linkurl]}{rewrite('price.php?itemid='.$itemid)}#record');"/></td>
-	</tr>
-	</table>
-	</form>
-	{if $tags}
-	<table cellpadding="16" cellspacing="0" class="tb">
-	<tr>
-	<th>价格({$DT[money_unit]})</th>
-	<th>单位</th>
-	<th>报价时间</th>
-	{if $MARKET}<th>市场</th>{/if}
-	<th>地区</th>
-	<th>报价公司</th>
-	<th>备注</th>
-	</tr>
-	{loop $tags $t}
-	<tr align="center">
-	<td class="f_price">{$t[price]}</td>
-	<td>{$P[unit]}</td>
-	<td>{timetodate($t[addtime], 5)}</td>
-	{if $MARKET}<td>{if $t[market]}{$MARKET[$t[market]]}{else}&nbsp;{/if}</td>{/if}
-	<td>{area_pos($t[areaid], '', 2)}</td>
-	<td title="{$t[company]}"><a href="{userurl($t[username], 'file=contact')}" target="_blank">{$t[company]}</a></td>
-	<td title="{$t[note]}">{dsubstr($t[note], 20, '..')}</td>
-	</tr>
-	{/loop}
-	</table>
-	{if $pages}<div class="pages">{$pages}</div>{/if}
-	{/if}
+		<div style="padding:10px 0 15px 0;">
+			<form action="{$MOD[linkurl]}price.php" id="fsearch">
+			<table cellpadding="3" cellspacing="3">
+			<tr>
+			<td width="80" align="right">产品名称：</td>
+			<td colspan="3"><input type="text" size="60" name="kw" value="{$kw}" class="pd3"/></td>
+			</tr>
+			<tr>
+			<td width="80" align="right">搜索选项：</td>
+			<td colspan="3">
+			<input type="radio" name="mode" value="0"{if $mode==0} checked{/if}/> 模糊
+			<input type="radio" name="mode" value="1"{if $mode==1} checked{/if}/> 精准
+			<input type="checkbox" name="thumb" id="thumb" value="1"{if $thumb} checked{/if}/> 有图
+			<input type="checkbox" name="vip" id="vip" value="1"{if $vip} checked{/if}/> {VIP}
+			</td>
+			</tr>
+			<tr>
+			<td align="right">更新日期：</td>
+			<td>{dcalendar('fromdate', $fromdate, '')} 至 {dcalendar('todate', $todate, '')}</td>
+			<td align="right">所属行业：</td>
+			<td>{ajax_category_select('catid', '不限行业', $catid, 5)}</td>
+			</tr>
+			<tr>
+			<td align="right">单价范围：</td>
+			<td>
+			<input type="text" size="10" name="minprice" value="{$minprice}"/> ~ <input type="text" size="10" name="maxprice" value="{$maxprice}"/>
+			</td>
+			<td align="right">所在地区：</td>
+			<td>{ajax_area_select('areaid', '不限地区', $areaid)}</td>
+			</tr>
+			<tr>
+			<td></td>
+			<td colspan="3">
+			<input type="image" src="{DT_SKIN}image/btn_search.gif"/>&nbsp;&nbsp;
+			<a href="{$MOD[linkurl]}price.php"><img src="{DT_SKIN}image/btn_reset_search.gif"/></a>	
+			</td>
+			</tr>
+			</table>
+			</form>
+		</div>
+		{if $tags}
+		<div style="padding:20px;border-top:#AACCEE 1px solid;">
+		<table cellpadding="6" cellspacing="1" width="100%" bgcolor="#C5D7ED">
+		<tr align="center" bgcolor="#F1F7FC">
+		<td><strong>品名</strong></td>
+		<td><strong>型号</strong></td>
+		<td><strong>规格</strong></td>
+		<td><strong>品牌</strong></td>
+		<td><strong>价格</strong></td>
+		<td><strong>更新时间</strong></td>
+		<td><strong>产地</strong></td>
+		<td><strong>公司</strong></td>
+		</tr>
+		{loop $tags $t}
+		<tr align="center" bgcolor="#FFFFFF">
+		<td><a href="{$t[linkurl]}" title="{$t[title]}" target="_blank">{$t[tag]}</a></td>
+		<td>{if $t[model]}{$t[model]}{else}-{/if}</td>
+		<td>{if $t[standard]}{$t[standard]}{else}-{/if}</td>
+		<td>{if $t[brand]}{$t[brand]}{else}-{/if}</td>
+		<td class="f_orange">{$t[price]}{$DT[money_unit]}/{$t[unit]}</td> 
+		<td class="px11">{timetodate($t[edittime], 5)}</td>
+		<td>{area_pos($t[areaid], '', 2)}</td>
+		<td><a href="{userurl($t[username])}" target="_blank">{$t[company]}</a></td>
+		</tr>
+		{/loop}
+		</table>
+		</div>
+		{if $pages}<div class="pages">{$pages}</div>{/if}
+		{else}
+		{template 'noresult', 'message'}
+		{/if}
+	</div>
 </div>
-{if $P[content]}
-<div class="m">
-	<div class="content">{$P[content]}</div>
+<div class="m_n f_l">&nbsp;</div>
+<div class="m_r_1 f_l">
+	{if $kw}
+	<div class="box_head_1"><div><strong>相关搜索</strong></div></div>
+	<div class="box_body">
+		<div class="sch_site">
+			<ul>
+			{loop $MODULE $mod}{if $mod[moduleid]>3 && $mod[moduleid]!=$moduleid && !$mod[islink]}<li><a href="{$mod[linkurl]}{rewrite('search.php?kw='.urlencode($kw))}">在 <span class="f_red">{$mod[name]}</span> 找 {$kw}</a></li>{/if}{/loop}
+			</ul>
+		</div>
+		<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=-$moduleid and status=3 and word!='$kw' and keyword like '%$keyword%'&pagesize=10&order=total_search desc&template=list-search_relate&file=price", -2)}-->
+	</div>
+	<div class="b10">&nbsp;</div>
+	{/if}
+	<div class="box_head_1"><div><strong>今日搜索排行</strong></div></div>
+	<div class="box_body">
+		<div class="rank_list">
+			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=-$moduleid and status=3 and updatetime>$today_endtime-86400&pagesize=10&order=today_search desc&key=today_search&template=list-search_rank&file=price", -2)}-->
+		</div>		
+	</div>
+	<div class="b10">&nbsp;</div>
+	<div class="box_head_1"><div><strong>本周搜索排行</strong></div></div>
+	<div class="box_body">
+		<div class="rank_list">
+			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=-$moduleid and status=3 and updatetime>$today_endtime-86400*7&pagesize=10&order=week_search desc&key=week_search&template=list-search_rank&file=price", -2)}-->
+		</div>		
+	</div>
+	<div class="b10">&nbsp;</div>
+	<div class="box_head_1"><div><strong>本月搜索排行</strong></div></div>
+	<div class="box_body">
+		<div class="rank_list">
+			<!--{tag("moduleid=$moduleid&table=keyword&condition=moduleid=-$moduleid and status=3 and updatetime>$today_endtime-86400*30&pagesize=10&order=month_search desc&key=month_search&template=list-search_rank&file=price", -2)}-->
+		</div>		
+	</div>
 </div>
-{/if}
+</div>
 {template 'footer'}

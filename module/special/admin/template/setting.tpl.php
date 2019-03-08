@@ -1,11 +1,12 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('基本设置'),
     array('SEO优化'),
     array('权限收费'),
-    array('定义字段', 'javascript:Dwidget(\'?file=fields&tb='.$table.'\', \'['.$MOD['name'].']定义字段\');'),
+    array('定义字段', '?file=fields&tb='.$table),
+    array('模板管理', '?file=template&dir='.$module),
 );
 show_menu($menus);
 ?>
@@ -14,27 +15,8 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">首页默认模板</td>
-<td><?php echo tpl_select('index', $module, 'setting[template_index]', '默认模板', $template_index);?></td>
-</tr>
-<tr>
-<td class="tl">列表默认模板</td>
-<td><?php echo tpl_select('list', $module, 'setting[template_list]', '默认模板', $template_list);?></td>
-</tr>
-<tr>
-<td class="tl">内容默认模板</td>
-<td><?php echo tpl_select('show', $module, 'setting[template_show]', '默认模板', $template_show);?></td>
-</tr>
-<tr>
-<td class="tl">搜索默认模板</td>
-<td><?php echo tpl_select('search', $module, 'setting[template_search]', '默认模板', $template_search);?></td>
-</tr>
-<tr>
-<td class="tl">类别默认模板</td>
-<td><?php echo tpl_select('type', $module, 'setting[template_type]', '默认模板', $template_type);?></td>
-</tr>
+<div class="tt">基本设置</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">默认缩略图[宽X高]</td>
 <td>
@@ -114,9 +96,9 @@ X
 <a href="?file=split&mid=<?php echo $moduleid;?>&action=merge" target="_blank" class="t" onclick="return confirm('确定要合并内容吗？合并成功之后请立即关闭内容分表\n\n建议在合并之前备份一次数据库');">[合并内容]</a>
 </span>
 <span style="display:none;" id="split_b">
-<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？拆分成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
+<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？合并成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
 </span>
-&nbsp;<?php tips('如果开启内容分表，内容表将根据id号10万数据创建一个分区<br/>如果你的数据少于10万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 100000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
+&nbsp;<?php tips('如果开启内容分表，内容表将根据id号50万数据创建一个分区<br/>如果你的数据少于50万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 500000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
 <input type="hidden" name="maxid" value="<?php echo $maxid;?>"/>
 </td>
 </tr>
@@ -141,11 +123,6 @@ X
 </tr>
 
 <tr>
-<td class="tl">首页推荐信息数量</td>
-<td><input type="text" size="3" name="setting[page_irec]" value="<?php echo $page_irec;?>"/></td>
-</tr>
-
-<tr>
 <td class="tl">首页分类信息数量</td>
 <td><input type="text" size="3" name="setting[page_icat]" value="<?php echo $page_icat;?>"/></td>
 </tr>
@@ -155,34 +132,12 @@ X
 <td><input type="text" size="3" name="setting[pagesize]" value="<?php echo $pagesize;?>"/></td>
 </tr>
 
-<tr>
-<td class="tl">内容图片最大宽度</td>
-<td><input type="text" size="3" name="setting[max_width]" value="<?php echo $max_width;?>"/> px</td>
-</tr>
-
-
-<tr>
-<td class="tl">内容点击次数</td>
-<td>
-<input type="radio" name="setting[hits]" value="1"  <?php if($hits) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[hits]" value="0"  <?php if(!$hits) echo 'checked';?>/> 关闭
-<?php tips('关闭后，有助于缓解频繁更新点击次数对数据表造成的压力');?>
-</td>
-</tr>
-
-<tr>
-<td class="tl">内容页评论列表</td>
-<td>
-<input type="radio" name="setting[page_comment]" value="1"  <?php if($page_comment==1) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[page_comment]" value="0"  <?php if($page_comment==0) echo 'checked';?>/> 关闭
-</td>
-</tr>
-
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">SEO优化</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">首页是否生成html</td>
 <td>
@@ -309,8 +264,10 @@ X
 </table>
 </div>
 
+
 <div id="Tabs2" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">权限收费</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">允许浏览<?php echo $MOD['name'];?>首页</td>
 <td><?php echo group_checkbox('setting[group_index][]', $group_index);?></td>
@@ -329,15 +286,26 @@ X
 <td><?php echo group_checkbox('setting[group_search][]', $group_search);?></td>
 </tr>
 
+</table>
+<div class="tt"><?php echo $DT['credit_name'];?>规则</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<td class="tl">向发布人打赏</td>
-<td><input type="text" size="2" name="setting[fee_award]" value="<?php echo $fee_award;?>"/> % <?php tips('请填写1-100之间的数字，用户打赏之后，系统将按此比例向发布人增加对应的赏金，填0代表关闭打赏');?></td>
+<td class="tl">发布<?php echo $MOD['name'];?>奖励</td>
+<td>
+<input type="text" size="5" name="setting[credit_add]" value="<?php echo $credit_add;?>"/>
+</td>
+</tr>
+<tr>
+<td class="tl"><?php echo $MOD['name'];?>被删除扣除</td>
+<td>
+<input type="text" size="5" name="setting[credit_del]" value="<?php echo $credit_del;?>"/>
+</td>
 </tr>
 </table>
 </div>
 
 <div class="sbt">
-<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -354,9 +322,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-$(function(){
+window.onload=function() {
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-});
+}
 </script>
 <?php include tpl('footer');?>

@@ -1,24 +1,23 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
-if(!isset($CFG['edittpl']) || !$CFG['edittpl']) msg('系统禁止了在线修改模板，请修改根目录config.inc.php<br/>$CFG[\'edittpl\'] = \'0\'; 修改为 $CFG[\'edittpl\'] = \'1\';');
+defined('IN_DESTOON') or exit('Access Denied');
+if(!isset($CFG['edittpl']) || !$CFG['edittpl']) msg('系统禁止了在线修改模板，请FTP修改根目录config.inc.php<br/>$CFG[\'edittpl\'] = \'0\'; 修改为 $CFG[\'edittpl\'] = \'1\';');
 isset($dir) or $dir = '';
 $menus = array (
 	array('新建模板', '?file='.$file.'&action=add&dir='.$dir),
     array('模板管理', '?file='.$file),
+    array('重建缓存', '?file='.$file.'&action=cache'),
     array('风格管理', '?file=skin'),
     array('标签向导', '?file=tag'),
 );
 isset($bakid) or $bakid = '';
 isset($fileid) or $fileid = '';
 $this_forward = '?file='.$file.'&dir='.$dir;
-$tpl = get_cookie('tpl');
-$tpl = check_name($tpl) ? $tpl : $CFG['template'];
-$template_root = DT_ROOT.'/template/'.$tpl.'/'.$dir;
-$template_path = 'template/'.$tpl.'/'.$dir;
+$template_root = DT_ROOT.'/template/'.$CFG['template'].'/'.$dir;
+$template_path = 'template/'.$CFG['template'].'/'.$dir;
 @include $template_root.'/these.name.php';
 
 function template_name($fileid = '', $name = '') {
@@ -32,34 +31,19 @@ function template_name($fileid = '', $name = '') {
 	file_put($template_root.'/these.name.php', "<?php\n\$names = ".var_export($names, true).";\n?>");
 }
 
-function template_safe($content) {
-	$content = stripslashes($content);
-	$content = strip_sql($content, 0);
-	if(preg_match_all("/script([^>]+)>/i", $content, $matches)) {
-		foreach($matches[1] as $m) {
-			$m = strtolower($m);
-			if(strpos($m, 'language') !== false || strpos($m, 'php') !== false) msg('模板内容包含不安全写法，禁止在线修改或预览');
-		}
-	}
-	if(preg_match("/(\<\?|\{php|file\(|eval|copy|file_put|file_get|fopen|fwrite|fread)/i", $content)) msg('模板内容包含不安全写法，禁止在线修改或预览');
-	return $content;
-}
-
 switch($action) {
 	case 'add':
 		if($submit) {
 			if(!preg_match("/^[a-z0-9_\-]+$/", $fileid)) msg('文件名只能为小写字母、数字、中划线、下划线');
-			if(substr($fileid, -1) == '-') msg('文件名不能以 - 符号结尾');
-			if(substr_count($fileid, '-') > 1) msg('文件名只能包含一个 - 符号');
 			if(!$name) $name = $fileid;
 			$template = $template_root.'/'.$fileid.'.htm';
 			if(isset($nowrite) && is_file($template)) msg('文件已经存在');
-			file_put($template, template_safe($content));
+			file_put($template, stripslashes($content));
 			if($name != $fileid) template_name($fileid, $name);
 			dmsg('创建成功', $this_forward);
 		} else {
 			$content = '';
-			if(isset($type)) $content = dhtmlspecialchars(file_get($template_root.'/'.$type.'.htm'));
+			if(isset($type)) $content = htmlspecialchars(file_get($template_root.'/'.$type.'.htm'));
 			include tpl('template_add');
 		}
 	break;
@@ -67,8 +51,6 @@ switch($action) {
 		if($submit) {
 			$dfileid or msg();
 			if(!preg_match("/^[a-z0-9_\-]+$/", $fileid)) msg('文件名只能为小写字母、数字、中划线、下划线');
-			if(substr($fileid, -1) == '-') msg('文件名不能以 - 符号结尾');
-			if(substr_count($fileid, '-') > 1) msg('文件名只能包含一个 - 符号');
 			if(!$name) $name = $fileid;
 			$dfile = $template_root.'/'.$dfileid.'.htm';
 			$nfile = $template_root.'/'.$fileid.'.htm';
@@ -82,7 +64,7 @@ switch($action) {
 					}
 				}
 			}
-			file_put($nfile, template_safe($content));
+			file_put($nfile, stripslashes($content));
 			if($dfileid != $fileid) file_del($dfile);
 			if($name != $fileid) template_name($fileid, $name);
 			dmsg('修改成功', '?file='.$file.'&action='.$action.'&fileid='.$fileid.'&dir='.$dir);
@@ -91,14 +73,14 @@ switch($action) {
 			if(!is_write($template_root.'/'.$fileid.'.htm')) msg($fileid.'.htm不可写，请将其属性设置为可写');
 			if($dir) $template_path = $template_path.'/';
 			$name = (isset($names[$fileid]) && $names[$fileid]) ? $names[$fileid] : $fileid;
-			$content = dhtmlspecialchars(file_get($template_root.'/'.$fileid.'.htm'));
+			$content = htmlspecialchars(file_get($template_root.'/'.$fileid.'.htm'));
 			include tpl('template_edit');
 		}
 	break;
 	case 'preview':
 		$db->halt = 0;
 		require_once DT_ROOT.'/include/template.func.php';
-		$tpl_content = template_safe($content);
+		$tpl_content = stripslashes($content);
 		unset($content);
 		$tpl_content = template_parse($tpl_content);
 		cache_write('_preview.tpl.php', $tpl_content, 'tpl');
@@ -116,6 +98,7 @@ switch($action) {
 	case 'template_name':
 		$fileid or exit('0');
 		$name or exit('0');
+		$name = convert($name, 'UTF-8', DT_CHARSET);
 		template_name($fileid, $name);
 		exit('1');
 	break;
@@ -134,14 +117,6 @@ switch($action) {
 	case 'cache':
 		cache_clear('php', 'dir', 'tpl');
 		dmsg('更新成功', $this_forward);	
-	break;
-	case 'change':
-		$to = check_name($to) ? $to : '';
-		if($to && is_dir(DT_ROOT.'/template/'.$to.'/')) {
-			if($to == $CFG['template']) $to = '';
-			set_cookie('tpl', $to);
-		}
-		dmsg('切换成功', $this_forward);	
 	break;
 	default:
 		$dirs = $files = $templates = $baks = array();

@@ -21,8 +21,9 @@ if($html == 'show') {
 					if(check_pay($mid, $itemid)) {
 						$user_status = 3;
 					} else {
-						$user_status = 2;
-						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid;
+						$user_status = 2;						
+						$linkurl = linkurl($MOD['linkurl'].$linkurl, 1);
+						$pay_url = linkurl($MODULE[2]['linkurl'], 1).'pay.php?mid='.$mid.'&itemid='.$itemid.'&fee='.$fee.'&currency='.$currency.'&sign='.crypt_sign($_username.$mid.$itemid.$fee.$currency.$linkurl.$item['title']).'&title='.rawurlencode($item['title']).'&forward='.urlencode($linkurl);
 					}
 				} else {
 					$user_status = 0;
@@ -64,8 +65,8 @@ if($html == 'show') {
 		echo 'Inner("photo", \''.$content.'\');';
 	}
 	$update = '';
-	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
-	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
+	include DT_ROOT.'/include/update.inc.php';
+	echo 'Inner("hits", \''.$item['hits'].'\');';
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
@@ -81,10 +82,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits'] && $MOD['hits']) {
-		$file = DT_CACHE.'/hits-'.$moduleid;
-		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
-	}
+	if($DT['cache_hits'] && $DT_TIME - @filemtime(DT_CACHE.'/hits-'.$moduleid.'.dat') > $DT['cache_hits']) update_hits($moduleid, $table);
 	if($MOD['index_html']) {
 		$file = DT_ROOT.'/'.$MOD['moduledir'].'/'.$DT['index'].'.'.$DT['file_ext'];
 		if($DT_TIME - @filemtime($file) > $task_index) tohtml('index', $module);

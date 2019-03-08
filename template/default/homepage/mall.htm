@@ -1,163 +1,65 @@
 {template 'header', $template}
-<div class="dsn" id="pos_show"><a href="{$COM[linkurl]}">首页</a> <i>&gt;</i> <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} <i>&gt;</i> {$title}{/if}</div>
+<div class="dsn" id="pos_show">您当前的位置：<a href="{$COM[linkurl]}">首页</a> &raquo; <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} &raquo; {$title}{/if}</div>
 {if $itemid}
-{load('mall.css')}
 <div class="main_head"><div><strong>{$title}</strong></div></div>
 <div class="main_body">	
 		<table width="100%" align="center">
 		<tr>
-		<td width="250" valign="top">
-			<div id="mid_pos"></div>
-			<div id="mid_div" onmouseover="SAlbum();" onmouseout="HAlbum();" onclick="PAlbum(Dd('mid_pic'));">
-			<img src="{$albums[0]}" width="240" height="180" id="mid_pic"/><span id="zoomer"></span>
+		<td width="270" valign="top">
+			<div class="album">
+				<table width="100%" cellpadding="0" cellspacing="0">
+				<tr align="center">
+				<td width="250" valign="top"><div><span id="abm" title="点击图片查看大图"><img src="{$albums[0]}" onload="if(this.width>240){this.width=240;}" onmouseover="SAlbum(this.src);" onmouseout="HAlbum();" onclick="PAlbum(this);" id="DIMG"/></span></div></td>
+				</tr>
+				<tr>
+				<td>
+				{loop $thumbs $k $v}<img src="{$v}" width="60" height="60" onmouseover="if(this.src.indexOf('nopic60.gif')==-1)Album({$k}, '{$albums[$k]}');"class="{if $k}ab_im{else}ab_on{/if}" id="t_{$k}"/>{/loop}</td>
+				</tr>
+				<tr align="center">
+				<td height="30" onclick="PAlbum(Dd('DIMG'));"><img src="{DT_SKIN}image/ico_zoom.gif" width="16" height="16" align="absmiddle"/> 点击图片查看大图</td>
+				</tr>
+				</table>
 			</div>
-			<div class="b5"></div>
-			<div>
-			{loop $thumbs $k $v}<img src="{$v}" width="60" height="60" onmouseover="if(this.src.indexOf('nopic60.gif')==-1)Album({$k}, '{$albums[$k]}');" class="{if $k}ab_im{else}ab_on{/if}" id="t_{$k}"/>{/loop}
-			</div>
-			<div class="b5"></div>
-			<div onclick="PAlbum(Dd('mid_pic'));" class="c_b t_c c_p"><img src="{DT_SKIN}image/ico_zoom.gif" width="16" height="16" align="absmiddle"/> 点击图片查看原图</div>
 		</td>
-		<td width="15"> </td>
 		<td valign="top">
-			<div id="big_div" style="display:none;"><img src="" id="big_pic"/></div>
-			{if $a2}
-			<div class="step_price">
-			<table width="100%" cellpadding="6" cellspacing="0">
-			<tr>
-			<td>起批</td>
-			<td>{$a1}-{$a2}{$unit}</td>
-			{if $a3}
-			<td>{$a2+1}-{$a3}{$unit}</td>
-			<td>{$a3}{$unit}以上</td>
-			{else}
-			<td>{$a2+1}{$unit}以上</td>
-			{/if}
-			</tr>
-			<tr>
-			<td>价格</td>
-			<td class="f_price">{$DT[money_sign]}<span class="px14">{$p1}</span></td>
-			{if $a3}
-			<td class="f_price">{$DT[money_sign]}<span class="px14">{$p2}</span></td>
-			<td class="f_price">{$DT[money_sign]}<span class="px14">{$p3}</span></td>
-			{else}
-			<td class="f_price">{$DT[money_sign]}<span class="px14">{$p2}</span></td>
-			{/if}
-			</tr>
-			</table>
-			</div>
-			{/if}
+			<div id="imgshow" style="display:none;"></div>
 			<table width="100%" cellpadding="4" cellspacing="4">
-			{if !$a2}
 			<tr>
-			<td>单价：</td>
-			<td class="f_price">{$DT[money_sign]}<span class="px16">{$price}</span></td>
-			</tr>
-			{/if}
-			{if $express_name_1 == '包邮'}
-			<tr>
-			<td>物流：</td>
-			<td>
-			{if $fee_start_1>0}
-			{if $fee_start_2>0} {$express_name_2}:{$fee_start_2}&nbsp;&nbsp;{/if}
-			{if $fee_start_3>0} {$express_name_3}:{$fee_start_3}&nbsp;&nbsp;{/if}
-			满{$fee_start_1}包邮
-			{else}
-			包邮
-			{/if}</td>
-			</tr>
-			{elseif $fee_start_1>0 || $fee_start_2>0 || $fee_start_3>0}
-			<tr>
-			<td>物流：</td>
-			<td class="f_gray">
-			{if $fee_start_1>0} {$express_name_1}:{$fee_start_1}&nbsp;&nbsp;{/if}
-			{if $fee_start_2>0} {$express_name_2}:{$fee_start_2}&nbsp;&nbsp;{/if}
-			{if $fee_start_3>0} {$express_name_3}:{$fee_start_3}&nbsp;&nbsp;{/if}
-			</td>
-			</tr>
-			{/if}
-			{if $cod}
-			<tr>
-			<td>到付：</td>
-			<td>支持货到付款</td>
-			</tr>
-			{/if}
-			<tr>
-			<td>品牌：</td>
-			<td>{if $brand}<a href="{$MOD[linkurl]}{rewrite('search.php?fields=4&kw='.urlencode($brand))}" target="_blank">{$brand}</a>{else}未填写{/if}</td>
+			<td width="80" class="f_dblue">商品：</td>
+			<td><strong>{$title}</strong>&nbsp;</td>
 			</tr>
 			<tr>
-			<td>地区：</td>
+			<td class="f_dblue">单 价：</td>
+			<td class="f_gray">￥<span class="f_price px16">{$price}</span></td>
+			</tr>
+			<tr>
+			<td class="f_dblue">品 牌：</td>
+			<td>{if $brand}<a href="{$MOD[linkurl]}search.php?fields=4&kw={urlencode($brand)}" target="_blank">{$brand}</a>{else}未填写{/if}</td>
+			</tr>
+			<tr>
+			<td class="f_dblue">所在地：</td>
 			<td>{area_pos($areaid, '')}</td>
 			</tr>
 			<tr>
-			<td>销量：</td>
+			<td class="f_dblue">销 量：</td>
 			<td><a href="{$linkurl}#order" target="_blank">累计出售 <span class="f_orange">{$sales}</span> 件，{$orders} 个订单</a></td>
 			</tr>
 			<tr>
-			<td>评价：</td>
+			<td class="f_dblue">评 价：</td>
 			<td><a href="{$linkurl}#comment" target="_blank">已有 <span class="f_orange">{$comments}</span> 条评价</a></td>
 			</tr>
 			<tr>
-			<td>库存：</td>
+			<td class="f_dblue">库 存：</td>
 			<td>还剩 <span class="f_orange">{$amount}</span> 件</td>
 			</tr>
-			{if $MOD[hits]}
 			<tr>
-			<td>人气：</td>
+			<td class="f_dblue">人 气：</td>
 			<td>已有 <span class="f_orange"><span id="hits">{$hits}</span></span> 人关注</td>
 			</tr>
-			{/if}
 			<tr>
-			<td width="50">更新：</td>
+			<td class="f_dblue">更 新：</td>
 			<td>{$editdate}</td>
 			</tr>
-			{if $RL}
-			<tr>
-			<td>{$relate_name}：</td>
-			<td>
-			{loop $RL $v}
-			<div class="relate_{if $itemid==$v[itemid]}2{else}1{/if}">{if $itemid==$v[itemid]}<em></em>{/if}<a href="{userurl($username, 'file=mall&itemid='.$v[itemid])}"><img src="{$v[thumb]}" alt="" title="{$v[relate_title]}"/></a></div>
-			{/loop}				
-			</td>
-			</tr>
-			{/if}
-			{if $P1}
-			<tr>
-			<td>{$n1}：</td>
-			<td id="p1">
-			<ul>
-			{loop $P1 $i $v}
-			<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
-			{/loop}
-			</ul>
-			</td>
-			</tr>
-			{/if}
-			{if $P2}
-			<tr>
-			<td>{$n2}：</td>
-			<td id="p2">
-			<ul>
-			{loop $P2 $i $v}
-			<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
-			{/loop}
-			</ul>
-			</td>
-			</tr>
-			{/if}
-			{if $P3}
-			<tr>
-			<td>{$n3}：</td>
-			<td id="p3">
-			<ul>
-			{loop $P3 $i $v}
-			<li class="nv_{if $i==0}2{else}1{/if}">{$v}</li>
-			{/loop}
-			</ul>
-			</td>
-			</tr>
-			{/if}
 			{if $status == 4}
 			<tr>
 			<td></td>
@@ -165,59 +67,43 @@
 			</tr>
 			{/if}
 			</table>
-			{if $status == 3 && $amount > 0}
+			{if $status == 3}
 			<div>
-			<img src="{DT_SKIN}image/btn_tobuy.gif" alt="立即购买" class="c_p" onclick="BuyNow();"/>
+			<img src="{DT_SKIN}image/btn_tobuy.gif" alt="立即购买" class="c_p" onclick="Go('{$MOD[linkurl]}{rewrite('buy.php?itemid='.$itemid)}');"/>
 			&nbsp;
-			<img src="{DT_SKIN}image/btn_addcart.gif" alt="加入购物车" class="c_p" onclick="AddCart();"/>
+			<img src="{DT_SKIN}image/btn_addcart.gif" alt="加入购物车" class="c_p" onclick="Go('{$MOD[linkurl]}{rewrite('cart.php?itemid='.$itemid)}');"/>
 			</div>
 			{/if}
 		</td>
 		</tr>
 		</table>
 	</div>
+
 	<div class="main_head"><div><strong>详细信息</strong></div></div>
 	<div class="main_body">
-		{if $CP}{template 'property_show', 'chip'}{/if}
+		{if $CP}{template 'property', 'chip'}{/if}
 		<div class="content" id="content">{$content}</div>
 	</div>
 	<script type="text/javascript">
 	var content_id = 'content';
 	var img_max_width = {$MOD[max_width]};
 	</script>
-	<script type="text/javascript" src="{DT_STATIC}file/script/content.js"></script>
-	<!--[if lte IE 9]><!-->
-	<script type="text/javascript" src="{DT_STATIC}file/script/jquery-1.5.2.min.js"></script>
-	<!--<![endif]-->
-	<!--[if (gte IE 10)|!(IE)]><!-->
-	<script type="text/javascript" src="{DT_STATIC}file/script/jquery-2.1.1.min.js"></script>
-	<!--<![endif]-->
-	<script type="text/javascript">
-	var s_s = {'1':0,'2':0,'3':0};
-	function addE(i) {
-		$('#p'+i+' li').mouseover(function() {
-			if(this.className == 'nv_1') this.className = 'nv_3';
-		});
-		$('#p'+i+' li').mouseout(function() {
-			if(this.className == 'nv_3') this.className = 'nv_1';
-		});
-		$('#p'+i+' li').click(function() {
-			$('#p'+i+' li')[s_s[i]].className = 'nv_1';
-			this.className = 'nv_2';
-			s_s[i] = $(this).index();
-		});
-	}
-	{if $p1}addE(1);{/if}
-	{if $p2}addE(2);{/if}
-	{if $p3}addE(3);{/if}
-	function BuyNow() {
-		Go('{$MODULE[2][linkurl]}buy.php?mid={$moduleid}&itemid={$itemid}&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]);
-	}
-	function AddCart() {
-		Go('{$MODULE[2][linkurl]}cart.php?mid={$moduleid}&itemid={$itemid}&s1='+s_s[1]+'&s2='+s_s[2]+'&s3='+s_s[3]);
-	}
-	</script>
+	<script type="text/javascript" src="{DT_PATH}file/script/content.js"></script>
 {else}
+<div class="main_head"><div><strong>商品分类</strong></div></div>
+<div class="main_body">
+	<div class="px13 lh18">
+	<!--{php $tags=tag("table=type&condition=item='mall-".$userid."'&pagesize=40&order=listorder asc,typeid desc&template=null");}-->
+	<div><span class="f_r"><a href="{$MENU[$menuid][linkurl]}" class="t">显示全部</a>&nbsp;</span>&nbsp;&nbsp;<strong>我公司主营以下几类商品，请查看： </strong></div>
+	<table width="98%" cellpadding="3" cellspacing="3" align="center">
+	{loop $tags $i $t}
+	{if $i%3==0}<tr>{/if}
+	<td width="33%" id="type_{$t[typeid]}"><a href="{userurl($username, 'file=mall&typeid='.$t['typeid'], $domain)}" title="{$t[typename]}" id="name_{$t[typeid]}">{set_style($t[typename], $t[style])}</a></td>
+	{if $i%3==2}</tr>{/if}
+	{/loop}
+	</table>
+	</div>
+</div>
 <div class="main_head">
 <div>
 <span class="f_r f_n px12">
@@ -240,10 +126,8 @@
 	</tr>
 	{loop $lists $k $v}
 	<tr align="center"{if $k%2==1} bgcolor="#FBFBFB"{/if}>
-	<td height="100"><a href="{$v[linkurl]}"><img src="{$v[thumb]}" width="80" height="80" alt="" style="border:#C0C0C0 1px solid;"/></a></td>
-	<td align="left" class="lh18"><a href="{$v[linkurl]}" class="px14">{$v[title]}</a><br/>
-	价格：{$DT[money_sign]}<strong class="f_red">{$v[price]}</strong><br/>
-	品牌：{$v[brand]}&nbsp;销量：{$v[orders]}&nbsp;评论：{$v[comments]}
+	<td height="100"><a href="{$v[linkurl]}"><img src="{imgurl($v[thumb], 1)}" width="80" height="80" alt="" style="border:#C0C0C0 1px solid;"/></a></td>
+	<td align="left" class="lh18" valign="top"><a href="{$v[linkurl]}" class="px13">{$v[title]}</a><br/><span class="f_gray">{$v[introduce]}</span>
 	</td>
 	<td>{timetodate($v[edittime], 3)}</td>
 	</tr>
@@ -253,11 +137,11 @@
 	<table cellpadding="0" cellspacing="0" width="100%">
 	{loop $lists $k $v}
 	{if $k%4==0}<tr align="center">{/if}
-	<td valign="top" width="25%">
-	<div class="thumb">
-		<a href="{$v[linkurl]}"><img src="{$v[thumb]}" width="160" height="160" alt="{$v[alt]}"/></a>
+	<td valign="top" width="25%" height="180">
+	<div class="thumb" onmouseover="this.className='thumb thumb_on';" onmouseout="this.className='thumb';">
+		<a href="{$v[linkurl]}"><img src="{imgurl($v[thumb], 1)}" width="100" height="100" alt="{$v[alt]}"/></a>
 		<div><a href="{$v[linkurl]}">{$v[title]}</a></div>
-		<span class="f_price">{$DT[money_sign]}{$v[price]}</span>
+		<span class="f_price">￥{$v[price]}</span>
 	</div>
 	</td>
 	{if $k%4==3}</tr>{/if}
@@ -266,6 +150,7 @@
 {/if}
 	<div class="pages">{$pages}</div>
 </div>
+
 <script type="text/javascript">
 try {Dd('type_{$typeid}').innerHTML = '<strong>'+Dd('name_{$typeid}').innerHTML+'</strong>';}catch (e){}
 </script>

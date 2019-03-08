@@ -1,26 +1,20 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="tt">会员组修改</div>
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="groupid" value="<?php echo $groupid;?>"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员组名称</td>
 <td><input type="text" size="20" name="groupname" id="groupname" value="<?php echo $groupname;?>"/> <span id="dgroupname" class="f_red"></span></td>
 </tr>
 <tr>
-<td class="tl"><span class="f_red">*</span> 会员类型</td>
-<td>
-<input type="radio" name="setting[type]" value="1" <?php if($type) echo 'checked';?>/> 企业会员&nbsp;&nbsp;
-<input type="radio" name="setting[type]" value="0" <?php if(!$type) echo 'checked';?>/> 个人会员
-</td>
-</tr>
-<tr id="mode" style="display:;">
 <td class="tl"><span class="f_red">*</span> 会员模式</td>
 <td>
 <input type="radio" name="setting[fee_mode]" value="1" <?php if($fee_mode) echo 'checked';?> onclick="Ds('mode_1');Dh('mode_0');"/> 收费会员&nbsp;&nbsp;
@@ -34,34 +28,24 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> <?php echo VIP;?>指数</td>
-<td><input type="text" size="2" name="vip" id="vip" value="<?php echo $vip;?>"/> <span class="f_gray">免费会员请填0，收费会员请填1-9数字</span> <span id="dvip" class="f_red"></span></td>
+<td><input type="text" size="20" name="vip" id="vip" value="<?php echo $vip;?>"/> <span class="f_gray">免费会员请填0，收费会员请填1-9数字</span> <span id="dvip" class="f_red"></span></td>
 </tr>
 </tbody>
 <tr id="mode_0" style="display:<?php echo $fee_mode ? 'none' : '';?>">
 <td class="tl"><span class="f_red">*</span> 享受折扣</td>
-<td><input type="text" size="2" name="setting[discount]" id="discount" value="<?php echo $discount;?>"/> % <span class="f_gray">折扣仅限系统收费，不针对会员产品</span></td>
+<td><input type="text" size="20" name="setting[discount]" id="discount" value="<?php echo $discount;?>"/> % 折扣仅限系统收费，不针对会员产品</td>
 </tr>
-<tr>
-<td class="tl"><span class="f_red">*</span> 交易佣金</td>
-<td><input type="text" size="2" name="setting[commission]" id="commission" value="<?php echo $commission;?>"/> % <span class="f_gray">会员通过商城、供应、团购完成交易后，系统扣除交易额一定比例作为网站服务费用</span></td>
-</tr>
+
 <tr>
 <td class="tl"><span class="f_red">*</span> 显示顺序</td>
-<td><input type="text" size="2" name="listorder" id="listorder" value="<?php echo $listorder;?>"/>  <span class="f_gray">数字越小越靠前</span></td>
+<td><input type="text" size="5" name="listorder" id="listorder" value="<?php echo $listorder;?>"/>  <span class="f_gray">数字越小越靠前</span></td>
 </tr>
 </table>
 <div class="tt">会员权限</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">设置说明</td>
 <td>数量限制填 <strong>0</strong> 则表示不限&nbsp;&nbsp;&nbsp;填 <strong>-1</strong> 表示禁止使用</td>
-</tr>
-<tr>
-<td class="tl">允许进入商户后台</td>
-<td>
-<input type="radio" name="setting[biz]" value="1" <?php if($biz) echo 'checked';?>> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[biz]" value="0" <?php if(!$biz) echo 'checked';?>> 否
-</td>
 </tr>
 <tr>
 <td class="tl">允许在会员升级页面显示</td>
@@ -111,10 +95,6 @@ show_menu($menus);
 <tr>
 <td class="tl">24小时上传数量限制</td>
 <td><input name="setting[uploadday]" type="text" value="<?php echo $uploadday;?>" size="5"/> <?php tips('24小时内最大文件上传数量限制，0为不限制<br/>此项会增加服务器压力，且在开启上传记录的情况下有效');?></td>
-</tr>
-<tr>
-<td class="tl">上传一张图片扣积分</td>
-<td><input name="setting[uploadcredit]" type="text" value="<?php echo $uploadcredit;?>" size="5"/> <?php tips('积分不足时将无法上传，0为不限制');?></td>
 </tr>
 <tr>
 <td class="tl">产品图片数量限制</td>
@@ -186,18 +166,18 @@ show_menu($menus);
 </tr>
 
 <tr>
-<td class="tl">允许管理订单</td>
+<td class="tl">允许站内付款</td>
 <td>
-<input type="radio" name="setting[trade_order]" value="1" <?php if($trade_order) echo 'checked';?>> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[trade_order]" value="0" <?php if(!$trade_order) echo 'checked';?>> 否
+<input type="radio" name="setting[trade_pay]" value="1" <?php if($trade_pay) echo 'checked';?>> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[trade_pay]" value="0" <?php if(!$trade_pay) echo 'checked';?>> 否
 </td>
 </tr>
 
 <tr>
-<td class="tl">允许管理团购订单</td>
+<td class="tl">允许查看订单</td>
 <td>
-<input type="radio" name="setting[group_order]" value="1" <?php if($group_order) echo 'checked';?>> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[group_order]" value="0" <?php if(!$group_order) echo 'checked';?>> 否
+<input type="radio" name="setting[trade_sell]" value="1" <?php if($trade_sell) echo 'checked';?>> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[trade_sell]" value="0" <?php if(!$trade_sell) echo 'checked';?>> 否
 </td>
 </tr>
 
@@ -259,20 +239,6 @@ show_menu($menus);
 </tr>
 
 <tr>
-<td class="tl">运费模板数量限制</td>
-<td>
-<input type="text" name="setting[express_limit]" size="5" value="<?php echo $express_limit;?>"/>
-</td>
-</tr>
-
-<tr>
-<td class="tl">优惠活动数量限制</td>
-<td>
-<input type="text" name="setting[promo_limit]" size="5" value="<?php echo $promo_limit;?>"/>
-</td>
-</tr>
-
-<tr>
 <td class="tl">每日可发站内信限制</td>
 <td>
 <input type="text" name="setting[message_limit]" size="5" value="<?php echo $message_limit;?>"/> <?php echo tips('询盘和报价为特殊的站内信，发送一次询盘或者报价会消耗一次站内信发送机会');?>
@@ -300,10 +266,11 @@ show_menu($menus);
 <input type="text" name="setting[type_limit]" size="5" value="<?php echo $type_limit;?>"/>
 </td>
 </tr>
+
 </table>
 
 <div class="tt">公司主页</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">拥有公司主页</td>
 <td>
@@ -485,7 +452,7 @@ show_menu($menus);
 </tr>
 </table>
 <div class="tt">信息发布</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">允许发布信息的模块</td>
 <td>
@@ -494,21 +461,19 @@ show_menu($menus);
 	$moduleids = explode(',', $moduleids);
 	foreach($MODULE as $m) {
 		if($m['moduleid'] > 4 && is_file(DT_ROOT.'/module/'.$m['module'].'/my.inc.php')) {
-			echo '<li><input type="checkbox" name="setting[moduleids][]" value="'.$m['moduleid'].'" '.(in_array($m['moduleid'], $moduleids) ? 'checked' : '').' id="mod_'.$m['moduleid'].'"/><label for="mod_'.$m['moduleid'].'"> '.$m['name'].'</label></li>';
+			if($m['moduleid'] == 9) {
+				echo '<li><input type="checkbox" name="setting[moduleids][]" value="9" '.(in_array(9, $moduleids) ? 'checked' : '').' id="mod_9"/><label for="mod_9"> 招聘</label></li>';
+				echo '<li><input type="checkbox" name="setting[moduleids][]" value="-9" '.(in_array(-9, $moduleids) ? 'checked' : '').' id="mod__9"/><label for="mod__9"> 简历</label></li>';
+			} else {
+				echo '<li><input type="checkbox" name="setting[moduleids][]" value="'.$m['moduleid'].'" '.(in_array($m['moduleid'], $moduleids) ? 'checked' : '').' id="mod_'.$m['moduleid'].'"/><label for="mod_'.$m['moduleid'].'"> '.$m['name'].'</label></li>';
+			}
 		}
 	}
 ?>
 </ul>
 </td>
 </tr>
-<tr>
-<td class="tl">允许发布个人简历</td>
-<td>
-<input type="radio" name="setting[resume]" value="1" <?php if($resume){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[resume]" value="0" <?php if(!$resume){ ?>checked <?php } ?>/> 否&nbsp;&nbsp;
-如果没有开启人才模块，请选否
-</td>
-</tr>
+
 
 <tr>
 <td class="tl">开启强制邮件认证</td>
@@ -542,22 +507,8 @@ show_menu($menus);
 开启之后，公司认证成功才可以发布信息
 </td>
 </tr>
-<tr>
-<td class="tl">开启强制缴纳保证金</td>
-<td>
-<input type="radio" name="setting[vdeposit]" value="1" <?php if($vdeposit){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[vdeposit]" value="0" <?php if(!$vdeposit){ ?>checked <?php } ?>/> 否&nbsp;&nbsp;
-开启之后，公司缴纳保证金才可以发布信息
-</td>
-</tr>
-<tr>
-<td class="tl">开启强制关注微信公众号</td>
-<td>
-<input type="radio" name="setting[vweixin]" value="1" <?php if($vweixin){ ?>checked <?php } ?>/> 是&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[vweixin]" value="0" <?php if(!$vweixin){ ?>checked <?php } ?>/> 否&nbsp;&nbsp;
-开启之后，关注网站微信号才可以发布信息
-</td>
-</tr>
+
+
 <tr>
 <td class="tl">允许删除信息</td>
 <td>
@@ -585,18 +536,10 @@ show_menu($menus);
 </tr>
 
 <tr>
-<td class="tl">1小时发布信息数量</td>
-<td>
-<input type="text" name="setting[hour_limit]" size="5" value="<?php echo $hour_limit;?>"/>
-&nbsp;&nbsp;填 0 表示不限制&nbsp;&nbsp;填正数表示1小时内在单模块发布信息数量限制（防灌水）
-</td>
-</tr>
-
-<tr>
 <td class="tl">24小时发布信息数量</td>
 <td>
 <input type="text" name="setting[day_limit]" size="5" value="<?php echo $day_limit;?>"/>
-&nbsp;&nbsp;填 0 表示不限制&nbsp;&nbsp;填正数表示24小时内在单模块发布信息数量限制（防灌水）
+&nbsp;&nbsp;填 0 表示不限制&nbsp;&nbsp;填正数表示24小时内在单模块发布信息数量限制
 </td>
 </tr>
 
@@ -615,8 +558,223 @@ show_menu($menus);
 &nbsp;&nbsp;单位： 天&nbsp;&nbsp;填 -1 表示不允许修改&nbsp;&nbsp;填 0 表示不限制时间修改&nbsp;&nbsp;填正数表示发布时间超出后不可修改
 </td>
 </tr>
+
+<tr>
+<td class="tl">发布供应总数限制</td>
+<td>
+<input type="text" name="setting[sell_limit]" size="5" value="<?php echo $sell_limit;?>"/>
+&nbsp;&nbsp;填 -1 表示禁止发布 填 0 表示不限制数量 填正数表示限制数量，下同
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布供应数量</td>
+<td>
+<input type="text" name="setting[sell_free_limit]" size="5" value="<?php echo $sell_free_limit;?>"/>
+&nbsp;&nbsp;填 -1 表示不收费 请填 0 表示无免费 填正数表示可免费发布条数，下同
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布求购总数限制</td>
+<td>
+<input type="text" name="setting[buy_limit]" size="5" value="<?php echo $buy_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布求购数量</td>
+<td>
+<input type="text" name="setting[buy_free_limit]" size="5" value="<?php echo $buy_free_limit;?>"/>
+</td>
+</tr>
+
+
+<tr>
+<td class="tl">发布商品总数限制</td>
+<td>
+<input type="text" name="setting[mall_limit]" size="5" value="<?php echo $mall_limit;?>"/> &nbsp;&nbsp;针对商城模块
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布商品数量</td>
+<td>
+<input type="text" name="setting[mall_free_limit]" size="5" value="<?php echo $mall_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布团购总数限制</td>
+<td>
+<input type="text" name="setting[group_limit]" size="5" value="<?php echo $group_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布团购数量</td>
+<td>
+<input type="text" name="setting[group_free_limit]" size="5" value="<?php echo $group_free_limit;?>"/>
+</td>
+</tr>
+<tr>
+<td class="tl">发布展会总数限制</td>
+<td>
+<input type="text" name="setting[exhibit_limit]" size="5" value="<?php echo $exhibit_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布展会数量</td>
+<td>
+<input type="text" name="setting[exhibit_free_limit]" size="5" value="<?php echo $exhibit_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布行情总数限制</td>
+<td>
+<input type="text" name="setting[quote_limit]" size="5" value="<?php echo $quote_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布行情数量</td>
+<td>
+<input type="text" name="setting[quote_free_limit]" size="5" value="<?php echo $quote_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布招聘总数限制</td>
+<td>
+<input type="text" name="setting[job_limit]" size="5" value="<?php echo $job_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布招聘数量</td>
+<td>
+<input type="text" name="setting[job_free_limit]" size="5" value="<?php echo $job_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布简历总数限制</td>
+<td>
+<input type="text" name="setting[resume_limit]" size="5" value="<?php echo $resume_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布简历数量</td>
+<td>
+<input type="text" name="setting[resume_free_limit]" size="5" value="<?php echo $resume_free_limit;?>"/>
+</td>
+</tr>
+
+
+<tr>
+<td class="tl">发布文章总数限制</td>
+<td>
+<input type="text" name="setting[article_limit]" size="5" value="<?php echo $article_limit;?>"/>
+“文章”指用文章模型创建的模块，例如“资讯”模块
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布文章数量</td>
+<td>
+<input type="text" name="setting[article_free_limit]" size="5" value="<?php echo $article_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布信息总数限制</td>
+<td>
+<input type="text" name="setting[info_limit]" size="5" value="<?php echo $info_limit;?>"/>
+“信息”指用信息模型创建的模块，例如“招商”模块
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布信息数量</td>
+<td>
+<input type="text" name="setting[info_free_limit]" size="5" value="<?php echo $info_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布知道总数限制</td>
+<td>
+<input type="text" name="setting[know_limit]" size="5" value="<?php echo $know_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布知道数量</td>
+<td>
+<input type="text" name="setting[know_free_limit]" size="5" value="<?php echo $know_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布品牌总数限制</td>
+<td>
+<input type="text" name="setting[brand_limit]" size="5" value="<?php echo $brand_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布品牌数量</td>
+<td>
+<input type="text" name="setting[brand_free_limit]" size="5" value="<?php echo $brand_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布图库总数限制</td>
+<td>
+<input type="text" name="setting[photo_limit]" size="5" value="<?php echo $photo_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布图库数量</td>
+<td>
+<input type="text" name="setting[photo_free_limit]" size="5" value="<?php echo $photo_free_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">发布视频总数限制</td>
+<td>
+<input type="text" name="setting[video_limit]" size="5" value="<?php echo $video_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布视频数量</td>
+<td>
+<input type="text" name="setting[video_free_limit]" size="5" value="<?php echo $video_free_limit;?>"/>
+</td>
+</tr>
+<tr>
+<td class="tl">发布下载总数限制</td>
+<td>
+<input type="text" name="setting[down_limit]" size="5" value="<?php echo $down_limit;?>"/>
+</td>
+</tr>
+
+<tr>
+<td class="tl">免费发布下载数量</td>
+<td>
+<input type="text" name="setting[down_free_limit]" size="5" value="<?php echo $down_free_limit;?>"/>
+</td>
+</tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn">&nbsp;&nbsp;&nbsp;&nbsp;</div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -630,9 +788,6 @@ function check() {
 	}
 	return true;
 }
-<?php if($groupid == 5 || $groupid == 6) { ?>
-Dh('mode');
-<?php } ?>
 </script>
 <script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -20,9 +20,10 @@ class upload {
     var $errmsg = errmsg;
 	var $userid;
 	var $image;
+	var $uptime = 0;
 	var $adduserid = true;
 
-    function __construct($_file, $savepath, $savename = '', $fileformat = '') {
+    function upload($_file, $savepath, $savename = '', $fileformat = '') {
 		global $DT, $_userid;
 		foreach($_file as $file) {
 			$this->file = $file['tmp_name'];
@@ -30,7 +31,6 @@ class upload {
 			$this->file_size = $file['size'];
 			$this->file_type = $file['type'];
 			$this->file_error = $file['error'];
-			break;
 		}
 		$this->userid = $_userid;
 		$this->ext = file_ext($this->file_name);
@@ -40,20 +40,15 @@ class upload {
 		$this->savename = $savename;
     }
 
-    function upload($_file, $savepath, $savename = '', $fileformat = '') {
-		$this->__construct($_file, $savepath, $savename, $fileformat);
-    }
-
 	function save() {
 		include load('include.lang');
-        if($this->file_error) return $this->_('Error(21)'.$L['upload_failed'].' ('.$L['upload_error_'.$this->file_error].')');
-		if($this->maxsize > 0 && $this->file_size > $this->maxsize) return $this->_('Error(22)'.$L['upload_size_limit'].' ('.intval($this->maxsize/1024).'Kb)');
-        if(!$this->is_allow()) return $this->_('Error(23)'.$L['upload_not_allow']);
+        if($this->file_error == UPLOAD_ERR_PARTIAL || $this->file_error == UPLOAD_ERR_NO_FILE || $this->file_error == UPLOAD_ERR_INI_SIZE || $this->file_error == UPLOAD_ERR_FORM_SIZE) return $this->_($L['upload_failed'].' ('.$this->file_error.')');
+		if($this->maxsize > 0 && $this->file_size > $this->maxsize) return $this->_($L['upload_size_limit'].' ('.intval($this->maxsize/1024).'Kb)');
+        if(!$this->is_allow()) return $this->_($L['upload_not_allow']);
         $this->set_savepath($this->savepath);
         $this->set_savename($this->savename);
-        if(!is_writable(DT_ROOT.'/'.$this->savepath)) return $this->_('Error(24)'.$L['upload_unwritable']);
-		if(!is_uploaded_file($this->file)) return $this->_('Error(25)'.$L['upload_failed']);
-		if(!move_uploaded_file($this->file, DT_ROOT.'/'.$this->saveto)) return $this->_('Error(26)'.$L['upload_failed']);
+        if(!is_writable(DT_ROOT.'/'.$this->savepath)) return $this->_($L['upload_unwritable']);
+		if(!move_uploaded_file($this->file, DT_ROOT.'/'.$this->saveto) && !copy($this->file, DT_ROOT.'/'.$this->saveto)) return $this->_($L['upload_failed']);
 		$this->image = $this->is_image();
 		if(DT_CHMOD) @chmod(DT_ROOT.'/'.$this->saveto, DT_CHMOD);
         return true;
@@ -63,11 +58,6 @@ class upload {
 		if(!$this->fileformat) return false;
 		if(!preg_match("/^(".$this->fileformat.")$/i", $this->ext)) return false;
 		if(preg_match("/^(php|phtml|php3|php4|jsp|exe|dll|cer|shtml|shtm|asp|asa|aspx|asax|ashx|cgi|fcgi|pl)$/i", $this->ext)) return false;
-		if($this->savename) {
-			$ext = file_ext($this->savename);
-			if(!preg_match("/^(".$this->fileformat.")$/i", $ext)) return false;
-			if(preg_match("/^(php|phtml|php3|php4|jsp|exe|dll|cer|shtml|shtm|asp|asa|aspx|asax|ashx|cgi|fcgi|pl)$/i", $ext)) return false;
-		}
 		return true;
     }
 
@@ -82,11 +72,13 @@ class upload {
     }
 
     function set_savename($savename) {
+		global $DT_TIME;
         if($savename) {
             $this->savename = $this->adduserid ? str_replace('.'.$this->ext, $this->userid.'.'.$this->ext, $savename) : $savename;
         } else {
-            $name = date('His', DT_TIME).mt_rand(10, 99);
-            $this->savename = $this->adduserid ? $name.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
+			$this->uptime = $DT_TIME;
+            $name = date('H-i-s', $this->uptime).'-'.rand(10, 99);
+            $this->savename = $this->adduserid ? $name.'-'.$this->userid.'.'.$this->ext : $name.'.'.$this->ext;
         }
 		$this->saveto = $this->savepath.$this->savename;		
         if(!$this->overwrite && is_file(DT_ROOT.'/'.$this->saveto)) {

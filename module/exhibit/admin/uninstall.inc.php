@@ -1,6 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_data_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_sign_".$moduleid."`");
+defined('IN_DESTOON') or exit('Access Denied');
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."`");
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_data`");
 ?>

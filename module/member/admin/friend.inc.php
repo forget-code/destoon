@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/friend.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/friend.class.php';
 $do = new friend();
 $menus = array (
     array('商友列表', '?moduleid='.$moduleid.'&file='.$file),
@@ -28,8 +28,8 @@ switch($action) {
 		dmsg('删除成功', $forward);
 	break;
 	default:
-		$sfields = array('按条件', '姓名', '公司', '职位', '电话', '手机', '主页', 'Email', 'QQ', '微信', '会员', '备注');
-		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'qq', 'wx', 'username', 'note');
+		$sfields = array('按条件', '姓名', '公司', '职位', '电话', '手机', '主页', 'Email', 'MSN', 'QQ', '会员', '备注');
+		$dfields = array('company', 'truename', 'company', 'career', 'telephone', 'mobile', 'homepage', 'email', 'msn', 'qq', 'username', 'note');
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$userid = isset($userid) ? intval($userid) : '';
 		$fields_select = dselect($sfields, 'fields', '', $fields);

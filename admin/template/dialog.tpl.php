@@ -1,25 +1,18 @@
 <?php 
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 ?>
-<!doctype html>
-<html lang="<?php echo DT_LANG;?>">
+<html>
 <head>
-<meta charset="<?php echo DT_CHARSET;?>"/>
-<title>提示信息</title>
+<meta http-equiv="Content-Type" content="text/html;charset=<?php echo DT_CHARSET; ?>" />
+<title>提示信息 - Powered By Destoon <?php echo DT_VERSION; ?></title>
 <link rel="stylesheet" href="admin/image/style.css" type="text/css" />
-<script type="text/javascript" src="<?php echo DT_STATIC;?>lang/<?php echo DT_LANG;?>/lang.js"></script>
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/config.js"></script>
-<!--[if lte IE 9]><!-->
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-1.5.2.min.js"></script>
-<!--<![endif]-->
-<!--[if (gte IE 10)|!(IE)]><!-->
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/jquery-2.1.1.min.js"></script>
-<!--<![endif]-->
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/common.js"></script>
-<script type="text/javascript" src="<?php echo DT_STATIC;?>file/script/admin.js"></script>
+<script type="text/javascript" src="<?php echo DT_PATH;?>lang/<?php echo DT_LANG;?>/lang.js"></script>
+<script type="text/javascript" src="<?php echo DT_PATH;?>file/script/config.js"></script>
+<script type="text/javascript" src="<?php echo DT_PATH;?>file/script/common.js"></script>
+<script type="text/javascript" src="<?php echo DT_PATH;?>file/script/admin.js"></script>
 </head>
 </body>
-<div id="box" style="padding:16px 16px 0 16px;line-height:2.0;">
+<div id="box">
 <?php echo $dcontent; ?>
 </div>
 <script type="text/javascript">

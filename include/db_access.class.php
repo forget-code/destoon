@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -25,10 +25,10 @@ class db_access {
 	function query($sql, $type = '', $expires = 3600, $dbname = '') {
 		$this->querynum++;
 		$sql = trim($sql);
-		if(preg_match("/^(select.*)limit ([0-9]+)(,([0-9]+))?$/i", $sql, $matches)) {
-			$sql = $matches[1];
-			$offset = $matches[2];
-			$pagesize = $matches[4];
+		if(preg_match("/^(select.*)limit ([0-9]+)(,([0-9]+))?$/i", $sql, $matchs)) {
+			$sql = $matchs[1];
+			$offset = $matchs[2];
+			$pagesize = $matchs[4];
 			$query = $this->conn->Execute($sql);
 			return $this->limit($query, $offset, $pagesize);
 		} else {

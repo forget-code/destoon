@@ -1,17 +1,16 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class dcache {
 	var $pre;
-
-    function __construct() {
-    }
+	var $time;
 
     function dcache() {
-		$this->__construct();
+		global $DT_TIME;
+		$this->time = $DT_TIME;
     }
 
 	function get($key) {
@@ -20,7 +19,7 @@ class dcache {
 		if(is_file($php)) {
 			$str = file_get($php);
 			$ttl = substr($str, 13, 10);
-			if($ttl < DT_TIME) return '';
+			if($ttl < $this->time) return '';
 			return substr($str, 23, 1) == '@' ? substr($str, 24) : unserialize(substr($str, 23));
 		} else {
 			return '';
@@ -30,7 +29,7 @@ class dcache {
 	function set($key, $val, $ttl = 600) {
 		global $db, $CFG;
 		is_md5($key) or $key = md5($this->pre.$key);
-		$ttl = DT_TIME + $ttl;
+		$ttl = $this->time + $ttl;
 		$sql = "REPLACE INTO {$db->pre}cache (`cacheid`,`totime`) VALUES ('$key','$ttl')";
 		strpos($CFG['database'], 'mysqli') !== false ? mysqli_query($db->connid, $sql) : mysql_query($sql, $db->connid);
 		$val = '<?php exit;?>'.$ttl.(is_array($val) ? serialize($val) : '@'.$val);
@@ -43,13 +42,12 @@ class dcache {
 	}
 
     function clear() {
-		$db->query("DELETE FROM {$db->pre}cache");
-        @rename(DT_CACHE.'/php/', DT_CACHE.'/'.timetodate(DT_TIME, 'YmdHis').'.tmp/');
+        //dir_delete(DT_CACHE.'/php/');
     }
 
 	function expire() {
 		global $db;
-		$result = $db->query("SELECT cacheid FROM {$db->pre}cache WHERE totime<".DT_TIME." ORDER BY totime ASC LIMIT 100");
+		$result = $db->query("SELECT cacheid FROM {$db->pre}cache WHERE totime<$this->time LIMIT 100");
 		while($r = $db->fetch_array($result)) {
 			$cid = $r['cacheid'];
 			$this->rm($cid);

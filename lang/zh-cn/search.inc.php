@@ -1,10 +1,10 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
-$L['by_auto'] = '智能';
+$L['by_auto'] = '模糊';
 $L['by_title'] = '标题';
 $L['by_content'] = '全文';
 $L['by_introduce'] = '简介';

@@ -1,30 +1,29 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 class dcache {
 	var $pre;
 
-    function __construct() {
+    function dcache() {
 		//
     }
 
-    function dcache() {
-		$this->__construct();
-    }
-
     function get($key) {
-        return apc_fetch($this->pre.$key);
+		$key = $this->pre.$key;
+        return apc_fetch($key);
     }
 
     function set($key, $val, $ttl = 600) {
-        return apc_store($this->pre.$key, $val, $ttl);
+		$key = $this->pre.$key;
+        return apc_store($key, $val, $ttl);
     }
 
     function rm($key) {
-        return apc_delete($this->pre.$key);
+		$key = $this->pre.$key;
+        return apc_delete($key);
     }
 
     function clear() {
@@ -32,7 +31,7 @@ class dcache {
     }
 
 	function expire() {
-		return true;
+		//
 	}
 }
 ?>

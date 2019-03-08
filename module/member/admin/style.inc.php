@@ -1,12 +1,12 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $TYPE = get_type('style', 1);
-require DT_ROOT.'/module/'.$module.'/style.class.php';
+require MD_ROOT.'/style.class.php';
 $do = new style();
 $menus = array (
     array('安装模板', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('模板列表', '?moduleid='.$moduleid.'&file='.$file),
-    array('模板分类', 'javascript:Dwidget(\'?file=type&item='.$file.'\', \'模板分类\');'),
+    array('模板分类', '?file=type&item=style'),
 );
 
 switch($action) {
@@ -42,9 +42,8 @@ switch($action) {
 	break;
 	case 'show':
 		$itemid or msg();
-		$u = $db->get_one("SELECT c.username FROM {$DT_PRE}company c,{$DT_PRE}member m WHERE c.userid=m.userid AND c.vip>0 AND m.edittime>0 ORDER BY m.logintimes DESC");
-		if($u) dheader(DT_PATH.'index.php?homepage='.$u['username'].'&preview='.$itemid);
-		msg('暂无符合条件的会员');
+		$u = $db->get_one("SELECT username FROM {$DT_PRE}company ORDER BY vip DESC");
+		dheader(DT_PATH.'index.php?homepage='.$u['username'].'&preview='.$itemid);
 	break;
 	case 'order':
 		$do->order($listorder);
@@ -71,7 +70,7 @@ switch($action) {
 	
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$order_select  = dselect($sorder, 'order', '', $order);
-		$type_select = type_select($TYPE, 1, 'typeid', '请选择分类', $typeid);
+		$type_select = type_select('style', 1, 'typeid', '请选择分类', $typeid);
 	
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";

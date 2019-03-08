@@ -1,3 +1,3 @@
 <?php
-include '../ajax.php';
+require '../ajax.php';
 ?>

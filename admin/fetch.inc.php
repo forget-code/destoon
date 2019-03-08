@@ -1,9 +1,9 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('添加规则', '?file='.$file.'&action=add'),
     array('采编规则', '?file='.$file),
@@ -46,14 +46,9 @@ switch($action) {
 		isset($fields) && isset($dfields[$fields]) or $fields = 0;
 		$fields_select = dselect($sfields, 'fields', '', $fields);
 		$condition = '1';
-		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}fetch WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);	
+		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";	
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}fetch WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$lists = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}fetch WHERE $condition ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {

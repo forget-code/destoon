@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $action == 'add' ? '添加' : '修改';?>证书</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 会员名</td>
 <td><input name="post[username]" type="text" id="username" size="20" value="<?php echo $username;?>"/> <a href="javascript:_user(Dd('username').value);" class="t">[资料]</a> <span id="dusername" class="f_red"></span></td>
@@ -34,9 +35,9 @@ show_menu($menus);
 <td class="tl"><span class="f_red">*</span> 证书图片</td>
 <td>
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
-	<table width="120" class="ctb">
+	<table width="120">
 	<tr align="center" height="120" class="c_p">
-	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,120, 90, Dd('thumb').value, true);}"/></td>
+	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,120, 90, Dd('thumb').value, true);}"/></td>
 	</tr>
 	<tr align="center" height="25">
 	<td><span onclick="Dalbum('',<?php echo $moduleid;?>,100, 100, Dd('thumb').value, true);" class="jt">[上传]</span>&nbsp;<span onclick="delAlbum('','wait');" class="jt">[删除]</span></td>
@@ -48,7 +49,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 证书介绍</td>
 <td class="tr"><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -66,10 +67,10 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">

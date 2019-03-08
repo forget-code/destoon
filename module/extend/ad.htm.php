@@ -3,16 +3,16 @@ defined('IN_DESTOON') or exit('Access Denied');
 if(!$aid) return false;
 $a or $a = $db->get_one("SELECT * FROM {$DT_PRE}ad WHERE aid=$aid");
 $p = $db->get_one("SELECT * FROM {$DT_PRE}ad_place WHERE pid=$a[pid]");
-if(!$p || !$a) return false;
+if(!$p) return false;
 $ad_moduleid = $p['moduleid']; 
 $pid = $p['pid'];
 $typeid = $p['typeid'];
 $width = $p['width'];
 $height = $p['height'];
-$areaid = intval($a['areaid']);
+$areaid = $a['areaid'];
 $fileroot = DT_CACHE.'/htm/';
 $filename = $fileroot.ad_name($a);
-$template = $p['template'] ? $p['template'] : 'ad';
+$template = $p['template'] ? $p['template'] : 'ad_code';
 if($p['code']) {
 	$default = $typeid > 5 ? 'ad_'.$ad_moduleid.'_d'.$typeid.'.htm' : 'ad_'.$pid.'_d0.htm';
 	file_put($fileroot.$default, '<!--'.($DT_TIME+86400*365*10).'-->'.$p['code']);
@@ -46,7 +46,7 @@ if($typeid == 7) {
 		$d = $db->get_one("SELECT * FROM ".get_table($ad_moduleid)." WHERE `{$id}`=$t[key_id]");
 		if($d) {
 			if($t['stat']) {
-				$d['linkurl'] = DT_PATH.'api/redirect.php?aid='.$t['aid'];
+				$d['linkurl'] = $MODULE[3]['linkurl'].rewrite('redirect.php?aid='.$t['aid']);
 			} else {
 				if(strpos($d['linkurl'], '://') === false) $d['linkurl'] = $MODULE[$ad_moduleid]['linkurl'].$d['linkurl'];
 			}
@@ -57,7 +57,7 @@ if($typeid == 7) {
 	}
 	if($tags) {
 		ob_start();
-		include template($template, 'chip');
+		include template($template, $module);
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);
@@ -70,27 +70,33 @@ if($typeid == 7) {
 	$tags = array();
 	$ad = $db->query("SELECT * FROM {$DT_PRE}ad WHERE pid=$p[pid] AND status=3 AND fromtime<$DT_TIME AND totime>$DT_TIME AND areaid=$areaid ORDER BY listorder ASC,addtime ASC");
 	while($t = $db->fetch_array($ad)) {
-		if(strpos($t['image_src'], '://') === false) $t['image_src'] = DT_PATH.$t['image_src'];
-		$t['alt'] = $t['image_alt'];
+		$t['title'] = $t['image_alt'];
 		$t['thumb'] = $t['image_src'];
-		$t['linkurl'] = $t['stat'] ? DT_PATH.'api/redirect.php?aid='.$t['aid'] : $t['url'];
+		$t['linkurl'] = $t['stat'] ? $MODULE[3]['linkurl'].rewrite('redirect.php?aid='.$t['aid']) : $t['url'];
 		if($t['totime'] > $totime) $totime = $t['totime'];
 		$tags[] = $t;
 	}
 	if($tags) {
 		ob_start();
-		include template($template, 'chip');
+		include template($template, $module);
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);
+		$data = trim(str_replace(array('<script type="text/javascript">', '</script>'), array('', ''), $data));
+		file_put(DT_ROOT.'/file/script/A'.$p['pid'].'.js', $data);
 	} else {
 		file_del($filename);
+		if($p['code']) {
+			file_put(DT_ROOT.'/file/script/A'.$p['pid'].'.js', $p['code']);
+		} else {
+			file_del(DT_ROOT.'/file/script/A'.$p['pid'].'.js');
+		}
 	}
 } else {
 	$ad = $db->get_one("SELECT * FROM {$DT_PRE}ad WHERE pid=$p[pid] AND status=3 AND fromtime<$DT_TIME AND totime>$DT_TIME AND areaid=$areaid ORDER BY fromtime DESC");
 	if($ad) {
 		extract($ad);
-		if($url && $stat) $url = DT_PATH.'api/redirect.php?aid='.$aid;
+		if($url && $stat) $url = $MODULE[3]['linkurl'].rewrite('redirect.php?aid='.$aid);
 		if($typeid == 2) {
 			$text_name = set_style($text_name, $text_style);
 		} else if($typeid == 3) {
@@ -105,12 +111,12 @@ if($typeid == 7) {
 			}
 		}
 		ob_start();
-		include template($template, 'chip');
+		include template($template, $module);
 		$data = ob_get_contents();
 		ob_clean();
 		file_put($filename, '<!--'.$totime.'-->'.$data);
 		if($typeid > 1) {
-			$data = 'document.write(\''.dwrite($data).'\');';
+			$data = 'document.write(\''.dtrim($data, true).'\');';
 			file_put(DT_ROOT.'/file/script/A'.$p['pid'].'.js', $data);
 		}
 	} else {

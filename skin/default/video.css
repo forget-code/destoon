@@ -1,12 +1,9 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-.player {padding:32px 0;}
-.play-list {padding:24px 24px 8px 24px;}
-.play-list div {height:75px;margin-bottom:16px;}
-.play-list div:hover {background:#404040;}
-.play-list img {float:left;}
-.play-list ul {float:left;width:190px;}
-.play-list p {height:40px;line-height:20px;overflow:hidden;margin:6px 10px;color:#F1F1F1;}
-.play-list span {color:#999999;padding-left:10px;}
+.player {text-align:center;padding:15px 0 15px 0;}
+.video {background:#333333 url('image/video_bg.gif');padding:15px 10px 10px 15px;}
+.video li {width:120px;}
+.video ul {margin:0 0 6px 0;}
+.li_video li {background:url('image/ico_video.gif') no-repeat 2px 4px;padding:0 10px 0 21px;}

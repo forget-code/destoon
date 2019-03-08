@@ -1,12 +1,11 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/alert.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/alert.class.php';
 $do = new alert();
 $menus = array (
-    array('添加提醒', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
+    array('发送商机', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
     array('贸易提醒', '?moduleid='.$moduleid.'&file='.$file),
     array('审核提醒', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
-    array('发送商机', '?moduleid='.$moduleid.'&file='.$file.'&action=send'),
 );
 $mids = array();
 $tmp = explode('|', $MOD['alertid']);
@@ -22,13 +21,14 @@ if(in_array($action, array('', 'check'))) {
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	$areaid = isset($areaid) ? intval($areaid) : 0;
+	$mid = isset($mid) ? intval($mid) : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
+	if($areaid) $condition .= ($AREA[$areaid]['child']) ? " AND areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND areaid=$areaid";
 	if($mid) $condition .= " AND mid=$mid";
 }
 switch($action) {
@@ -42,9 +42,9 @@ switch($action) {
 				$item['sql'] = $sql;
 				$item['ord'] = $ord;
 				$item['template'] = $template;
-				cache_write('alert-'.$_userid.'.php', $item);
+				cache_write('alert.php', $item);
 			} else {
-				$item = cache_read('alert-'.$_userid.'.php');
+				$item = cache_read('alert.php');
 				extract($item);
 			}
 			if(!isset($num)) {
@@ -72,11 +72,11 @@ switch($action) {
 						$catid = $r['catid'];
 						$areaid = $r['areaid'];
 						$MOD = cache_read('module-'.$mid.'.php');
-						$CAT = get_cat($catid);
+						$CATEGORY = cache_read('category-'.$mid.'.php');
 						$condition = "status=3 AND addtime>$r[sendtime]";
 						if($kw) $condition .= " AND keyword LIKE '%$kw%'";
-						if($areaid) $condition .= $AREA[$areaid]['child'] ? " AND areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND areaid=$areaid";
-						if($catid) $condition .= $CAT['child'] ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
+						if($areaid) $condition .= ($AREA[$areaid]['child']) ? " AND areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND areaid=$areaid";
+						if($catid) $condition .= ($CATEGORY[$catid]['child']) ? " AND catid IN (".$CATEGORY[$catid]['arrchildid'].")" : " AND catid=$catid";
 						if($sql) $condition .= ' '.$sql;
 						if($ord) $condition .= ' ORDER BY '.$ord;
 						$lists = array();
@@ -99,7 +99,7 @@ switch($action) {
 			}
 			msg('ID从'.$fid.'至'.($itemid-1).'发送成功'.progress($sid, $fid, $tid), "?moduleid=$moduleid&file=$file&action=$action&sid=$sid&fid=$itemid&tid=$tid&num=$num&send=1");
 		} else {
-			$item = cache_read('alert-'.$_userid.'.php');
+			$item = cache_read('alert.php');
 			if($item) {
 				extract($item);
 			} else {
@@ -119,7 +119,7 @@ switch($action) {
 			foreach($usernames as $username) {
 				$username = trim($username);
 				if(!$username) continue;
-				$user = userinfo($username);
+				$user = memberinfo($username);
 				if(!$user) continue;
 				$post['username'] = $username;
 				$post['email'] = $user['email'];
@@ -127,12 +127,12 @@ switch($action) {
 				if($do->pass($post)) {
 					$do->add($post);
 				} else {
-					msg($do->errmsg);
+					message($do->errmsg);
 				}
 			}
 			dmsg('添加成功', '?moduleid='.$moduleid.'&file='.$file);
 		} else {
-			$mid or $mid = $mids[0];
+			$mid = isset($mid) ? intval($mid) : $mids[0];
 			$mid or msg();
 			isset($username) or $username = '';
 			if(isset($userid)) {
@@ -152,23 +152,23 @@ switch($action) {
 		}
 	break;
 	case 'edit':
-		$itemid or msg();
+		$itemid or message();
 		$do->itemid = $itemid;
 		$r = $do->get_one();
-		if(!$r) msg();
+		if(!$r) message();
 		if($submit) {
 			if($do->pass($post)) {
-				$user = userinfo($post['username']);
+				$user = memberinfo($post['username']);
 				if($user) {
 					$email = $post['email'] = $user['email'];
 					$do->edit($post);
 					$db->query("UPDATE {$DT_PRE}alert SET email='$email' WHERE username='$post[username]'");
 					dmsg('修改成功', $forward);
 				} else {
-					msg('会员不存在');
+					message('会员不存在');
 				}
 			} else {
-				msg($do->errmsg);
+				message($do->errmsg);
 			}
 		} else {
 			extract($r);

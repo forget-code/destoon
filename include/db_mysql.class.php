@@ -1,19 +1,22 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
-define('DB_ASSOC', MYSQL_ASSOC);
 class db_mysql {
 	var $connid;
 	var $pre;
 	var $querynum = 0;
 	var $ttl;
 	var $cursor = 0;
+	var $cache_id = '';
+	var $cache_ttl = '';
 	var $halt = 0;
+	var $cids = 0;
 	var $linked = 1;
 	var $result = array();
+	var $cache_ids = array();
 
 	function connect($dbhost, $dbuser, $dbpass, $dbname, $dbttl, $dbcharset, $pconnect = 0) {
 		$this->ttl = $dbttl;
@@ -28,8 +31,6 @@ class db_mysql {
 				}
 			}
 			if($this->linked == 0) {
-				global $DT_BOT;
-				if($DT_BOT) dhttp(503);
 				if($this->halt) {
 					exit(include template('mysql', 'message'));
 				} else {
@@ -38,8 +39,7 @@ class db_mysql {
 			}
 		}
 		$version = $this->version();
-		/* NOET: IN_ADMIN COMMENT MESSY */
-		if($version > '4.1' && $dbcharset) mysql_query(IN_ADMIN ? "SET NAMES '".$dbcharset."'" : "SET character_set_connection=".$dbcharset.", character_set_results=".$dbcharset.", character_set_client=binary", $this->connid);
+		if($version > '4.1' && $dbcharset) mysql_query("SET NAMES '".$dbcharset."'" , $this->connid);
 		if($version > '5.0') mysql_query("SET sql_mode=''", $this->connid);
 		if($dbname && !mysql_select_db($dbname, $this->connid)) $this->halt('Cannot use database '.$dbname);
 		return $this->connid;
@@ -49,13 +49,25 @@ class db_mysql {
 		return mysql_select_db($dbname, $this->connid);
 	}
 
-	function query($sql, $type = '', $ttl = 0) {
+	function query($sql, $type = '', $ttl = 0, $save_id = false) {
+		//echo $sql;echo '<br/>';
 		$select = strtoupper(substr($sql, 0, 7)) == 'SELECT ' ? 1 : 0;
+		/*
+		if($select) {
+			if(strpos($sql, '/*') !== false) die('MySQL Query Error');
+			if(strpos($sql, 'outfile') !== false) die('MySQL Query Error');
+			if(strpos($sql, 'union') !== false) die('MySQL Query Error');
+		}
+		*/
 		if($this->ttl > 0 && $type == 'CACHE' && $select) {
 			$this->cursor = 0;
+			$this->cache_id = md5($sql);
+			if($this->cids) $this->cache_ids[] = $this->cache_id;
 			$this->result = array();
-			return $this->_query($sql, $ttl ? $ttl : $this->ttl);
+			$this->cache_ttl = ($ttl ? $ttl : $this->ttl) + mt_rand(-10, 30);
+			return $this->_query($sql);
 		}
+		if(!$save_id) $this->cache_id = 0;
 		$func = $type == 'UNBUFFERED' ? 'mysql_unbuffered_query' : 'mysql_query';
 		if(!($query = $func($sql, $this->connid))) $this->halt('MySQL Query Error', $sql);
 		$this->querynum++;
@@ -72,14 +84,15 @@ class db_mysql {
 	}
 	
 	function count($table, $condition = '', $ttl = 0) {
-		$sql = 'SELECT COUNT(*) AS amount FROM '.$table;
+		global $DT_TIME;
+		$sql = 'SELECT COUNT(*) as amount FROM '.$table;
 		if($condition) $sql .= ' WHERE '.$condition;
 		$r = $this->get_one($sql, $ttl ? 'CACHE' : '', $ttl);
 		return $r ? $r['amount'] : 0;
 	}
 
 	function fetch_array($query, $result_type = MYSQL_ASSOC) {
-		return is_array($query) ? $this->_fetch_array($query) : mysql_fetch_array($query, $result_type);
+		return $this->cache_id ? $this->_fetch_array($query) : mysql_fetch_array($query, $result_type);
 	}
 
 	function affected_rows() {
@@ -130,22 +143,21 @@ class db_mysql {
 
 	function halt($message = '', $sql = '')	{
 		if($message && DT_DEBUG) log_write("\t\t<query>".$sql."</query>\n\t\t<errno>".$this->errno()."</errno>\n\t\t<error>".$this->error()."</error>\n\t\t<errmsg>".$message."</errmsg>\n", 'sql');
-		if($this->halt) message('MySQL Query:'.str_replace($this->pre, '[pre]', $sql).' <br/> MySQL Error:'.str_replace($this->pre, '[pre]', $this->error()).' MySQL Errno:'.$this->errno().' <br/>Message:'.$message);
+		if($this->halt) message('MySQL Query:'.$sql.' <br/> MySQL Error:'.$this->error().' MySQL Errno:'.$this->errno().' <br/>Message:'.$message);
 	}
 
-	function _query($sql, $ttl) {
+	function _query($sql) {
 		global $dc;
-		$cid = md5($sql);
-		$this->result = $dc->get($cid);
-		if(!is_array($this->result)) {
+		$this->result = $dc->get($this->cache_id);
+		if(!$this->result) {
 			$tmp = array(); 
-			$result = $this->query($sql, '', '');
+			$result = $this->query($sql, '', '', true);
 			while($r = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				$tmp[] = $r; 
 			}
 			$this->result = $tmp;
 			$this->free_result($result);
-			$dc->set($cid, $tmp, $ttl);
+			$dc->set($this->cache_id, $tmp, $this->cache_ttl);
 		}
 		return $this->result;
 	}
@@ -155,7 +167,7 @@ class db_mysql {
 		if(isset($this->result[$this->cursor])) {
 			return $this->result[$this->cursor++];
 		} else {
-			$this->cursor = 0;
+			$this->cursor = $this->cache_id = 0;
 			return array();
 		}
 	}

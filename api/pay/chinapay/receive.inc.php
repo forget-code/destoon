@@ -1,11 +1,14 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-require DT_ROOT.'/api/pay/'.$bank.'/netpayclient_config.php';
+require DT_ROOT."/api/pay/chinapay/netpayclient_config.php";
 //加载 netpayclient 组件
-require DT_ROOT.'/api/pay/'.$bank.'/netpayclient.php';
+require DT_ROOT."/api/pay/chinapay/netpayclient.php";
 //导入公钥文件
 $flag = buildKey(PUB_KEY);
-if(!$flag) message("导入公钥文件失败！");
+if(!$flag) {
+	echo "导入公钥文件失败！";
+	exit;
+}
 //获取交易应答的各项值
 $merid = $merid;
 $orderno = $orderno;

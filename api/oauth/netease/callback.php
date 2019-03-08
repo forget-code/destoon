@@ -7,11 +7,19 @@ $par = 'grant_type=authorization_code'
 	 . '&client_id='.NE_ID
 	 . '&client_secret='.NE_SECRET
 	 . '&redirect_uri='.urlencode(NE_CALLBACK);
-$rec = dcurl(NE_TOKEN_URL, $par);
+$cur = curl_init(NE_TOKEN_URL);
+curl_setopt($cur, CURLOPT_POST, 1);
+curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
+curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt($cur, CURLOPT_HEADER, 0);
+curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
+$rec = curl_exec($cur);
+curl_close($cur);
 if(strpos($rec, 'access_token') !== false) {
 	$arr = json_decode($rec, true);
 	$_SESSION['ne_access_token'] = $arr['access_token'];
-	dheader('index.php?time='.$DT_TIME);
+	dheader('./');
 } else {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);
 }

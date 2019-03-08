@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -8,11 +8,11 @@ show_menu($menus);
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>
 &nbsp;<?php echo $type_select;?>&nbsp;
-<input type="text" size="30" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="关键词"/>&nbsp;
 <?php echo $level_select;?>&nbsp;
 <select name="type">
 <option value="0"<?php if($type == 0) echo ' selected';?>>类型</option>
@@ -22,16 +22,16 @@ show_menu($menus);
 &nbsp;
 <?php echo $order_select;?>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="window.location='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>';"/>
 </td>
 </tr>
 </table>
 </form>
 <form method="post">
 <div class="tt">审核链接</div>
-<table cellspacing="0" class="tb ls">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th>分类</th>
 <th>网站名称</th>
 <th>网站LOGO</th>
@@ -40,10 +40,10 @@ show_menu($menus);
 <th width="50">操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr align="center" title="网站介绍:<?php echo $v['introduce'];?>">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center" title="网站介绍:<?php echo $v['introduce'];?>">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><a href="<?php echo $v['typeurl'];?>" target="_blank"><?php echo $v['typename'];?></td>
-<td><a href="<?php echo DT_PATH;?>api/redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
+<td><a href="<?php echo $MOD['linkurl'];?>redirect.php?url=<?php echo urlencode($v['linkurl']);?>" target="_blank"><?php echo $v['title'];?></td>
 <td><?php if($v['thumb']) {?><img src="<?php echo $v['thumb'];?>" width="88" /><?php } ?></td>
 <td><?php echo $v['thumb'] ? 'LOGO' : '文字';?></td>
 <td><?php echo $v['adddate'];?></td>
@@ -56,10 +56,10 @@ show_menu($menus);
 </table>
 <div class="btns">
 <input type="submit" value=" 通过审核 " class="btn" onclick="this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=check';"/>&nbsp;
-<input type="submit" value="删 除" class="btn-r" onclick="if(confirm('确定要删除选中链接吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<input type="submit" value=" 删 除 " class="btn" onclick="if(confirm('确定要删除选中链接吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
 </div>
 </form>
-<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
+<div class="pages"><?php echo $pages;?></div>
 <br/>
 <script type="text/javascript">Menuon(2);</script>
 <?php include tpl('footer');?>

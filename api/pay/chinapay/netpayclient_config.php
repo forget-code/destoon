@@ -3,9 +3,9 @@ defined('IN_DESTOON') or exit('Access Denied');
 /*请按照您的实际情况配置以下各参数*/
 
 //私钥文件，在CHINAPAY申请商户号时获取，请相应修改此处，可填相对路径，下同
-define("PRI_KEY", DT_ROOT.'/api/pay/'.$bank.'/'.$PAY[$bank]['partnerid']);
+define("PRI_KEY", DT_ROOT.'/api/pay/chinapay/'.$PAY[$bank]['partnerid']);
 //公钥文件，示例中已经包含
-define("PUB_KEY", DT_ROOT.'/api/pay/'.$bank.'/PgPubk.key');
+define("PUB_KEY", DT_ROOT.'/api/pay/chinapay/PgPubk.key');
 
 /*如您已有生产密钥，请修改以下配置，默认为测试环境*/
 

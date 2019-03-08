@@ -9,7 +9,7 @@ if(!$pagesize || $pagesize > 100) $pagesize = 33;
 $offset = ($page-1)*$pagesize;
 $r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition", 'CACHE');
 $items = $r['num'];
-$pages = $DT_PC ? home_pages($items, $page, $pagesize, $demo_url) : mobile_pages($items, $page, $pagesize, $demo_url);
+$pages = home_pages($items, $pagesize, $demo_url, $page);
 $lists = array();
 if($items) {
 	$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY listorder DESC,addtime DESC LIMIT $offset,$pagesize");

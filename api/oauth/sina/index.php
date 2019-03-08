@@ -13,7 +13,7 @@ if($_SESSION['token']) {
 	if($me && isset($me['screen_name'])) {
 		$success = 1;
 		$openid = $me['id'];
-		$nickname = $me['screen_name'];
+		$nickname = convert($me['screen_name'], 'utf-8', DT_CHARSET);
 		$avatar = $me['profile_image_url'];
 		$url = $me['url'];
 		$DS = array('token');

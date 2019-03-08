@@ -1,13 +1,14 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
+show_menu($menus);
 ?>
 <form method="post" action="?">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="userid" value="<?php echo $userid;?>"/>
-<div class="tt">面板管理</div>
-<table cellspacing="0" class="tb ls">
+<div class="tt">管理员[<?php echo $username;?>]会员面板管理</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="40">删除</th>
 <th>排序</th>
@@ -15,15 +16,15 @@ include tpl('header');
 <th>地址</th>
 </tr>
 <?php foreach($dmenus as $k=>$v) {?>
-<tr align="center">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input name="right[<?php echo $v['adminid'];?>][delete]" type="checkbox" value="1"/></td>
 <td><input name="right[<?php echo $v['adminid'];?>][listorder]" type="text" size="3" value="<?php echo $v['listorder'];?>"/></td>
 <td><input name="right[<?php echo $v['adminid'];?>][title]" type="text" size="12" value="<?php echo $v['title'];?>"/> <?php echo dstyle('right['.$v['adminid'].'][style]', $v['style']);?></td>
 <td><input name="right[<?php echo $v['adminid'];?>][url]" type="text" size="60" value="<?php echo $v['url'];?>"/></td>
 </tr>
 <?php }?>
-<tr align="center">
-<td class="f_green">新增</td>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<td class="f_red">新增</td>
 <td><input name="right[0][listorder]" type="text" size="3" value=""/></td>
 <td><input name="right[0][title]" type="text" size="12" value="" id="p_title"/> <?php echo dstyle('right[0][style]');?></td>
 <td><input name="right[0][url]" type="text" size="60" value="" id="p_url"/>
@@ -33,7 +34,7 @@ include tpl('header');
 <td height="30"> </td>
 <td colspan="4">
 &nbsp;
-<input type="submit" name="submit" value="更 新" class="btn-g"/>&nbsp;
+<input type="submit" name="submit" value="更 新" class="btn"/>&nbsp;
 <select onchange="if(this.value){Dd('p_title').value=this.options[selectedIndex].innerHTML;Dd('p_url').value=this.value;}" style="width:120px;">
 <option value="">常用操作</option>
 <?php
@@ -98,8 +99,9 @@ foreach($MODULE as $m) {
 <?php } ?>
 <?php } ?>
 <?php } ?>
-</select>&nbsp;&nbsp;
-提示：添加常用操作可以自动分配对应权限
+</select>
+&nbsp;&nbsp;
+<strong>提示</strong>：添加常用操作可以自动分配对应权限
 </td>
 </tr>
 </table>
@@ -111,8 +113,8 @@ foreach($MODULE as $m) {
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="userid" value="<?php echo $userid;?>"/>
-<div class="tt">权限分配</div>
-<table cellspacing="0" class="tb ls">
+<div class="tt">管理员[<?php echo $username;?>]权限分配</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="40">删除</th>
 <th>模块ID</th>
@@ -121,7 +123,7 @@ foreach($MODULE as $m) {
 <th>分类ID(catid)</th>
 </tr>
 <?php foreach($drights as $k=>$v) {?>
-<tr align="center">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input name="right[<?php echo $v['adminid'];?>][delete]" type="checkbox" value="1"/></td>
 <td align="left"><input name="right[<?php echo $v['adminid'];?>][moduleid]" type="text" size="2" value="<?php echo $v['moduleid'];?>"/> <?php echo $v['module'];?></td>
 <td align="left"><input name="right[<?php echo $v['adminid'];?>][file]" type="text" size="10" value="<?php echo $v['file'];?>"/> <?php echo $v['name'];?></td>
@@ -132,8 +134,8 @@ foreach($MODULE as $m) {
 </tr>
 <?php }?>
 
-<tr align="center">
-<td class="f_green">新增</td>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<td class="f_red">新增</td>
 <td align="left"><input name="right[-1][moduleid]" type="text" size="10"/></td>
 <td align="left"><input name="right[-1][file]" type="text" size="10"/></td>
 <td><input name="right[-1][action]" type="text" size="25"/></td>
@@ -141,7 +143,7 @@ foreach($MODULE as $m) {
 </tr>
 
 <tr align="center">
-<td class="f_green">选择</td>
+<td class="f_red">选择</td>
 <td id="moduleids" align="left">
 <select name="right[0][moduleid]" size="2" style="height:200px;width:100px;" onchange="get_file(this.value);">
 <option value="0">选择模块[单选]</option>
@@ -169,7 +171,7 @@ foreach($MODULE as $m) {
 </tr>
 <tr>
 <td> </td>
-<td height="30" colspan="4"><input type="submit" name="submit" value="更 新" class="btn-g"/>&nbsp;&nbsp;提示：动作和分类可按住Ctrl键多选</td>
+<td height="30" colspan="4"><input type="submit" name="submit" value="更 新" class="btn"/> 提示：动作和分类可按住Ctrl键多选</td>
 </tr>
 </table>
 </form>
@@ -179,22 +181,30 @@ var html_action = Dd('actions').innerHTML;
 var html_catid = Dd('catids').innerHTML;
 function get_file(mid) {
 	if(mid) {
-		$.get('?file=<?php echo $file;?>&action=ajax&mid='+mid, function(data) {
-			if(data) {
-				var s = data.split('|');
-				Dd('files').innerHTML = s[0] != 0 ? s[0] : html_file;
-				Dd('catids').innerHTML = s[1] != 0 ? s[1] : html_catid;
-			}
-		});
+		makeRequest('file=<?php echo $file;?>&action=ajax&mid='+mid, '?', '_get_file');
+	}
+}
+function _get_file() {
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) {
+			var s = xmlHttp.responseText.split('|');
+			Dd('files').innerHTML = s[0] != 0 ? s[0] : html_file;
+			Dd('catids').innerHTML = s[1] != 0 ? s[1] : html_catid;
+		}
 	}
 }
 function get_action(fi, mid) {
 	if(mid) {
-		$.get('?file=<?php echo $file;?>&action=ajax&mid='+mid+'&fi='+fi, function(data) {
-			Dd('actions').innerHTML = data != 0 ? data : html_action;
-		});
+		makeRequest('file=<?php echo $file;?>&action=ajax&mid='+mid+'&fi='+fi, '?', '_get_action');
+	}
+}
+function _get_action() {    
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		Dd('actions').innerHTML = xmlHttp.responseText != 0 ? xmlHttp.responseText : html_action;
 	}
 }
 </script>
 <?php } ?>
+<script type="text/javascript">Menuon(2);</script>
+<br/>
 <?php include tpl('footer');?>

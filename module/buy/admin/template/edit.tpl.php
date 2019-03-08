@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息类型</td>
 <td>
@@ -18,13 +19,20 @@ show_menu($menus);
 <?php } ?>
 </td>
 </tr>
+<!--
+<tr>
+<td class="tl"><span class="f_red">*</span> 产品名称</td>
+<td><input name="post[tag]" id="tag" type="text" size="30" value="<?php echo $tag;?>" onkeyup="_p();"/><span id="reccate" style="display:none;"> <a href="javascript:" onclick="reccate(<?php echo $moduleid;?>, 'tag');" class="t">[分类建议]</a></span> <span id="dtag" class="f_red"></span></td>
+</tr>
+-->
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息标题</td>
 <td><input name="post[title]" type="text" id="title" size="60" value="<?php echo $title;?>"/> <?php echo level_select('post[level]', '级别', $level);?> <?php echo dstyle('post[style]', $style);?> <br/><span id="dtitle" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业分类</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?> <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?>
+<br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 <?php if($CP) { ?>
 <script type="text/javascript">
@@ -33,6 +41,7 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
+<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -41,7 +50,7 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 详细说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -50,11 +59,11 @@ var property_admin = 1;
 	<input type="hidden" name="post[thumb]" id="thumb" value="<?php echo $thumb;?>"/>
 	<input type="hidden" name="post[thumb1]" id="thumb1" value="<?php echo $thumb1;?>"/>
 	<input type="hidden" name="post[thumb2]" id="thumb2" value="<?php echo $thumb2;?>"/>
-	<table width="360" class="ctb">
+	<table width="360">
 	<tr align="center" height="120" class="c_p">
-	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb').value, true);}"/></td>
-	<td width="120"><img src="<?php echo $thumb1 ? $thumb1 : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb1" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb1').src, 1);}else{Dalbum(1,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb1').value, true);}"/></td>
-	<td width="120"><img src="<?php echo $thumb2 ? $thumb2 : DT_SKIN.'image/waitpic.gif';?>" width="100" height="100" id="showthumb2" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb2').src, 1);}else{Dalbum(2,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb2').value, true);}"/></td>
+	<td width="120"><img src="<?php echo $thumb ? $thumb : DT_SKIN.'image/waitpic.gif';?>" id="showthumb" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb').src, 1);}else{Dalbum('',<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb').value, true);}"/></td>
+	<td width="120"><img src="<?php echo $thumb1 ? $thumb1 : DT_SKIN.'image/waitpic.gif';?>" id="showthumb1" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb1').src, 1);}else{Dalbum(1,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb1').value, true);}"/></td>
+	<td width="120"><img src="<?php echo $thumb2 ? $thumb2 : DT_SKIN.'image/waitpic.gif';?>" id="showthumb2" title="预览图片" alt="" onclick="if(this.src.indexOf('waitpic.gif') == -1){_preview(Dd('showthumb2').src, 1);}else{Dalbum(2,<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb2').value, true);}"/></td>
 	</tr>
 	<tr align="center" class="c_p">
 	<td><span onclick="Dalbum('',<?php echo $moduleid;?>,<?php echo $MOD['thumb_width'];?>,<?php echo $MOD['thumb_height'];?>, Dd('thumb').value, true);" class="jt"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_upload.gif" width="12" height="12" title="上传"/></span>&nbsp;&nbsp;<img src="<?php echo $MODULE[2]['linkurl'];?>image/img_select.gif" width="12" height="12" title="选择" onclick="selAlbum('');"/>&nbsp;&nbsp;<span onclick="delAlbum('', 'wait');" class="jt"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_delete.gif" width="12" height="12" title="删除"/></span></td>
@@ -66,59 +75,36 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 过期时间</td>
-<td><?php echo dcalendar('post[totime]', $totime, '-', 1);?>&nbsp;
+<td><?php echo dcalendar('post[totime]', $totime);?>&nbsp;
 <select onchange="Dd('posttotime').value=this.value;">
 <option value="">快捷选择</option>
 <option value="">长期有效</option>
-<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?> 23:59:59">3天</option>
-<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?> 23:59:59">一周</option>
-<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?> 23:59:59">半月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?> 23:59:59">一月</option>
-<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?> 23:59:59">半年</option>
-<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?> 23:59:59">一年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*3, 3);?>">3天</option>
+<option value="<?php echo timetodate($DT_TIME+86400*7, 3);?>">一周</option>
+<option value="<?php echo timetodate($DT_TIME+86400*15, 3);?>">半月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*30, 3);?>">一月</option>
+<option value="<?php echo timetodate($DT_TIME+86400*182, 3);?>">半年</option>
+<option value="<?php echo timetodate($DT_TIME+86400*365, 3);?>">一年</option>
 </select>&nbsp;
 <span id="dposttotime" class="f_red"></span> 不选表示长期有效</td>
 </tr>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 主要参数</td>
-<td class="nv">
-<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
-<tr align="center">
-<th>参数名称</th>
-<th>参数值</th>
-</tr>
-<tr bgcolor="#FFFFFF">
-<td><input name="post[n1]" type="text" size="10" value="<?php echo $n1;?>" id="n1"/></td>
-<td><input name="post[v1]" type="text" size="20" value="<?php echo $v1;?>" id="v1"/></td>
-</tr>
-<tr bgcolor="#FFFFFF">
-<td><input name="post[n2]" type="text" size="10" value="<?php echo $n2;?>" id="n2"/></td>
-<td><input name="post[v2]" type="text" size="20" value="<?php echo $v2;?>" id="v2"/></td>
-</tr>
-<tr bgcolor="#FFFFFF">
-<td><input name="post[n3]" type="text" size="10" value="<?php echo $n3;?>" id="n3"/></td>
-<td><input name="post[v3]" type="text" size="20" value="<?php echo $v3;?>" id="v3"/></td>
-</tr>
-<tr bgcolor="#FFFFFF">
-<td class="f_gray">例如：规格</td>
-<td class="f_gray">例如：10cm*20cm</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
 <td class="tl"><span class="f_hid">*</span> 交易条件</td>
 <td>
-	<table cellspacing="1" bgcolor="#E7E7EB" class="ctb">
-	<tr bgcolor="#FFFFFF">
+	<table width="100%">
+	<tr>
 	<td width="70">需求数量</td>
 	<td><input name="post[amount]" type="text" size="20" value="<?php echo $amount;?>"/></td>
 	</tr>
-	<tr bgcolor="#FFFFFF">
+	<tr>
 	<td>价格要求</td>
 	<td><input name="post[price]" type="text" size="20" value="<?php echo $price;?>"/></td>
 	</tr>
-	<tr bgcolor="#FFFFFF">
+	<tr>
+	<td>规格要求</td>
+	<td><input name="post[standard]" type="text" size="20" value="<?php echo $standard;?>"/></td>
+	</tr>
+	<tr>
 	<td>包装要求</td>
 	<td><input name="post[pack]" type="text" size="20" value="<?php echo $pack;?>"/></td>
 	</tr>
@@ -141,7 +127,7 @@ var property_admin = 1;
 <tbody id="d_guest" style="display:<?php echo $username ? 'none' : '';?>">
 <tr>
 <td class="tl"><span class="f_red">*</span> 公司名称</td>
-<td class="tr"><input name="post[company]" type="text" id="company" size="50" value="<?php echo $company;?>" /> 个人请填姓名 例如：张三<br/><span id="dcompany" class="f_red"></span> </td>
+<td class="tr"><input name="post[company]" type="text" id="company" size="50" value="<?php echo $company;?>" /> 个人请填 姓名(个人) 例如：张三(个人)<br/><span id="dcompany" class="f_red"></span> </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 所在地区</td>
@@ -165,30 +151,30 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 联系地址</td>
-<td class="tr"><input name="post[address]" id="address" type="text" size="60" value="<?php echo $address;?>"/></td>
+<td class="tr"><input name="post[address]" type="text" size="60" value="<?php echo $address;?>"/></td>
 </tr>
 <?php if($DT['im_qq']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> QQ</td>
-<td class="tr"><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
-</tr>
-<?php } ?>
-<?php if($DT['im_wx']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 微信</td>
-<td class="tr"><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+<td class="tr"><input name="post[qq]" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_ali']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
-<td class="tr"><input name="post[ali]" id="ali" type="text" size="30" value="<?php echo $ali;?>"/></td>
+<td class="tr"><input name="post[ali]" type="text" size="30" value="<?php echo $ali;?>"/></td>
+</tr>
+<?php } ?>
+<?php if($DT['im_msn']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> MSN</td>
+<td class="tr"><input name="post[msn]" type="text" size="30" value="<?php echo $msn;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_skype']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> Skype</td>
-<td class="tr"><input name="post[skype]" id="skype" type="text" size="30" value="<?php echo $skype;?>"/></td>
+<td class="tr"><input name="post[skype]" type="text" size="30" value="<?php echo $skype;?>"/></td>
 </tr>
 <?php } ?>
 </tbody>
@@ -208,7 +194,7 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
@@ -230,20 +216,19 @@ var property_admin = 1;
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
-<?php load('guest.js'); ?>
 <?php if($action == 'add') { ?>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>
@@ -283,7 +268,7 @@ function check() {
 			return false;
 		}
 		if(Dd('areaid_1').value == 0) {
-			Dmsg('请选择所在地区', 'areaid');
+			Dmsg('请选择所在地区', 'areaid', 1);
 			return false;
 		}
 		f = 'truename';
@@ -300,7 +285,16 @@ function check() {
 		}
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	<?php echo $CP ? property_js() : '';?>
+	if(Dd('property_require') != null) {
+		var ptrs = Dd('property_require').getElementsByTagName('option');
+		for(var i = 0; i < ptrs.length; i++) {		
+			f = 'property-'+ptrs[i].value;
+			if(Dd(f).value == 0 || Dd(f).value == '') {
+				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 </script>

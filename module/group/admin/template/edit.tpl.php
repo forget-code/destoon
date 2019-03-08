@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
 <td><?php echo $_admin == 1 ? category_select('post[catid]', '选择分类', $catid, $moduleid) : ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?><span id="dcatid" class="f_red"></span></td>
@@ -60,6 +61,7 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
+<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -72,16 +74,16 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_hid">*</span> 详细说明</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <?php
-if($MOD['swfu'] && DT_EDITOR == 'fckeditor') { 
-	include DT_ROOT.'/api/swfupload/editor.inc.php';
+if($MOD['swfu']) { 
+	include DT_ROOT.'/file/swfupload/editor.inc.php';
 }
 ?>
 <tr>
-<td class="tl"><span class="f_hid">*</span> 需要快递</td>
+<td class="tl"><span class="f_hid">*</span> 需要物流</td>
 <td>
 <input type="radio" name="post[logistic]" value="1" <?php if($logistic) echo 'checked';?> id="logistic_1"/><label for="logistic_1"> 是</label>&nbsp;&nbsp;&nbsp;
 <input type="radio" name="post[logistic]" value="0" <?php if(!$logistic) echo 'checked';?> id="logistic_0"/><label for="logistic_0"> 否</label>
@@ -111,7 +113,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 浏览次数</td>
@@ -133,7 +135,7 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php if($action == 'add') { ?>
@@ -142,10 +144,10 @@ if($MOD['swfu'] && DT_EDITOR == 'fckeditor') {
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>
@@ -207,7 +209,7 @@ function check() {
 			return false;
 		}
 		if(Dd('areaid_1').value == 0) {
-			Dmsg('请选择所在地区', 'areaid');
+			Dmsg('请选择所在地区', 'areaid', 1);
 			return false;
 		}
 		f = 'truename';
@@ -224,7 +226,16 @@ function check() {
 		}
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	<?php echo $CP ? property_js() : '';?>
+	if(Dd('property_require') != null) {
+		var ptrs = Dd('property_require').getElementsByTagName('option');
+		for(var i = 0; i < ptrs.length; i++) {		
+			f = 'property-'+ptrs[i].value;
+			if(Dd(f).value == 0 || Dd(f).value == '') {
+				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 </script>

@@ -1,23 +1,16 @@
-<!doctype html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="{DT_CHARSET}"/>
+<meta http-equiv="Content-Type" content="text/html;charset={DT_CHARSET}"/>
 <title>Send_Message</title>
-<meta name="generator" content="DESTOON B2B - www.destoon.com"/>
-<link rel="stylesheet" type="text/css" href="{DT_STATIC}{$MODULE[4][moduledir]}/skin/common.css"/>
+<link rel="stylesheet" type="text/css" href="{$MODULE[4][linkurl]}skin/common.css"/>
 <link rel="stylesheet" type="text/css" href="{$HSPATH}style.css" />
-<script type="text/javascript" src="{DT_STATIC}lang/{DT_LANG}/lang.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/config.js"></script>
-<!--[if lte IE 9]><!-->
-<script type="text/javascript" src="{DT_STATIC}file/script/jquery-1.5.2.min.js"></script>
-<!--<![endif]-->
-<!--[if (gte IE 10)|!(IE)]><!-->
-<script type="text/javascript" src="{DT_STATIC}file/script/jquery-2.1.1.min.js"></script>
-<!--<![endif]-->
-<script type="text/javascript" src="{DT_STATIC}file/script/common.js"></script>
-<script type="text/javascript" src="{DT_STATIC}file/script/page.js"></script>
+<script type="text/javascript" src="{DT_PATH}lang/{DT_LANG}/lang.js"></script>
+<script type="text/javascript" src="{DT_PATH}file/script/config.js"></script>
+<script type="text/javascript" src="{DT_PATH}file/script/common.js"></script>
+<script type="text/javascript" src="{DT_PATH}file/script/page.js"></script>
 <script type="text/javascript">
-if(parent.location == window.location) Go('{userurl($username)}');
+if(parent.location == window.location) window.location='{userurl($username)}';
 </script>
 </head>
 <body style="background:#FFFFFF;">
@@ -71,20 +64,20 @@ if(parent.location == window.location) Go('{userurl($username)}');
 </tr>
 {if $DT[im_qq]}
 <tr>
-<td>QQ</td>
+<td>QQ </td>
 <td><input type="text" size="20" name="qq" id="qq" value="{$qq}"/></td>
-</tr>
-{/if}
-{if $DT[im_wx]}
-<tr>
-<td>微信</td>
-<td><input type="text" size="20" name="wx" id="wx" value="{$wx}"/></td>
 </tr>
 {/if}
 {if $DT[im_ali]}
 <tr>
 <td>阿里旺旺 </td>
 <td><input type="text" size="20" name="ali" id="ali" value="{$ali}"/></td>
+</tr>
+{/if}
+{if $DT[im_msn]}
+<tr>
+<td>MSN </td>
+<td><input type="text" size="30" name="msn" id="msn" value="{$msn}"/></td>
 </tr>
 {/if}
 {if $DT[im_skype]}
@@ -107,6 +100,14 @@ if(parent.location == window.location) Go('{userurl($username)}');
 </table>
 </form>
 <script type="text/javascript">
+function is_captcha(v) {
+	if(v == L['str_captcha']) return false;
+	if(v.match(/^[a-z0-9A-Z]{1,}$/)) {
+		return v.match(/^[a-z0-9A-Z]{4,}$/);
+	} else {
+		return v.length > 1;
+	}
+}
 function check() {
 	var l;
 	var f;
@@ -140,11 +141,17 @@ function check() {
 		return false;
 	}					
 	f = 'captcha';
-	if($('#c'+f).html().indexOf('ok.png') == -1) {
+	l = Dd(f).value;
+	if(!is_captcha(l)) {
 		alert('请填写正确的验证码');
 		Dd(f).focus();
 		return false;
 	}
+	if(Dd('c'+f).innerHTML.indexOf('error') != -1) {
+		Dd(f).focus();
+		return false;
+	}
+
 }
 </script>
 </body>

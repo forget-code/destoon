@@ -1,7 +1,7 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
-$do = new $module($moduleid);
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/mall.class.php';
+$do = new mall($moduleid);
 $menus = array (
     array('添加商品', '?moduleid='.$moduleid.'&action=add'),
     array('商品列表', '?moduleid='.$moduleid),
@@ -24,24 +24,21 @@ if(in_array($action, array('add', 'edit'))) {
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 
 if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
-	$sfields = array('模糊',  '商品名称', '商品品牌',  '简介', '计量单位', '关联名称', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', '编辑', 'IP', '属性名1', '属性名2', '属性名3', '属性值1', '属性值2', '属性值3', '快递1', '快递2', '快递3', '文件路径', '内容模板');
-	$dfields = array('keyword', 'title', 'brand', 'introduce', 'unit', 'relate_name', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'editor', 'ip', 'n1', 'n2', 'n3', 'v1', 'v2', 'v3', 'express_name_1', 'express_name_2', 'express_name_3', 'filepath', 'template');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '商品单价降序', '商品单价升序', '订单数量降序', '订单数量升序', '销售数量降序', '销售数量升序', '库存总量降序', '库存总量升序', '评论数量降序', '评论数量升序', '浏览人气降序', '浏览人气升序', '信息ID降序', '信息ID升序');
+	$sfields = array('模糊',  '商品名称', '商品品牌',  '简介', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', 'IP');
+	$dfields = array('keyword', 'title', 'brand', 'introduce', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'ip');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', VIP.'级别降序', VIP.'级别升序', '商品单价降序', '商品单价升序', '订单数量降序', '订单数量升序', '销售数量降序', '销售数量升序', '库存总量降序', '库存总量升序', '评论次数降序', '评论次数升序', '浏览人气降序', '浏览人气升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'vip DESC', 'vip ASC', 'price DESC', 'price DESC', 'orders DESC', 'orders ASC', 'sales DESC', 'sales ASC', 'amount DESC', 'amount ASC', 'comments DESC', 'comments ASC', 'hits DESC', 'hits ASC', 'itemid DESC', 'itemid ASC');
 
 	$level = isset($level) ? intval($level) : 0;
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	$elite = isset($elite) ? intval($elite) : 0;
-	$cod = isset($cod) ? intval($cod) : 0;
-	$mp = isset($mp) ? intval($mp) : 0;
-	$rl = isset($rl) ? intval($rl) : 0;
 	$price = isset($price) ? intval($price) : 0;
 
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime')) or $datetype = 'edittime';
-	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
+	$fromdate = isset($fromdate) && preg_match("/^([0-9]{8})$/", $fromdate) ? $fromdate : '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	(isset($todate) && is_date($todate)) or $todate = '';
+	$todate = isset($todate) && preg_match("/^([0-9]{8})$/", $todate) ? $todate : '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 	
 	$minprice = isset($minprice) ? dround($minprice) : '';
@@ -71,7 +68,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$itemid or $itemid = '';
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level, 'all');
+	$level_select = level_select('level', '级别', $level);
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
@@ -81,11 +78,8 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($ARE['child']) ? " AND areaid IN (".$ARE['arrchildid'].")" : " AND areaid=$areaid";
 
-	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
+	if($level) $condition .= " AND level=$level";
 	if($elite) $condition .= " AND elite>0";
-	if($cod) $condition .= " AND cod>0";
-	if($mp) $condition .= " AND step LIKE '%Y%'";
-	if($rl) $condition .= " AND relate_id<>''";
 	if($price) $condition .= " AND price>0";
 	if($minprice)  $condition .= " AND price>=$minprice";
 	if($maxprice)  $condition .= " AND price<=$maxprice";
@@ -101,7 +95,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($maxvip)  $condition .= " AND vip<=$maxvip";
 	if($fromtime) $condition .= " AND `$datetype`>=$fromtime";
 	if($totime) $condition .= " AND `$datetype`<=$totime";
-	if($itemid) $condition .= " AND itemid=$itemid";
+	if($itemid) $condition = " AND itemid=$itemid";
 
 	$timetype = strpos($dorder[$order], 'add') !== false ? 'add' : '';
 }
@@ -114,7 +108,6 @@ switch($action) {
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
 				dmsg('添加成功', '?moduleid='.$moduleid.'&action='.$action);
 			} else {
 				msg($do->errmsg);
@@ -123,26 +116,18 @@ switch($action) {
 			foreach($do->fields as $v) {
 				isset($$v) or $$v = '';
 			}
-			$a1 = 1;
-			$a2 = $a3 = $p1 = $p2 = $p3 = '';
-			$unit = '件';
-			$boc = 1;
 			$content = '';
 			$status = 3;
 			$addtime = timetodate($DT_TIME);
 			$username = $_username;
 			$item = array();
+			$menuid = 0;
+			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
 				if($tmp) extract($tmp);
 			}
-			$EXP = array();
-			$result = $db->query("SELECT * FROM {$table_express} WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
-			while($r = $db->fetch_array($result)) {
-				$EXP[] = $r;
-			}
-			$menuid = 0;
 			include tpl('edit', $module);
 		}
 	break;
@@ -153,9 +138,9 @@ switch($action) {
 			if($do->pass($post)) {
 				if($FD) fields_check($post_fields);
 				if($CP) property_check($post_ppt);
+				$do->edit($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				$do->edit($post);
 				dmsg('修改成功', $forward);
 			} else {
 				msg($do->errmsg);
@@ -163,26 +148,10 @@ switch($action) {
 		} else {
 			$item = $do->get_one();
 			extract($item);
-			if($step) {
-				extract(unserialize($step));
-				$a2 > 0 or $a2 = '';
-				$a3 > 0 or $a3 = '';
-				$p2 > 0 or $p2 = '';
-				$p3 > 0 or $p3 = '';
-			} else {
-				$a1 = 1;
-				$p1 = $item['price'];
-				$a2 = $a3 = $p2 = $p3 = '';
-			}
-			$unit or $unit = '件';
 			$addtime = timetodate($addtime);
-			$EXP = array();
-			$result = $db->query("SELECT * FROM {$table_express} WHERE username='$username' AND parentid=0 ORDER BY listorder ASC,itemid ASC LIMIT 100");
-			while($r = $db->fetch_array($result)) {
-				$EXP[] = $r;
-			}
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
+			$tname = '修改'.$MOD['name'];
 			include tpl($action, $module);
 		}
 	break;
@@ -197,8 +166,8 @@ switch($action) {
 			}
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
-			$menuid = 6;
-			include tpl($action);
+			$menuid = 5;
+			include tpl($action, $module);
 		}
 	break;
 	case 'update':
@@ -213,7 +182,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('生成成功', $forward);
+		dmsg('更新成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择商品');
@@ -263,62 +232,19 @@ switch($action) {
 		}
 	break;
 	case 'expire':
-		$lists = $do->get_list('status=4'.$condition);
-		$menuid = 3;
-		include tpl('index', $module);
-	break;
-	case 'unsale':
-		$itemid or msg('请选择商品');
-		$do->unsale($itemid);
-		dmsg('下架成功', $forward);
+		if($itemid && !$psize) {
+			$do->unsale($itemid);
+			dmsg('下架成功', $forward);
+		} else {
+			$lists = $do->get_list('status=4'.$condition);
+			$menuid = 3;
+			include tpl('index', $module);
+		}
 	break;
 	case 'onsale':
 		$itemid or msg('请选择商品');
 		$do->onsale($itemid);
 		dmsg('上架成功', $forward);
-	break;
-	case 'relate_del':
-		$itemid or msg('请选择商品');
-		$do->itemid = $itemid;
-		$M = $do->get_one();
-		($M && $M['status'] == 3) or msg('请选择商品');
-		$id = isset($id) ? intval($id) : 0;
-		$id or msg('请选择移除商品');
-		$do->itemid = $id;
-		$A = $do->get_one();
-		$do->relate_del($M, $A);
-		dmsg('移除成功', '?moduleid='.$moduleid.'&file='.$file.'&itemid='.$itemid.'&action=relate');
-	break;
-	case 'relate_add':
-		$relate_name = isset($relate_name) ? dhtmlspecialchars(trim($relate_name)) : '';
-		$relate_name or msg('请填写关联名称');
-		$itemid or msg('请选择商品');
-		$do->itemid = $itemid;
-		$M = $do->get_one();
-		($M && $M['status'] == 3) or msg('请选择商品');
-		$id = isset($id) ? intval($id) : 0;
-		$id or msg('请选择关联商品');
-		$do->itemid = $id;
-		$A = $do->get_one();
-		($A && $A['status'] == 3 && $A['username'] == $M['username']) or msg('请选择关联商品');
-		if($itemid == $id) msg('选择的商品已经存在');
-		$do->relate_add($M, $A, $relate_name);
-		dmsg('新增成功', '?moduleid='.$moduleid.'&file='.$file.'&itemid='.$itemid.'&action=relate');
-	break;
-	case 'relate':
-		$itemid or msg('请选择商品');
-		$do->itemid = $itemid;
-		$M = $do->get_one();
-		($M && $M['status'] == 3) or msg('请选择商品');
-		if($submit) {
-			$relate_name = isset($relate_name) ? dhtmlspecialchars(trim($relate_name)) : '';
-			$relate_name or msg('请填写关联名称');
-			$do->relate($M, $post, $relate_name);
-			dmsg('更新成功', '?moduleid='.$moduleid.'&file='.$file.'&itemid='.$itemid.'&action=relate');
-		} else {
-			$lists = $do->relate_list($M);
-			include tpl('relate', $module);
-		}
 	break;
 	case 'check':
 		if($itemid && !$psize) {

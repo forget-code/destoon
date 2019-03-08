@@ -21,8 +21,9 @@ if($html == 'show') {
 					if(check_pay($mid, $itemid)) {
 						$user_status = 3;
 					} else {
-						$user_status = 2;
-						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid;
+						$user_status = 2;						
+						$linkurl = linkurl($MOD['linkurl'].$linkurl, 1);
+						$pay_url = linkurl($MODULE[2]['linkurl'], 1).'pay.php?mid='.$mid.'&itemid='.$itemid.'&fee='.$fee.'&currency='.$currency.'&sign='.crypt_sign($_username.$mid.$itemid.$fee.$currency.$linkurl.$item['title']).'&title='.rawurlencode($item['title']).'&forward='.urlencode($linkurl);
 					}
 				} else {
 					$user_status = 0;
@@ -42,23 +43,20 @@ if($html == 'show') {
 			$content = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 			$content = $content['content'];
 			if($user_status == 2) $description = get_description($content, $MOD['pre_view']);
-			if(strpos($content, 'de-pagebreak') !== false) {
-				$content = str_replace('"de-pagebreak" /', '"de-pagebreak"/', $content);
-				$contents = explode('<hr class="de-pagebreak"/>', $content);
-				$total = count($contents);
-				$pages = pages($total, $page, 1, $MOD['linkurl'].itemurl($item, '{destoon_page}'));
-				if($pages) $pages = substr($pages, 0, strpos($pages, '<cite>'));
-				$content = $contents[$page-1];
+			if(strpos($content, '[pagebreak]') !== false) {
+				$content = explode('[pagebreak]', $content);
+				$total = count($content);
+				$pages = showpages($item, $total, $page);
+				$content = $content[$page-1];
 			}
 			if($MOD['keylink']) $content = keylink($content, $moduleid);
-			$content = parse_video($content);
 		}
 		$content = strip_nr(ob_template('content', 'chip'), true);
 		echo 'Inner("content", \''.$content.'\');';
 	}
 	$update = '';
-	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
-	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
+	include DT_ROOT.'/include/update.inc.php';
+	echo 'Inner("hits", \''.$item['hits'].'\');';
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
@@ -74,10 +72,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits'] && $MOD['hits']) {
-		$file = DT_CACHE.'/hits-'.$moduleid;
-		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
-	}
+	if($DT['cache_hits'] && $DT_TIME - @filemtime(DT_CACHE.'/hits-'.$moduleid.'.dat') > $DT['cache_hits']) update_hits($moduleid, $table);
 	if($MOD['index_html']) {
 		$file = DT_ROOT.'/'.$MOD['moduledir'].'/'.$DT['index'].'.'.$DT['file_ext'];
 		if($DT_TIME - @filemtime($file) > $task_index) tohtml('index', $module);

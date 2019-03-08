@@ -1,21 +1,20 @@
-<table cellpadding="0" cellspacing="0" width="100%">
+<table cellpadding="3" cellspacing="3" width="100%">
 {loop $tags $t}
 	<tr>
-		<td class="jt-title"><div><a href="{$t[linkurl]}" target="_blank" title="{$t[alt]}">{$t[title]}</a></div></td>
-		<td class="jt-salary"><div>
+		<td width="200" align="left">&nbsp;<a href="{$t[linkurl]}" target="_blank" title="{$t[alt]}">{$t[title]}</a></td>
+		<td align="left"><a href="{userurl($t[username])}" target="_blank">{$t[company]}</a>{if $t[vip]} <img src="{DT_SKIN}image/vip.gif" alt="{$t[vip]}级" title="{$t[vip]}级"/>{/if}</td>
+		<td width="100" align="center">
 		{if $t[minsalary] && $t[maxsalary]}
-			{$t[minsalary]}-{$t[maxsalary]}元/月
+			{$t[minsalary]}-{$t[maxsalary]}{$DT[money_unit]}/月
 		{elseif $t[minsalary]}
-			{$t[minsalary]}元/月以上
+			{$t[minsalary]}{$DT[money_unit]}/月以上
 		{elseif $t[maxsalary]}
-			{$t[maxsalary]}元/月以内
+			{$t[maxsalary]}{$DT[money_unit]}/月以内
 		{else}
 			面议
 		{/if}
-		</div>
 		</td>
-		<td class="jt-company"><div>{if $t[vip]}<img src="{DT_SKIN}image/vip_{$t[vip]}.gif" alt="{VIP}" title="{VIP}:{$t[vip]}级" align="absmiddle"/> {/if}<a href="{userurl($t[username])}" target="_blank">{$t[company]}</a></div></td>
-		<td class="jt-area"><div>{area_pos($t[areaid], '', 1)}</div></td>
+		<td width="80" align="center">{area_pos($t[areaid], '', 1)}</td>
 	</tr>
 {/loop}	
 </table>

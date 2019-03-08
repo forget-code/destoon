@@ -1,18 +1,13 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 require DT_ROOT.'/include/module.func.php';
 $menus = array (
-    array('数据库备份', '?file=database'),
-    array('数据库恢复', '?file=database&action=import'),
-    array('字符替换', '?file=database&action=replace'),
-    array('执行SQL', '?file=database&action=execute'),
-    array('显示进程', '?file=database&action=process'),
-    array('数据互转', '?file=database&action=move'),
-    array('数据导入', '?file=data'),
+    array('数据导入', '?file='.$file),
+    array('数据备份', '?file=database'),
 );
 $this_forward = '?file='.$file;
 isset($name) or $name = '';

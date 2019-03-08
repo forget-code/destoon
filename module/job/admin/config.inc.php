@@ -1,12 +1,12 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $MCFG['module'] = 'job';
 $MCFG['name'] = '人才';
-$MCFG['author'] = 'DESTOON';
+$MCFG['author'] = 'Destoon.COM';
 $MCFG['homepage'] = 'www.destoon.com';
-$MCFG['copy'] = true;
+$MCFG['copy'] = false;
 $MCFG['uninstall'] = true;
-$MCFG['moduleid'] = 0;
+$MCFG['moduleid'] = 9;
 
 $RT = array();
 $RT['file']['index'] = '招聘管理';
@@ -18,7 +18,7 @@ $RT['action']['index']['edit'] = '修改招聘';
 $RT['action']['index']['delete'] = '删除招聘';
 $RT['action']['index']['check'] = '审核招聘';
 $RT['action']['index']['expire'] = '过期招聘';
-$RT['action']['index']['reject'] = '未通过';
+$RT['action']['index']['reject'] = '未通过招聘';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '移动招聘';
 $RT['action']['index']['level'] = '信息级别';

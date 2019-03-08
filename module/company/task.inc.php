@@ -14,12 +14,9 @@ if($html == 'list') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits'] && $MOD['hits']) {
-		$file = DT_CACHE.'/hits-'.$moduleid;
-		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
-	}
+	if($DT['cache_hits'] && $DT_TIME - @filemtime(DT_CACHE.'/hits-'.$moduleid.'.dat') > $DT['cache_hits']) update_hits($moduleid, $table);
 	if($MOD['index_html']) {
-		$file = DT_CACHE.'/htm/company.htm';
+		$file = DT_ROOT.'/'.$MOD['moduledir'].'/index.inc.html';
 		if($DT_TIME - @filemtime($file) > $task_index) tohtml('index', $module);
 	}
 }

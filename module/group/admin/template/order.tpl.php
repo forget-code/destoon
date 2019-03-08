@@ -1,38 +1,37 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
-if(!$id) show_menu($menus);
+show_menu($menus);
 ?>
 <script type="text/javascript">var errimg = '<?php echo DT_SKIN;?>image/nopic50.gif';</script>
+<div class="tt">记录搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<input type="hidden" name="id" value="<?php echo $id;?>"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
 <?php echo $fields_select;?>&nbsp;
-<input type="text" size="20" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词"/>&nbsp;
+<input type="text" size="20" name="kw" value="<?php echo $kw;?>"/>&nbsp;
 <?php echo $status_select;?>&nbsp;
 <?php echo $order_select;?>&nbsp;
 <select name="logistic">
-<option value="-1">快递</option>
+<option value="-1">物流</option>
 <option value="0" <?php if($logistic == 0) echo 'selected';?>>不需要</option>
 <option value="1" <?php if($logistic == 1) echo 'selected';?>>需要</option>
 </select>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&id=<?php echo $id;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="window.location='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>';"/>
 </td>
 </tr>
-<?php if(!$id) { ?>
 <tr>
 <td>&nbsp;
 <select name="timetype">
 <option value="addtime" <?php if($timetype == 'addtime') echo 'selected';?>>下单时间</option>
 <option value="updatetime" <?php if($timetype == 'updatetime') echo 'selected';?>>更新时间</option>
 </select>&nbsp;
-<?php echo dcalendar('fromdate', $fromdate);?> 至 <?php echo dcalendar('todate', $todate);?>&nbsp;
+<?php echo dcalendar('fromtime', $fromtime);?> 至 <?php echo dcalendar('totime', $totime);?>&nbsp;
 <select name="mtype">
 <option value="money" <?php if($mtype == 'money') echo 'selected';?>>交易总额</option>
 <option value="amount" <?php if($mtype == 'amount') echo 'selected';?>>下单金额</option>
@@ -49,13 +48,14 @@ if(!$id) show_menu($menus);
 商品单号：<input type="text" name="gid" value="<?php echo $gid;?>" size="10"/>&nbsp;
 卖家：<input type="text" name="seller" value="<?php echo $seller;?>" size="10"/>&nbsp;
 买家：<input type="text" name="buyer" value="<?php echo $buyer;?>" size="10"/>&nbsp;
+
 </td>
 </tr>
-<?php } ?>
 </table>
 </form>
 <form method="post">
-<table cellspacing="0" class="tb ls">
+<div class="tt">交易记录</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
 <th width="60">缩略图</th>
@@ -70,7 +70,7 @@ if(!$id) show_menu($menus);
 <th>操作</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr align="center">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
 <td><a href="<?php echo $v['linkurl'];?>" target="_blank"><img src="<?php if($v['thumb']) { ?><?php echo $v['thumb'];?><?php } else { ?><?php echo DT_SKIN;?>image/nopic50.gif<?php } ?>" width="50" height="50" onerror="this.src=errimg;" style="padding:5px;"/></a></td>
 <td align="left" class="f_gray">
@@ -80,23 +80,19 @@ if(!$id) show_menu($menus);
 <strong>单价：</strong><?php echo $v['price'];?>&nbsp;
 <strong>密码：</strong><?php echo $v['password'];?>
 </td>
-<td class="f_red px12"><?php echo $v['money'];?></td>
-<td class="px12"><?php echo $v['number'];?></td>
-<td class="px12">
+<td class="f_red px11"><?php echo $v['money'];?></td>
+<td class="px11"><?php echo $v['number'];?></td>
+<td class="px11">
 <a href="javascript:_user('<?php echo $v['seller'];?>');"><?php echo $v['seller'];?></a>
 </td>
-<td class="px12">
+<td class="px11">
 <a href="javascript:_user('<?php echo $v['buyer'];?>');"><?php echo $v['buyer'];?></a>
 </td>
-<td class="px12"><?php echo $v['addtime'];?></td>
-<td class="px12"><?php echo $v['updatetime'];?></td>
+<td class="px11"><?php echo $v['addtime'];?></td>
+<td class="px11"><?php echo $v['updatetime'];?></td>
 <td><?php echo $v['dstatus'];?></td>
 <td>
-<?php if($v['status'] == 4) {?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="受理" alt=""/></a>
-<?php } else { ?>
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&id=<?php echo $id;?>&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
-<?php } ?>
+<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=show&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/view.png" width="16" height="16" title="查看" alt=""/></a>
 </td>
 </tr>
 <?php }?>
@@ -109,9 +105,12 @@ if(!$id) show_menu($menus);
 </tr>
 </table>
 <div class="btns">
-<input type="submit" value="批量删除" class="btn-r" onclick="if(confirm('确定要删除选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
+<input type="submit" value=" 批量退款 " class="btn" onclick="if(confirm('确定要退款选中记录吗？请谨慎!此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=refund'}else{return false;}"/>&nbsp;
+<input type="button" value="导出SQL" class="btn" onclick="Go('?file=database&action=export&table=<?php echo $table;?>');"/>
 </div>
 </form>
-<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
+<div class="pages"><?php echo $pages;?></div>
 <script type="text/javascript">Menuon(1);</script>
+<br/>
 <?php include tpl('footer');?>

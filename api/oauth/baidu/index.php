@@ -5,12 +5,20 @@ $success = 0;
 $DS = array();
 if($_SESSION['bd_access_token']) {
 	$par = 'access_token='.$_SESSION['bd_access_token'];
-	$rec = dcurl(BD_USERINFO_URL, $par);
+	$cur = curl_init(BD_USERINFO_URL);
+	curl_setopt($cur, CURLOPT_POST, 1);
+	curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
+	curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($cur, CURLOPT_HEADER, 0);
+	curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
+	$rec = curl_exec($cur);
+	curl_close($cur);
 	if(strpos($rec, 'uname') !== false) {
 		$success = 1;
 		$arr = json_decode($rec, true);
 		$openid = $arr['uid'];
-		$nickname = $arr['uname'];
+		$nickname = convert($arr['uname'], 'utf-8', DT_CHARSET);
 		$avatar = '';
 		$url = '';
 		$DS = array('bd_access_token');

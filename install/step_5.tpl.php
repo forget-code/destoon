@@ -10,13 +10,13 @@ include IN_ROOT.'/header.tpl.php';
 </div>
 <div class="body">
 <div>
-<textarea style="width:760px;height:240px;border:#CCCCCC 1px solid;padding:10px;" id="msgbox"></textarea>
+<textarea style="width:515px;height:215px;" id="msgbox"> </textarea>
 </div>
 </div>
 <div class="foot">
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td width="220">
+<td width="215">
 <div class="progress">
 <div id="progress"></div>
 </div>

@@ -1,8 +1,8 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $MCFG['module'] = 'company';
 $MCFG['name'] = '公司';
-$MCFG['author'] = 'DESTOON';
+$MCFG['author'] = 'Destoon.COM';
 $MCFG['homepage'] = 'www.destoon.com';
 $MCFG['copy'] = false;
 $MCFG['uninstall'] = false;

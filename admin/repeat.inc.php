@@ -1,19 +1,19 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('重名检测', '?file='.$file),
 );
-$mid or $mid = 21;
 $key = isset($key) ? trim($key) : 'title';
+$mid = isset($mid) ? intval($mid) : 21;
 $num = isset($num) ? intval($num) : 100;
+$mid = isset($mid) ? intval($mid) : 21;
 $status = isset($status) ? intval($status) : 3;
 $lists = array();
-if(isset($ok)) {
-	$submit = 1;
+if($submit) {
 	$act = '';
 	if($status == 4) $act = 'expire';
 	if($status == 2) $act = 'check';

@@ -1,6 +1,8 @@
-<ul>
+<table width="100%" cellpadding="3">
 {loop $tags $i $t}
-<li><span class="f_r f_gray">{$t[item]}条报价</span><a href="{$MODULE[$moduleid][linkurl]}{rewrite('price.php?itemid='.$t['itemid'])}"{if $target} target="{$target}"{/if} title="{$t[alt]}">{$t[title]}</a></li>
+{if $i%$cols==0}<tr>{/if}
+<td><a href="{$MODULE[$moduleid][linkurl]}{rewrite('search.php?pid='.$t['pid'])}"{if $target} target="{$target}"{/if} title="{$t[alt]}">{$t[title]}</a></td>
+{if $i%$cols==($cols-1)}</tr>{/if}
 {/loop}
-</ul>
+</table>
 {if $showpage && $pages}<div class="pages">{$pages}</div>{/if}

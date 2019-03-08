@@ -1,12 +1,13 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 $menus = array (
     array('基本设置'),
     array('SEO优化'),
     array('权限收费'),
-    array('招聘字段', 'javascript:Dwidget(\'?file=fields&tb='.$table.'\', \'招聘定义字段\');'),
-    array('简历字段', 'javascript:Dwidget(\'?file=fields&tb='.$table_resume.'\', \'简历定义字段\');'),
+    array('招聘字段', '?file=fields&tb=job'),
+    array('简历字段', '?file=fields&tb=resume'),
+    array('模板管理', '?file=template&dir='.$module),
 );
 show_menu($menus);
 ?>
@@ -15,39 +16,8 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="tab" id="tab" value="<?php echo $tab;?>"/>
 <div id="Tabs0" style="display:">
-<table cellspacing="0" class="tb">
-<tr>
-<td class="tl">首页默认模板</td>
-<td><?php echo tpl_select('index', $module, 'setting[template_index]', '默认模板', $template_index);?></td>
-</tr>
-<tr>
-<td class="tl">列表默认模板</td>
-<td><?php echo tpl_select('list', $module, 'setting[template_list]', '默认模板', $template_list);?></td>
-</tr>
-<tr>
-<td class="tl">内容默认模板</td>
-<td><?php echo tpl_select('show', $module, 'setting[template_show]', '默认模板', $template_show);?></td>
-</tr>
-<tr>
-<td class="tl">搜索默认模板</td>
-<td><?php echo tpl_select('search', $module, 'setting[template_search]', '默认模板', $template_search);?></td>
-</tr>
-<tr>
-<td class="tl">简历默认模板</td>
-<td><?php echo tpl_select('resume', $module, 'setting[template_resume]', '默认模板', $template_resume);?></td>
-</tr>
-<tr>
-<td class="tl">应聘默认模板</td>
-<td><?php echo tpl_select('apply', $module, 'setting[template_apply]', '默认模板', $template_apply);?></td>
-</tr>
-<tr>
-<td class="tl">招聘发布模板</td>
-<td><?php echo tpl_select('my_'.$module, 'member', 'setting[template_my]', '默认模板', $template_my);?></td>
-</tr>
-<tr>
-<td class="tl">简历发布模板</td>
-<td><?php echo tpl_select('my_job_resume', 'member', 'setting[template_my_resume]', '默认模板', $template_my_resume);?></td>
-</tr>
+<div class="tt">基本设置</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">免冠照片[宽X高]</td>
 <td>
@@ -141,9 +111,9 @@ X
 <a href="?file=split&mid=<?php echo $moduleid;?>&action=merge" target="_blank" class="t" onclick="return confirm('确定要合并内容吗？合并成功之后请立即关闭内容分表\n\n建议在合并之前备份一次数据库');">[合并内容]</a>
 </span>
 <span style="display:none;" id="split_b">
-<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？拆分成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
+<a href="?file=split&mid=<?php echo $moduleid;?>" target="_blank" class="t" onclick="return confirm('确定要拆分内容吗？合并成功之后请立即开启内容分表\n\n建议在拆分之前备份一次数据库');">[拆分内容]</a>
 </span>
-&nbsp;<?php tips('如果开启内容分表，内容表将根据id号10万数据创建一个分区<br/>如果你的数据少于10万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 100000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
+&nbsp;<?php tips('如果开启内容分表，内容表将根据id号50万数据创建一个分区<br/>如果你的数据少于50万，则不需要开启，当前最大id为'.$maxid.'，'.($maxid > 500000 ? '建议开启' : '无需开启').'<br/>如果需要开启，请先点拆分内容，然后保存设置<br/>如果需要关闭，请先点合并内容，然后保存设置<br/>此项一旦开启，请不要随意关闭，以免出现未知错误，同时全文搜索将关闭');?>
 <input type="hidden" name="maxid" value="<?php echo $maxid;?>"/>
 </td>
 </tr>
@@ -175,27 +145,12 @@ X
 <td><input type="text" size="3" name="setting[max_width]" value="<?php echo $max_width;?>"/> px</td>
 </tr>
 
-<tr>
-<td class="tl">内容点击次数</td>
-<td>
-<input type="radio" name="setting[hits]" value="1"  <?php if($hits) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[hits]" value="0"  <?php if(!$hits) echo 'checked';?>/> 关闭
-<?php tips('关闭后，有助于缓解频繁更新点击次数对数据表造成的压力');?>
-</td>
-</tr>
-
-<tr>
-<td class="tl">内容页评论列表</td>
-<td>
-<input type="radio" name="setting[page_comment]" value="1"  <?php if($page_comment==1) echo 'checked';?>/> 开启&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="setting[page_comment]" value="0"  <?php if($page_comment==0) echo 'checked';?>/> 关闭
-</td>
-</tr>
 </table>
 </div>
 
 <div id="Tabs1" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">SEO优化</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">首页是否生成html</td>
 <td>
@@ -323,7 +278,8 @@ X
 </div>
 
 <div id="Tabs2" style="display:none">
-<table cellspacing="0" class="tb">
+<div class="tt">权限收费</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">允许浏览模块首页</td>
 <td><?php echo group_checkbox('setting[group_index][]', $group_index);?></td>
@@ -373,7 +329,7 @@ X
 </td>
 </tr>
 <tr>
-<td class="tl">发布招聘验证问题</td>
+<td class="tl">发布招聘启用验问题</td>
 <td>
 <input type="radio" name="setting[question_add]" value="2"  <?php if($question_add == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[question_add]" value="1"  <?php if($question_add == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -399,24 +355,12 @@ X
 <td><input type="text" size="5" name="setting[fee_add]" value="<?php echo $fee_add;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
 </tr>
 <tr>
-<td class="tl">发布简历收费</td>
-<td><input type="text" size="5" name="setting[fee_add_resume]" value="<?php echo $fee_add_resume;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
-</tr>
-<tr>
 <td class="tl">查看简历收费</td>
-<td><input type="text" size="5" name="setting[fee_view]" value="<?php echo $fee_view;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
+<td><input type="text" size="5" name="setting[fee_view_resume]" value="<?php echo $fee_view_resume;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
 </tr>
 <tr>
 <td class="tl">收费有效时间</td>
 <td><input type="text" size="5" name="setting[fee_period]" value="<?php echo $fee_period;?>"/> 分钟 <?php tips('如果支付时间超过有效时间，系统将重新收费<br/>填零表示不重复收费');?></td>
-</tr>
-<tr>
-<td class="tl">向发布人返利</td>
-<td><input type="text" size="2" name="setting[fee_back]" value="<?php echo $fee_back;?>"/> % <?php tips('请填写1-100之间的数字，用户支付之后，系统将按此比例向发布人增加对应的'.$DT['money_name'].'或者'.$DT['credit_name']);?></td>
-</tr>
-<tr>
-<td class="tl">向发布人打赏</td>
-<td><input type="text" size="2" name="setting[fee_award]" value="<?php echo $fee_award;?>"/> % <?php tips('请填写1-100之间的数字，用户打赏之后，系统将按此比例向发布人增加对应的赏金，填0代表关闭打赏');?></td>
 </tr>
 <tr>
 <td class="tl">允许浏览招聘列表</td>
@@ -459,16 +403,24 @@ X
 </td>
 </tr>
 <tr>
-<td class="tl">发布简历验证问题</td>
+<td class="tl">发布简历启用验问题</td>
 <td>
 <input type="radio" name="setting[question_add_resume]" value="2"  <?php if($question_add_resume == 2) echo 'checked';?>> 继承会员组设置&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[question_add_resume]" value="1"  <?php if($question_add_resume == 1) echo 'checked';?>> 全部启用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="radio" name="setting[question_add_resume]" value="0"  <?php if($question_add_resume == 0) echo 'checked';?>> 全部关闭
 </td>
 </tr>
+<tr>
+<td class="tl">发布简历收费</td>
+<td><input type="text" size="5" name="setting[fee_add_resume]" value="<?php echo $fee_add_resume;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
+</tr>
+<tr>
+<td class="tl">查看招聘收费</td>
+<td><input type="text" size="5" name="setting[fee_view]" value="<?php echo $fee_view;?>"/> <?php echo $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];?>/条</td>
+</tr>
 </table>
 <div class="tt"><?php echo $DT['credit_name'];?>规则</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">发布招聘奖励</td>
 <td>
@@ -506,35 +458,10 @@ X
 </td>
 </tr>
 </table>
-<div class="tt">发布数量</div>
-<table cellspacing="0" class="tb">
-<tr align="center">
-<td width="158">会员组</td>
-<td width="100">总数限制</td>
-<td width="100">免费数量</td>
-<td width="100">简历总数</td>
-<td width="100">免费简历</td>
-<td align="right"><a href="<?php echo DT_PATH;?>api/redirect.php?url=https://www.destoon.com/doc/skill/94.html" target="_blank" class="t">设置说明</a></td>
-</tr>
-<?php foreach($GROUP as $v) {?>
-<tr align="center">
-<td><?php echo $v['groupname'];?></td>
-<?php $k = 'limit_'.$v['groupid'];?>
-<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
-<?php $k = 'free_limit_'.$v['groupid'];?>
-<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
-<?php $k = 'resume_limit_'.$v['groupid'];?>
-<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
-<?php $k = 'resume_free_limit_'.$v['groupid'];?>
-<td><input type="text" name="setting[<?php echo $k;?>]" size="5" value="<?php echo $$k;?>"/></td>
-<td></td>
-</tr>
-<?php }?>
-</table>
 </div>
 
 <div class="sbt">
-<input type="submit" name="submit" value="保 存" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;
 <input type="button" value="展 开" id="ShowAll" class="btn" onclick="TabAll();" title="展开/合并所有选项"/>
 </div>
 </form>
@@ -551,9 +478,9 @@ function TabAll() {
 	Dd('ShowAll').value = all ? '展 开' : '合 并';
 	all = all ? 0 : 1;
 }
-$(function(){
+window.onload=function() {
 	if(tab) Tab(tab);
 	if(all) {all = 0; TabAll();}
-});
+}
 </script>
 <?php include tpl('footer');?>

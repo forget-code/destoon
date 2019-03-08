@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS `destoon_job_9`;
-CREATE TABLE `destoon_job_9` (
+DROP TABLE IF EXISTS `destoon_job`;
+CREATE TABLE `destoon_job` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
-  `areaid` int(10) unsigned NOT NULL default '0',
+  `areaid` smallint(6) unsigned NOT NULL default '0',
   `level` tinyint(1) unsigned NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
@@ -22,8 +22,6 @@ CREATE TABLE `destoon_job_9` (
   `minage` smallint(2) unsigned NOT NULL default '0',
   `maxage` smallint(2) unsigned NOT NULL default '0',
   `hits` int(10) unsigned NOT NULL default '0',
-  `comments` int(10) unsigned NOT NULL default '0',
-  `thumb` varchar(255) NOT NULL,
   `apply` int(10) unsigned NOT NULL default '0',
   `username` varchar(30) NOT NULL default '',
   `groupid` smallint(4) unsigned NOT NULL default '0',
@@ -35,8 +33,8 @@ CREATE TABLE `destoon_job_9` (
   `mobile` varchar(50) NOT NULL default '',
   `address` varchar(255) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
+  `msn` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
-  `wx` varchar(50) NOT NULL default '',
   `ali` varchar(30) NOT NULL default '',
   `skype` varchar(30) NOT NULL default '',
   `sex` tinyint(1) unsigned NOT NULL default '1',
@@ -60,8 +58,8 @@ CREATE TABLE `destoon_job_9` (
   KEY `areaid` (`areaid`)
 ) TYPE=MyISAM COMMENT='招聘';
 
-DROP TABLE IF EXISTS `destoon_job_apply_9`;
-CREATE TABLE `destoon_job_apply_9` (
+DROP TABLE IF EXISTS `destoon_job_apply`;
+CREATE TABLE `destoon_job_apply` (
   `applyid` bigint(20) unsigned NOT NULL auto_increment,
   `jobid` bigint(20) unsigned NOT NULL default '0',
   `resumeid` bigint(20) unsigned NOT NULL default '0',
@@ -75,18 +73,28 @@ CREATE TABLE `destoon_job_apply_9` (
   KEY `apply_username` (`apply_username`)
 ) TYPE=MyISAM COMMENT='应聘工作';
 
-DROP TABLE IF EXISTS `destoon_job_data_9`;
-CREATE TABLE `destoon_job_data_9` (
+DROP TABLE IF EXISTS `destoon_job_data`;
+CREATE TABLE `destoon_job_data` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` mediumtext NOT NULL,
   PRIMARY KEY  (`itemid`)
 ) TYPE=MyISAM COMMENT='招聘内容';
 
-DROP TABLE IF EXISTS `destoon_job_resume_9`;
-CREATE TABLE `destoon_job_resume_9` (
+DROP TABLE IF EXISTS `destoon_job_talent`;
+CREATE TABLE `destoon_job_talent` (
+  `talentid` bigint(20) unsigned NOT NULL auto_increment,
+  `username` varchar(30) NOT NULL default '',
+  `resumeid` bigint(20) unsigned NOT NULL default '0',
+  `jointime` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`talentid`),
+  KEY `username` (`username`)
+) TYPE=MyISAM COMMENT='人才库';
+
+DROP TABLE IF EXISTS `destoon_resume`;
+CREATE TABLE `destoon_resume` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
-  `areaid` int(10) unsigned NOT NULL default '0',
+  `areaid` smallint(6) unsigned NOT NULL default '0',
   `level` tinyint(1) unsigned NOT NULL default '0',
   `title` varchar(100) NOT NULL default '',
   `style` varchar(50) NOT NULL default '',
@@ -113,8 +121,8 @@ CREATE TABLE `destoon_job_resume_9` (
   `telephone` varchar(50) NOT NULL default '',
   `address` varchar(255) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
+  `msn` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
-  `wx` varchar(50) NOT NULL default '',
   `ali` varchar(30) NOT NULL default '',
   `skype` varchar(30) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
@@ -136,20 +144,3 @@ CREATE TABLE `destoon_job_resume_9` (
   KEY `catid` (`catid`),
   KEY `areaid` (`areaid`)
 ) TYPE=MyISAM COMMENT='简历';
-
-DROP TABLE IF EXISTS `destoon_job_resume_data_9`;
-CREATE TABLE `destoon_job_resume_data_9` (
-  `itemid` bigint(20) unsigned NOT NULL default '0',
-  `content` mediumtext NOT NULL,
-  PRIMARY KEY  (`itemid`)
-) TYPE=MyISAM COMMENT='简历内容';
-
-DROP TABLE IF EXISTS `destoon_job_talent_9`;
-CREATE TABLE `destoon_job_talent_9` (
-  `talentid` bigint(20) unsigned NOT NULL auto_increment,
-  `username` varchar(30) NOT NULL default '',
-  `resumeid` bigint(20) unsigned NOT NULL default '0',
-  `jointime` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`talentid`),
-  KEY `username` (`username`)
-) TYPE=MyISAM COMMENT='人才库';

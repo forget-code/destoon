@@ -1,10 +1,10 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <div class="tt">电子邮件</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl">标题</td>
 <td class="f_b"><?php echo $title;?></td>
@@ -32,5 +32,5 @@ show_menu($menus);
 </tbody>
 </table>
 <div class="sbt"><input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/></div>
-<script type="text/javascript">Menuon(1);</script>
+<script type="text/javascript">Menuon(3);</script>
 <?php include tpl('footer');?>

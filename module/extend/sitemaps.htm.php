@@ -14,19 +14,17 @@ $data .= '<loc>'.DT_PATH.'</loc>';
 $data .= '<lastmod>'.$today.'</lastmod>';
 $data .= '<changefreq>always</changefreq>';
 $data .= '<priority>1.0</priority>';
-$data .= '<data><display></display></data>';
 $data .= '</url>';
 $item = '';
 foreach($mods as $mid) {
 	if(isset($MODULE[$mid]) && !$MODULE[$mid]['islink'] && !$MODULE[$mid]['domain']) {
 		if($mid == 4 && $CFG['com_domain']) continue;
-		$url = $MODULE[$mid]['linkurl'];
+		$url = linkurl($MODULE[$mid]['linkurl']);
 		$data .= '<url>';
 		$data .= '<loc>'.$url.'</loc>';
 		$data .= '<lastmod>'.$today.'</lastmod>';
 		$data .= '<changefreq>hourly</changefreq>';
 		$data .= '<priority>0.9</priority>';
-		$data .= '<data><display></display></data>';
 		$data .= '</url>';
 		if($nums) {
 			$fields = $mid == 4 ? 'linkurl' : 'linkurl,edittime';
@@ -39,7 +37,6 @@ foreach($mods as $mid) {
 				$item .= '<lastmod>'.($mid == 4 ? $today : timetodate($r['edittime'], 3)).'</lastmod>';
 				$item .= '<changefreq>'.$MOD['sitemaps_changefreq'].'</changefreq>';
 				$item .= '<priority>'.$MOD['sitemaps_priority'].'</priority>';
-				$item .= '<data><display></display></data>';
 				$item .= '</url>';
 			}
 		}
@@ -48,11 +45,12 @@ foreach($mods as $mid) {
 $data .= $item;
 $data .= '</urlset>';
 $data = str_replace('><', ">\n<", $data);
+$data = convert($data, DT_CHARSET, 'UTF-8');
 file_put(DT_ROOT.'/sitemaps.xml', $data);
 foreach($mods as $mid) {
 	if(isset($MODULE[$mid]) && !$MODULE[$mid]['islink'] && $MODULE[$mid]['domain']) {
 		if($mid == 4 && $CFG['com_domain']) continue;
-		$url = $MODULE[$mid]['linkurl'];
+		$url = linkurl($MODULE[$mid]['linkurl']);
 		$data = '<?xml version="1.0" encoding="UTF-8"?>';
 		$data .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		$data .= '<url>';
@@ -60,7 +58,6 @@ foreach($mods as $mid) {
 		$data .= '<lastmod>'.$today.'</lastmod>';
 		$data .= '<changefreq>always</changefreq>';
 		$data .= '<priority>1.0</priority>';
-		$data .= '<data><display></display></data>';
 		$data .= '</url>';
 		foreach(cache_read('category-'.$mid.'.php') as $c) {
 			$data .= '<url>';
@@ -68,7 +65,6 @@ foreach($mods as $mid) {
 			$data .= '<lastmod>'.$today.'</lastmod>';
 			$data .= '<changefreq>hourly</changefreq>';
 			$data .= '<priority>0.9</priority>';
-			$data .= '<data><display></display></data>';
 			$data .= '</url>';
 		}
 		$item = '';
@@ -84,13 +80,13 @@ foreach($mods as $mid) {
 				$item .= '<lastmod>'.($mid == 4 ? $today : timetodate($r['edittime'], 3)).'</lastmod>';
 				$item .= '<changefreq>'.$MOD['sitemaps_changefreq'].'</changefreq>';
 				$item .= '<priority>'.$MOD['sitemaps_priority'].'</priority>';
-				$item .= '<data><display></display></data>';
 				$item .= '</url>';
 			}
 		}
 		$data .= $item;
 		$data .= '</urlset>';
 		$data = str_replace('><', ">\n<", $data);
+		$data = convert($data, DT_CHARSET, 'UTF-8');
 		file_put(DT_ROOT.'/'.$MODULE[$mid]['moduledir'].'/sitemaps.xml', $data);
 	}
 }

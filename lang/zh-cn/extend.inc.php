@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -101,8 +101,7 @@ $L['gift_error_3'] = '抱歉，此兑换已经过期';
 $L['gift_error_4'] = '抱歉，此兑换名额用尽，已经结束';
 $L['gift_error_5'] = '抱歉，您的'.$DT['credit_name'].'不足';
 $L['gift_error_6'] = '抱歉，您的会员组没有兑换礼品的权限';
-$L['gift_error_7'] = '抱歉，您已经兑换过此礼品或超出最低兑换次数';
-$L['gift_error_8'] = '兑换频率过快，请改天再试';
+$L['gift_error_7'] = '抱歉，您已经兑换过此礼品，请勿重复兑换';
 $L['gift_credit_reason'] = '积分换礼';
 $L['gift_status'] = '处理中';
 $L['vote_title'] = '投票调查';
@@ -122,21 +121,10 @@ $L['poll_error_6'] = '投票尚未开始';
 $L['poll_error_7'] = '投票已经结束';
 $L['poll_error_8'] = '您已经投过此票';
 $L['poll_error_9'] = '最多可投{V0}票';
-$L['form_title'] = '表单问卷';
-$L['form_other'] = '其他';
-$L['form_choose'] = '请选择{V0}';
-$L['form_min_word'] = '{V0}最少{V1}字';
-$L['form_max_word'] = '{V0}最多{V1}字';
-$L['form_min_choose'] = '{V0}最少选择{V1}项';
-$L['form_max_choose'] = '{V0}最多选择{V1}项';
-$L['form_failed'] = '提交失败';
 $L['rss_title'] = 'RSS订阅';
 $L['rss_area'] = '选择地区';
 $L['rss_close'] = '系统未开启RSS订阅';
-$L['share_title'] = '分享好友';
-$L['share_not_support'] = '此页面不支持分享';
 $L['sitemap_title'] = '网站地图';
 $L['view_title'] = '查看大图';
-$L['wx_title'] = '微信联系';
-$L['address_title'] = '查看地图';
+$L['shortcut_error_1'] = '抱歉，此功能仅限IE浏览器使用';
 ?>

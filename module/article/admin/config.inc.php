@@ -1,9 +1,9 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $MCFG = array();
 $MCFG['module'] = 'article';
 $MCFG['name'] = '文章';
-$MCFG['author'] = 'DESTOON';
+$MCFG['author'] = 'Destoon.COM';
 $MCFG['homepage'] = 'www.destoon.com';
 $MCFG['copy'] = true;
 $MCFG['uninstall'] = true;
@@ -17,7 +17,6 @@ $RT['action']['index']['add'] = '添加文章';
 $RT['action']['index']['edit'] = '修改文章';
 $RT['action']['index']['delete'] = '删除文章';
 $RT['action']['index']['check'] = '审核文章';
-$RT['action']['index']['reject'] = '未通过';
 $RT['action']['index']['recycle'] = '回收站';
 $RT['action']['index']['move'] = '文章移动';
 $RT['action']['index']['level'] = '信息级别';

@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 require 'common.inc.php';
@@ -10,18 +10,12 @@ if(strpos($_SERVER['QUERY_STRING'], '404;') !== false) {
 }
 if($DT['log_404'] && strpos($DT_URL, '/404.php') === false) {
 	require DT_ROOT.'/file/config/robot.inc.php';
-	$url = addslashes(dhtmlspecialchars($DT_URL));
-	$refer = addslashes(dhtmlspecialchars($DT_REF));
+	$url = addslashes($DT_URL);
 	$time = $DT_TIME - 86400;
 	$r = $db->get_one("SELECT itemid FROM {$DT_PRE}404 WHERE addtime>$time AND url='$url'");
-	if(!$r) $db->query("INSERT INTO {$DT_PRE}404 (url,refer,robot,username,ip,addtime) VALUES ('$url','$refer','".get_robot()."','$_username','$DT_IP','$DT_TIME')");
+	if(!$r) $db->query("INSERT INTO {$DT_PRE}404 (url,robot,username,ip,addtime) VALUES ('$url','".get_robot()."','$_username','$DT_IP','$DT_TIME')");
 }
-if($DT_BOT) dhttp(404, $DT_BOT);
 $head_title = '404 Not Found';
-if($DT_PC) {
-	if($EXT['mobile_enable']) $head_mobile = DT_MOB.'404.php';
-} else {
-	//
-}
+@header("HTTP/1.1 404 Not Found");
 include template('404', 'message');
 ?>

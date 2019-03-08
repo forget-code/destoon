@@ -5,7 +5,7 @@ $map = isset($map) ? $map : '';
 preg_match("/^[0-9\.\,\-]{20,50}$/", $map) or $map = $map_mid;
 $company = isset($company) ? trim(strip_tags($company)) : '';
 $address = isset($address) ? trim(strip_tags($address)) : '';
-($company && $address) or exit;
+($map_key && $company && $address) or exit;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -28,7 +28,7 @@ function mapOnLoad() {
 		var mapObj = document.getElementById("map");
 		if (mapObj != "undefined" && mapObj != null) {
 			map = new GMap2(document.getElementById("map"));
-			map.setCenter(new GLatLng(<?php echo $map;?>), 13, G_NORMAL_MAP);
+			map.setCenter(new GLatLng(<?php echo $map;?>), 15, G_NORMAL_MAP);
 			map.addControl(new GLargeMapControl3D());
 			map.addControl(new GMenuMapTypeControl());
 			map.addControl(new GScaleControl());

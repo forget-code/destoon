@@ -1,31 +1,31 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 /* global */
-body {margin:0px;font-size:12px;color:#333333;background:#FFFFFF;}
+body {margin:0px;font-size:12px;color:#000000;background:#FFFFFF url('bg.jpg') no-repeat center 0;}
 /* common */
-.m {width:1200px;margin:auto;}
-.top {height:32px;line-height:32px;background:#F1F1F1;border-bottom:#CCCCCC 1px solid;width:100%;}
+.m {width:960px;margin:auto;}
+.top {height:26px;line-height:26px;background:#EEF7FB;padding:0 10px 0 10px;}
 #top a {text-decoration:none;}
-.head {height:116px;overflow:hidden;}
+.head {height:115px;overflow:hidden;}
 .head div {float:left;}
-.head .logo {padding:16px 10px 0 0px;height:90px;overflow:hidden;}
-.head h1 {font-size:24px;margin:32px 0 6px 0;color:#333333;filter:glow(color=#FFFFFF,strength=3);}
-.head h4 {font-size:16px;margin:0;color:#333333;}
+.head .logo {padding:15px 10px 0 0px;height:90px;overflow:hidden;}
+.head h1 {font-size:24px;margin:32px 0 5px 10px;color:#333333;font-family:\9ED1\4F53;filter:glow(color=#FFFFFF,strength=3);}
+.head h4 {font-size:15px;margin:0 0 0 10px;color:#333333;}
 
 #menu a {text-decoration:none;}
-.menu {background:#2587F4;height:44px;overflow:hidden;font-size:16px;}
-.menu span {color:#FFFFFF;}
-.menu_li {float:left;white-space:nowrap;line-height:44px;padding:0 16px;}
-.menu_li:hover {background:#0072C6;}
-.menu_on {float:left;white-space:nowrap;line-height:44px;padding:0 16px;background:#0072C6;}
+.menu {background:url('menu_bg.gif');height:30px;overflow:hidden;padding:0 0 0 20px;font-size:14px;font-weight:bold;border:#438ECE 1px solid;border-top:#438ECE 2px solid;}
+.menu_li {float:left;border-right:#FFFFFF 1px solid;line-height:30px;padding:0 20px 0 20px;}
+.menu_li span {color:#003D70;}
+.menu_on {float:left;border-right:#438ECE 1px solid;border-left:#438ECE 1px solid;line-height:30px;padding:0 20px 0 20px;background:url('menu_on.gif') repeat-x;}
+.menu_on span {color:#FFFFFF;}
 
-.side_head {border:#CCCCCC 1px solid;border-bottom:none;background:#EEEEEE;}
-.side_head div {padding:0 16px;font-size:14px;height:44px;line-height:44px;overflow:hidden;}
-.side_body {border:#CCCCCC 1px solid;border-top:none;background:#FFFFFF;padding:16px;margin:0 0 20px;}
-.side_body li {background:url('../../image/ico_arrow.gif') no-repeat 4px 12px;padding:0 0 0 20px;height:32px;line-height:32px;overflow:hidden;}
+.side_head {border:#79B7EC 1px solid;border-bottom:none;background:url('side_head.gif') repeat-x;}
+.side_head div {padding:0 10px 0 10px;font-size:14px;height:28px;line-height:30px;overflow:hidden;letter-spacing:1px;}
+.side_body {border:#79B7EC 1px solid;border-top:none;background:#FFFFFF;padding:10px;margin:0 0 10px;}
+.side_body li {background:url('../../image/ico_arrow.gif') no-repeat 5px 7px;padding:0 0 0 20px;height:26px;line-height:26px;overflow:hidden;}
 
-.main_head {border:#CCCCCC 1px solid;border-bottom:none;background:#EEEEEE;}
-.main_head div {padding:0 16px;font-size:14px;height:44px;line-height:44px;overflow:hidden;}
-.main_body {border:#CCCCCC 1px solid;border-top:none;background:#FFFFFF;padding:16px;margin:0 0 20px;}
+.main_head {border:#79B7EC 1px solid;border-bottom:none;background:url('main_head.gif') repeat-x;}
+.main_head div {padding:0 10px 0 10px;font-size:14px;height:28px;line-height:30px;overflow:hidden;letter-spacing:1px;}
+.main_body {border:#79B7EC 1px solid;border-top:none;background:#FFFFFF;padding:10px;margin:0 0 10px;}

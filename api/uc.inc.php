@@ -21,11 +21,11 @@ require_once DT_ROOT.'/api/ucenter/client.php';
 switch($action) {
 	case 'login':
 		$uc_username = convert($passport, DT_CHARSET, $MOD['uc_charset']);
-		$user = $db->get_one("SELECT username,passport,password,groupid,email,passsalt FROM {$DT_PRE}member WHERE username='$username'");
+		$user = $db->get_one("SELECT username,passport,password,groupid,email FROM {$DT_PRE}member WHERE username='$username'");
 		list($uid, $rt_username, $rt_password, $rt_email) = uc_user_login($uc_username, $password, 0, 0);
 		if($uid == -1) {/* Ucenter 用户不存在或被删除 */
 			if($user) {
-				$vpassword = dpassword($password, $user['passsalt']);
+				$vpassword = is_md5($password) ? md5($password) : md5(md5($password));
 				if($user['password'] !=  $vpassword) message('密码错误，请重试');
 				if($user['groupid'] == 2) message('该帐号已被禁止访问');
 				//if($user['groupid'] == 4) message('该帐号尚在审核中');
@@ -37,7 +37,7 @@ switch($action) {
 			}
 		} else if($uid == -2) {/* Ucenter 密码错误 */
 			if($user) {
-				if($user['password'] == dpassword($password, $user['passsalt'])) { /* 更新UC密码 */
+				if($user['password'] == (is_md5($password) ? md5($password) : md5(md5($password)))) { /* 更新UC密码 */
 					uc_user_edit($uc_username, '', $password, '', 1);
 					$uc_get_user = uc_get_user($uc_username);
 					if($uc_get_user[0]) $api_msg = uc_user_synlogin($uc_get_user[0]);
@@ -52,11 +52,11 @@ switch($action) {
 		} else if($uid > 0) {/* Ucenter 验证成功 */
 			$api_msg = uc_user_synlogin($uid);
 			if($user) {
-				$vpassword = dpassword($password, $user['passsalt']);/* 同步DT密码 */
+				$vpassword = is_md5($password) ? md5($password) : md5(md5($password));/* 同步DT密码 */
 				if($user['password'] != $vpassword) $db->query("UPDATE {$DT_PRE}member SET password='$vpassword' WHERE username='$username'");
 			} else {/* 会员不存在 */
-				$auth = encrypt($username.'|'.$rt_password.'|'.$rt_email, DT_KEY.'UC');
-				message('请激活您的账号', $MOD['linkurl'].$DT['file_register'].'?auth='.$auth);
+				$auth = rawurlencode(encrypt($username.'|'.$rt_password.'|'.$rt_email));
+				message('请激活您的通行证账号', $MOD['linkurl'].$DT['file_register'].'?auth='.$auth);
 			}
 		}
 	break;

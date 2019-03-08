@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `destoon_brand_13`;
-CREATE TABLE `destoon_brand_13` (
+DROP TABLE IF EXISTS `destoon_brand`;
+CREATE TABLE `destoon_brand` (
   `itemid` bigint(20) unsigned NOT NULL auto_increment,
   `catid` int(10) unsigned NOT NULL default '0',
   `level` tinyint(1) unsigned NOT NULL default '0',
@@ -9,7 +9,6 @@ CREATE TABLE `destoon_brand_13` (
   `keyword` varchar(255) NOT NULL default '',
   `pptword` varchar(255) NOT NULL default '',
   `hits` int(10) unsigned NOT NULL default '0',
-  `comments` int(10) unsigned NOT NULL default '0',
   `thumb` varchar(255) NOT NULL default '',
   `homepage` varchar(255) NOT NULL default '',
   `username` varchar(30) NOT NULL default '',
@@ -17,7 +16,7 @@ CREATE TABLE `destoon_brand_13` (
   `addtime` int(10) unsigned NOT NULL default '0',
   `adddate` date NOT NULL default '0000-00-00',
   `totime` int(10) unsigned NOT NULL default '0',
-  `areaid` int(10) unsigned NOT NULL default '0',
+  `areaid` smallint(6) unsigned NOT NULL default '0',
   `company` varchar(100) NOT NULL default '',
   `vip` smallint(2) unsigned NOT NULL default '0',
   `validated` tinyint(1) unsigned NOT NULL default '0',
@@ -28,9 +27,9 @@ CREATE TABLE `destoon_brand_13` (
   `address` varchar(255) NOT NULL default '',
   `email` varchar(50) NOT NULL default '',
   `qq` varchar(20) NOT NULL default '',
-  `wx` varchar(50) NOT NULL default '',
   `ali` varchar(30) NOT NULL default '',
   `skype` varchar(30) NOT NULL default '',
+  `msn` varchar(50) NOT NULL default '',
   `introduce` varchar(255) NOT NULL default '',
   `editor` varchar(30) NOT NULL default '',
   `edittime` int(10) unsigned NOT NULL default '0',
@@ -49,8 +48,8 @@ CREATE TABLE `destoon_brand_13` (
   KEY `editdate` (`editdate`,`vip`,`edittime`)
 ) TYPE=MyISAM COMMENT='品牌';
 
-DROP TABLE IF EXISTS `destoon_brand_data_13`;
-CREATE TABLE `destoon_brand_data_13` (
+DROP TABLE IF EXISTS `destoon_brand_data`;
+CREATE TABLE `destoon_brand_data` (
   `itemid` bigint(20) unsigned NOT NULL default '0',
   `content` mediumtext NOT NULL,
   PRIMARY KEY  (`itemid`)

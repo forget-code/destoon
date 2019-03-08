@@ -1,55 +1,73 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 function Print(i) {if(isIE) {window.print();} else {var i = i ? i : 'content'; var w = window.open('','',''); w.opener = null; w.document.write('<div style="width:630px;">'+Dd(i).innerHTML+'</div>'); w.window.print();}}
-function addFav(t) {document.write('<a href="'+window.location.href+'" title="'+document.title.replace(/<|>|'|"|&/g, '')+'" rel="sidebar" onclick="if(UA.indexOf(\'chrome\') != -1){alert(\''+L['chrome_fav_tip']+'\');return false;}window.external.addFavorite(this.href, this.title);return false;">'+t+'</a>');}
-function SendFav(mid, itemid) {
-	mid = mid ? mid : 0;
-	itemid = itemid ? itemid : 0;
-	var htm = '<form method="post" action="'+MEPath+'favorite.php" id="dfavorite" target="_blank">';
-	htm += '<input type="hidden" name="action" value="add"/>';
-	htm += '<input type="hidden" name="title" value="'+$('#title').html()+'"/>';
-	htm += '<input type="hidden" name="url" value="'+window.location.href+'"/>';
-	htm += '<input type="hidden" name="mid" value="'+mid+'"/>';
-	htm += '<input type="hidden" name="itemid" value="'+itemid+'"/>';
-	htm += '</form>';
-	$('#destoon_space').html(htm);
-	Dd('dfavorite').submit();
+function addFav(t) {document.write('<a href="'+window.location.href+'" title="'+document.title+'" rel="sidebar" onclick="window.external.addFavorite(this.href, this.title);return false;">'+t+'</a>');}
+function Album(id, s) {
+	for(var i=0; i<3; i++) {Dd('t_'+i).className = i==id ? 'ab_on' : 'ab_im';}
+	Dd('abm').innerHTML = '<img src="'+s+'" onload="if(this.width>240){this.width=240;}" onclick="PAlbum(this);" onmouseover="SAlbum(this.src);" onmouseout="HAlbum();" id="DIMG"/>';
 }
-function SendReport(c) {
-	var c = c ? c : ($('#title').length > 0 ? $('#title').html() : document.title)+'\n'+window.location.href;
-	var htm = '<form method="post" action="'+DTPath+'api/report.php" id="dreport" target="_blank">';
-	htm += '<textarea style="display:none;" name="content">'+c+'</textarea>';
-	htm += '</form>';
-	$('#destoon_space').html(htm);
-	Dd('dreport').submit();
+function SAlbum(s) {
+	if(s.indexOf('nopic240.gif') != -1) return;
+	if(s.indexOf('.middle.') != -1) s = s.substring(0, s.length-8-ext(s).length);
+	Dd('imgshow').innerHTML = '<img src="'+s+'" onload="if(this.width<240){HAlbum();}else if(this.width>630){this.width=630;}"/>';
+	Ds('imgshow');
 }
-function Dshare(mid, id) {Go(DTPath+'api/share.php?mid='+mid+'&itemid='+id);}
-function Dsearch(i) {
+function PAlbum(o) {if(o.src.indexOf('nopic240.gif')==-1) View(o.src);}
+function HAlbum() {Dh('imgshow');}
+function Dsearch() {
 	if(Dd('destoon_kw').value.length < 1 || Dd('destoon_kw').value == L['keyword_message']) {
-		Dd('destoon_kw').value = '';window.setTimeout(function(){Dd('destoon_kw').value = L['keyword_message'];}, 500);
+		Dd('destoon_kw').value = '';
+		window.setTimeout(function(){Dd('destoon_kw').value = L['keyword_message'];}, 500);
 		return false;
 	}
-	if(i && Dd('destoon_search').action.indexOf('/api/') == -1) {$('#destoon_moduleid').remove();$('#destoon_spread').remove();}
 	return true;
 }
-function Dsearch_adv() {Go(Dd('destoon_search').action.indexOf('/api/') != -1 ? DTPath+'api/search.php?moduleid='+Dd('destoon_moduleid').value : Dd('destoon_search').action);}
-function Dsearch_top() {if(Dsearch(0)){Dd('destoon_search').action = DTPath+'api/search.php';Dd('destoon_spread').value=1;Dd('destoon_search').submit();}}
-function View(s) {window.open(DTPath+'api/view.php?img='+s);}
-function setModule(i, n) {Dd('destoon_search').action = DTPath+'api/search.php';Dd('destoon_moduleid').value = i;searchid = i;Dd('destoon_select').value = n;$('#search_module').fadeOut('fast');Dd('destoon_kw').focus();}
+function Dsearch_adv() {Go(DTPath+'search.php?moduleid='+Dd('destoon_moduleid').value);}
+function Dsearch_top() {if(Dsearch()){Dd('destoon_spread').value=1;Dd('destoon_search').submit();}}
+function View(s) {window.open(EXPath+'view.php?img='+s);}
+function PushNew() {makeRequest('action=new', AJPath, '_PushNew');}
+function _PushNew() {
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) {
+			var t = xmlHttp.responseText.split('|');
+			var s = '';
+			t[3] = substr_count(get_cookie('cart'), ',');
+			Dd('destoon_cart').innerHTML = t[3] > 0 ? '<strong class="f_red">'+t[3]+'</strong>' : '0';
+			Dd('destoon_chat').innerHTML = t[0] > 0 ? '<strong class="f_red">'+t[0]+'</strong>' : '0';
+			Dd('destoon_message').innerHTML = t[1] > 0 ? '<strong class="f_red">'+t[1]+'</strong>' : '0';
+			if(t[0] && destoon_chat < t[0]) s += sound('chat_new');
+			if(t[1] && t[2] && destoon_message < t[1]) s += sound('message_'+t[2]);
+			if(s) Dd('tb_c').innerHTML = s;
+			destoon_chat = t[0];
+			destoon_message = t[1];
+		}
+	}
+}
+function setModule(i, o) {
+	Dd('destoon_moduleid').value = i;
+	searchid = i;
+	var lis = Dd('search_module').getElementsByTagName('li');
+	for(var i=0;i<lis.length;i++) {
+		lis[i].className = lis[i] == o ? 'head_search_on' : '';
+	}
+}
 function setTip(w) {Dh('search_tips'); Dd('destoon_kw').value = w; Dd('destoon_search').submit();}
 var tip_word = '';
 function STip(w) {
 	if(w.length < 2) {Dd('search_tips').innerHTML = ''; Dh('search_tips'); return;}
 	if(w == tip_word) {return;} else {tip_word = w;}
-	$.post(AJPath, 'action=tipword&mid='+searchid+'&word='+w, function(data) {
-		if(data) {
-			Ds('search_tips'); Dd('search_tips').innerHTML = data + '<label onclick="Dh(\'search_tips\');">'+L['search_tips_close']+'&nbsp;&nbsp;</label>';
+	makeRequest('action=tipword&mid='+searchid+'&word='+w, AJPath, '_STip');
+}
+function _STip() {
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) {
+			Ds('search_tips'); Dd('search_tips').innerHTML = xmlHttp.responseText + '<label onclick="Dh(\'search_tips\');">'+L['search_tips_close']+'&nbsp;&nbsp;</label>';
 		} else {
 			Dd('search_tips').innerHTML = ''; Dh('search_tips');
 		}
-	});
+	}
 }
 function SCTip(k) {
 	var o = Dd('search_tips');
@@ -75,11 +93,24 @@ function SCTip(k) {
 		if(w >= 0) {var r = d[w].innerHTML.split('>'); Dd('destoon_kw').value = r[2];} else {Dd('destoon_kw').value = tip_word;}
 	}
 }
+function setFModule(id) {
+	var name = Dd('foot_search_m_'+id).innerHTML;
+	Dd('foot_moduleid').value = id;
+	var ss = Dd('foot_search_m').getElementsByTagName('span');
+	for(var i=0;i<ss.length;i++) {if(ss[i].id == 'foot_search_m_'+id) {ss[i].className = 'f_b';} else {ss[i].className = '';}}
+}
+function Fsearch() {
+	if(Dd('foot_kw').value.length < 1 || Dd('foot_kw').value == L['keyword_message']) {
+		Dd('foot_kw').value = ''; window.setTimeout(function(){Dd('foot_kw').value = L['keyword_message'];}, 500); return false;
+	}
+}
 function user_login() {
 	if(Dd('user_name').value.length < 2) {Dd('user_name').focus(); return false;}
 	if(Dd('user_pass').value == 'password' || Dd('user_pass').value.length < 6) {Dd('user_pass').focus(); return false;}
 }
+function show_comment(u, m, i) {document.write('<iframe src="'+u+'comment.php?mid='+m+'&itemid='+i+'" name="destoon_comment" id="des'+'toon_comment" style="width:99%;height:0px;" scrolling="no" frameborder="0"></iframe>');}
 function show_answer(u, i) {document.write('<iframe src="'+u+'answer.php?itemid='+i+'" name="destoon_answer" id="des'+'toon_answer" style="width:100%;height:0px;" scrolling="no" frameborder="0"></iframe>');}
+function show_message(u, i) {document.write('<iframe src="'+u+'message.php?itemid='+i+'" name="destoon_msg" id="des'+'toon_msg" style="width:99%;height:0px;" scrolling="no" frameborder="0"></iframe>');}
 function show_task(s) {document.write('<script type="text/javascript" src="'+DTPath+'api/task.js.php?'+s+'&refresh='+Math.random()+'.js"></sc'+'ript>');}
 var sell_n = 0;
 function sell_tip(o, i) {
@@ -115,25 +146,4 @@ function img_tip(o, i) {
 	} else {
 		Dh('img_tip');
 	}
-}
-function Dqrcode() {
-	var url = $('meta[http-equiv=mobile-agent]').attr('content');
-	url = url ? url.substr(17) : window.location.href;
-	if($('#destoon_qrcode').length > 0) {
-		if($('#destoon_qrcode').html().length < 10) {
-			$('#destoon_qrcode').css({'position':'fixed','z-index':'99999','left':'50%','top':'0','margin-left':'-130px','width':'260px','background':'#FFFFFF','text-align':'center'});
-			$('#destoon_qrcode').html('<div style="text-align:right;color:#555555;font-size:16px;font-family:Verdana;font-weight:100;padding-right:6px;cursor:pointer;">x</div><img src="'+DTPath+'api/qrcode.png.php?auth='+encodeURIComponent(url)+'" width="140" height="140"/><div style="padding:10px 0;font-size:14px;font-weight:bold;color:#555555;">扫一扫，直接在手机上打开</div><div style="padding-bottom:20px;color:#999999;">推荐微信、QQ扫一扫等扫码工具</div>');
-			$('#destoon_qrcode').click(function(){$('#destoon_qrcode').fadeOut('fast');});
-		}
-		$('#destoon_qrcode').fadeIn('fast');
-	}
-}
-function Dmobile() {
-	var url = $('meta[http-equiv=mobile-agent]').attr('content');
-	Go(DTPath+'api/mobile.php'+(url ? '?uri='+encodeURIComponent(url.substr(17)) : ''));
-}
-function oauth_logout() {
-	set_cookie('oauth_site', '');
-	set_cookie('oauth_user', '');
-	window.location.reload();
 }

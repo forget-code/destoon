@@ -34,8 +34,8 @@ function mapInit() {
 	mapObj.addEventListener(mapObj,MConstants.MOUSE_CLICK,MclickMouse);//鼠标点击事件
 }
 function MclickMouse(param){	
-	window.parent.document.getElementById('map').value = param.eventX+','+param.eventY;
-	window.parent.cDialog();
+	window.opener.document.getElementById('map').value = param.eventX+','+param.eventY;
+	window.close();
 }
 </script>
 </head>

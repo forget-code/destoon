@@ -1,15 +1,14 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/guestbook.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/guestbook.class.php';
 $do = new guestbook();
 $menus = array (
     array('留言列表', '?moduleid='.$moduleid.'&file='.$file),
-    array('模块设置', 'javascript:Dwidget(\'?moduleid='.$moduleid.'&file=setting&action='.$file.'\', \'模块设置\');'),
 );
 if($_catids || $_areaids) require DT_ROOT.'/admin/admin_check.inc.php';
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('按条件', '留言标题', '会员名', '联系人', '联系电话', '电子邮件', 'QQ', '微信', '阿里旺旺', 'Skype', '留言IP', '留言内容', '回复内容');
-	$dfields = array('title','title','username','truename','telephone','email','qq','wx','ali','skype','ip','content','reply');
+	$sfields = array('按条件', '留言标题', '会员名', '联系人', '联系电话', '电子邮件', 'QQ', '阿里旺旺', 'MSN','Skype','留言IP', '留言内容', '回复内容');
+	$dfields = array('title','title','username','truename','telephone','email','qq','ali','msn','skype','ip','content','reply');
 	$sorder  = array('结果排序方式', '留言时间降序', '留言时间升序', '回复时间降序', '回复时间升序');
 	$dorder  = array('itemid DESC', 'addtime DESC', 'addtime ASC', 'edittime DESC', 'edittime ASC');
 

@@ -1,13 +1,13 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function sql_split($sql) {
-	global $CFG;
-	if($CFG['db_charset']) $sql = DB::version() > '4.1' ? preg_replace("/TYPE=(MyISAM|InnoDB|HEAP|MEMORY)( DEFAULT CHARSET=[^; ]+)?/", "ENGINE=\\1 DEFAULT CHARSET=".$CFG['db_charset'], $sql) : preg_replace("/( DEFAULT CHARSET=[^; ]+)?/", '', $sql);
-	if(DT_PRE != 'destoon_') $sql = str_replace('destoon_', DT_PRE, $sql);
+	global $CFG, $db;
+	if($CFG['db_charset']) $sql = $db->version() > '4.1' ? preg_replace("/TYPE=(MyISAM|InnoDB|HEAP)( DEFAULT CHARSET=[^; ]+)?/", "ENGINE=\\1 DEFAULT CHARSET=".$CFG['db_charset'], $sql) : preg_replace("/( DEFAULT CHARSET=[^; ]+)?/", '', $sql);
+	if($CFG['tb_pre'] != 'destoon_') $sql = str_replace('destoon_', $CFG['tb_pre'], $sql);
 	$sql = str_replace("\r", "\n", $sql);
 	$sql = str_replace("; \n", ";\n", $sql);
 	$ret = array();
@@ -28,19 +28,20 @@ function sql_split($sql) {
 }
 
 function sql_execute($sql) {
+	global $db;
     $sqls = sql_split($sql);
 	if(is_array($sqls)) {
 		foreach($sqls as $sql) {
-			if(trim($sql) != '') DB::query($sql);
+			if(trim($sql) != '') $db->query($sql);
 		}
 	} else {
-		DB::query($sqls);
+		$db->query($sqls);
 	}
 	return true;
 }
 
 function sql_dumptable($table, $startfrom = 0, $currsize = 0) {
-	global $db, $sizelimit, $startrow, $sqlcompat, $sqlcharset, $dumpcharset, $CFG;
+	global $db, $sizelimit, $startrow, $sqlcompat, $sqlcharset, $dumpcharset, $DT_PRE;
 	if(!isset($tabledump)) $tabledump = '';
 	$offset = 100;
 	if(!$startfrom) {
@@ -62,11 +63,7 @@ function sql_dumptable($table, $startfrom = 0, $currsize = 0) {
 			$comma = "";
 			$tabledump .= "INSERT INTO `$table` VALUES(";
 			for($i = 0; $i < $numfields; $i++) {
-				if(strpos($CFG['database'], 'mysqli') !== false) {
-					$tabledump .= $comma."'".mysqli_escape_string($db->connid, $row[$i])."'";
-				} else {
-					$tabledump .= $comma."'".mysql_escape_string($row[$i])."'";
-				}
+				$tabledump .= $comma."'".mysql_escape_string($row[$i])."'";
 				$comma = ",";
 			}
 			$tabledump .= ");\n";

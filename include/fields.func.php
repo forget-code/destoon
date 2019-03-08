@@ -1,11 +1,11 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
 function fields_update($post_fields, $table, $itemid, $keyname = 'itemid', $fd = array()) {
-	global $FD;
+	global $FD, $db;
 	if(!$table || !$itemid) return '';
 	if($fd) $FD = $fd;
 	$sql = '';
@@ -14,12 +14,11 @@ function fields_update($post_fields, $table, $itemid, $keyname = 'itemid', $fd =
 			$mk = $v['name'];
 			$mv = $post_fields[$v['name']];
 			if($v['html'] == 'checkbox') $mv = implode(',', $post_fields[$v['name']]);
-			$mv = $v['html'] == 'editor' ? dsafe($mv) : dhtmlspecialchars(trim($mv));
 			$sql .= ",$mk='$mv'";
 		}
 	}
 	$sql = substr($sql, 1);
-	if($sql) DB::query("UPDATE {$table} SET $sql WHERE `$keyname`=$itemid");
+	if($sql) $db->query("UPDATE {$table} SET $sql WHERE `$keyname`=$itemid");
 }
 
 function fields_check($post_fields, $fd = array()) {
@@ -42,20 +41,20 @@ function fields_check($post_fields, $fd = array()) {
 		if(!$v['input_limit']) continue;
 		if(!defined('DT_ADMIN') && !$v['front']) continue;
 		if($v['input_limit'] == 'is_date') {
-			if(!is_date($value)) fields_message(lang($L['fields_input'], array($v['title'])));
-		} else if($v['input_limit'] == 'is_time') {
-			if(!is_time($value)) fields_message(lang($L['fields_input'], array($v['title'])));
+			if(!is_date($value)) message(lang($L['fields_input'], array($v['title'])));
 		} else if($v['input_limit'] == 'is_email') {
-			if(!is_email($value)) fields_message(lang($L['fields_valid'], array($v['title'])));
+			if(!is_email($value)) message(lang($L['fields_valid'], array($v['title'])));
 		} else if(is_numeric($v['input_limit'])) {
-			$length = $value ? ($v['html'] == 'checkbox' ? count($value) : word_count($value)) : 0;
-			if($length < $v['input_limit']) fields_message(lang($L['fields_less'], array($v['title'], $v['input_limit'])));
-		} else if(preg_match("/^([0-9]{1,})\-([0-9]{1,})$/", $v['input_limit'], $m)) {			
-			$length = $value ? ($v['html'] == 'checkbox' ? count($value) : word_count($value)) : 0;
-			if($m[1] && $length < $m[1]) fields_message(lang($L['fields_less'], array($v['title'], $m[1])));
-			if($m[2] && $length > $m[2]) fields_message(lang($L['fields_more'], array($v['title'], $m[2])));
+			$length = word_count($value);
+			if($length < $v['input_limit']) message(lang($L['fields_less'], array($v['title'], $v['input_limit'])));
 		} else {
-			if(!preg_match("/^".$v['input_limit']."$/", $value)) fields_message(lang($L['fields_match'], array($v['title'])));
+			if(preg_match("/^([0-9]{1,})\-([0-9]{1,})$/", $v['input_limit'], $m)) {			
+				$length = word_count($value);
+				if($m[1] && $length < $m[1]) message(lang($L['fields_less'], array($v['title'], $m[1])));
+				if($m[2] && $length > $m[2]) message(lang($L['fields_more'], array($v['title'], $m[2])));
+			} else {
+				if(!preg_match("/^".$v['input_limit']."$/", $value)) message(lang($L['fields_match'], array($v['title'])));
+			}
 		}
 	}
 }
@@ -71,36 +70,26 @@ function fields_js($fd = array()) {
 		if($v['input_limit'] == 'is_date') {
 			$js .= 'f = "post_fields'.$v['name'].'";l = Dd(f).value.length;';
 			$js .= 'if(l != 10) {Dmsg("'.lang($L['fields_input'], array($v['title'])).'", f, 1);return false;}';
-		} else if($v['input_limit'] == 'is_time') {
-			$js .= 'f = "post_fields'.$v['name'].'";l = Dd(f).value.length;';
-			$js .= 'if(l > 19 || l > 16) {Dmsg("'.lang($L['fields_input'], array($v['title'])).'", f, 1);return false;}';
 		} else if($v['input_limit'] == 'is_email') {
 			$js .= 'f = "'.$v['name'].'";l = Dd(f).value.length;';
 			$js .= 'if(l < 8) {Dmsg("'.lang($L['fields_input'], array($v['title'])).'", f);return false;}';
 		} else if(is_numeric($v['input_limit'])) {
 			if($v['html'] == 'area') {
 				$js .= 'f = "'.$v['name'].'";l = Dd("areaid_1").value;';
-				$js .= 'if(l == 0) {Dmsg("'.lang($L['fields_area']).'", f, 1);return false;}';
-			} else if($v['html'] == 'checkboxs') {
-				$js .= 'f = "'.$v['name'].'";l = checked_count(f);';
-				$js .= 'if(l < '.$v['input_limit'].') {Dmsg("'.lang($L['fields_less'], array($v['title'], $v['input_limit'])).'", f, 1);return false;}';
+				$js .= 'if(l == 0) {Dmsg("'.lang($L['fields_area']).'", f);return false;}';
 			} else {
 				$js .= 'f = "'.$v['name'].'";l = Dd(f).value.length;';
 				$js .= 'if(l < '.$v['input_limit'].') {Dmsg("'.lang($L['fields_less'], array($v['title'], $v['input_limit'])).'", f);return false;}';
 			}
-		} else if(preg_match("/^([0-9]{1,})\-([0-9]{1,})$/", $v['input_limit'], $m)) {
-			if($v['html'] == 'checkbox') {
-				$js .= 'f = "'.$v['name'].'";l = checked_count(f);';
-				if($m[1]) $js .= 'if(l < '.$m[1].') {Dmsg("'.lang($L['fields_less'], array($v['title'], $m[1])).'", f, 1);return false;}';
-				if($m[2]) $js .= 'if(l > '.$m[2].') {Dmsg("'.lang($L['fields_more'], array($v['title'], $m[2])).'", f, 1);return false;}';
-			} else {
+		} else {
+			if(preg_match("/^([0-9]{1,})\-([0-9]{1,})$/", $v['input_limit'], $m)) {			
 				$js .= 'f = "'.$v['name'].'";l = Dd(f).value.length;';
 				if($m[1]) $js .= 'if(l < '.$m[1].') {Dmsg("'.lang($L['fields_less'], array($v['title'], $m[1])).'", f);return false;}';
 				if($m[2]) $js .= 'if(l > '.$m[2].') {Dmsg("'.lang($L['fields_more'], array($v['title'], $m[2])).'", f);return false;}';
+			} else {
+				$js .= 'f = "'.$v['name'].'";l = Dd(f).value;';
+				$js .= 'if(l.match(/^'.$v['input_limit'].'$/) == null) {Dmsg("'.lang($L['fields_match'], array($v['title'])).'", f);return false;}';
 			}
-		} else {
-			$js .= 'f = "'.$v['name'].'";l = Dd(f).value;';
-			$js .= 'if(l.match(/^'.$v['input_limit'].'$/) == null) {Dmsg("'.lang($L['fields_match'], array($v['title'])).'", f);return false;}';
 		}
 	}
 	return $js;
@@ -128,7 +117,6 @@ function fields_show($itemid, $left = '<td class="tl">', $right = '<td>', $value
 	$html = '';
 	$v = $FD[$itemid];
 	$value = $v['default_value'];
-	$did = 'd'.$v['name'];
 	if(isset($values[$v['name']])) {
 		$value = $values[$v['name']];
 	} else if($v['default_value']) {
@@ -137,27 +125,21 @@ function fields_show($itemid, $left = '<td class="tl">', $right = '<td>', $value
 	if($v['html'] == 'hidden') {
 		$html .= '<input type="hidden" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
 	} else {
-		if($DT_PC) {
-			$html .= '<tr>'.$left;
-			if($v['input_limit']) {
-				$html .= '<span class="f_red">*</span> ';
-			} else {
-				$html .= defined('DT_ADMIN') ? '<span class="f_hid">*</span> ' : '';
-			}
-			$html .= $v['title'];
-			$html .= '</td>';
-			$html .= $right;
+		$html .= '<tr>'.$left;
+		if($v['input_limit']) {
+			$html .= '<span class="f_red">*</span> ';
 		} else {
-			$html .= '<p>'.$v['title'];
-			if($v['input_limit']) $html .= '<em>*</em>';
-			$html .= '<b id="'.$did.'"></b></p><div>';
+			$html .= defined('DT_ADMIN') ? '<span class="f_hid">*</span> ' : '';
 		}
+		$html .= $v['title'];
+		$html .= '</td>';
+		$html .= $right;
 		switch($v['html']) {
 			case 'text':
-				$html .= '<input type="text" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
+				$html .= '<input type="text" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/> <span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 			case 'textarea':
-				$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" '.$v['addition'].'>'.$value.'</textarea>';
+				$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" '.$v['addition'].'>'.$value.'</textarea> <span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 			case 'select':
 				if($v['option_value']) {
@@ -169,7 +151,7 @@ function fields_show($itemid, $left = '<td class="tl">', $right = '<td>', $value
 							$html .= '<option value="'.$cols[0].'"'.($cols[0] == $value ? ' selected' : '').'>'.$cols[1].'</option>';
 						}
 					}
-					$html .= '</select>';
+					$html .= '</select> <span class="f_red" id="d'.$v['name'].'"></span>';
 				}
 			break;
 			case 'radio':
@@ -182,7 +164,7 @@ function fields_show($itemid, $left = '<td class="tl">', $right = '<td>', $value
 							$html .= '<input type="radio" name="post_fields['.$v['name'].']" value="'.$cols[0].'" id="'.$v['name'].'_'.$rw.'"'.($cols[0] == $value ? ' checked' : '').'> '.$cols[1].'&nbsp;&nbsp;&nbsp;';
 						}
 					}
-					$html .= '</span>';
+					$html .= '</span> <span class="f_red" id="d'.$v['name'].'"></span>';
 				}
 			break;
 			case 'checkbox':
@@ -196,68 +178,35 @@ function fields_show($itemid, $left = '<td class="tl">', $right = '<td>', $value
 							$html .= '<input type="checkbox" name="post_fields['.$v['name'].'][]" value="'.$cols[0].'" id="'.$v['name'].'_'.$rw.'"'.(in_array($cols[0], $value) ? ' checked' : '').'> '.$cols[1].'&nbsp;&nbsp;&nbsp;';
 						}
 					}
-					$html .= '</span>';
+					$html .= '</span> <span class="f_red" id="d'.$v['name'].'"></span>';
 				}
 			break;
 			case 'date':
-				if($DT_PC) {
-					$html .= dcalendar('post_fields['.$v['name'].']', $value);
-					$did = 'post_dfields'.$v['name'];
-				} else {
-					$html .= '<input type="date" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
-				}
-			break;
-			case 'time':
-				if($DT_PC) {
-					$html .= dcalendar('post_fields['.$v['name'].']', $value, '-', 1);
-					$did = 'post_dfields'.$v['name'];
-				} else {
-					$html .= '<input type="datetime-local" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
-				}
+				$html .= dcalendar('post_fields['.$v['name'].']', $value);
+				$html .= ' <span class="f_red" id="post_dfields'.$v['name'].'"></span>';
 			break;
 			case 'thumb':
-				if($DT_PC) {
-					$html .= '<input name="post_fields['.$v['name'].']" type="text" size="60" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>&nbsp;&nbsp;<span onclick="Dthumb('.$moduleid.','.$v['width'].','.$v['height'].', Dd(\''.$v['name'].'\').value,\''.(defined('DT_ADMIN') ? '' : '1').'\',\''.$v['name'].'\');" class="jt">['.$L['upload'].']</span>&nbsp;&nbsp;<span onclick="_preview(Dd(\''.$v['name'].'\').value);" class="jt">['.$L['preview'].']</span>&nbsp;&nbsp;<span onclick="Dd(\''.$v['name'].'\').value=\'\';" class="jt">['.$L['delete'].']</span>';
-				} else {
-					$html .= '<input type="url" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
-				}
+				$html .= '<input name="post_fields['.$v['name'].']" type="text" size="60" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>&nbsp;&nbsp;<span onclick="Dthumb('.$moduleid.','.$v['width'].','.$v['height'].', Dd(\''.$v['name'].'\').value,\''.(defined('DT_ADMIN') ? '' : '1').'\',\''.$v['name'].'\');" class="jt">['.$L['upload'].']</span>&nbsp;&nbsp;<span onclick="_preview(Dd(\''.$v['name'].'\').value);" class="jt">['.$L['preview'].']</span>&nbsp;&nbsp;<span onclick="Dd(\''.$v['name'].'\').value=\'\';" class="jt">['.$L['delete'].']</span>';
+				$html .= ' <span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 			case 'file':
-				if($DT_PC) {
-					$html .= '<input name="post_fields['.$v['name'].']" type="text" size="60" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>&nbsp;&nbsp;<span onclick="Dfile('.$moduleid.', Dd(\''.$v['name'].'\').value, \''.$v['name'].'\');" class="jt">['.$L['upload'].']</span>&nbsp;&nbsp;<span onclick="if(Dd(\''.$v['name'].'\').value) window.open(Dd(\''.$v['name'].'\').value);" class="jt">['.$L['preview'].']</span>&nbsp;&nbsp;<span onclick="Dd(\''.$v['name'].'\').value=\'\';" class="jt">['.$L['delete'].']</span>';
-				} else {
-					$html .= '<input type="url" name="post_fields['.$v['name'].']" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>';
-				}
+				$html .= '<input name="post_fields['.$v['name'].']" type="text" size="60" id="'.$v['name'].'" value="'.$value.'" '.$v['addition'].'/>&nbsp;&nbsp;<span onclick="Dfile('.$moduleid.', Dd(\''.$v['name'].'\').value, \''.$v['name'].'\');" class="jt">['.$L['upload'].']</span>&nbsp;&nbsp;<span onclick="if(Dd(\''.$v['name'].'\').value) window.open(Dd(\''.$v['name'].'\').value);" class="jt">['.$L['preview'].']</span>';
+				$html .= ' <span class="f_red" id="d'.$v['name'].'"></span>&nbsp;&nbsp;<span onclick="Dd(\''.$v['name'].'\').value=\'\';" class="jt">['.$L['delete'].']</span>';
+				$html .= ' <span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 			case 'editor':
-				if($DT_PC) {
-					$toolbar = isset($group_editor) ? $group_editor : 'Destoon';
-					if(DT_EDITOR == 'fckeditor') {
-						$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" style="display:none">'.$value.'</textarea><iframe id="'.$v['name'].'___Frame" src="'.$MODULE[2]['linkurl'].'editor/fckeditor/editor/fckeditor.html?InstanceName='.$v['name'].'&Toolbar='.$toolbar.'" width="'.$v['width'].'" height="'.$v['height'].'" frameborder="no" scrolling="no"></iframe><br/>';
-					} else {
-						$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" style="display:none">'.$value.'</textarea>'. deditor($moduleid, $v['name'], $toolbar, $v['width'], $v['height']);
-					}
-				} else {
-					$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" '.$v['addition'].'>'.$value.'</textarea>';
-				}
-				
+				$toolbar = isset($GLOBALS['group_editor']) ? $GLOBALS['group_editor'] : 'Destoon';
+				$html .= '<textarea name="post_fields['.$v['name'].']" id="'.$v['name'].'" style="display:none">'.$value.'</textarea><iframe id="'.$v['name'].'___Frame" src="'.$MODULE[2]['linkurl'].'fckeditor/editor/fckeditor.html?InstanceName='.$v['name'].'&Toolbar='.$toolbar.'" width="'.$v['width'].'" height="'.$v['height'].'" frameborder="no" scrolling="no"></iframe>';
+				$html .= '<br/><span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 			case 'area':
 				$html .= ajax_area_select('post_fields['.$v['name'].']', $GLOBALS['L']['choose'], $value);
+				$html .= ' <span class="f_red" id="d'.$v['name'].'"></span>';
 			break;
 		}
-		if($DT_PC) {
-			$html .= ' <span class="f_red" id="'.$did.'"></span>';
-			$html .= $v['note'];
-			$html .= '</td></tr>';
-		} else {
-			$html .= '</div>';
-		}
+		$html .= $v['note'];
+		$html .= '</td></tr>';
 	}
 	return $html;
-}
-
-function fields_message($msg) {
-	defined('DT_ADMIN') ? msg($msg) : dalert($msg);
 }
 ?>

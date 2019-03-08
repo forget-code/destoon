@@ -1,10 +1,10 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
 <div class="tt">新数据</div>
-<table cellspacing="0" class="tb ls">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>字段</th>
 <th>数据</th>
@@ -17,7 +17,7 @@ show_menu($menus);
 <?php } ?>
 </table>
 <div class="tt">源数据</div>
-<table cellspacing="0" class="tb ls">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>字段</th>
 <th>数据</th>
@@ -29,5 +29,5 @@ show_menu($menus);
 </tr>
 <?php } ?>
 </table>
-<script type="text/javascript">Menuon(6);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

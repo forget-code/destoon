@@ -1,34 +1,49 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-var _p0 = _p1 = 0;
-function AutoTab0() {
-	Dd('ian').onmouseover = function() {_p0 = 1;} 
-	Dd('ian').onmouseout = function() {_p0 = 0;}
-	if(_p0) return;
+var index_timeout, index_l = '';
+function index_timer(l) {
+	index_timeout = setTimeout(
+	function() {
+		if(index_l) Dd('index_'+index_l).className = 'catalog_letter_li';
+		index_l = l;
+		Dd('index_'+l).className = 'catalog_letter_on';
+		Ds('catalog_index');
+		Dd('catalog_index').className = 'catalog_index';
+		makeRequest('moduleid=5&action=letter&cols=5&letter='+l, AJPath, 'index_show');
+	} ,200);
+}
+function index_out() {clearTimeout(index_timeout);}
+function index_show() {if(xmlHttp.readyState==4 && xmlHttp.status==200) {Dd('catalog_index').innerHTML = xmlHttp.responseText+'<div onclick="index_hide()" title="'+L['close_letter']+'">&nbsp;</div>';}}
+function index_hide() {
+	if(index_l) Dd('index_'+index_l).className = 'catalog_letter_li';
+	Dd('catalog_index').innerHTML = ''; Dh('catalog_index'); index_out();
+}
+function index_leave(o, e) {
+	if(e.currentTarget) {
+		if(typeof(HTMLElement) != "undefined") {
+			HTMLElement.prototype.contains = function(obj) {
+				if(obj==this) return true; 
+				while(obj=obj.parentNode) {if(obj==this) return true;}
+				return false; 
+			}
+		}
+		if(o.contains(e.relatedTarget)) return;
+	} else {
+		if(o.contains(e.toElement)) return;
+	}
+	setTimeout(index_hide, 200);
+}
+var _p = 0;
+function AutoTab() {
 	var c;
-	for(var i = 1; i < 4; i++) { if(Dd('ian-h-'+i).className == 'on') {c = i;} }
+	Dd('trades').onmouseover = function() {_p = 1;} 
+	Dd('trades').onmouseout = function() {_p = 0;}
+	if(_p) return;
+	for(var i = 1; i < 4; i++) { if(Dd('trade_t_'+i).className == 'tab_2') {c = i;} }
 	c++; 
-	if(c > 3) c = 1;
-	Tb(Dd('ian-h-'+c));
+	if(c>3) c = 1;
+	Tb(c, 3, 'trade', 'tab');
 }
-function AutoTab1() {
-	Dd('itrade').onmouseover = function() {_p1 = 1;} 
-	Dd('itrade').onmouseout = function() {_p1 = 0;}
-	if(_p1) return;
-	var c;
-	var a = new Array;
-	var i = 0;
-	$('#trade-h').children().each(function() {
-		if($(this).attr('class') == 'on') c = i;
-		a[i++] = $(this).attr('id');
-	});
-	a[i++] = a[0];
-	Tb(Dd(a[c+1]));
-}
-$(function(){
-	if(Dd('brands') != null) new dmarquee(220, 10, 3000, 'brands');
-	if(Dd('ian') != null) window.setInterval('AutoTab0()', 5000);
-	if(Dd('itrade') != null) window.setInterval('AutoTab1()', 8000);
-});
+if(Dd('trades') != null) window.setInterval('AutoTab()',5000);

@@ -5,22 +5,22 @@ include IN_ROOT.'/header.tpl.php';
 <noscript><br/><br/><center><h3>您的浏览器不支持JavaScript,请更换支持JavaScript的浏览器</h1></center><br/><br/></noscript>
 <div class="head">
 	<div>
-		<strong>欢迎使用，DESTOON B2B网站管理系统V<?php echo DT_VERSION;?> <?php echo strtoupper($CFG['charset']);?> 安装向导</strong><br/>
+		<strong>欢迎使用，Destoon B2B网站管理系统V<?php echo DT_VERSION;?> <?php echo strtoupper($CFG['charset']);?> 安装向导</strong><br/>
 		请仔细阅读以下软件使用协议，在理解并同意协议的基础上安装本软件
 	</div>
 </div>
 <div class="body">
-<div style="padding:24px;">
-<textarea style="width:760px;height:224px;border:#CCCCCC 1px solid;margin-bottom:16px;padding:10px;">
+<div>
+<textarea style="width:100%;height:190px;margin:0 0 10px 0;">
 <?php echo $license;?>
 </textarea>
-<span style="color:red;">&nbsp;&nbsp;注意：本软件仅限个人免费使用，非个人用户(公司、协会等组织机构)必须购买授权后正式建站</span>
+<strong style="color:red;">注意</strong>：本软件仅限个人免费使用，非个人用户(公司、协会、政府部门等)必须购买授权后正式建站
 </div>
 </div>
 <div class="foot">
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td width="220">
+<td width="215">
 <div class="progress">
 <div id="progress"></div>
 </div>

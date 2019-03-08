@@ -1,8 +1,8 @@
 <?php
 defined('IN_DESTOON') or exit('Access Denied');
-require DT_ROOT.'/api/pay/'.$bank.'/netpayclient_config.php';
+require DT_ROOT."/api/pay/chinapay/netpayclient_config.php";
 //加载 netpayclient 组件
-require DT_ROOT.'/api/pay/'.$bank.'/netpayclient.php';
+require DT_ROOT."/api/pay/chinapay/netpayclient.php";
 //导入私钥文件, 返回值即为您的商户号，长度15位
 $merid = buildKey(PRI_KEY);
 $merid or exit('导入私钥文件失败！');
@@ -38,7 +38,7 @@ $priv1 = $orderid;//设置为订单ID
 $plain = $merid . $ordid . $transamt . $curyid . $transdate . $transtype . $priv1;
 //生成签名值，必填
 $chkvalue = sign($plain);
-$chkvalue or message('签名失败！');
+$chkvalue or exit('签名失败！');
 ?>
 <html>
 <head>

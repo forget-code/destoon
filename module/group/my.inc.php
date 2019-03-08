@@ -2,14 +2,13 @@
 defined('IN_DESTOON') or exit('Access Denied');
 login();
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
-$mod_limit = intval($MOD['limit_'.$_groupid]);
-$mod_free_limit = intval($MOD['free_limit_'.$_groupid]);
-$mod_limit > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+$MG['group_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/include/post.func.php';
 include load($module.'.lang');
 include load('my.lang');
-require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
-$do = new $module($moduleid);
+require MD_ROOT.'/group.class.php';
+$do = new group($moduleid);
+
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -18,36 +17,33 @@ if(in_array($action, array('add', 'edit'))) {
 	if($CP) require DT_ROOT.'/include/property.func.php';
 	isset($post_ppt) or $post_ppt = array();
 }
+
 $sql = $_userid ? "username='$_username'" : "ip='$DT_IP'";
 $limit_used = $limit_free = $need_password = $need_captcha = $need_question = $fee_add = 0;
 if(in_array($action, array('', 'add'))) {
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND status>1");
 	$limit_used = $r['num'];
-	$limit_free = $mod_limit > $limit_used ? $mod_limit - $limit_used : 0;
+	$limit_free = $MG['group_limit'] > $limit_used ? $MG['group_limit'] - $limit_used : 0;
 }
 if(check_group($_groupid, $MOD['group_refresh'])) $MOD['credit_refresh'] = 0;
+
 switch($action) {
 	case 'add':
-		if($mod_limit && $limit_used >= $mod_limit) dalert(lang($L['info_limit'], array($mod_limit, $limit_used)), $_userid ? '?mid='.$mid : '?action=index');
-		if($MG['hour_limit']) {
-			$today = $DT_TIME - 3600;
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
-			if($r && $r['num'] >= $MG['hour_limit']) dalert(lang($L['hour_limit'], array($MG['hour_limit'])), $_userid ? '?mid='.$mid : '?action=index');
-		}
+		if($MG['group_limit'] && $limit_used >= $MG['group_limit']) dalert(lang($L['info_limit'], array($MG[$MOD['module'].'_limit'], $limit_used)), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
 		if($MG['day_limit']) {
-			$today = $today_endtime - 86400;
+			$today = strtotime(timetodate($DT_TIME, 3).' 00:00:00');
 			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $sql AND addtime>$today");
-			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? '?mid='.$mid : '?action=index');
+			if($r && $r['num'] >= $MG['day_limit']) dalert(lang($L['day_limit'], array($MG['day_limit'])), $_userid ? $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid : $MODULE[2]['linkurl'].$DT['file_my']);
 		}
 
-		if($mod_free_limit >= 0) {
-			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $mod_free_limit && $_userid) ? dround($MOD['fee_add']) : 0;
+		if($MG['group_free_limit'] >= 0) {
+			$fee_add = ($MOD['fee_add'] && (!$MOD['fee_mode'] || !$MG['fee_mode']) && $limit_used >= $MG['group_free_limit'] && $_userid) ? dround($MOD['fee_add']) : 0;
 		} else {
 			$fee_add = 0;
 		}
 		$fee_currency = $MOD['fee_currency'];
 		$fee_unit = $fee_currency == 'money' ? $DT['money_unit'] : $DT['credit_unit'];
-		$need_password = $fee_add && $fee_currency == 'money' && $fee_add > $DT['quick_pay'];
+		$need_password = $fee_add && $fee_currency == 'money';
 		$need_captcha = $MOD['captcha_add'] == 2 ? $MG['captcha'] : $MOD['captcha_add'];
 		$need_question = $MOD['question_add'] == 2 ? $MG['question'] : $MOD['question_add'];
 		$could_color = check_group($_groupid, $MOD['group_color']) && $MOD['credit_color'] && $_userid;
@@ -88,17 +84,18 @@ switch($action) {
 				$post['hits'] = 0;
 				$post['orders'] = 0;
 				$post['username'] = $_username;
-				if($FD) fields_check($post_fields);
-				if($CP) property_check($post_ppt);
-				if($could_color && $color && $_credit > $MOD['credit_color']) {
-					$post['style'] = $color;
+
+				if($could_color && $style && $_credit > $MOD['credit_color']) {
+					$post['style'] = $style;
 					credit_add($_username, -$MOD['credit_color']);
 					credit_record($_username, -$MOD['credit_color'], 'system', $L['title_color'], '['.$MOD['name'].']'.$post['title']);
 				}
+				if($FD) fields_check($post_fields);
+				if($CP) property_check($post_ppt);
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
+
 				if($fee_add) {
 					if($fee_currency == 'money') {
 						money_add($_username, -$fee_add);
@@ -110,17 +107,13 @@ switch($action) {
 				}
 				
 				$msg = $post['status'] == 2 ? $L['success_check'] : $L['success_add'];
-				$js = '';
-				if(isset($post['sync_sina']) && $post['sync_sina']) $js .= sync_weibo('sina', $moduleid, $do->itemid);
 				if($_userid) {
 					set_cookie('dmsg', $msg);
-					$forward = '?mid='.$mid.'&status='.$post['status'];
-					$msg = '';
+					$forward = $MODULE[2]['linkurl'].$DT['file_my'].'?mid='.$mid.'&status='.$post['status'];
+					dalert('', '', 'parent.window.location="'.$forward.'";');
 				} else {
-					$forward = '?mid='.$mid.'&action=add';
+					dalert($msg, '', 'parent.window.location=parent.window.location;');
 				}
-				$js .= 'window.onload=function(){parent.window.location="'.$forward.'";}';
-				dalert($msg, '', $js);
 			} else {
 				dalert($do->errmsg, '', ($need_captcha ? reload_captcha() : '').($need_question ? reload_question() : ''));
 			}
@@ -128,18 +121,17 @@ switch($action) {
 			if($itemid) {
 				$MG['copy'] && $_userid or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 				$do->itemid = $itemid;
-				$item = $do->get_one();
-				if(!$item || $item['username'] != $_username) message();
-				extract($item);
+				$r = $do->get_one();
+				if(!$r || $r['username'] != $_username) message();
+				extract($r);
 				$thumb = $thumb1 = $thumb2 = '';
 				$totime = $totime > $DT_TIME ? timetodate($totime, 3) : '';
 			} else {
-				$_catid = $catid;
 				foreach($do->fields as $v) {
 					$$v = '';
 				}
 				$content = '';
-				$catid = $_catid;
+				$catid = 0;
 				$totime = '';
 			}
 			$item = array();
@@ -161,10 +153,10 @@ switch($action) {
 				$post['addtime'] = timetodate($item['addtime']);
 				$post['level'] = $item['level'];
 				$post['fee'] = $item['fee'];
-				$post['style'] = addslashes($item['style']);
-				$post['template'] = addslashes($item['template']);
-				$post['filepath'] = addslashes($item['filepath']);
-				$post['note'] = addslashes($item['note']);
+				$post['style'] = $item['style'];
+				$post['template'] = $item['template'];
+				$post['filepath'] = $item['filepath'];
+				$post['note'] = $item['note'];
 				if(!$IMVIP && $MG['uploadpt']) {
 					$post['thumb1'] = $item['thumb1'];
 					$post['thumb2'] = $item['thumb2'];
@@ -176,9 +168,10 @@ switch($action) {
 				$post['username'] = $_username;
 				if($FD) fields_check($post_fields);
 				if($CP) property_check($post_ppt);
+				$do->edit($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				$do->edit($post);
+
 				set_cookie('dmsg', $L['success_edit']);
 				dalert('', '', 'parent.window.location="'.$forward.'"');
 			} else {
@@ -195,7 +188,7 @@ switch($action) {
 		$itemids = is_array($itemid) ? $itemid : array($itemid);
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $db->get_one("SELECT username FROM {$table} WHERE itemid=$itemid");
+			$item = $do->get_one();
 			if(!$item || $item['username'] != $_username) message();
 			$do->recycle($itemid);
 		}
@@ -203,16 +196,16 @@ switch($action) {
 	break;
 	case 'refresh':
 		$MG['refresh_limit'] > -1 or dalert(lang('message->without_permission_and_upgrade'), 'goback');
+		$do->_update($_username);
 		$itemid or message($L['select_info']);
-		if($MOD['credit_refresh'] && $_credit < $MOD['credit_refresh']) message($L['credit_lack']);
 		$itemids = $itemid;
 		$s = $f = 0;
 		foreach($itemids as $itemid) {
 			$do->itemid = $itemid;
-			$item = $db->get_one("SELECT username,edittime FROM {$table} WHERE itemid=$itemid");
+			$item = $do->get_one();
 			$could_refresh = $item && $item['username'] == $_username;
 			if($could_refresh && $MG['refresh_limit'] && $DT_TIME - $item['edittime'] < $MG['refresh_limit']) $could_refresh = false;
-			if($could_refresh && $MOD['credit_refresh'] && ($MOD['credit_refresh'] > $_credit || $_credit < 0)) $could_refresh = false;
+			if($could_refresh && $MOD['credit_refresh'] && $MOD['credit_refresh'] > $_credit) $could_refresh = false;
 			if($could_refresh) {
 				$do->refresh($itemid);
 				$s++;
@@ -248,32 +241,15 @@ switch($action) {
 		$lists = $do->get_list($condition, $dorder[$order]);
 	break;
 }
+$head_title = lang($L['module_manage'], array($MOD['name']));
 if($_userid) {
 	$nums = array();
 	for($i = 1; $i < 5; $i++) {
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE username='$_username' AND status=$i");
 		$nums[$i] = $r['num'];
 	}
-	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table_order} WHERE seller='$_username'");
+	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table}_order WHERE seller='$_username'");
 	$nums[9] = $r['num'];
 }
-if($DT_PC) {
-	if($EXT['mobile_enable']) $head_mobile = str_replace($MODULE[2]['linkurl'], $MODULE[2]['mobile'], $DT_URL);
-} else {
-	$foot = '';
-	if($action == 'add' || $action == 'edit') {
-		$back_link = '?mid='.$mid;
-	} else {
-		$time = strpos($MOD['order'], 'add') !== false ? 'addtime' : 'edittime';
-		foreach($lists as $k=>$v) {
-			$lists[$k]['linkurl'] = str_replace($MOD['linkurl'], $MOD['mobile'], $v['linkurl']);
-			$lists[$k]['date'] = timetodate($v[$time], 5);
-		}
-		$pages = mobile_pages($items, $page, $pagesize);
-		$foot = '';
-		$back_link = ($kw || $page > 1) ? '?mid='.$mid.'&status='.$status : '?action=index';
-	}
-}
-$head_title = lang($L['module_manage'], array($MOD['name']));
-include template($MOD['template_my'] ? $MOD['template_my'] : 'my_'.$module, 'member');
+include template('my_'.$module, 'member');
 ?>

@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -11,10 +11,11 @@ show_menu($menus);
 <input type="hidden" name="specialid" value="<?php echo $specialid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
 <input type="hidden" name="post[specialid]" value="<?php echo $specialid;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 选择信息源</td>
-<td><select id="s_mid" onchange="if(this.value){select_item(this.value, 'special');$('#s_mid').val(0);}">
+<td><select id="s_mid" onchange="if(this.value){select_item(this.value, 'special');select_op('s_mid', 0);}">
 <option value="0">请选择</option>
 <?php
 foreach($MODULE as $m) {
@@ -25,7 +26,7 @@ foreach($MODULE as $m) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所属分类</td>
-<td><span id="type_box"><?php echo type_select($tid, 0, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?></span> <a href="javascript:var type_item='<?php echo $tid;?>',type_name='post[typeid]',type_default='请选择分类',type_id=<?php echo $typeid;?>,type_interval=setInterval('type_reload()',500);Dwidget('?file=type&item=<?php echo $tid;?>', '[<?php echo $special['title'];?>] 专题信息分类');"><img src="<?php echo $MODULE[2]['linkurl'];?>image/img_add.gif" width="12" height="12" title="管理分类"/></a> <span id="dtypeid" class="f_red"></span></td>
+<td><?php echo type_select($tid, 0, 'post[typeid]', '请选择分类', $typeid, 'id="typeid"');?>&nbsp;&nbsp;<a href="?file=type&item=<?php echo $tid;?>" target="_blank" class="t">[管理分类]</a> <span id="dtypeid" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 信息标题</td>
@@ -42,15 +43,15 @@ foreach($MODULE as $m) {
 <tr>
 <td class="tl"><span class="f_hid">*</span> 内容摘要</td>
 <td>
-<textarea rows="5" cols="90" name="post[introduce]" id="introduce"><?php echo $introduce;?></textarea>
+<textarea rows="5" cols="100" name="post[introduce]" id="introduce"><?php echo $introduce;?></textarea>
 </td>
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>" id="addtime"/></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&special=<?php echo $special;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 返 回 " class="btn" onclick="history.back(-1);"/>
 </div>
 </form>
 <?php load('clear.js'); ?>

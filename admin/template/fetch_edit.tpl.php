@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -8,7 +8,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">添加规则</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 采编域名</td>
 <td><input name="domain" type="text" id="domain" size="50" value="<?php echo $domain;?>"/>
@@ -27,17 +28,17 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 内容规则</td>
 <td><textarea name="content" rows="6" cols="50" id="content"><?php echo $content;?></textarea>
-<br/><span id="dcontent" class="f_red"></span></td>
+<span id="dcontent" class="f_red"></span></td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 内容编码</td>
 <td>
-<input type="radio" name="encode" value="utf-8"<?php echo $encode == 'utf-8' ? ' checked' : '';?>/> UTF-8&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="radio" name="encode" value="gbk"<?php echo $encode == 'gbk' ? ' checked' : '';?>/> GBK
+<input type="radio" name="encode" value="gbk"<?php echo $encode == 'gbk' ? ' checked' : '';?>/> GBK&nbsp;&nbsp;
+<input type="radio" name="encode" value="utf-8"<?php echo $encode == 'utf-8' ? ' checked' : '';?>/> UTF-8
 </td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $itemid ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $itemid ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
 </form>
 <script type="text/javascript">
 function check() {
@@ -52,5 +53,5 @@ function check() {
 	return true;
 }
 </script>
-<script type="text/javascript">Menuon(<?php echo $itemid ? 1 : 0;?>);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

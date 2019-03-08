@@ -5,7 +5,6 @@ $names = array (
   'buy' => '求购模板',
   'chip' => '模板片断',
   'city' => '城市分站',
-  'club' => '商圈模板',
   'company' => '公司模板',
   'down' => '下载模板',
   'exhibit' => '展会模板',
@@ -28,5 +27,6 @@ $names = array (
   'special' => '专题模板',
   'tag' => '标签模板',
   'video' => '视频模板',
+  'wap' => 'WAP',
 );
 ?>

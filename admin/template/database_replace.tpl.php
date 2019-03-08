@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,8 +7,8 @@ show_menu($menus);
 <form method="post" action="?" onsubmit="return fcheck();">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="file_replace"/>
-<div class="tt">备份内容替换</div>
-<table cellspacing="0" class="tb">
+<div class="tt">备份文件内容替换</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 备份系列</td>
 <td>
@@ -28,7 +28,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td><input type="submit" name="submit" value="执 行" class="btn-r"/></td> 
+<td><input type="submit" name="submit" value="执 行" class="btn"/></td> 
 </tr>
 </table>
 </form>
@@ -36,8 +36,8 @@ show_menu($menus);
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<div class="tt">数据内容替换</div>
-<table cellspacing="0" class="tb">
+<div class="tt">数据库内容替换</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 数据字段</td>
 <td>
@@ -52,8 +52,8 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 替换类型</td>
 <td>
-<input name="type" type="radio" value="1" checked id="type" onclick="Dd('adds').style.display='none';Dd('replace').style.display='';"/> 直接替换&nbsp;&nbsp;
-<input name="type" type="radio" value="2" onclick="Dd('adds').style.display='';Dd('replace').style.display='none';"/> 头部追加&nbsp;&nbsp;
+<input name="type" type="radio" value="1" checked id="type" onclick="Dd('adds').style.display='none';Dd('replace').style.display='';"/> 直接替换
+<input name="type" type="radio" value="2" onclick="Dd('adds').style.display='';Dd('replace').style.display='none';"/> 头部追加
 <input name="type" type="radio" value="3" onclick="Dd('adds').style.display='';Dd('replace').style.display='none';"/> 尾部追加
 </td>
 </tr>
@@ -79,7 +79,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl">&nbsp;</td>
-<td><input type="submit" name="submit" value="执 行" class="btn-r"/></td> 
+<td><input type="submit" name="submit" value="执 行" class="btn"/></td> 
 </tr>
 </table>
 </form>
@@ -88,9 +88,12 @@ show_menu($menus);
 var vid = '';
 function get_fields(tb) {
 	if(!tb) return false;
-	$.get('?file=<?php echo $file;?>&action=fields&table='+tb, function(data) {
-		if(data) Dd('fields').innerHTML = data;
-	});
+	makeRequest('file=<?php echo $file;?>&action=fields&table='+tb, '?', 'dget_fields')
+}
+function dget_fields() {    
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) Dd('fields').innerHTML = xmlHttp.responseText;
+	}
 }
 function fcheck() {
 	if(Dd('file_pre').value == '') {

@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $specialid = isset($specialid) ? intval($specialid) : 0;
 $specialid or msg('请选择'.$MOD['name']);
 $special = $db->get_one("SELECT * FROM {$table} WHERE itemid=$specialid");
@@ -7,7 +7,7 @@ $special or msg($MOD['name'].'不存在');
 !$special['islink'] or msg($MOD['name'].'为外部链接，无需添加信息');
 $tid = 'special-'.$specialid;
 $TYPE = get_type($tid);
-require DT_ROOT.'/module/'.$module.'/item.class.php';
+require MD_ROOT.'/item.class.php';
 $do = new item($specialid);
 $_mid = 5;
 foreach($MODULE as $m) {
@@ -20,7 +20,9 @@ $menus = array (
     array('添加信息', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid.'&action=add'),
     array('批量添加', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid.'&action=batch&mid='.$_mid),
     array('信息列表', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid),
-    array('信息分类', 'javascript:Dwidget(\'?file=type&item='.$tid.'\', \'['.$special['title'].'] 专题信息分类\');'),
+    array('信息分类', '?file=type&item='.$tid),
+    array('专题预览', $MODULE[3]['linkurl'].'redirect.php?mid='.$moduleid.'&itemid='.$specialid, ' target="_blank"'),
+    array('专题列表', '?moduleid='.$moduleid),
 );
 $MOD['level'] = $MOD['level_item'];
 switch($action) {
@@ -38,7 +40,6 @@ switch($action) {
 			}
 			$content = '';
 			$addtime = timetodate($DT_TIME);
-			$typeid = 0;
 			$item = array();
 			$menuid = 0;
 			$tname = $menus[$menuid][0];
@@ -59,7 +60,7 @@ switch($action) {
 			$item = $do->get_one();
 			extract($item);
 			$addtime = timetodate($addtime);
-			$menuid = 0;
+			$menuid = 1;
 			$tname = $menus[$menuid][0];
 			include tpl('item_edit', $module);
 		}
@@ -89,22 +90,21 @@ switch($action) {
 			}
 			dmsg('添加成功', '?moduleid='.$moduleid.'&file='.$file.'&specialid='.$specialid);
 		} else {
+			$mid = isset($mid) ? intval($mid) : 0;
 			$lists = array();
 			$pages = '';
 			$tname = '选择信息';
 			if($mid) {
+				$CATEGORY = cache_read('category-'.$mid.'.php');
 				$table = get_table($mid);
 				$condition = 'status=3';
 				if($keyword) $condition .= " AND keyword LIKE '%$keyword%'";
-				if($catid) $condition .= $CAT['child'] ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
+				if($catid) $condition .= ($CATEGORY[$catid]['child']) ? " AND catid IN (".$CATEGORY[$catid]['arrchildid'].")" : " AND catid=$catid";
 				$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
 				$items = $r['num'];
 				$pages = pages($items, $page, $pagesize);
 				$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
 				while($r = $db->fetch_array($result)) {
-					$C = get_cat($r['catid']);
-					$r['caturl'] = $MODULE[$mid]['linkurl'].$C['linkurl'];
-					$r['catname'] = $C['catname'];
 					$r['adddate'] = timetodate($r['addtime'], 5);
 					$r['editdate'] = timetodate($r['edittime'], 5);
 					$r['alt'] = $r['title'];
@@ -153,8 +153,8 @@ switch($action) {
 		if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
 		if($level) $condition .= " AND level=$level";
 		if($typeid) $condition .= " AND typeid=$typeid";
-		if($thumb) $condition .= " AND thumb<>''";
-		if($itemid) $condition .= " AND itemid=$itemid";
+		if($thumb) $condition .= " AND thumb!=''";
+		if($itemid) $condition = " AND itemid=$itemid";
 
 		$lists = $do->get_list($condition);
 		if($condition == "specialid=$specialid" && $items != $special['items']) $db->query("UPDATE {$table} SET items=$items WHERE itemid=$specialid");

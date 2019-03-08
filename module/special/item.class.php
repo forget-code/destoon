@@ -3,19 +3,17 @@ defined('IN_DESTOON') or exit('Access Denied');
 class item {
 	var $specialid;
 	var $itemid;
+	var $db;
 	var $table;
 	var $fields;
 	var $errmsg = errmsg;
 
-    function __construct($specialid) {
-		global $table_item;
-		$this->specialid = $specialid;
-		$this->table = $table_item;
-		$this->fields = array('typeid','specialid','level','title','style','introduce','thumb','username','addtime', 'editor','edittime','ip','template','linkurl','note');
-    }
-
     function item($specialid) {
-		$this->__construct($specialid);
+		global $db, $DT_PRE;
+		$this->specialid = $specialid;
+		$this->table = $DT_PRE.'special_item';
+		$this->db = &$db;
+		$this->fields = array('typeid','specialid','level','title','style','introduce','thumb','username','addtime', 'editor','edittime','ip','template','linkurl','note');
     }
 
 	function pass($post) {
@@ -26,36 +24,32 @@ class item {
 	}
 
 	function set($post) {
-		global $MOD, $_username, $_userid;
-		$post['addtime'] = (isset($post['addtime']) && is_time($post['addtime'])) ? strtotime($post['addtime']) : DT_TIME;
+		global $MOD, $DT_TIME, $DT_IP, $_username, $_userid;
+		$post['addtime'] = (isset($post['addtime']) && $post['addtime']) ? strtotime($post['addtime']) : $DT_TIME;
 		$post['adddate'] = timetodate($post['addtime'], 3);
-		$post['edittime'] = DT_TIME;
+		$post['edittime'] = $DT_TIME;
+		clear_upload($post['thumb'], $this->specialid);
 		if($this->itemid) {
 			$post['editor'] = $_username;
 		} else {
 			$post['username'] = $post['editor'] = $_username;
-			$post['ip'] = DT_IP;
+			$post['ip'] = $DT_IP;
 		}
 		return $post;
 	}
 
 	function get_one() {
-        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = 'status=3', $order = 'addtime DESC', $cache = '') {
-		global $MOD, $pages, $page, $pagesize, $offset, $items, $TYPE, $special, $sum;
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
-			$items = $r['num'];
-		}
+		global $MOD, $pages, $page, $pagesize, $offset, $items, $TYPE, $special;
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition", $cache);
+		$items = $r['num'];
 		$pages =  pages($items, $page, $pagesize);
-		if($items < 1) return array();
 		$lists = array();
-		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize", $cache);
+		while($r = $this->db->fetch_array($result)) {
 			$r['adddate'] = timetodate($r['addtime'], 5);
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['alt'] = $r['title'];
@@ -70,7 +64,7 @@ class item {
 	function add($post) {
 		global $MOD;
 		$post = $this->set($post);
-		$t = DB::get_one("SELECT * FROM {$this->table} WHERE specialid=$post[specialid] AND linkurl='$post[linkurl]'");
+		$t = $this->db->get_one("SELECT * FROM {$this->table} WHERE specialid=$post[specialid] AND linkurl='$post[linkurl]'");
 		if($t) return false;
 		$sqlk = $sqlv = '';
 		foreach($post as $k=>$v) {
@@ -78,9 +72,8 @@ class item {
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
-		$this->itemid = DB::insert_id();
-		clear_upload($post['thumb'], $this->itemid, $this->table);
+		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->itemid = $this->db->insert_id();
 		return $this->itemid;
 	}
 
@@ -91,8 +84,7 @@ class item {
 			if(in_array($k, $this->fields)) $sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
-		clear_upload($post['thumb'], $this->itemid, $this->table);
+	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -102,18 +94,18 @@ class item {
 				$this->delete($v, $all);
 			}
 		} else {
-			DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+			$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
 		}
 	}
 
 	function level($itemid, $level) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		DB::query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
+		$this->db->query("UPDATE {$this->table} SET level=$level WHERE itemid IN ($itemids)");
 	}
 
 	function type($itemid, $typeid) {
 		$itemids = is_array($itemid) ? implode(',', $itemid) : $itemid;
-		DB::query("UPDATE {$this->table} SET typeid=$typeid WHERE itemid IN ($itemids)");
+		$this->db->query("UPDATE {$this->table} SET typeid=$typeid WHERE itemid IN ($itemids)");
 	}
 
 	function _($e) {

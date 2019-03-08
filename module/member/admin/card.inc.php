@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('生成充值卡', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('充值卡管理', '?moduleid='.$moduleid.'&file='.$file),
@@ -53,13 +53,13 @@ switch($action) {
 		$dfields = array('number', 'number', 'password', 'amount', 'username', 'ip', 'editor');
 		$sorder  = array('排序方式', '面额降序', '面额升序', '充值时间降序', '充值时间升序', '到期时间降序', '到期时间升序', '制卡时间降序', '制卡时间升序');
 		$dorder  = array('itemid DESC', 'amount DESC', 'amount ASC', 'updatetime DESC', 'updatetime ASC', 'totime DESC', 'totime ASC', 'addtime DESC', 'addtime ASC');
-		isset($fields) && isset($dfields[$fields]) or $fields = 0;		
-		(isset($username) && check_name($username)) or $username = '';
+		isset($fields) && isset($dfields[$fields]) or $fields = 0;
+		isset($username) or $username = '';
 		isset($number) or $number = '';
-		$fromdate = isset($fromdate) ? $fromdate : '';
-		$fromtime = is_date($fromdate) ? strtotime($fromdate.' 0:0:0') : 0;
-		$todate = isset($todate) ? $todate : '';
-		$totime = is_date($todate) ? strtotime($todate.' 23:59:59') : 0;
+		isset($fromtime) or $fromtime = '';
+		isset($totime) or $totime = '';
+		isset($dfromtime) or $dfromtime = '';
+		isset($dtotime) or $dtotime = '';
 		isset($type) or $type = 0;
 		isset($minamount) or $minamount = '';
 		isset($maxamount) or $maxamount = '';
@@ -71,19 +71,14 @@ switch($action) {
 		$condition = '1';
 		if($keyword) $condition .= " AND $dfields[$fields]='$keyword'";
 		if($print) $condition .= " AND updatetime=0  AND totime>$DT_TIME";
-		if($fromtime) $condition .= " AND $timetype>=$fromtime";
-		if($totime) $condition .= " AND $timetype<=$totime";
+		if($fromtime) $condition .= " AND $timetype>".(strtotime($fromtime.' 00:00:00'));
+		if($totime) $condition .= " AND $timetype<".(strtotime($totime.' 23:59:59'));
 		if($username) $condition .= " AND username='$username'";
 		if($number) $condition .= " AND number='$number'";
 		if($minamount != '') $condition .= " AND amount>=$minamount";
 		if($maxamount != '') $condition .= " AND amount<=$maxamount";
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);	
+		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$lists = array();
 		$result = $db->query("SELECT * FROM {$table} WHERE $condition ORDER BY $dorder[$order] LIMIT $offset,$pagesize");
 		$income = $expense = 0;

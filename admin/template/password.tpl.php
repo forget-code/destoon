@@ -1,11 +1,12 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="tt">修改密码</div>
 <form method="post" action="?" onsubmit="return check();">
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 新登录密码</td>
 <td><input type="password" name="password" size="30" id="password" autocomplete="off"/> <span id="dpassword" class="f_red"></span></td>
@@ -20,7 +21,7 @@ show_menu($menus);
 </tr>
 <tr>
 <td class="tl"> </td>
-<td><input type="submit" name="submit" value="修 改" class="btn-g"/></td>
+<td><input type="submit" name="submit" value="修 改" class="btn"/></td>
 </tr>
 </form>
 </table>
@@ -49,5 +50,5 @@ function check() {
 	return true;
 }
 </script>
-<script type="text/javascript">Menuon(1);</script>
+<script type="text/javascript">Menuon(3);</script>
 <?php include tpl('footer');?>

@@ -1,7 +1,9 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
+define('MD_ROOT', DT_ROOT.'/module/'.$module);
 require DT_ROOT.'/include/module.func.php';
-require DT_ROOT.'/module/'.$module.'/global.func.php';
-$table = $DT_PRE.$module.'_'.$moduleid;
-$table_data = $DT_PRE.$module.'_data_'.$moduleid;
+require MD_ROOT.'/global.func.php';
+$table = $DT_PRE.$module;
+$table_data = $DT_PRE.$module.'_data';
+$PLAYER = explode('|', trim($MOD['player']));
 ?>

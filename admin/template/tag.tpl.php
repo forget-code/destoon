@@ -1,27 +1,28 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
-<table cellspacing="0" class="tb">
+<div class="tt">标签创建向导</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 所属模块</td>
 <td><input type="text" name="setting[moduleid]" size="20" id="moduleid" value="<?php echo $mid;?>"/>
 <select onchange="mod(this.value);">
 <option value="">请选择</option>
+<option value="$moduleid">变量</option>
 <?php foreach($MODULE as $k=>$v) {
 	if($k > 4 && !$v['islink']) echo '<option value="'.$k.'"'.($k == $mid ? ' selected' : '').'>'.$v['name'].'</option>';
 }
 ?>
-<option value="$moduleid" style="background:blue;">变量</option>
 </select>
 </td>
 <td width="100">moduleid</td>
 </tr>
-<tr id="tr_table" style="display:<?php echo $mid ? 'none' : '';?>">
+<tr>
 <td class="tl"><span class="f_hid">*</span> 数据表</td>
 <td><input type="text" name="setting[table]" size="20" id="table"/>
-<span id="stable"><select onchange="Dd('table').value=this.value;">
+<span id="stable"><select onchange="Dd('table').value=this.value">
 <option value="">选择表</option>
 <?php echo $table_select;?>
 </select></span>
@@ -47,7 +48,7 @@ show_menu($menus);
 <option value="status=3 and thumb<>''">有图的信息</option>
 <option value="status=3 and vip>0"><?php echo VIP;?>信息</option>
 </select>
-<?php tips('SQL语句的WHERE之后的条件语句，1表示不限条件<br>此项需要对MySQL语法有一定了解');?>
+<?php tips('1表示不限条件<br>此项需要对MySQL语法有一定了解');?>
 </td>
 <td>condition</td>
 </tr>
@@ -68,6 +69,7 @@ show_menu($menus);
 <option value="hits desc">按浏览次数排序</option>
 <option value="rand() desc">按随机排序</option>
 </select>
+<?php tips('标签模板位与模板目录的tag目录里');?>
 </td>
 <td>order</td>
 </tr>
@@ -89,7 +91,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 包含子分类</td>
 <td>
-<input type="radio" name="setting[child]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[child]" value="1" checked/> 是&nbsp;&nbsp;
 <input type="radio" name="setting[child]" value="0" id="child"/> 否
 </td>
 <td>child</td>
@@ -105,7 +107,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_hid">*</span> 包含子地区</td>
 <td>
-<input type="radio" name="setting[areachild]" value="1" checked/> 是&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="radio" name="setting[areachild]" value="1" checked/> 是&nbsp;&nbsp;
 <input type="radio" name="setting[areachild]" value="0" id="areachild"/> 否
 </td>
 <td>areachild</td>
@@ -115,11 +117,20 @@ show_menu($menus);
 <td><input type="text" name="setting[expires]" size="10" id="expires"/>
 <select onchange="Dd('expires').value=this.value">
 <option value="">默认缓存</option>
-<option value="0">不缓存</option>
+<option value="-1">不缓存</option>
+<option value="-2">SQL缓存</option>
 <option value="600">自定义时间(秒)</option>
 </select>
 </td>
 <td>expires</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 显示调试信息</td>
+<td>
+<input type="radio" name="setting[debug]" value="1" id="debug"/> 是&nbsp;&nbsp;
+<input type="radio" name="setting[debug]" value="0" checked/> 否
+</td>
+<td>debug</td>
 </tr>
 <tr>
 <td class="tl"><span class="f_red">*</span> 标签模板</td>
@@ -129,12 +140,11 @@ show_menu($menus);
 <td>template</td>
 </tr>
 <tr>
-<td class="tl" height="40">
+<td class="tl">
 
 </td>
 <td>
-<input type="button" value="生成标签" class="btn-b" onclick="mk_tag();"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value="调用手册" class="btn" onclick="window.open('https://www.destoon.com/doc/develop/22.html');"/>
+<input type="button" value="生成标签" class="btn" onclick="mk_tag();"/>
 </td>
 <td> </td>
 </table>
@@ -143,13 +153,13 @@ show_menu($menus);
 <input type="hidden" name="action" value="preview"/>
 <input type="hidden" id="tag_expires" name="tag_expires"/>
 <div class="tt">标签代码</div>
-<table cellspacing="0" class="tb">
-<tr class="dsn">
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
 <td class="tl"><span class="f_hid">*</span> 自定义CSS</td>
 <td><textarea name="tag_css" id="tag_css"  style="width:98%;height:40px;font-family:Fixedsys,verdana;overflow:visible;color:green;"></textarea> 
 </td>
 </tr>
-<tr class="dsn">
+<tr>
 <td class="tl"><span class="f_hid">*</span> HTML开始标签</td>
 <td><input type="text" name="tag_html_s" id="tag_html_s" size="30" value="" style="font-family:Fixedsys,verdana;"/></td>
 </tr>
@@ -158,26 +168,104 @@ show_menu($menus);
 <td><textarea name="tag_code" id="tag_code"  style="width:98%;height:40px;font-family:Fixedsys,verdana;overflow:visible;color:blue;"></textarea> 
 </td>
 </tr>
-<tr class="dsn">
+<tr>
+<td class="tl"><span class="f_hid">*</span> JS调用</td>
+<td><textarea name="tag_js" id="tag_js"  style="width:98%;height:40px;font-family:Fixedsys,verdana;overflow:visible;color:#800000;"></textarea> 
+</td>
+</tr>
+<tr>
 <td class="tl"><span class="f_hid">*</span> HTML结束标签</td>
 <td><input type="text" name="tag_html_e" id="tag_html_e" size="10" value="" style="font-family:Fixedsys,verdana;"/></td>
 </tr>
 <tr>
 <td class="tl"></td>
 <td>
-<input type="submit" name="submit" value="预览标签" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" value="重新生成" class="btn" onclick="Go('?file=<?php echo $file;?>');"/>&nbsp;&nbsp;
+<input type="submit" name="submit" value="预览标签" class="btn"/>
+<input type="button" value="复制标签" class="btn" onclick="copy_tag();"/>
+<input type="button" value="清空标签" class="btn" onclick="Dd('tag_code').value='';"/>
+<input type="button" value="清空CSS" class="btn" onclick="Dd('tag_css').value='';"/>
+<input type="button" value="清空HTML" class="btn" onclick="Dd('tag_html_s').value='';Dd('tag_html_e').value='';"/>
 </td>
 </tr>
 </table>
 </form>
+<div class="tt">调用手册</div>
+<table cellpadding="2" cellspacing="1" class="tb" style="line-height:200%;">
+<tr>
+<td class="tl"><span class="f_hid">*</span> 前言</td>
+<td>
+标签调用理论上需要网站管理人员有一定的HTML+CSS知识，并对PHP+MySQL有初步的了解。<br/>
+<strong>调用过程</strong>实际是按照<span style="color:#006699;">调用条件</span>从<span style="color:#006699;">数据表</span>读取<span style="color:#006699;">调用数量</span>条数据，并依<span style="color:#006699;">排序方式</span>排序，最终通过<span style="color:#006699;">标签模板</span>的布局输出数据。<br/>
+本页内容有限，仅为概述，更多方法技巧请关注官方教程及论坛。<a href="http://help.destoon.com/faq/tag.php?tc=client" target="_blank">http://help.destoon.com/faq/tag.php</a><br/>
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 函数原型</td>
+<td>
+<strong>tag</strong>($parameter, $expires = 0)<br/>
+$parameter 表示传递给tag函数的字符串，系统自动将其转换为多个变量<br/>
+例如传递 table=destoon&pagesize=10，系统相当于得到$table = 'destoon'；$pagesize = 10；两个变量<br/>
+$expires 表示缓存过期时间<br/>
+<span style="color:blue;">>0</span>  缓存$expires秒；<span style="color:blue;">0</span> - 系统默认时间；<span style="color:blue;">-1</span> - 不缓存；<span style="color:blue;">-2</span> - 缓存SQL；一般情况保持默认即可。<br/>
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 常量</td>
+<td>
+<strong>{DT_SKIN}</strong><br/>
+系统风格网址。<br/>
+<strong>{DT_PATH}</strong><br/>
+网站首页网址。<br/>
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 变量</td>
+<td>
+<strong>$tags</strong><br/>
+以数组类型保存标签调用的数据，可通过loop语法遍历显示。<br/>
+<strong>$pages</strong><br/>
+保存数据分页代码，仅在调用了分页时有效。<br/>
+<strong>$MODULE[5][name]</strong><br/>
+ID为5的模块名称。<br/>
+<strong>$MODULE[5][linkurl]</strong><br/>
+ID为5的模块网址。<br/>
+<strong>$CATEGORY[5][catname]</strong><br/>
+ID为5的分类名称(仅变量$CATEGORY存在时有效)。<br/>
+<strong>$CATEGORY[5][linkurl]</strong><br/>
+ID为5的分类网址(仅变量$CATEGORY存在时有效)。<br/>
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 常用字段</td>
+<td>
+<strong>title</strong> 标题； <strong>linkurl</strong> 链接； <strong>catid</strong> 分类ID； <strong>introduce</strong> 简介； <strong>addtime</strong> 添加时间；
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 常用函数</td>
+<td>
+<strong>dsubstr</strong>($string, $length, $suffix = '')<br/>
+将字符串$string截取为$length长,尾部追加$suffix(例如..)<br/>
+<strong>date</strong>($format, $timestamp)<br/>
+将时间戳$timestamp转化为$format(例如Y-m-d)格式<br/>
+</td>
+</tr>
+<tr>
+<td class="tl"><span class="f_hid">*</span> 标签模板</td>
+<td>
+模板保存于./template/<?php echo $CFG['template'];?>/tag/目录；<br/>
+建议不要删除或者修改自带的模板，推荐在自带模板基础上新建模板并应用。<br/>
+</td>
+</tr>
+</table>
+</div>
 <script type="text/javascript">
 function mk_tag() {
+	var tag = js = '';
 	if(Dd('moduleid').value == '' && Dd('table').value == '') {
 		alert('所属模块 或 数据表 必须指定一项');
 		return false;
 	}
-	var tag = '';
 	if(Dd('moduleid').value != '') tag += '&moduleid='+Dd('moduleid').value;
 	if(Dd('table').value != '') tag += '&table='+Dd('table').value;
 	if(Dd('catid').value != '') tag += '&catid='+Dd('catid').value;
@@ -194,13 +282,30 @@ function mk_tag() {
 	}
 	if(Dd('order').value != '') tag += '&order='+Dd('order').value;
 	if(Dd('template').value != 0) tag += '&template='+Dd('template').value;
+	if(Dd('debug').checked) tag += '&debug=1';
 	tag = tag.substr(1);
+	var rp = false;
+	for(var i=0;i<tag.length;i++) {
+		if(tag.charAt(i) == '$') {
+			js += '{$'
+			rp = true;
+		} else if(rp && tag.charAt(i) == '&') {
+			js += '}&';
+			rp = false;
+		} else {
+			js += tag.charAt(i);
+		}
+	}
+	js = '<script type="text/javascript" src="<?php echo DT_PATH;?>api/js.php?'+js;
 	tag = '<!--{tag("'+tag+'"';
 	if(Dd('expires').value != '') {
 		tag += ', '+Dd('expires').value;
+		js += '&tag_expires='+Dd('expires').value;
 	}
+	js = js+'"><\/script>';
 	tag = tag+')}-->';
 	Dd('tag_code').value = tag;
+	Dd('tag_js').value = js;
 }
 function copy_tag() {
 	if(!Dd('tag_code').value) return;
@@ -219,27 +324,9 @@ function check() {
 	}
 }
 function mod(m) {
-	if(m == '$moduleid') {
-		Dd('moduleid').value = m;
-		Dh('tr_table');
-		return false;
-	}
-	if(m == '') {
-		Dd('moduleid').value = m;
-		Ds('tr_table');
-		return false;
-	}
+	Dd('moduleid').value = m;
+	if(m == '' || m == '$moduleid') return false;
 	Go('?file=<?php echo $file;?>&mid='+m);
-}
-function stoinp(s, i, p) {
-	if(Dd(i).value) {
-		var p = p ? p : ',';
-		var a = Dd(i).value.split(p);
-		for (var j=0; j<a.length; j++) {if(s == a[j]) return;}
-		Dd(i).value += p+s;
-	} else {
-		Dd(i).value = s;
-	}
 }
 function cat() {
 	if(Dd('catid_1').value > 0) {
@@ -260,8 +347,8 @@ function Dict() {
 		alert('所属模块 或 数据表 必须指定一项');
 		return false;
 	}
-	Dwidget('?file=tag&action=find&mid='+Dd('moduleid').value+'&tb='+Dd('table').value, '数据字典');
+	mkDialog('', '<iframe src="?file=tag&action=find&mid='+Dd('moduleid').value+'&tb='+Dd('table').value+'" width="600" height=300" border="0" vspace="0" hspace="0" marginwidth="0" marginheight="0" framespacing="0" frameborder="0" scrolling="yes"></iframe>', '数据字典', 620, 0, 0);
 }
 </script>
-<script type="text/javascript">Menuon(3);</script>
+<script type="text/javascript">Menuon(0);</script>
 <?php include tpl('footer');?>

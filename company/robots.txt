@@ -1,4 +1,5 @@
-# Robots For DESTOON B2B
+# Robots For Destoon
 User-agent: *
 Disallow: /image/
 Disallow: /skin/
+Disallow: /home.php*

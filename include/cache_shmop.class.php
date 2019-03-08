@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -9,16 +9,13 @@ class dcache {
 	var $shmop_key;
 	var $shmop_id;
 
-    function __construct() {
+    function dcache() {
 		//
     }
 
-    function dcache() {
-		$this->__construct();
-    }
-
     function get($key) {
-        $this->shmop_key = ftok($this->pre.$key);//Linux/Unix Only
+		$key = $this->pre.$key;
+        $this->shmop_key = ftok($key);//Linux/Unix Only
         $this->shmop_id = shmop_open($this->shmop_key, 'c', 0644, 0);
         if($this->shmop_id === false) return false;
 		$data = shmop_read($this->shmop_id, 0, shmop_size($this->shmop_id));
@@ -27,8 +24,9 @@ class dcache {
     }
 
     function set($key, $val, $ttl = 600) {
+		$key = $this->pre.$key;
         if(function_exists('gzcompress')) $val = gzcompress($val, 3);
-        $this->shmop_key = ftok($this->pre.$key);
+        $this->shmop_key = ftok($key);
         $this->shmop_id = shmop_open($this->shmop_key, 'c', 0644, strlen($val));
         $result = shmop_write($this->shmop_id, $val, 0);
 		shmop_close($this->shmop_id);
@@ -36,7 +34,8 @@ class dcache {
     }
 
     function rm($key) {
-        $this->shmop_key = ftok($this->pre.$key);
+		$key = $this->pre.$key;
+        $this->shmop_key = ftok($key);
         $this->shmop_id = shmop_open($this->shmop_key, 'c', 0644, 0);
         $result = shmop_delete($this->shmop_id);
 		shmop_close($this->shmop_id);
@@ -44,11 +43,11 @@ class dcache {
     }
 
     function clear() {
-        return true;
+        //
     }
 
 	function expire() {
-		return true;
+		//
 	}
 }
 ?>

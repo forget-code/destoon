@@ -1,5 +1,4 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
 	/*
 	*功能：付款过程中服务器通知类
 	*版本：2.0
@@ -17,9 +16,6 @@ class alipay_notify {
 	var $mysign;            //签名     
 	var $_input_charset;    //字符编码格式
 	var $transport;         //访问模式
-	function __construct($partner,$security_code,$sign_type = "MD5",$_input_charset = "GBK",$transport= "https") {
-		$this->alipay_notify($partner,$security_code,$sign_type,$_input_charset,$transport);
-	}
 	function alipay_notify($partner,$security_code,$sign_type = "MD5",$_input_charset = "GBK",$transport= "https") {
 		$this->partner        = $partner;
 		$this->security_code  = $security_code;

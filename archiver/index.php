@@ -2,9 +2,11 @@
 define('DT_REWRITE', true);
 require '../common.inc.php';
 $EXT['archiver_enable'] or dheader(DT_PATH);
-$DT_BOT or dheader(DT_PATH);
+if($EXT['archiver_robot']) {
+	if(!$DT_BOT) dheader(DT_PATH);
+}
 $N = $M = $T = array();
-$mid or $mid = 5;
+$mid = isset($mid) ? intval($mid) : 5;
 $vmid = $list = 0;
 foreach($MODULE as $k=>$v) {
 	if(!$v['islink'] && $v['ismenu'] && $v['moduleid'] > 4) {
@@ -50,7 +52,7 @@ if(isset($month) && isset($M[$month])) {
 	if($num) {
 		$result = $db->query("SELECT title,linkurl,addtime FROM {$table} WHERE $condition ORDER BY addtime DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
-			$r['adddate'] = timetodate($r['addtime'], 5);
+			$r['adddate'] = timetodate($r['addtime'], 6);
 			if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MODULE[$mid]['linkurl'].$r['linkurl'];
 			$T[] = $r;
 		}

@@ -39,7 +39,7 @@ if ($v_md5str == $md5string) {
 		} else if($v_amount != $charge_money) {
 			$charge_status = 2;
 			$charge_errcode = '充值金额不匹配';
-			$note = $charge_errcode.'S:'.$charge_money.'R:'.$v_amount;
+			$note = charge_errcode.'S:'.$charge_money.'R:'.$v_amount;
 			log_write($note, 'rchinabank');
 		} else {
 			$charge_status = 1;

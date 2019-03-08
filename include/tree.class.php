@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -9,15 +9,11 @@ class tree {
 	var $icon;
 	var $ret;
 
-	function __construct($arr = array()) {
+	function tree($arr = array()) {
 		$this->arr = $arr;
-		$this->icon = array('&#9474;', '&#9500;', '&#9492;');
+		$this->icon = lang('include->tree_icon');
 		$this->ret = '';
 		return is_array($arr);
-	}
-
-	function tree($arr = array()) {
-		$this->__construct($arr);
 	}
 
 	function get_parent($myid) {
@@ -73,7 +69,7 @@ class tree {
 				}
 				$spacer = $adds ? $adds.$j : '';
 				$selected = $id == $sid ? 'selected' : '';
-				extract($a);
+				@extract($a);
 				eval("\$nstr = \"$str\";");
 				$this->ret .= $nstr;
 				$this->get_tree($id, $str, $sid, $adds.$k.'&nbsp;');

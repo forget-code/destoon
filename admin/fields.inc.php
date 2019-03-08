@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-$tb = isset($tb) ? strip_sql(trim($tb), 0) : '';
+defined('IN_DESTOON') or exit('Access Denied');
+$tb = isset($tb) ? trim($tb) : '';
 $tb or msg();
 $len = strlen($DT_PRE);
 if(substr($tb, 0, $len) == $DT_PRE) $tb = substr($tb, $len);
@@ -8,7 +8,7 @@ $do = new fields();
 $do->tb = $tb;
 $menus = array (
     array('添加字段', '?file='.$file.'&tb='.$tb.'&action=add'),
-    array('字段列表', '?file='.$file.'&tb='.$tb),
+    array('字段列表', '?&file='.$file.'&tb='.$tb),
 );
 $this_forward = '?moduleid='.$moduleid.'&file='.$file.'&tb='.$tb;
 switch($action) {
@@ -39,9 +39,19 @@ switch($action) {
 			include tpl('fields_edit');
 		}
 	break;
-	case 'update':
-		$do->update($post);
+	case 'delete':
+		$itemid or msg();
+		$do->delete($itemid);
+		dmsg('删除成功', $this_forward);
+	break;
+	case 'order':
+		$do->order($listorder);
 		dmsg('更新成功', $this_forward);
+	break;
+	case 'delete':
+		$itemid or msg();
+		$do->delete($itemid);
+		dmsg('删除成功', $this_forward);
 	break;
 	default:
 		$lists = $do->get_list("tb='$tb'");
@@ -52,19 +62,21 @@ switch($action) {
 
 class fields {
 	var $itemid;
+	var $db;
 	var $tb;
+	var $pre;
 	var $table;
 	var $errmsg = errmsg;
 
-    function __construct() {
-		$this->table = DT_PRE.'fields';
-    }
-
     function fields() {
-		$this->__construct();
+		global $db, $DT_PRE;
+		$this->pre = $DT_PRE;
+		$this->table = $DT_PRE.'fields';
+		$this->db = &$db;
     }
 
 	function pass($post) {
+		global $DT_TIME;
 		if(!is_array($post)) return false;
 		if(!$post['name']) return $this->_('请填写字段');
 		if(!preg_match("/^[a-z0-9]+$/", $post['name'])) return $this->_('字段名只能为小写字母和数字的组合');
@@ -96,21 +108,16 @@ class fields {
 	}
 
 	function get_one() {
-        return DB::get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
+        return $this->db->get_one("SELECT * FROM {$this->table} WHERE itemid='$this->itemid'");
 	}
 
 	function get_list($condition = '', $order = 'listorder ASC,itemid ASC') {
-		global $MOD, $pages, $page, $pagesize, $offset, $sum;
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);	
+		global $MOD, $pages, $page, $pagesize, $offset;
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);		
 		$lists = array();
-		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $order LIMIT $offset,$pagesize");
+		while($r = $this->db->fetch_array($result)) {
 			$lists[] = $r;
 		}
 		return $lists;
@@ -127,14 +134,14 @@ class fields {
 		$type = strtoupper($post['type']);
 		if($length) $type .= "($length)";
 		$name = '`'.$post['name'].'`';
-        DB::query("ALTER TABLE ".DT_PRE."{$this->tb} ADD $name $type NOT NULL");
+        $this->db->query("ALTER TABLE {$this->pre}{$this->tb} ADD $name $type NOT NULL");
 		$sqlk = $sqlv = '';
 		foreach($post as $k=>$v) {
 			$sqlk .= ','.$k; $sqlv .= ",'$v'";
 		}
         $sqlk = substr($sqlk, 1);
         $sqlv = substr($sqlv, 1);
-		DB::query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
+		$this->db->query("INSERT INTO {$this->table} ($sqlk) VALUES ($sqlv)");
 		return $this->itemid;
 	}
 
@@ -151,13 +158,13 @@ class fields {
 		$cname = '`'.$post['cname'].'`';
 		unset($post['cname']);
 		$name = '`'.$post['name'].'`';
-        DB::query("ALTER TABLE ".DT_PRE."{$this->tb} CHANGE $cname $name $type NOT NULL");
+        $this->db->query("ALTER TABLE {$this->pre}{$this->tb} CHANGE $cname $name $type NOT NULL");
 		$sql = '';
 		foreach($post as $k=>$v) {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    DB::query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
+	    $this->db->query("UPDATE {$this->table} SET $sql WHERE itemid=$this->itemid");
 		return true;
 	}
 
@@ -165,22 +172,16 @@ class fields {
 		$this->itemid = $itemid;
 		$r = $this->get_one();
 		$name = '`'.$r['name'].'`';
-		DB::query("DELETE FROM {$this->table} WHERE itemid=$itemid");
-	    DB::query("ALTER TABLE ".DT_PRE."{$this->tb} DROP $name");
+		$this->db->query("DELETE FROM {$this->table} WHERE itemid=$itemid");
+	    $this->db->query("ALTER TABLE {$this->pre}{$this->tb} DROP $name");
 	}
 	
-	function update($post) {
-		foreach($post as $k=>$v) {
+	function order($listorder) {
+		if(!is_array($listorder)) return false;
+		foreach($listorder as $k=>$v) {
 			$k = intval($k);
-			if(isset($v['delete']) && $v['delete']) {
-				$this->delete($k);
-			} else {
-				$listorder = intval($v['listorder']);
-				$title = $v['title'];
-				$display = $v['display'] ? 1 : 0;
-				$front = $v['front'] ? 1 : 0;
-				DB::query("UPDATE {$this->table} SET listorder=$listorder,display=$display,front=$front,title='$title' WHERE itemid=$k");
-			}
+			$v = intval($v);
+			$this->db->query("UPDATE {$this->table} SET listorder=$v WHERE itemid=$k");
 		}
 		return true;
 	}

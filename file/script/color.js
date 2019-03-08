@@ -1,41 +1,44 @@
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 document.write('<style type="text/css">');
-document.write('.color_div_t {width:16px;height:16px;padding:6px;background:#FFFFFF;}');
-document.write('.color_div_o,.color_div_t:hover {width:16px;height:16px;padding:6px;background:#DDDDDD;cursor:crosshair;}');
-document.write('.color_div {width:16px;height:16px;line-height:16px;font-size:1px;}');
+document.write('.color_div_o {width:16px;height:16px;padding:4px 0 0 4px;background:#B6BDD2;cursor:crosshair;}');
+document.write('.color_div_t {width:16px;height:16px;padding:4px 0 0 4px;background:#F1F2F3;}');
+document.write('.color_div {border:#808080 1px solid;width:10px;height:10px;line-height:10px;font-size:1px;}');
 document.write('</style>');
 var color_id = 1; var color_bk = color_htm = '';
-color_htm += '<table cellpadding="0" cellspacing="0" bgcolor="#666666" width="100%">';
-color_htm += '<tr><td width="10" height="32"> </td>';
-color_htm += '<td><input type="text" style="width:60px;height:12px;border:#A0A0A0 1px solid;" value="" maxlength="7" id="color_viewview" onblur="color_select(this.value);" onkeyup="color_view(this.value);" ondblclick="this.value=\'\';"/></td>';
-color_htm += '<td>&nbsp;&nbsp;&nbsp;</td>';
-color_htm += '<td style="cursor:pointer;font-size:20px;width:32px;text-align:center;color:#FFFFFF;"  onmouseover="this.style.backgroundColor=\'#CE3C39\';" onmouseout="this.style.backgroundColor=\'#666666\';" onclick="color_close();">&#215;</td>';
+color_htm += '<table cellpadding="0" cellspacing="0" bgcolor="#2875B9" width="160">';
+color_htm += '<tr><td width="2" height="20"> </td>';
+color_htm += '<td><input type="text" style="width:60px;height:12px;border:#A0A0A0 1px solid;" value="" id="color_viewview" onblur="color_select(this.value);" onkeyup="color_view(this.value);" ondblclick="this.value=\'\';"/></td>';
+color_htm += '<td title="Destoon Color Selector Powered By Destoon.COM">&nbsp;&nbsp;&nbsp;</td>';
+color_htm += '<td align="right" style="color:#FFFFFF;font-weight:bold;cursor:pointer;" onclick="color_close();" title="Close">&#215;&nbsp;</td>';
 color_htm += '</tr>';
 color_htm += '</table>';
 color_htm += '<div id="destoon_color_show"></div>';
-function color_show(id) {
+function color_show(id, color, obj) {
 	Eh();
 	if(Dd('destoon_color') == null) {
 		var destoon_color_div = document.createElement("div");
+		with(destoon_color_div.style) {zIndex = 9999; position = 'absolute'; display = 'none'; width = '160px'; padding = '1px'; top = 0; left = 0; border = '#A0A0A0 1px solid'; backgroundColor = '#FFFFFF';}
 		destoon_color_div.id = 'destoon_color';
-		document.body.appendChild(destoon_color_div);		
-		$('#destoon_color').css({'zIndex':'9999','position':'absolute','display':'none','width':'226px','background':'#FFFFFF'});
+		document.body.appendChild(destoon_color_div);
 	}
-	$('#destoon_color').css({'left':$('#color_img_'+color_id).offset().left+'px','top':($('#color_img_'+color_id).offset().top+$('#color_img_'+color_id).height())+'px'});
-	$('#destoon_color').html(color_htm);
+	var aTag = obj; var leftpos = toppos = 0;
+	do {aTag = aTag.offsetParent; leftpos	+= aTag.offsetLeft; toppos += aTag.offsetTop;
+	} while(aTag.offsetParent != null);
+	Dd('destoon_color').style.left = (obj.offsetLeft + leftpos) + 'px';
+	Dd('destoon_color').style.top = (obj.offsetTop + toppos + 20) + 'px';
+	Dd('destoon_color').innerHTML = color_htm;
 	color_id = id;
-	var color = Dd('color_input_'+id).value;
 	color_bk = color;
-	$('#destoon_color').fadeIn(300);
+	Dd('destoon_color').style.display = '';
 	if(color) color_view(color);
 	color_setup(color);
 }
-function color_hide() {$('#destoon_color').fadeOut(100);Es();}
-function color_close() {color_hide();Dd('color_img_'+color_id).style.backgroundColor = color_bk;}
-function color_select(color) {color=color.toUpperCase();if(color.length>0&&!color.match(/^#[A-F0-9]{6}$/)){return;}color_hide();Dd('color_input_'+color_id).value = color; Dd('color_img_'+color_id).style.backgroundColor = color;}
+function color_hide() {Dh('destoon_color'); Es();}
+function color_close() {color_hide(); Dd('color_img_'+color_id).style.backgroundColor = color_bk;}
+function color_select(color) {Dd('color_input_'+color_id).value = color; Dd('color_img_'+color_id).style.backgroundColor = color; color_hide();}
 function color_setup(color) {
 	var colors = [
 	'#000000', '#993300', '#333300', '#003300', '#003366', '#000080', '#333399', '#333333',
@@ -44,19 +47,19 @@ function color_setup(color) {
 	'#FF00FF', '#FFCC00', '#FFFF00', '#00FF00', '#00FFFF', '#00CCFF', '#993366', '#C0C0C0', 
 	'#FF99CC', '#FFCC99', '#FFFF99', '#CCFFCC', '#CCFFFF', '#99CCFF', '#CC99FF', ''];
 	var colors_select = '';
-	colors_select += '<table cellpadding="0" cellspacing="0" style="border:#E0E0E0 1px solid;">'
+	colors_select += '<table cellpadding="0" cellspacing="0">'
 	for(i = 0; i < colors.length; i++) {
 		if(i%8 == 0) colors_select += '<tr>';
-		colors_select += '<td width="28" height="28">';
+		colors_select += '<td width="20" height="20">';
 		if(color == colors[i]) {
 			colors_select += '<div class="color_div_o" onmouseover="color_view(\''+colors[i]+'\');" onclick="color_select(\''+colors[i]+'\');">';
 		} else {
-			colors_select += '<div class="color_div_t" onmouseover="color_view(\''+colors[i]+'\');" onclick="color_select(\''+colors[i]+'\');">';
+			colors_select += '<div class="color_div_t" onmouseover="this.className=\'color_div_o\';color_view(\''+colors[i]+'\');" onmouseout="this.className=\'color_div_t\';" onclick="color_select(\''+colors[i]+'\');">';
 		}
-		colors_select += '<div class="color_div" style="background:'+(colors[i] ? colors[i] : '#FFFFFF;border:#DDDDDD 1px dotted;')+'" onmouseover="color_view(\'\');" onclick="color_select(\'\');">&nbsp;</div></div></td>';
+		colors_select += '<div class="color_div" style="background:'+colors[i]+'">&nbsp;</div></div></td>';
 		if(i%8 == 7) colors_select += '</tr>';
 	}
 	colors_select += '</table>';
-	$('#destoon_color_show').html(colors_select);
+	Dd('destoon_color_show').innerHTML = colors_select;
 }
-function color_view(color){color=color.toUpperCase();if(color.length>0&&!color.match(/^#[A-F0-9]{6}$/)){return;}try {Dd('color_viewview').value = color; Dd('color_viewview').style.color = color; Dd('color_img_'+color_id).style.backgroundColor = color;} catch(e) {}}
+function color_view(color) {try {Dd('color_viewview').value = color; Dd('color_viewview').style.color = color; Dd('color_img_'+color_id).style.backgroundColor = color;} catch(e) {}}

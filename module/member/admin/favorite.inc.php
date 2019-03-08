@@ -1,6 +1,6 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/favorite.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/favorite.class.php';
 $do = new favorite();
 $menus = array (
     array('收藏列表', '?moduleid='.$moduleid.'&file='.$file),

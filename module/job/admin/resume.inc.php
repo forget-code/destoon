@@ -1,7 +1,7 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-$table = $table_resume;
-require DT_ROOT.'/module/'.$module.'/resume.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+$table = $DT_PRE.'resume';
+require MD_ROOT.'/resume.class.php';
 $do = new resume($moduleid);
 $menus = array (
     array('添加简历', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
@@ -11,6 +11,7 @@ $menus = array (
     array('回收站', '?moduleid='.$moduleid.'&file='.$file.'&action=recycle'),
     array('移动简历', '?moduleid='.$moduleid.'&file='.$file.'&action=move'),
 );
+
 if(in_array($action, array('add', 'edit'))) {
 	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
@@ -22,8 +23,8 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$TYPE[0] = '工作';
 	$MARRIAGE[0] = '婚姻';
 	$EDUCATION[0] = '学历';
-	$sfields = array('模糊', '标题', '简介', '会员名', '真实姓名', '毕业院校', '所学专业', '专业技能', '语言水平', '联系手机', '联系电话', '联系地址', 'Email', 'QQ', '微信', '模板', 'IP');
-	$dfields = array('keyword', 'title', 'introduce', 'username', 'truename', 'school', 'major', 'skill', 'language', 'mobile', 'telephone', 'address', 'email', 'qq', 'wx', 'template', 'ip');
+	$sfields = array('模糊', '标题', '简介', '会员名', '真实姓名', '毕业院校', '所学专业', '专业技能', '语言水平', '期望职位', '联系手机', '联系电话', '联系地址', 'Email', 'MSN', 'QQ', '模板', 'IP');
+	$dfields = array('keyword', 'title', 'introduce', 'username', 'truename', 'school', 'major', 'skill', 'language', 'job', 'mobile', 'telephone', 'address', 'email', 'msn', 'qq','template', 'ip');
 	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
 	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
 
@@ -43,9 +44,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime')) or $datetype = 'edittime';
-	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
+	$fromdate = isset($fromdate) && preg_match("/^([0-9]{8})$/", $fromdate) ? $fromdate : '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	(isset($todate) && is_date($todate)) or $todate = '';
+	$todate = isset($todate) && preg_match("/^([0-9]{8})$/", $todate) ? $todate : '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$areaid = isset($areaid) ? intval($areaid) : 0;
@@ -68,10 +69,10 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($minsalary) $condition .= " AND minsalary>=$minsalary";
 	if($maxsalary) $condition .= " AND maxsalary<=$maxsalary";
 	if($open) $condition .= " AND open=$open";
-	if($thumb) $condition .= " AND thumb<>''";
+	if($thumb) $condition .= " AND thumb!=''";
 	if($fromtime) $condition .= " AND `$datetype`>=$fromtime";
 	if($totime) $condition .= " AND `$datetype`<=$totime";
-	if($itemid) $condition .= " AND itemid=$itemid";
+	if($itemid) $condition = " AND itemid=$itemid";
 
 	$timetype = strpos($dorder[$order], 'add') !== false ? 'add' : '';
 }
@@ -103,6 +104,7 @@ switch($action) {
 			$open = 3;
 			$item = array();
 			$menuid = 0;
+			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -117,8 +119,8 @@ switch($action) {
 		if($submit) {
 			if($do->pass($post)) {
 				if($FD) fields_check($post_fields);
-				if($FD) fields_update($post_fields, $table, $do->itemid);
 				$do->edit($post);
+				if($FD) fields_update($post_fields, $table, $do->itemid);
 				dmsg('修改成功', $forward);
 			} else {
 				msg($do->errmsg);
@@ -130,6 +132,7 @@ switch($action) {
 			list($byear, $bmonth, $bday) = explode('-', $birthday);
 			$menuon = array('4', '3', '2', '1');
 			$menuid = $menuon[$status];
+			$tname = '修改简历';
 			include tpl('resume_'.$action, $module);
 		}
 	break;
@@ -145,7 +148,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 5;
-			include tpl($action);
+			include tpl($action, $module);
 		}
 	break;
 	case 'update':
@@ -183,7 +186,7 @@ switch($action) {
 	case 'recycle':
 		$lists = $do->get_list('status=0'.$condition);
 		$menuid = 4;
-		include tpl('resume', $module);
+		include tpl('resume_index', $module);
 	break;
 	case 'reject':
 		if($itemid && !$psize) {
@@ -192,7 +195,7 @@ switch($action) {
 		} else {
 			$lists = $do->get_list('status=1'.$condition);
 			$menuid = 3;
-			include tpl('resume', $module);
+			include tpl('resume_index', $module);
 		}
 	break;
 	case 'check':
@@ -202,13 +205,13 @@ switch($action) {
 		} else {
 			$lists = $do->get_list('status=2'.$condition);
 			$menuid = 2;
-			include tpl('resume', $module);
+			include tpl('resume_index', $module);
 		}
 	break;
 	default:
 		$lists = $do->get_list('status=3'.$condition);
 		$menuid = 1;
-		include tpl('resume', $module);
+		include tpl('resume_index', $module);
 	break;
 }
 ?>

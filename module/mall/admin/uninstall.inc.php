@@ -1,9 +1,8 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_data_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_comment_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_express_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_stat_".$moduleid."`");
-$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_view_".$moduleid."`");
+defined('IN_DESTOON') or exit('Access Denied');
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."`");
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_data`");
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_order`");
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_comment`");
+$db->query("DROP TABLE IF EXISTS `".$DT_PRE.$module."_stat`");
 ?>

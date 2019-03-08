@@ -1,7 +1,6 @@
 <?php 
 defined('IN_DESTOON') or exit('Access Denied');
 login();
-$MG['biz'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 $MG['mail'] or dalert(lang('message->without_permission_and_upgrade'), 'goback');
 require DT_ROOT.'/module/'.$module.'/common.inc.php';
 require DT_ROOT.'/include/post.func.php';
@@ -17,7 +16,7 @@ switch($action) {
 		} else {
 			message($L['mail_msg_not_add']);
 		}
-		dmsg($L['mail_msg_cancel'], '?action=index');
+		dmsg($L['mail_msg_cancel'], $MOD['linkurl'].'mail.php');
 	break;
 	case 'show':
 		$itemid or message();
@@ -30,21 +29,19 @@ switch($action) {
 		$r or message($L['mail_msg_not_add']);
 		$typeids = substr($r['typeids'], 1, -1);
 		$r = $db->get_one("SELECT COUNT(*) AS num FROM {$DT_PRE}mail WHERE typeid IN ($typeids)");
-		$items = $r['num'];
-		$pages = pages($items, $page, $pagesize);		
-		$lists = array();
+		$pages = pages($r['num'], $page, $pagesize);		
+		$mails = array();
 		$result = $db->query("SELECT * FROM {$DT_PRE}mail WHERE typeid IN ($typeids) ORDER BY itemid DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['editdate'] = timetodate($r['edittime'], 5);
 			$r['adddate'] = timetodate($r['addtime'], 5);
-			$lists[] = $r;
+			$mails[] = $r;
 		}
 		$head_title = $L['mail_title_list'];
 	break;
 	default:
 		if($submit) {
-			(isset($typeids) && is_array($typeids) && $typeids) or message($L['mail_msg_choose'], '?action=index');
-			$_typeids = '';
+			(isset($typeids) && is_array($typeids) && $typeids) or message($L['mail_msg_choose'], $MOD['linkurl'].'mail.php');
 			foreach($typeids as $t) {
 				$_typeids .= intval($t).',';
 			}
@@ -54,7 +51,7 @@ switch($action) {
 			} else {
 				$db->query("INSERT INTO {$DT_PRE}mail_list (username,email,typeids,addtime,edittime) VALUES ('$_username','$_email','$_typeids','$DT_TIME','$DT_TIME')");
 			}
-			dmsg($L['mail_msg_update'], '?action=index');
+			dmsg($L['mail_msg_update'], 'mail.php');
 		} else {
 			$mytypeids = array();
 			if($r) {
@@ -71,19 +68,6 @@ switch($action) {
 			$head_title = $L['mail_title'];
 		}
 	break;
-}
-if($DT_PC) {	
-	$menu_id = 2;
-} else {
-	$foot = '';
-	if($action == 'show') {
-		$back_link = '?action=list';
-	} else if($action == 'list') {
-		$pages = mobile_pages($items, $page, $pagesize);
-		$back_link = '?action=index';
-	} else {
-		$back_link = 'biz.php';
-	}
 }
 include template('mail', $module);
 ?>

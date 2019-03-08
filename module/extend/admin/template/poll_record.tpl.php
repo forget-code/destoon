@@ -1,16 +1,19 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
-show_menu($menus);
+//show_menu($menus);
 ?>
-<div class="sbox">
 <form action="?">
+<div class="tt">记录搜索</div>
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="pollid" value="<?php echo $pollid;?>"/>
-<?php echo $fields_select;?>&nbsp;
-<input type="text" size="30" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词" title="请输入关键词"/>&nbsp;
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<td>
+&nbsp;
+<input type="text" size="30" name="kw" value="<?php echo $kw;?>" title="会员或IP"/>&nbsp;
 <select name="itemid">
 <option value="0">投票选项</option>
 <?php
@@ -20,13 +23,17 @@ foreach($I as $k=>$v) {
 <?php
 }
 ?>
-</select>&nbsp;
-<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
+</select>
+&nbsp;
+<input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&pollid=<?php echo $pollid;?>&itemid=<?php echo $itemid;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="window.location='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>&pollid=<?php echo $pollid;?>';"/>
+</td>
+</tr>
+</table>
 </form>
-</div>
-<table cellspacing="0" class="tb ls">
+<div class="tt">投票记录[<?php echo $P['title'];?>]</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <th>IP</th>
 <th>地区</th>
@@ -35,15 +42,16 @@ foreach($I as $k=>$v) {
 <th>选项</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr align="center">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><?php echo $v['ip'];?></td>
 <td><?php echo ip2area($v['ip']);?></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a></td>
-<td class="px12"><?php echo $v['polldate'];?></td>
+<td class="px11"><?php echo $v['polldate'];?></td>
 <td><?php echo $I[$v['itemid']]['title'];?></td>
 </tr>
 <?php }?>
 </table>
-<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
+<div class="pages"><?php echo $pages;?></div>
+<br/>
 <script type="text/javascript">Menuon(1);</script>
 <?php include tpl('footer');?>

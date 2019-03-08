@@ -1,6 +1,7 @@
 <?php
 require '../../../common.inc.php';
 include DT_ROOT.'/api/map/google/config.inc.php';
+$map_key or exit;
 $map = isset($map) ? $map : '';
 preg_match("/^[0-9\.\,\-]{20,50}$/", $map) or $map = $map_mid;
 ?>
@@ -31,17 +32,15 @@ function mapOnLoad() {
 		map.addControl(new GLargeMapControl3D());
 		map.addControl(new GMenuMapTypeControl());
 		map.addControl(new GScaleControl());
-		map.addOverlay(new GMarker(new GLatLng(<?php echo $map;?>)));
-			GEvent.addListener(map, 'dblclick', function(overlay,point) {
+		map.addOverlay(new GMarker(new GLatLng(<?php echo $map;?>)));//
+			GEvent.addListener(map, 'click', function(overlay,point) {
 				if(overlay) {
 				} else if(point) {
 					map.clearOverlays();
 					map.addOverlay(new GMarker(point));
 					try {
-						//for(var x in point) alert(x+':'+point[x]);
-						//var xy = point.toString();
-						window.parent.document.getElementById('map').value = point.lat()+','+point.lng();
-						window.parent.cDialog();
+						window.opener.document.getElementById('map').value = point.y+','+point.x;
+						window.close();
 					} catch(e) {}
 				}
 			});
@@ -59,15 +58,19 @@ function isArray(a) {return isObject(a) && a.constructor == Array;}
 function isObject(a) {return (a && typeof a == 'object') || isFunction(a);}
 function isFunction(a) {return typeof a == 'function';}
 window.onload=mapOnLoad;
+//]]>
 </script>
 </head>
 <body>
 <script type="text/javascript">
+//<![CDATA[
 if (GBrowserIsCompatible()) {
 document.write('<div id="map" class="map" style="width:100%;height:100%;"></div>');
 } else {
 document.write('The map could not be displayed on your browser.');
 }
+//]]>
 </script>
+<noscript>The map requires javascript to be enabled.</noscript>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
 defined('IN_DESTOON') or exit('Access Denied');
@@ -13,14 +13,11 @@ $L['common_login'] = '您的帐号在别处(IP:{V0})登录，您被迫下线\n�
 /* upload.php */
 $L['upload_refuse'] = '没有权限上传文件';
 $L['upload_limit'] = '上传数量超出限制，同一信息最多上传{V0}文件';
-$L['upload_credit'] = '上传文件需扣除{V0}'.$DT['credit_name'].'，当前'.$DT['credit_name'].'余额{V1}';
 $L['upload_limit_day'] = '24小时内最多上传{V0}文件，当前已经上传{V1}文件';
-$L['upload_bad'] = '错误的图片文件格式';
-$L['upload_cmyk'] = '浏览器不支持CMYK模式图片，请转换为RGB格式';
+$L['upload_bad'] = '错误的文件格式';
 $L['upload_jpg'] = '系统不支持GIF格式图片处理，请上传JPG或者PNG格式';
 $L['upload_fail'] = '上传失败';
 /* .class.php */
-$L['pass_areaid'] = '请选择地区';
 $L['pass_catid'] = '请选择分类';
 $L['pass_cate'] = '请选择行业分类';
 $L['pass_title'] = '请填写标题';
@@ -30,7 +27,13 @@ $L['pass_thumb'] = '请上传标题图片';
 $L['pass_logo'] = '请上传LOGO';
 $L['pass_date'] = '日期格式错误';
 $L['pass_todate'] = '信息过期时间必须在当前时间之后';
-$L['pass_max'] = '内容过长，限制为'.DT_MAX_LEN.'字符';
+/*
+$L['pass_product'] = '请填写产品名称';
+$L['pass_product_op_pid'] = '请选择商品类型';
+$L['pass_product_op_name'] = '请填写属性名称';
+$L['pass_product_op_value'] = '请填写备选值';
+$L['pass_product_op_value_min'] = '最少需要设定2个备选值';
+*/
 $L['pass_truename'] = '请填写联系人';
 $L['pass_address'] = '请填写详细地址';
 $L['pass_postcode'] = '请填写邮政编码';
@@ -38,7 +41,7 @@ $L['pass_telephone'] = '请填写电话号码';
 $L['pass_mobile'] = '请填写手机号码';
 $L['pass_email'] = '请填写电子邮件';
 $L['pass_qq'] = '请填写正确的QQ';
-$L['pass_wx'] = '请填写正确的微信';
+$L['pass_msn'] = '请填写正确的MSN';
 $L['pass_down_fileurl'] = '请上传文件或填写地址';
 $L['pass_down_badurl'] = '文件地址错误';
 $L['pass_down_filesize'] = '请填写文件大小';

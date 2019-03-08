@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 所属分类</td>
 <td><?php echo $_admin == 1 ? category_select('post[catid]', '选择分类', $catid, $moduleid) : ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?> <span id="dcatid" class="f_red"></span></td>
@@ -22,7 +23,13 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 产品名称</td>
 <td>
 <input name="post[tag]" type="text" size="20" value="<?php echo $tag;?>" id="tag"/>&nbsp;
-<span onclick="price();" class="jt">[获取报价单]</span> <span id="dtag" class="f_red"></span>
+<select name="post[pid]" onchange="Dd('tag').value = this.value > 0 ? this.options[this.selectedIndex].innerHTML : '';">
+<option value="0">选择产品</option>
+<?php foreach($QP as $k=>$v) { ?>
+<option value="<?php echo $v['pid'];?>"<?php echo $pid==$v['pid'] ? ' selected' : '';?>><?php echo $v['title'];?></option>
+<?php } ?>
+</select>&nbsp;
+<span onclick="price();" class="jt">[获取报价单]</span>
 </td>
 </tr>
 <tr>
@@ -36,6 +43,7 @@ var property_itemid = <?php echo $itemid;?>;
 var property_admin = 1;
 </script>
 <script type="text/javascript" src="<?php echo DT_PATH;?>file/script/property.js"></script>
+<?php if($itemid) { ?><script type="text/javascript">setTimeout("load_property()", 1000);</script><?php } ?>
 <tbody id="load_property" style="display:none;">
 <tr><td></td><td></td></tr>
 </tbody>
@@ -44,15 +52,15 @@ var property_admin = 1;
 <tr>
 <td class="tl"><span class="f_red">*</span> <?php echo $MOD['name'];?>内容</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
 <td class="tl" height="30"><span class="f_hid">*</span> 内容选项</td>
 <td>
 <a href="javascript:pagebreak();"><img src="admin/image/pagebreak.gif" align="absmiddle"/> 插入分页符</a>&nbsp;&nbsp;
-<input type="checkbox" name="post[save_remotepic]" value="1"<?php if($MOD['save_remotepic']) echo 'checked';?>/> 下载远程图片&nbsp;&nbsp;
-<input type="checkbox" name="post[clear_link]" value="1"<?php if($MOD['clear_link']) echo 'checked';?>/> 清除链接&nbsp;&nbsp;
+<input type="checkbox" name="post[save_remotepic]" value="1"<?php if($MOD['save_remotepic']) echo 'checked';?>/>下载远程图片&nbsp;&nbsp;
+<input type="checkbox" name="post[clear_link]" value="1"<?php if($MOD['clear_link']) echo 'checked';?>/>清除链接&nbsp;&nbsp;
 设置内容第 <input name="post[thumb_no]" type="text" size="2" value=""/> 张图片为标题图
 </td>
 </tr>
@@ -71,7 +79,7 @@ var property_admin = 1;
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 
 <tr>
@@ -99,7 +107,7 @@ var property_admin = 1;
 </tr>
 <?php } ?>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
 <?php if($action == 'add') { ?>
@@ -108,10 +116,10 @@ var property_admin = 1;
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>
@@ -138,25 +146,38 @@ function check() {
 		return false;
 	}
 	<?php echo $FD ? fields_js() : '';?>
-	<?php echo $CP ? property_js() : '';?>
+	if(Dd('property_require') != null) {
+		var ptrs = Dd('property_require').getElementsByTagName('option');
+		for(var i = 0; i < ptrs.length; i++) {		
+			f = 'property-'+ptrs[i].value;
+			if(Dd(f).value == 0 || Dd(f).value == '') {
+				Dmsg('请填写或选择'+ptrs[i].innerHTML, f);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 function price() {
 	if(Dd('tag').value) {
-		var day = prompt('请限定报价更新日期(yyyy-mm-dd格式)，取消或留空表示不限日期', '<?php echo timetodate($DT_TIME, 3);?>');
+		var day = prompt('请限定产品更新日期(yyyy-mm-dd格式)，取消或留空表示不限日期', '<?php echo timetodate($DT_TIME, 3);?>');
 		if(day == null) day = '';
-		$.get('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=price&day='+day+'&tag='+Dd('tag').value, function(data) {
-			if(data) {
-				var c = data.split('|*|');
-				if(confirm('查找到 '+c[0]+' 条产品报价，是否替换编辑器中当前内容？')) EditorAPI('content', 'set', c[1]);
-			} else {
-				Dmsg('未找到产品报价，请换个产品名称或者日期再试', 'tag');
-			}
-		});
+		makeRequest('moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=price&day='+day+'&tag='+Dd('tag').value, '?', '_price');
 	} else {
-		Dmsg('请填写产品名称', 'tag');
+		alert('请填写产品名称');
+		Dd('tag').focus();
 	}
 }
-Menuon(<?php echo $menuid;?>);
+function _price() {    
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) {
+			var c = xmlHttp.responseText.split('|*|');
+			if(confirm('查找到 '+c[0]+' 条产品报价，是否替换编辑器中当前内容？')) FCKeditorAPI.GetInstance('content').SetData(c[1]);
+		} else {
+			confirm('未找到产品报价，请换个产品名称再试');
+		}
+	}
+}
 </script>
+<script type="text/javascript">Menuon(<?php echo $menuid;?>);</script>
 <?php include tpl('footer');?>

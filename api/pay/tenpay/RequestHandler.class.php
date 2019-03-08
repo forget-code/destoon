@@ -1,5 +1,4 @@
 <?php
-defined('IN_DESTOON') or exit('Access Denied');
 /**
  * 请求类
  * ============================================================================
@@ -35,7 +34,7 @@ class RequestHandler {
 	}
 	
 	function RequestHandler() {
-		$this->gateUrl = "https://www.tenpay.com/cgi-bin/v1.0/service_gate.cgi";
+		$this->gateUrl = "http://service.tenpay.com/cgi-bin/v3.0/payservice.cgi";
 		$this->key = "";
 		$this->parameters = array();
 		$this->debugInfo = "";
@@ -147,7 +146,9 @@ class RequestHandler {
 			}
 		}
 		$signPars .= "key=" . $this->getKey();
+		
 		$sign = strtolower(md5($signPars));
+		
 		$this->setParameter("sign", $sign);
 		
 		//debug信息

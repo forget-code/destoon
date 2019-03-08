@@ -1,33 +1,34 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<div class="tt">发送邮件</div>
 <form method="post" action="?" id="dform" onsubmit="return check();">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="send" value="1"/>
 <input type="hidden" name="preview" id="preview" value="0"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 收件人</td>
 <td>
-	<input type="radio" name="sendtype" value="1" id="s1" onclick="ck(1);"<?php echo $sendtype == 1 ? ' checked' : '';?>/> <label for="s1">单收件人</label>&nbsp;&nbsp;
-	<input type="radio" name="sendtype" value="2" id="s2" onclick="ck(2);"<?php echo $sendtype == 2 ? ' checked' : '';?>/> <label for="s2">多收件人</label>&nbsp;&nbsp;
-	<input type="radio" name="sendtype" value="3" id="s3" onclick="ck(3);"<?php echo $sendtype == 3 ? ' checked' : '';?>/> <label for="s3">列表群发</label>
+	<input type="radio" name="sendtype" value="1" id="s1" onclick="ck(1);" checked/> <label for="s1">单收件人</label>
+	<input type="radio" name="sendtype" value="2" id="s2" onclick="ck(2);"/> <label for="s2">多收件人</label>
+	<input type="radio" name="sendtype" value="3" id="s3" onclick="ck(3);"/> <label for="s3">列表群发</label>
 </td>
 </tr>
 <tbody id="t1" style="display:;">
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件地址</td>
-<td><input type="text" size="30" name="email" value=""/></td>
+<td><input type="text" size="30" name="email" value="<?php echo $email;?>"/></td>
 </tr>
 </tbody>
 <tbody id="t2" style="display:none;">
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件地址</td>
-<td class="f_gray"><textarea name="emails" rows="4" cols="50"><?php echo $emails;?></textarea> [一行一个邮件地址]</td>
+<td class="f_gray"><textarea name="emails" rows="4" cols="50"></textarea> [一行一个邮件地址]</td>
 </tr>
 </tbody>
 <tbody id="t3" style="display:none;">
@@ -54,10 +55,6 @@ show_menu($menus);
 <td class="tl"><span class="f_red">*</span> 每轮发送邮件数</td>
 <td><input type="text" size="5" name="pernum" id="pernum" value="5"/></td>
 </tr>
-<tr>
-<td class="tl"><span class="f_red">*</span> 发送时间间隔</td>
-<td><input type="text" size="5" name="pertime" id="pertime" value="5"/><?php tips('例如设置为5，则系统在每轮发送之后暂停5秒，以免因为发送过快而被收件服务器拒收');?></td>
-</tr>
 </tbody>
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件标题</td>
@@ -74,7 +71,7 @@ show_menu($menus);
 <tr>
 <td class="tl"><span class="f_red">*</span> 邮件正文</td>
 <td>
-<textarea name="content" id="content" class="dsn"></textarea><?php echo deditor($moduleid, 'content', 'Destoon', '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<textarea name="content" id="content" class="dsn"></textarea><?php echo deditor($moduleid, 'content', 'Destoon', '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 <tr>
@@ -93,7 +90,7 @@ show_menu($menus);
 <td><input type="text" size="5" name="fields" value="email"/> 需要和邮件导出时一致，默认为email</td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="发 送" class="btn-g" onclick="Dd('preview').value=0;this.form.target='';"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value="预 览" class="btn" onclick="Dd('preview').value=1;this.form.target='_blank';"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn" onclick="Dd('preview').value=0;this.form.target='';"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value=" 预 览 " class="btn" onclick="Dd('preview').value=1;this.form.target='_blank';"/></div>
 </form>
 <?php load('clear.js'); ?>
 <script type="text/javascript">
@@ -103,7 +100,6 @@ function ck(id) {
 	Dd('t'+id).style.display='';
 	i = id;
 }
-ck(<?php echo $sendtype;?>);
 function check() {
 	var l;
 	var f;

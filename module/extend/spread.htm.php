@@ -28,7 +28,7 @@ $pages = '';
 $datetype = 5;
 $showpage = 0;
 $tags = $tag = array();
-$result = $db->query("SELECT * FROM ".get_table($moduleid)." WHERE `{$id}` IN ($spread_itemids)");
+$result = $db->query("SELECT * FROM {$DT_PRE}{$spread_module} WHERE `{$id}` IN ($spread_itemids)");
 while($r = $db->fetch_array($result)) {
 	if(strpos($r['linkurl'], '://') === false) $r['linkurl'] = $MODULE[$spread_moduleid]['linkurl'].$r['linkurl'];
 	$tag[$r[$id]] = $r;
@@ -43,7 +43,7 @@ foreach($itemids as $v) {//Order
 }
 ob_start();
 echo '<!--'.$totime.'-->';
-include template('spread', 'chip');
+include template('spread_code', $module);
 $data = ob_get_contents();
 ob_clean();
 file_put($filename, $data);

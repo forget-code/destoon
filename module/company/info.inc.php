@@ -8,39 +8,30 @@ $table_data = $DT_PRE.'info_data_'.$moduleid;
 if($itemid) {
 	$item = $db->get_one("SELECT * FROM {$table} WHERE itemid=$itemid");
 	if(!$item || $item['status'] < 3 || $item['username'] != $username) dheader($MENU[$menuid]['linkurl']);
-	if($item['islink']) dheader($item['linkurl']);
 	unset($item['template']);
 	extract($item);
 	$CAT = get_cat($catid);
 	$content_table = content_table($moduleid, $itemid, $MOD['split'], $table_data);
 	$t = $db->get_one("SELECT content FROM {$content_table} WHERE itemid=$itemid");
 	$content = $t['content'];
-	$content = $DT_PC ? parse_video($content) : video5($content);
 	$CP = $MOD['cat_property'] && $CAT['property'];
 	if($CP) {
 		require DT_ROOT.'/include/property.func.php';
 		$options = property_option($catid);
 		$values = property_value($moduleid, $itemid);
 	}
-	$adddate = timetodate($addtime, 5);
-	$editdate = timetodate($edittime, 5);
+	$adddate = timetodate($addtime, 3);
+	$editdate = timetodate($edittime, 3);
 	$todate = $totime ? timetodate($totime, 3) : 0;
 	$expired = $totime && $totime < $DT_TIME ? true : false;
-	$linkurl = $MOD['linkurl'].$linkurl;
+	$linkurl = linkurl($MOD['linkurl'].$linkurl, 1);
 	$thumbs = get_albums($item);
 	$albums =  get_albums($item, 1);
-	$album_js = 1;
 	$update = '';
-	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
-	$head_canonical = $linkurl;
+	include DT_ROOT.'/include/update.inc.php';
 	$head_title = $title.$DT['seo_delimiter'].$head_title;
 	$head_keywords = $keyword;
 	$head_description = $introduce ? $introduce : $title;
-	if($DT_PC) {
-		//
-	} else {
-		$back_link = userurl($username, "file=$file", $domain);
-	}
 } else {
 	$url = "file=$file";
 	$condition = "username='$username' AND status=3";
@@ -55,14 +46,14 @@ if($itemid) {
 	$offset = ($page-1)*$pagesize;
 	$r = $db->get_one("SELECT COUNT(*) AS num FROM {$table} WHERE $condition", 'CACHE');
 	$items = $r['num'];
-	$pages = $DT_PC ? home_pages($items, $page, $pagesize, $demo_url) : mobile_pages($items, $page, $pagesize, $demo_url);
+	$pages = home_pages($items, $pagesize, $demo_url, $page);
 	$lists = array();
 	if($items) {
 		$result = $db->query("SELECT ".$MOD['fields']." FROM {$table} WHERE $condition ORDER BY edittime DESC LIMIT $offset,$pagesize");
 		while($r = $db->fetch_array($result)) {
 			$r['alt'] = $r['title'];
 			$r['title'] = set_style($r['title'], $r['style']);
-			$r['linkurl'] = $homeurl ? ($DT_PC ? $MOD['linkurl'] : $MOD['mobile']).$r['linkurl'] : userurl($username, "file=$file&itemid=$r[itemid]", $domain);
+			$r['linkurl'] = $homeurl ? $MOD['linkurl'].$r['linkurl'] : userurl($username, "file=$file&itemid=$r[itemid]", $domain);
 			if($kw) {
 				$r['title'] = str_replace($kw, '<span class="highlight">'.$kw.'</span>', $r['title']);
 				$r['introduce'] = str_replace($kw, '<span class="highlight">'.$kw.'</span>', $r['introduce']);
@@ -70,11 +61,6 @@ if($itemid) {
 			$lists[] = $r;
 		}
 		$db->free_result($result);
-	}
-	if($DT_PC) {
-		//
-	} else {
-		if($kw) $back_link = userurl($username, "file=$file", $domain);
 	}
 }
 include template('info', $template);

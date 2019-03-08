@@ -1,28 +1,30 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 class admin {
 	var $userid;
 	var $username;
+	var $founderid;
+	var $db;
+	var $pre;
 	var $errmsg = errmsg;
 
-	function __construct() {
-		global $admin;
-	}
-
 	function admin() {
-		$this->__construct();
+		global $db, $admin, $CFG;
+		$this->founderid = $CFG['founderid'];
+		$this->db = &$db;
+		$this->pre = $this->db->pre;
 	}
 
 	function is_member($username) {
-		return DB::get_one("SELECT userid FROM ".DT_PRE."member WHERE username='$username'");
+		return $this->db->get_one("SELECT userid FROM {$this->pre}member WHERE username='$username'");
 	}
 
 	function count_admin() {
-		$r = DB::get_one("SELECT COUNT(*) AS num FROM ".DT_PRE."member WHERE groupid=1 AND admin=1 ");
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->pre}member WHERE groupid=1 AND admin=1 ");
 		return $r['num'];
 	}
 
@@ -31,23 +33,23 @@ class admin {
 		$r = $this->is_member($username);
 		if(!$r) return $this->_('会员不存在');
 		$userid = $r['userid'];
-		if(is_founder($userid)) {
+		if($this->founderid == $userid) {
 			$admin = 1;
 			$aid = 0;
 		}
 		if($admin == 1) $aid = 0;
-		DB::query("UPDATE ".DT_PRE."member SET groupid=1,admin=$admin,role='$role',aid=$aid WHERE userid=$userid");
-		DB::query("UPDATE ".DT_PRE."company SET groupid=1 WHERE userid=$userid");
+		$this->db->query("UPDATE {$this->pre}member SET groupid=1,admin=$admin,role='$role',aid=$aid WHERE userid=$userid");
+		$this->db->query("UPDATE {$this->pre}company SET groupid=1 WHERE userid=$userid");
 		return true;
 	}
 
 	function move_admin($username) {
 		$r = $this->get_one($username);
 		if($r && $r['admin'] > 0) {			
-			if(is_founder($r['userid'])) return $this->_('创始人不可改变级别');
+			if($r['userid'] == $this->founderid) return $this->_('创始人不可改变级别');
 			if($r['admin'] == 1 && $this->count_admin() < 2) return $this->_('系统最少需要保留一位超级管理员');
 			$admin = $r['admin'] == 1 ? 2 : 1;
-			DB::query("UPDATE ".DT_PRE."member SET admin=$admin WHERE username='$username'");
+			$this->db->query("UPDATE {$this->pre}member SET admin=$admin WHERE username='$username'");
 			return true;
 		} else {
 			return $this->_('管理员不存在');
@@ -57,13 +59,13 @@ class admin {
 	function delete_admin($username) {
 		$r = $this->get_one($username);
 		if($r) {
-			if(is_founder($r['userid'])) return $this->_('创始人不可删除');
+			if($r['userid'] == $this->founderid) return $this->_('创始人不可删除');
 			if($r['admin'] == 1 && $this->count_admin() < 2) return $this->_('系统最少需要保留一位超级管理员');
 			$userid = $r['userid'];
 			$groupid = $r['regid'] ? $r['regid'] : 6;
-			DB::query("UPDATE ".DT_PRE."member SET groupid=$groupid,admin=0,role='',aid=0 WHERE userid=$userid");
-			DB::query("UPDATE ".DT_PRE."company SET groupid=$groupid WHERE userid=$userid");
-			DB::query("DELETE FROM ".DT_PRE."admin WHERE userid=$userid");
+			$this->db->query("UPDATE {$this->pre}member SET groupid=$groupid,admin=0,role='',aid=0 WHERE userid=$userid");
+			$this->db->query("UPDATE {$this->pre}company SET groupid=$groupid WHERE userid=$userid");
+			$this->db->query("DELETE FROM {$this->pre}admin WHERE userid=$userid");
 			cache_delete('menu-'.$userid.'.php');
 			cache_delete('right-'.$userid.'.php');
 			return true;
@@ -74,23 +76,18 @@ class admin {
 
 	function get_one($user, $type = 1) {
 		$fields = $type ? 'username' : 'userid';
-        return DB::get_one("SELECT * FROM ".DT_PRE."member WHERE `$fields`='$user'");
+        return $this->db->get_one("SELECT * FROM {$this->pre}member WHERE `$fields`='$user'");
 	}
 
 	function get_list($condition) {
-		global $pages, $page, $pagesize, $offset, $pagesize, $CFG, $sum;
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = DB::get_one("SELECT COUNT(*) AS num FROM ".DT_PRE."member WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);
+		global $pages, $page, $pagesize, $offset, $pagesize, $CFG;
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->pre}member WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);	
 		$admins = array();
-		$result = DB::query("SELECT * FROM ".DT_PRE."member WHERE $condition ORDER BY admin ASC,userid ASC LIMIT $offset,$pagesize");
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->pre}member WHERE $condition ORDER BY admin ASC,userid ASC LIMIT $offset,$pagesize");
+		while($r = $this->db->fetch_array($result)) {
 			$r['logintime'] = timetodate($r['logintime'], 5);
-			$r['adminname'] = $r['admin'] == 1 ? (is_founder($r['userid']) ? '<span class="f_red">网站创始人</span>' : '<span class="f_blue">超级管理员</span>') : '普通管理员';
+			$r['adminname'] = $r['admin'] == 1 ? ($CFG['founderid'] == $r['userid'] ? '<span class="f_red">网站创始人</span>' : '<span class="f_blue">超级管理员</span>') : '普通管理员';
 			$admins[] = $r;
 		}
 		return $admins;
@@ -99,8 +96,8 @@ class admin {
 	function get_right($userid) {
 		global $MODULE;
 		$rights = array();
-		$result = DB::query("SELECT * FROM ".DT_PRE."admin WHERE userid=$userid AND url='' ORDER BY moduleid DESC,file DESC,adminid DESC ");
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->pre}admin WHERE userid=$userid AND url='' ORDER BY moduleid DESC,file DESC,adminid DESC ");
+		while($r = $this->db->fetch_array($result)) {
 			@include DT_ROOT.'/'.($r['moduleid'] == 1 ? 'admin' : 'module/'.$MODULE[$r['moduleid']]['module'].'/admin').'/config.inc.php';
 			$r['name'] = isset($RT['file'][$r['file']]) ? '('.$RT['file'][$r['file']].')' : '';
 			$r['module'] = '('.$MODULE[$r['moduleid']]['name'].')';
@@ -111,8 +108,8 @@ class admin {
 
 	function get_menu($userid) {
 		$menus = array();
-		$result = DB::query("SELECT * FROM ".DT_PRE."admin WHERE userid=$userid AND url!='' ORDER BY listorder ASC,adminid ASC ");
-		while($r = DB::fetch_array($result)) {
+		$result = $this->db->query("SELECT * FROM {$this->pre}admin WHERE userid=$userid AND url!='' ORDER BY listorder ASC,adminid ASC ");
+		while($r = $this->db->fetch_array($result)) {
 			$menus[] = $r;
 		}
 		return $menus;
@@ -135,7 +132,7 @@ class admin {
 			}
 		}
 		$this->edit($right, $type);
-		if($admin == 1) DB::query("DELETE FROM ".DT_PRE."admin WHERE userid=$userid AND url=''");
+		if($admin == 1) $this->db->query("DELETE FROM {$this->pre}admin WHERE userid=$userid AND url=''");
 		$this->cache_right($userid);
 		$this->cache_menu($userid);
 		return true;
@@ -144,7 +141,7 @@ class admin {
 	function add($userid, $right, $admin) {
 		if(isset($right['url'])) {
 			if(!$right['title'] || !$right['url']) return false;
-			$r = DB::get_one("SELECT * FROM ".DT_PRE."admin WHERE userid=$userid AND url='".$right['url']."'");
+			$r = $this->db->get_one("SELECT * FROM {$this->pre}admin WHERE userid=$userid AND url='".$right['url']."'");
 			if($r) return false;
 			if($admin == 2 && defined('MANAGE_ADMIN')) {
 				$r = $this->url_right($right['url']);
@@ -173,7 +170,7 @@ class admin {
 		}		
         $sql1 = substr($sql1, 1);
         $sql2 = substr($sql2, 1);
-		DB::query("INSERT INTO ".DT_PRE."admin ($sql1) VALUES($sql2)");
+		$this->db->query("INSERT INTO {$this->pre}admin ($sql1) VALUES($sql2)");
 	}
 
 	function edit($right, $type = 0) {
@@ -208,7 +205,7 @@ class admin {
 				$sql .= ",$k='$v'";
 			}
 			$sql = substr($sql, 1);
-			DB::query("UPDATE ".DT_PRE."admin SET $sql WHERE adminid='$key'");
+			$this->db->query("UPDATE {$this->pre}admin SET $sql WHERE adminid='$key'");
 		}
 	}
 
@@ -263,7 +260,7 @@ class admin {
 	}
 
 	function delete($adminid) {
-		DB::query("DELETE FROM ".DT_PRE."admin WHERE adminid=$adminid");
+		$this->db->query("DELETE FROM {$this->pre}admin WHERE adminid=$adminid");
 	}
 
 	function _($e) {

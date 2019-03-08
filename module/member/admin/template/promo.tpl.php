@@ -1,89 +1,102 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
+<?php if($print) { ?>
+<table cellpadding="2" cellspacing="1" class="tb">
+<tr>
+<th>优惠码</th>
+<th>类型</th>
+<th>面额</th>
+<th>有效期至</th>
+</tr>
+<?php foreach($lists as $k=>$v) {?>
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
+<td><?php echo $v['number'];?></td>
+<td><?php echo $v['type'] ? '有效期' : '抵金额';?></td>
+<td class="f_blue"><?php echo $v['amount'];?></td>
+<td><?php echo $v['totime'];?></td>
+</tr>
+<?php }?>
+</table>
+<div class="pages"><?php echo $pages;?></div>
+<script type="text/javascript">Dh('destoon_menu');</script>
+<?php exit; } ?>
+<div class="tt">优惠码搜索</div>
 <form action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
-<input type="hidden" name="action" value="<?php echo $action;?>"/>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td>&nbsp;
 <?php echo $fields_select;?>&nbsp;
-<input type="text" size="40" name="kw" value="<?php echo $kw;?>" placeholder="请输入关键词"/>&nbsp;
+<input type="text" size="20" name="kw" value="<?php echo $kw;?>"/>&nbsp;
+<select name="status">
+<option value="0">状态</option>
+<option value="1" <?php if($status == 1) echo 'selected';?>>已使用</option>
+<option value="2" <?php if($status == 2) echo 'selected';?>>已过期</option>
+</select>&nbsp;
 <?php echo $order_select;?>&nbsp;
 <input type="text" name="psize" value="<?php echo $pagesize;?>" size="2" class="t_c" title="条/页"/>&nbsp;
 <input type="submit" value="搜 索" class="btn"/>&nbsp;
-<input type="button" value="重 置" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>');"/>
+<input type="button" value="重 置" class="btn" onclick="window.location='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=<?php echo $action;?>';"/>
 </td>
 </tr>
 <tr>
 <td>&nbsp;
 <select name="timetype">
-<option value="addtime" <?php if($timetype == 'addtime') echo 'selected';?>>添加时间</option>
-<option value="edittime" <?php if($timetype == 'edittime') echo 'selected';?>>更新时间</option>
-<option value="fromtime" <?php if($timetype == 'fromtime') echo 'selected';?>>开始时间</option>
-<option value="totime" <?php if($timetype == 'totime') echo 'selected';?>>结束时间</option>
+<option value="updatetime" <?php if($timetype == 'updatetime') echo 'selected';?>>使用时间</option>
+<option value="totime" <?php if($timetype == 'totime') echo 'selected';?>>到期时间</option>
+<option value="addtime" <?php if($timetype == 'addtime') echo 'selected';?>>制卡时间</option>
 </select>&nbsp;
-<?php echo dcalendar('fromdate', $fromdate);?> 至 <?php echo dcalendar('todate', $todate);?>&nbsp;
-<select name="mtype">
-<option value="price" <?php if($mtype == 'price') echo 'selected';?>>优惠额度</option>
-<option value="cost" <?php if($mtype == 'cost') echo 'selected';?>>最低消费</option>
-<option value="amount" <?php if($mtype == 'amount') echo 'selected';?>>数量限制</option>
-<option value="number" <?php if($mtype == 'number') echo 'selected';?>>领券人数</option>
-</select>&nbsp;
+<?php echo dcalendar('fromtime', $fromtime);?> 至 <?php echo dcalendar('totime', $totime);?>&nbsp;
+额度：
 <input type="text" name="minamount" value="<?php echo $minamount;?>" size="5"/> 至 
 <input type="text" name="maxamount" value="<?php echo $maxamount;?>" size="5"/>&nbsp;
-<select name="open">
-<option value="-1" <?php if($open == -1) echo 'selected';?>>会员领取</option>
-<option value="1" <?php if($open == 1) echo 'selected';?>>开启</option>
-<option value="0" <?php if($open == 0) echo 'selected';?>>关闭</option>
-</select>&nbsp;
-卖家: <input type="text" name="username" value="<?php echo $username;?>" size="10"/>&nbsp;
+会员名：<input type="text" name="username" value="<?php echo $username;?>" size="10"/>&nbsp;
+代码：<input type="text" name="number" value="<?php echo $number;?>" size="10"/>&nbsp;
 </td>
 </tr>
 </table>
 </form>
+<div class="tt">优惠码管理</div>
 <form method="post">
-<table cellspacing="0" class="tb ls">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
-<th width="20"><input type="checkbox" onclick="checkall(this.form);"/></th>
-<th>优惠名称</th>
-<th>卖家</th>
-<th>额度</th>
-<th>最低消费</th>
-<th>数量限制</th>
-<th>领券人数</th>
-<th width="130">开始时间</th>
-<th width="130">结束时间</th>
-<th width="130">添加时间</th>
-<th width="70">操作</th>
+<th width="25"><input type="checkbox" onclick="checkall(this.form);"/></th>
+<th>优惠代码</th>
+<th>类型</th>
+<th>优惠额度</th>
+<th>有效期至</th>
+<th>使用会员</th>
+<th>使用时间/次数</th>
+<th>使用IP</th>
+<th>重复</th>
+<th>生成时间</th>
 </tr>
 <?php foreach($lists as $k=>$v) {?>
-<tr align="center">
+<tr onmouseover="this.className='on';" onmouseout="this.className='';" align="center">
 <td><input type="checkbox" name="itemid[]" value="<?php echo $v['itemid'];?>"/></td>
-<td><?php echo $v['title'];?></td>
+<td<?php if($v['reuse']) { ?> class="f_b"<?php } ?>><?php echo $v['number'];?></td>
+<td><?php echo $v['type'] ? '有效期' : '抵金额';?></td>
+<td class="f_blue"><?php echo $v['amount'];?><?php echo $v['type'] ? '天' : $DT['money_unit'];?></td>
+<td><?php echo $v['totime'];?></td>
 <td><a href="javascript:_user('<?php echo $v['username'];?>');"><?php echo $v['username'];?></a></td>
-<td title="备注:<?php echo $v['note'];?>"><?php echo $v['price'];?></td>
-<td><?php echo $v['cost'];?></td>
-<td><?php echo $v['amount'];?></td>
-<td><a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=coupon&pid=<?php echo $v['itemid'];?>', '领券记录');"><?php echo $v['number'];?></a></td>
-<td class="px12"><?php echo timetodate($v['fromtime'], 5);?></td>
-<td class="px12"><?php echo timetodate($v['totime'], 5);?></td>
-<td class="px12" title="修改时间:<?php echo timetodate($v['edittime'], 5);?>"><?php echo timetodate($v['addtime'], 5);?></td>
-<td>
-<a href="javascript:Dwidget('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=give&itemid=<?php echo $v['itemid'];?>', '赠送优惠券');"><img src="admin/image/add.png" width="16" height="16" title="赠送" alt=""/></a>&nbsp;
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=edit&itemid=<?php echo $v['itemid'];?>"><img src="admin/image/edit.png" width="16" height="16" title="修改" alt=""/></a>&nbsp;
-<a href="?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete&itemid=<?php echo $v['itemid'];?>" onclick="return _delete();"><img src="admin/image/delete.png" width="16" height="16" title="删除" alt=""/></a>
-</td>
+<td><?php echo $v['updatetime'];?></td>
+<td><a href="javascript:_ip('<?php echo $v['ip'];?>');" title="显示IP所在地"><?php echo $v['ip'];?></a></td>
+<td><?php echo $v['reuse'] ? '<span class="f_red">是</span>' : '否';?></td>
+<td title="制做人:<?php echo $v['editor'];?>"><?php echo $v['addtime'];?></td>
 </tr>
 <?php }?>
 </table>
 <div class="btns">
-<input type="submit" value=" 删 除 " class="btn-r" onclick="if(confirm('确定要删除选中优惠吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>
+<input type="submit" value=" 批量删除 " class="btn" onclick="if(confirm('确定要删除选中优惠码吗？此操作将不可撤销')){this.form.action='?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&action=delete'}else{return false;}"/>&nbsp;
+<input type="button" value=" 打印代码 " class="btn" onclick="window.open('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>&print=1');"/>&nbsp;
+<input type="button" value="导出SQL" class="btn" onclick="Go('?file=database&action=export&table=<?php echo $table;?>');"/>
 </div>
 </form>
-<?php echo $pages ? '<div class="pages">'.$pages.'</div>' : '';?>
+<div class="pages"><?php echo $pages;?></div>
 <script type="text/javascript">Menuon(1);</script>
+<br/>
 <?php include tpl('footer');?>

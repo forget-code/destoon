@@ -1,23 +1,22 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-$qid = isset($qid) ? intval($qid) : 0;
-require DT_ROOT.'/module/'.$module.'/answer.class.php';
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/answer.class.php';
 $do = new answer();
 $menus = array (
-    array('答案列表', '?moduleid='.$moduleid.'&file='.$file.'&qid='.$qid),
-    array('答案审核', '?moduleid='.$moduleid.'&file='.$file.'&qid='.$qid.'&action=check'),
+    array('答案列表', '?moduleid='.$moduleid.'&file='.$file),
+    array('答案审核', '?moduleid='.$moduleid.'&file='.$file.'&action=check'),
 );
 $this_forward = '?moduleid='.$moduleid.'&file='.$file;
 if(in_array($action, array('', 'check'))) {
-	$sfields = array('内容', '会员名', '昵称', 'IP', '问题ID', '答案ID', '参考资料');
-	$dfields = array('content', 'username', 'passport', 'ip', 'qid', 'itemid', 'linkurl');
+	$sfields = array('内容', '会员名', 'IP', '问题ID', '答案ID', '参考资料');
+	$dfields = array('content', 'username', 'ip', 'qid', 'itemid', 'linkurl');
 	$sorder  = array('结果排序方式', '添加时间降序', '添加时间升序', '投票次数降序', '投票次数升序');
 	$dorder  = array('itemid desc', 'addtime DESC', 'addtime ASC', 'vote DESC', 'vote ASC');
 
 	isset($fields) && isset($dfields[$fields]) or $fields = 0;
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	isset($ip) or $ip = '';
-	$expert = isset($expert) ? intval($expert) : 0;
+	$qid = isset($qid) ? intval($qid) : 0;
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
 	$order_select  = dselect($sorder, 'order', '', $order);
@@ -26,21 +25,12 @@ if(in_array($action, array('', 'check'))) {
 	if($keyword) $condition .= in_array($dfields[$fields], array('qid', 'itemid', 'ip')) ? " AND $dfields[$fields]='$kw'" : " AND $dfields[$fields] LIKE '%$keyword%'";
 	if($qid) $condition .= " AND qid='$qid'";
 	if($ip) $condition .= " AND ip='$ip'";
-	if($expert) $condition .= " AND expert>0";
 }
 switch($action) {
 	case 'edit':
 		$itemid or msg();
 		$do->itemid = $itemid;
 		if($submit) {
-			$content = stripslashes(trim($post['content']));
-			if(!$content) msg('请填写答案');
-			$content = save_local($content);
-			if($MOD['clear_alink']) $content = clear_link($content);
-			if($MOD['save_remotepic']) $content = save_remote($content);
-			$content = dsafe($content);
-			$post['content'] = addslashes($content);
-			clear_upload($content, $itemid, $table_answer);
 			if($do->pass($post)) {
 				$do->edit($post);
 				dmsg('修改成功', $forward);

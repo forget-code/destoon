@@ -1,5 +1,5 @@
 <?php
-$moduleid = 10;
+require 'config.inc.php';
 require '../common.inc.php';
 require DT_ROOT.'/module/'.$module.'/faq.inc.php';
 ?>

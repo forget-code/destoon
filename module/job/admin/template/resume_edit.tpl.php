@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -9,7 +9,8 @@ show_menu($menus);
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="itemid" value="<?php echo $itemid;?>"/>
 <input type="hidden" name="forward" value="<?php echo $forward;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt"><?php echo $tname;?></div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_red">*</span> 简历名称</td>
 <td><input name="post[title]" type="text" id="title" size="60" value="<?php echo $title;?>"/> <?php echo level_select('post[level]', '级别', $level);?> <?php echo dstyle('post[style]', $style);?> <br/><span id="dtitle" class="f_red"></span></td>
@@ -18,7 +19,7 @@ show_menu($menus);
 
 <tr>
 <td class="tl"><span class="f_red">*</span> 行业/职位</td>
-<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '选择分类', $catid, $moduleid);?> <a href="javascript:schcate(<?php echo $moduleid;?>);" class="t">搜索分类</a> <span id="dcatid" class="f_red"></span></td>
+<td><div id="catesch"></div><?php echo ajax_category_select('post[catid]', '', $catid, $moduleid, 'size="2" style="height:120px;width:180px;"');?><br/><input type="button" value="搜索分类" onclick="schcate(<?php echo $moduleid;?>);" class="btn"/> <span id="dcatid" class="f_red"></span></td>
 </tr>
 
 <tr>
@@ -162,7 +163,7 @@ foreach($TYPE as $k=>$v) {
 <tr>
 <td class="tl"><span class="f_red">*</span> 自我鉴定</td>
 <td><textarea name="post[content]" id="content" class="dsn"><?php echo $content;?></textarea>
-<?php echo deditor($moduleid, 'content', $MOD['editor'], '100%', 350);?><br/><span id="dcontent" class="f_red"></span>
+<?php echo deditor($moduleid, 'content', $MOD['editor'], '98%', 350);?><span id="dcontent" class="f_red"></span>
 </td>
 </tr>
 
@@ -180,30 +181,30 @@ foreach($TYPE as $k=>$v) {
 </tr>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 联系地址</td>
-<td><input name="post[address]" id="address" type="text" size="60" value="<?php echo $address;?>"/></td>
+<td><input name="post[address]" type="text" size="60" value="<?php echo $address;?>"/></td>
 </tr>
 <?php if($DT['im_qq']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> QQ</td>
-<td class="tr"><input name="post[qq]" id="qq" type="text" size="30" value="<?php echo $qq;?>"/></td>
-</tr>
-<?php } ?>
-<?php if($DT['im_wx']) { ?>
-<tr>
-<td class="tl"><span class="f_hid">*</span> 微信</td>
-<td class="tr"><input name="post[wx]" id="wx" type="text" size="30" value="<?php echo $wx;?>"/></td>
+<td class="tr"><input name="post[qq]" type="text" size="30" value="<?php echo $qq;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_ali']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> 阿里旺旺</td>
-<td class="tr"><input name="post[ali]" id="ali" type="text" size="30" value="<?php echo $ali;?>"/></td>
+<td class="tr"><input name="post[ali]" type="text" size="30" value="<?php echo $ali;?>"/></td>
+</tr>
+<?php } ?>
+<?php if($DT['im_msn']) { ?>
+<tr>
+<td class="tl"><span class="f_hid">*</span> MSN</td>
+<td class="tr"><input name="post[msn]" type="text" size="30" value="<?php echo $msn;?>"/></td>
 </tr>
 <?php } ?>
 <?php if($DT['im_skype']) { ?>
 <tr>
 <td class="tl"><span class="f_hid">*</span> Skype</td>
-<td class="tr"><input name="post[skype]" id="skype" type="text" size="30" value="<?php echo $skype;?>"/></td>
+<td class="tr"><input name="post[skype]" type="text" size="30" value="<?php echo $skype;?>"/></td>
 </tr>
 <?php } ?>
 <tr>
@@ -247,7 +248,7 @@ foreach($SITUATION as $k=>$v) {
 
 <tr>
 <td class="tl"><span class="f_hid">*</span> 添加时间</td>
-<td><?php echo dcalendar('post[addtime]', $addtime, '-', 1);?></td>
+<td><input type="text" size="22" name="post[addtime]" value="<?php echo $addtime;?>"/></td>
 </tr>
 
 <tr>
@@ -269,20 +270,19 @@ foreach($SITUATION as $k=>$v) {
 <td><?php echo tpl_select('resume', $module, 'post[template]', '默认模板', $template, 'id="template"');?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="<?php echo $action == 'edit' ? '修 改' : '添 加';?>" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="<?php echo $action == 'edit' ? '返 回' : '取 消';?>" class="btn" onclick="Go('?moduleid=<?php echo $moduleid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value=" 确 定 " class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value=" 重 置 " class="btn"/></div>
 </form>
 <?php load('clear.js'); ?>
-<?php load('guest.js'); ?>
 <?php if($action == 'add') { ?>
 <form method="post" action="?">
 <input type="hidden" name="moduleid" value="<?php echo $moduleid;?>"/>
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <div class="tt">单页采编</div>
-<table cellspacing="0" class="tb">
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 目标网址</td>
-<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="Dwidget('?file=fetch', '管理规则');"/></td>
+<td><input name="url" type="text" size="80" value="<?php echo $url;?>"/>&nbsp;&nbsp;<input type="submit" value=" 获 取 " class="btn"/>&nbsp;&nbsp;<input type="button" value=" 管理规则 " class="btn" onclick="window.open('?file=fetch');"/></td>
 </tr>
 </table>
 </form>

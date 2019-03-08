@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 include tpl('header');
 show_menu($menus);
 ?>
@@ -7,7 +7,8 @@ show_menu($menus);
 <input type="hidden" name="file" value="<?php echo $file;?>"/>
 <input type="hidden" name="action" value="<?php echo $action;?>"/>
 <input type="hidden" name="mid" value="<?php echo $mid;?>"/>
-<table cellspacing="0" class="tb">
+<div class="tt">分类添加</div>
+<table cellpadding="2" cellspacing="1" class="tb">
 <tr>
 <td class="tl"><span class="f_hid">*</span> 上级分类</td>
 <td><?php echo category_select('category[parentid]', '请选择', $parentid, $mid);?><?php tips('如果不选择，则为顶级分类');?></td>
@@ -28,14 +29,16 @@ show_menu($menus);
 <td class="tl"><span class="f_hid">*</span> 级别</td>
 <td><input name="category[level]" type="text" size="2" value="1"/><?php tips('0 - 不在首页显示 1 - 正常显示 2 - 首页和上级分类并列显示');?></td>
 </tr>
+
 <tr>
 <td class="tl"><span class="f_hid">*</span> 分类模板</td>
 <td><?php echo tpl_select('list', $MODULE[$mid]['module'], 'category[template]', '默认模板');?></td>
 </tr>
-<tr style="display:<?php echo $MODULE[$mid]['module'] == 'club' ? 'none' : '';?>;">
+<tr>
 <td class="tl"><span class="f_hid">*</span> 内容模板</td>
 <td><?php echo tpl_select('show', $MODULE[$mid]['module'], 'category[show_template]', '默认模板');?></td>
 </tr>
+
 <tr>
 <td class="tl"><span class="f_hid">*</span> Title(SEO标题)</td>
 <td><input name="category[seo_title]" type="text" size="61"></td>
@@ -65,7 +68,7 @@ show_menu($menus);
 <td><?php echo group_checkbox('category[group_add][]');?></td>
 </tr>
 </table>
-<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn-g"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="取 消" class="btn" onclick="Go('?mid=<?php echo $mid;?>&file=<?php echo $file;?>');"/></div>
+<div class="sbt"><input type="submit" name="submit" value="确 定" class="btn"/>&nbsp;&nbsp;&nbsp;&nbsp;<input type="reset" name="reset" value="重 置" class="btn"/></div>
 </form>
 <script type="text/javascript">
 function ckDir() {
@@ -85,10 +88,15 @@ function check() {
 	return true;
 }
 function get_letter(catname) {
-	$.get('?file=<?php echo $file;?>&mid=<?php echo $mid;?>&action=letter&catname='+catname, function(data) {
-		if(Dd('catdir').value == '') Dd('catdir').value = data;
-		if(Dd('letter').value == '') Dd('letter').value = data.substr(0, 1);
-	});
+	makeRequest('file=<?php echo $file;?>&mid=<?php echo $mid;?>&action=letter&catname='+catname, '?', '_get_letter');
+}
+function _get_letter() {
+	if(xmlHttp.readyState==4 && xmlHttp.status==200) {
+		if(xmlHttp.responseText) {
+			if(Dd('catdir').value == '') Dd('catdir').value = xmlHttp.responseText;
+			if(Dd('letter').value == '') Dd('letter').value = xmlHttp.responseText.substr(0,1);
+		}
+	}
 }
 </script>
 <script type="text/javascript">Menuon(0);</script>

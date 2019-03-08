@@ -22,8 +22,9 @@ if($html == 'show') {
 					if(check_pay($mid, $itemid)) {
 						$user_status = 3;
 					} else {
-						$user_status = 2;
-						$pay_url = $MODULE[2]['linkurl'].'pay.php?mid='.$mid.'&itemid='.$itemid;
+						$user_status = 2;						
+						$linkurl = linkurl($MOD['linkurl'].$linkurl, 1);
+						$pay_url = linkurl($MODULE[2]['linkurl'], 1).'pay.php?mid='.$mid.'&itemid='.$itemid.'&fee='.$fee.'&currency='.$currency.'&sign='.crypt_sign($_username.$mid.$itemid.$fee.$currency.$linkurl.$item['title']).'&title='.rawurlencode($item['title']).'&forward='.urlencode($linkurl);
 					}
 				} else {
 					$user_status = 0;
@@ -39,39 +40,19 @@ if($html == 'show') {
 	if($_username && $_username == $item['username']) $user_status = 3;
 	if($inner) {
 		if($user_status == 3) {
-			$UA = strtolower($_SERVER['HTTP_USER_AGENT']);
-			$video_i = (strpos($UA, 'ipad') !== false || strpos($UA, 'ipod') !== false || strpos($UA, 'iphone') !== false || strpos($UA, 'android') !== false) ? 1 : 0;
 			$video_s = $video;
 			$video_w = $width;
 			$video_h = $height;
-			$video_p = 0;
-			$video_e = file_ext($video);
-			$video_d = cutstr($video, '://', '/');
-			$video_s = $video;
-			$video_w = $width;
-			$video_h = $height;
+			$video_p = $player;
+			if(in_array(file_ext($video), array('flv', 'mp4')) && strpos($video, '?') === false) $video_p = -1;
 			$video_a = $MOD['autostart'] ? 'true' : 'false';
-			$video_p = 0;
-			$video_e = file_ext($video);
-			$video_d = cutstr($video, '://', '/');
-			if(in_array($video_e, array('flv', 'mp4'))) {
-				$video_p = 1;
-			} else if(in_array($video_e, array('wma', 'wmv'))) {
-				$video_p = 2;
-			} else if(in_array($video_e, array('rm', 'rmvb', 'ram'))) {
-				$video_p = 3;
-			} else if(in_array($video_d, array('player.youku.com', 'v.qq.com', 'm.iqiyi.com', 'liveshare.huya.com'))) {
-				$video_p = 4;
-			} else if($video_d == 'staticlive.douyucdn.cn') {
-				$video_p = 5;
-			}
 		}
 		$content = strip_nr(ob_template('content', 'chip'), true);
 		echo 'Inner("player", \''.$content.'\');';
 	}
 	$update = '';
-	if(!$DT_BOT) include DT_ROOT.'/include/update.inc.php';
-	if($MOD['hits']) echo 'Inner("hits", \''.$item['hits'].'\');';
+	include DT_ROOT.'/include/update.inc.php';
+	echo 'Inner("hits", \''.$item['hits'].'\');';
 	if($MOD['show_html'] && $task_item && $DT_TIME - @filemtime(DT_ROOT.'/'.$MOD['moduledir'].'/'.$item['linkurl']) > $task_item) tohtml('show', $module);
 } else if($html == 'list') {
 	$catid or exit;
@@ -87,10 +68,7 @@ if($html == 'show') {
 		if($fid >= 1 && $fid <= $totalpage && $DT_TIME - @filemtime(str_replace('{DEMO}', $fid, $demo)) > $task_list) tohtml('list', $module);
 	}
 } else if($html == 'index') {
-	if($DT['cache_hits'] && $MOD['hits']) {
-		$file = DT_CACHE.'/hits-'.$moduleid;
-		if($DT_TIME - @filemtime($file.'.dat') > $DT['cache_hits'] || @filesize($file.'.php') > 102400) update_hits($moduleid, $table);
-	}
+	if($DT['cache_hits'] && $DT_TIME - @filemtime(DT_CACHE.'/hits-'.$moduleid.'.dat') > $DT['cache_hits']) update_hits($moduleid, $table);
 	if($MOD['index_html']) {
 		$file = DT_ROOT.'/'.$MOD['moduledir'].'/'.$DT['index'].'.'.$DT['file_ext'];
 		if($DT_TIME - @filemtime($file) > $task_index) tohtml('index', $module);

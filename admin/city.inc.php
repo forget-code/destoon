@@ -1,9 +1,9 @@
 <?php
 /*
-	[DESTOON B2B System] Copyright (c) 2008-2018 www.destoon.com
+	[Destoon B2B System] Copyright (c) 2008-2011 Destoon.COM
 	This is NOT a freeware, use is subject to license.txt
 */
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('分站添加', '?file='.$file.'&action=edit'),
     array('分站管理', '?file='.$file),
@@ -17,13 +17,12 @@ switch($action) {
 		if($submit) {
 			if(!$post['areaid']) msg('请选择所在地区');
 			if(!$post['name']) msg('分站名不能为空');
-			$post['name'] = trim($post['name']);
-			$post['domain'] = fix_domain($post['domain']);
+			$city['cityname'] = trim($city['cityname']);
 			$do->edit($post);
 			dmsg('更新成功', $forward);
 		} else {
 			if($areaid) {
-				extract($do->get_one());
+				@extract($do->get_one());
 			} else {
 				$areaid = $listorder = 0;
 				$name = $style = $letter = $domain = $iparea = $template = $seo_title = $seo_keywords = $seo_description = '';
@@ -37,7 +36,7 @@ switch($action) {
 			$letter = $do->letter($r['name']);
 			$db->query("UPDATE {$DT_PRE}city SET letter='$letter' WHERE areaid=$r[areaid]");
 		}
-		dmsg('更新成功', $forward);
+		dmsg('更新成功', '?file='.$file);
 	break;
 	case 'delete':
 		if($areaid) $areaids = $areaid;
@@ -61,16 +60,14 @@ switch($action) {
 
 class city {
 	var $areaid;
+	var $db;
 	var $table;
 
-	function __construct($areaid = 0)	{
-		global $city;
-		$this->table = DT_PRE.'city';
-		$this->areaid = $areaid;
-	}
-
 	function city($areaid = 0)	{
-		$this->__construct($areaid);
+		global $db, $city;
+		$this->db = &$db;
+		$this->table = $this->db->pre.'city';
+		$this->areaid = $areaid;
 	}
 
 	function edit($post) {
@@ -82,7 +79,7 @@ class city {
 			$sql2 .= $s."'".$v."'";
 			$s = ',';
 		}
-		DB::query("REPLACE INTO {$this->table} ($sql1) VALUES ($sql2)");		
+		$this->db->query("REPLACE INTO {$this->table} ($sql1) VALUES ($sql2)");		
 		return true;
 	}
 
@@ -91,34 +88,27 @@ class city {
 		$areaid = $post['areaid'];
 		if(!$areaid) return false;
 		$post['letter'] or $post['letter'] = $this->letter($post['name']);
-		$post['name'] = trim($post['name']);
-		$post['domain'] = fix_domain($post['domain']);
 		$sql = '';
 		foreach($post as $k=>$v) {
 			$sql .= ",$k='$v'";
 		}
         $sql = substr($sql, 1);
-	    DB::query("UPDATE {$this->table} SET $sql WHERE areaid=$areaid");	
+	    $this->db->query("UPDATE {$this->table} SET $sql WHERE areaid=$areaid");	
 		return true;
 	}
 	
 	function get_one() {
-        return DB::get_one("SELECT * FROM {$this->table} WHERE areaid=$this->areaid");
+        return $this->db->get_one("SELECT * FROM {$this->table} WHERE areaid=$this->areaid");
 	}
 
 	function get_list($condition) {
-		global $pages, $page, $pagesize, $offset, $pagesize, $sum;
-		if($page > 1 && $sum) {
-			$items = $sum;
-		} else {
-			$r = DB::get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
-			$items = $r['num'];
-		}
-		$pages = pages($items, $page, $pagesize);
+		global $pages, $page, $pagesize, $offset, $pagesize;
+		$r = $this->db->get_one("SELECT COUNT(*) AS num FROM {$this->table} WHERE $condition");
+		$pages = pages($r['num'], $page, $pagesize);
 		$lists = array();
-		$result = DB::query("SELECT * FROM {$this->table} WHERE $condition ORDER BY letter,listorder LIMIT $offset,$pagesize");
-		while($r = DB::fetch_array($result)) {
-			$r['linkurl'] = DT_PATH.'api/city.php?action=go&forward=&areaid='.$r['areaid'];
+		$result = $this->db->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY letter,listorder LIMIT $offset,$pagesize");
+		while($r = $this->db->fetch_array($result)) {
+			$r['linkurl'] = DT_PATH.'city.php?action=go&forward=&areaid='.$r['areaid'];
 			$lists[] = $r;
 		}
 		return $lists;
@@ -126,7 +116,7 @@ class city {
 
 	function delete($areaids) {
 		$areaids = is_array($areaids) ? implode(',', $areaids) : $areaids;
-		DB::query("DELETE FROM {$this->table} WHERE areaid IN ($areaids)");
+		$this->db->query("DELETE FROM {$this->table} WHERE areaid IN ($areaids)");
 		return true;
 	}
 

@@ -1,6 +1,5 @@
 pid,ID,
 item,地址md5值,
-tb,表名称,
 moduleid,模块ID,
 itemid,信息ID,
 fileurl,文件地址,

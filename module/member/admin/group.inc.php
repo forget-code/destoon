@@ -1,5 +1,5 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
+defined('IN_DESTOON') or exit('Access Denied');
 $menus = array (
     array('会员组添加', '?moduleid='.$moduleid.'&file='.$file.'&action=add'),
     array('会员组管理', '?moduleid='.$moduleid.'&file='.$file),
@@ -41,11 +41,9 @@ if($action == 'add') {
 			if($vip < 1) $do->vip = $vip = 1;
 			$setting['fee'] = intval($setting['fee']);
 			if($setting['fee'] < 1) $setting['fee'] = 3000;
-			$setting['reg'] = 0;
 		} else {
 			$do->vip = $vip = $setting['fee'] = 0;
 		}
-		if($groupid == 6) $setting['reg'] = 1;
 		$do->listorder = intval($listorder);
 		$do->edit($setting);
 		dmsg('修改成功', '?moduleid='.$moduleid.'&file='.$file.'&action=edit&groupid='.$groupid);
@@ -88,21 +86,20 @@ class group {
 	var $groupname;
 	var $vip;
 	var $listorder;
+	var $db;
 	var $table;
 
-	function __construct() {
-		$this->table = DT_PRE.'member_group';
-	}
-
 	function group() {
-		$this->__construct();
+		global $db, $DT_PRE;
+		$this->table = $DT_PRE.'member_group';
+		$this->db = &$db;
 	}
 
 	function add($setting) {
 		if(!is_array($setting)) return false;
-		DB::query("INSERT INTO {$this->table} (groupname,vip) VALUES('$this->groupname','$this->vip')");
-		$this->groupid = DB::insert_id();
-		DB::query("UPDATE {$this->table} SET `listorder`=`groupid` WHERE groupid=$this->groupid");
+		$this->db->query("INSERT INTO {$this->table} (groupname,vip) VALUES('$this->groupname','$this->vip')");
+		$this->groupid = $this->db->insert_id();
+		$this->db->query("UPDATE {$this->table} SET `listorder`=`groupid` WHERE groupid=$this->groupid");
 		update_setting('group-'.$this->groupid, $setting);
 		cache_group();
 		return $this->groupid;
@@ -112,7 +109,7 @@ class group {
 		if(!is_array($setting)) return false;
 		update_setting('group-'.$this->groupid, $setting);
 		$setting = addslashes(serialize(dstripslashes($setting)));
-		DB::query("UPDATE {$this->table} SET groupname='$this->groupname',vip='$this->vip',listorder='$this->listorder' WHERE groupid=$this->groupid");
+		$this->db->query("UPDATE {$this->table} SET groupname='$this->groupname',vip='$this->vip',listorder='$this->listorder' WHERE groupid=$this->groupid");
 		cache_group();
 		return true;
 	}
@@ -122,7 +119,7 @@ class group {
 		foreach($listorder as $k=>$v) {
 			$k = intval($k);
 			$v = intval($v);
-			if($v > 6) DB::query("UPDATE {$this->table} SET listorder=$v WHERE groupid=$k");
+			if($v > 6) $this->db->query("UPDATE {$this->table} SET listorder=$v WHERE groupid=$k");
 		}
 		cache_group();
 		return true;
@@ -130,14 +127,14 @@ class group {
 
 	function delete() {
 		if($this->groupid < 5) return false;
-		DB::query("DELETE FROM {$this->table} WHERE groupid=$this->groupid");
+		$this->db->query("DELETE FROM {$this->table} WHERE groupid=$this->groupid");
 		cache_delete('group-'.$this->groupid.'.php');
 		cache_group();
 		return true;
 	}
 
 	function get_one() {
-		$r = DB::get_one("SELECT * FROM {$this->table} WHERE groupid=$this->groupid");
+		$r = $this->db->get_one("SELECT * FROM {$this->table} WHERE groupid=$this->groupid");
 		$tmp = get_setting('group-'.$this->groupid);
 		if($tmp) {
 			foreach($tmp as $k=>$v) {

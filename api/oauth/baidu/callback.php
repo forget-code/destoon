@@ -7,11 +7,19 @@ $par = 'grant_type=authorization_code'
 	 . '&client_id='.BD_ID
 	 . '&client_secret='.BD_SECRET
 	 . '&redirect_uri='.urlencode(BD_CALLBACK);
-$rec = dcurl(BD_TOKEN_URL, $par);
+$cur = curl_init(BD_TOKEN_URL);
+curl_setopt($cur, CURLOPT_POST, 1);
+curl_setopt($cur, CURLOPT_POSTFIELDS, $par);
+curl_setopt($cur, CURLOPT_FOLLOWLOCATION, 1);
+curl_setopt($cur, CURLOPT_HEADER, 0);
+curl_setopt($cur, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt($cur, CURLOPT_RETURNTRANSFER, 1);
+$rec = curl_exec($cur);
+curl_close($cur);
 if(strpos($rec, 'access_token') !== false) {
 	$arr = json_decode($rec, true);
 	$_SESSION['bd_access_token'] = $arr['access_token'];
-	dheader('index.php?time='.$DT_TIME);
+	dheader('./');
 } else {
 	dalert('Error Token.', $MODULE[2]['linkurl'].$DT['file_login'].'?step=token&site='.$site);
 }

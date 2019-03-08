@@ -1,7 +1,7 @@
 <?php
-defined('DT_ADMIN') or exit('Access Denied');
-require DT_ROOT.'/module/'.$module.'/'.$module.'.class.php';
-$do = new $module($moduleid);
+defined('IN_DESTOON') or exit('Access Denied');
+require MD_ROOT.'/job.class.php';
+$do = new job($moduleid);
 $menus = array (
     array('添加招聘', '?moduleid='.$moduleid.'&action=add'),
     array('招聘列表', '?moduleid='.$moduleid),
@@ -13,7 +13,7 @@ $menus = array (
 );
 
 if(in_array($action, array('add', 'edit'))) {
-	$FD = cache_read('fields-'.substr($table, strlen($DT_PRE)).'.php');
+	$FD = cache_read('fields-job.php');
 	if($FD) require DT_ROOT.'/include/fields.func.php';
 	isset($post_fields) or $post_fields = array();
 	$CP = $MOD['cat_property'];
@@ -28,10 +28,10 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	$TYPE[0] = '工作性质';
 	$MARRIAGE[0] = '婚姻状况';
 	$EDUCATION[0] = '学历要求';
-	$sfields = array('模糊', '职位名称', '简介', '招聘部门', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', 'QQ', '微信', '会员名', 'IP');
-	$dfields = array('keyword', 'title', 'introduce', 'department', 'company', 'truename', 'telephone', 'address', 'email', 'qq', 'wx', 'username', 'ip');
-	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '评论数量降序', '评论数量升序', '招聘人数降序', '招聘人数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
-	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'comments DESC', 'comments ASC', 'total DESC', 'total ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
+	$sfields = array('模糊', '职位名称', '简介', '招聘部门', '公司名', '联系人', '联系电话', '联系地址', '电子邮件', '联系MSN', '联系QQ', '会员名', 'IP');
+	$dfields = array('keyword', 'title', 'introduce', 'department', 'company', 'truename', 'telephone', 'address', 'email', 'msn', 'qq','username', 'ip');
+	$sorder  = array('结果排序方式', '更新时间降序', '更新时间升序', '添加时间降序', '添加时间升序', '浏览次数降序', '浏览次数升序', '招聘人数降序', '招聘人数升序', '最低待遇降序', '最低待遇升序', '最高待遇降序', '最高待遇升序', '学历高低降序', '学历高低升序', '信息ID降序', '信息ID升序');
+	$dorder  = array($MOD['order'], 'edittime DESC', 'edittime ASC', 'addtime DESC', 'addtime ASC', 'hits DESC', 'hits ASC', 'total DESC', 'total ASC', 'minsalary DESC', 'minsalary ASC', 'maxalary DESC', 'maxsalary ASC', 'education DESC', 'education ASC', 'itemid DESC', 'itemid ASC');
 
 	$level = isset($level) ? intval($level) : 0;
 	$gender = isset($gender) ? intval($gender) : 0;
@@ -47,9 +47,9 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	isset($order) && isset($dorder[$order]) or $order = 0;
 	
 	isset($datetype) && in_array($datetype, array('edittime', 'addtime', 'totime')) or $datetype = 'edittime';
-	(isset($fromdate) && is_date($fromdate)) or $fromdate = '';
+	$fromdate = isset($fromdate) && preg_match("/^([0-9]{8})$/", $fromdate) ? $fromdate : '';
 	$fromtime = $fromdate ? strtotime($fromdate.' 0:0:0') : 0;
-	(isset($todate) && is_date($todate)) or $todate = '';
+	$todate = isset($todate) && preg_match("/^([0-9]{8})$/", $todate) ? $todate : '';
 	$totime = $todate ? strtotime($todate.' 23:59:59') : 0;
 
 	$areaid = isset($areaid) ? intval($areaid) : 0;
@@ -61,16 +61,16 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 
 
 	$fields_select = dselect($sfields, 'fields', '', $fields);
-	$level_select = level_select('level', '级别', $level, 'all');
+	$level_select = level_select('level', '级别', $level);
 	$order_select  = dselect($sorder, 'order', '', $order);
 
 	$condition = '';
 	if($_childs) $condition .= " AND catid IN (".$_childs.")";//CATE
 	if($_areaids) $condition .= " AND areaid IN (".$_areaids.")";//CITY
 	if($keyword) $condition .= " AND $dfields[$fields] LIKE '%$keyword%'";
-	if($catid) $condition .= ($CAT['child']) ? " AND catid IN (".$CAT['arrchildid'].")" : " AND catid=$catid";
+	if($catid) $condition .= ($CATEGORY[$catid]['child']) ? " AND catid IN (".$CATEGORY[$catid]['arrchildid'].")" : " AND catid=$catid";
 	if($areaid) $condition .= ($AREA[$areaid]['child']) ? " AND areaid IN (".$AREA[$areaid]['arrchildid'].")" : " AND areaid=$areaid";
-	if($level) $condition .= $level > 9 ? " AND level>0" : " AND level=$level";
+	if($level) $condition .= " AND level=$level";
 	if($gender) $condition .= " AND gender=$gender";
 	if($type) $condition .= " AND type=$type";
 	if($marriage) $condition .= " AND marriage=$marriage";
@@ -82,7 +82,7 @@ if(in_array($action, array('', 'check', 'expire', 'reject', 'recycle'))) {
 	if($totime) $condition .= " AND `$datetype`<=$totime";
 	if($minvip)  $condition .= " AND vip>=$minvip";
 	if($maxvip)  $condition .= " AND vip<=$maxvip";
-	if($itemid) $condition .= " AND itemid=$itemid";
+	if($itemid) $condition = " AND itemid=$itemid";
 
 	$timetype = strpos($dorder[$order], 'add') !== false ? 'add' : '';
 }
@@ -95,7 +95,6 @@ switch($action) {
 				$do->add($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				if($MOD['show_html'] && $post['status'] > 2) $do->tohtml($do->itemid);
 				dmsg('添加成功', '?moduleid='.$moduleid.'&action='.$action);
 			} else {
 				msg($do->errmsg);
@@ -111,6 +110,7 @@ switch($action) {
 			$username = $_username;
 			$item = array();
 			$menuid = 0;
+			$tname = $menus[$menuid][0];
 			isset($url) or $url = '';
 			if($url) {
 				$tmp = fetch_url($url);
@@ -126,9 +126,9 @@ switch($action) {
 			if($do->pass($post)) {
 				if($FD) fields_check($post_fields);
 				if($CP) property_check($post_ppt);
+				$do->edit($post);
 				if($FD) fields_update($post_fields, $table, $do->itemid);
 				if($CP) property_update($post_ppt, $moduleid, $post['catid'], $do->itemid);
-				$do->edit($post);
 				dmsg('修改成功', $forward);
 			} else {
 				msg($do->errmsg);
@@ -137,9 +137,10 @@ switch($action) {
 			$item = $do->get_one();
 			extract($item);
 			$addtime = timetodate($addtime);
-			$totime = $totime ? timetodate($totime, 6) : '';
+			$totime = $totime ? timetodate($totime, 3) : '';
 			$menuon = array('5', '4', '2', '1', '3');
 			$menuid = $menuon[$status];
+			$tname = '修改招聘';
 			include tpl($action, $module);
 		}
 	break;
@@ -155,7 +156,7 @@ switch($action) {
 		} else {
 			$itemid = $itemid ? implode(',', $itemid) : '';
 			$menuid = 6;
-			include tpl($action);
+			include tpl($action, $module);
 		}
 	break;
 	case 'update':
@@ -170,7 +171,7 @@ switch($action) {
 		foreach($itemid as $itemid) {
 			tohtml('show', $module);
 		}
-		dmsg('生成成功', $forward);
+		dmsg('更新成功', $forward);
 	break;
 	case 'delete':
 		$itemid or msg('请选择'.$MOD['name']);

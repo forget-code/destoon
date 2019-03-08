@@ -1,5 +1,7 @@
 {template 'header', $template}
-<div class="dsn" id="pos_show"><a href="{$COM[linkurl]}">首页</a> <i>&gt;</i> <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} <i>&gt;</i> {$title}{/if}</div>
+<div class="dsn" id="pos_show">您当前的位置：<a href="{$COM[linkurl]}">首页</a> &raquo; <a href="{$MENU[$menuid][linkurl]}">{$MENU[$menuid][name]}</a>{if $itemid} &raquo; {$title}{/if}</div>
+
+
 {if $itemid}
 <div class="main_head"><div><strong>{$MENU[$menuid][name]}</strong></div></div>
 <div class="main_body">
@@ -36,7 +38,7 @@
 {else}
 <div class="main_head"><div><strong>{$MENU[$menuid][name]}</strong></div></div>
 <div class="main_body">
-	<div class="px14 lh18">
+	<div class="px13 lh18">
 	<table cellpadding="2" cellspacing="2" width="100%" align="center">
 	<tr bgcolor="#F1F1F1">
 	<th width="130" height="25">证书</th>
